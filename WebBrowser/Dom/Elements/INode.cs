@@ -9,6 +9,7 @@ namespace WebBrowser.Dom
 		string InternalId { get; }
 		string Id { get; set; }
 		INode Parent { get; set; }
+		Document OwnerDocument { get; set; }
 		INode CloneNode();
 	}
 

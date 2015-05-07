@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace WebBrowser.Dom
+namespace WebBrowser.Dom.Elements
 {
 	public class Element : Node
 	{

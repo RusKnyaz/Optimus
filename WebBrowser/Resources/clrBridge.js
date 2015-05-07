@@ -43,6 +43,8 @@
 			typeHandlers.splice(handlerIndex, 1);
 		};
 
+		node.dispatchEvent = function(evt) {netElem.DispatchEvent(evt.netEvent);};
+
 		netElem.add_OnEvent(function(netEvent) {
 			var event = wrapEvent(netEvent);
 			var typeHandlers = registeredEventsHandlers[event.type];
@@ -72,7 +74,7 @@
 			Object.defineProperty(this, 'tagName', { get: function () { return netElem.TagName; } });
 			//htmlElement
 			if (netElem.Click) this.click = function () { netElem.Click(); };
-			if (netElem.Value) Object.defineProperty(this, 'value', { get: function () { return netElem.Value; }, set: function (v) { netElem.Value = v; } });
+			if (netElem.get_Value) Object.defineProperty(this, 'value', { get: function () { return netElem.Value; }, set: function (v) { netElem.Value = v; } });
 		}
 
 		//comment
@@ -114,8 +116,10 @@
 
 	function wrapEvent(netEvent) {
 		return {
+			netEvent: netEvent,
 			type: netEvent.Type,
-			Target: wrap(netEvent.Target)
+			Target: wrap(netEvent.Target),
+			initEvent: function (type, b1, b2) { netEvent.InitEvent(type, b1, b2); }
 			//todo: remains properties
 		};
 	}

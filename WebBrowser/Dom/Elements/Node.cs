@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WebBrowser.Dom
+namespace WebBrowser.Dom.Elements
 {
 	public abstract class Node : INode
 	{
+		public Document OwnerDocument { get; set; }
+
 		public INode AppendChild(INode node)
 		{
 			if (node is DocumentFragment)
@@ -19,6 +21,7 @@ namespace WebBrowser.Dom
 			{
 				ChildNodes.Add(node);
 				node.Parent = this;
+				node.OwnerDocument = OwnerDocument;
 			}
 			return node;
 		}
@@ -43,6 +46,7 @@ namespace WebBrowser.Dom
 		{
 			ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
 			newChild.Parent = this;
+			newChild.OwnerDocument = OwnerDocument;
 			return newChild;
 		}
 
@@ -52,6 +56,8 @@ namespace WebBrowser.Dom
 		{
 			InsertBefore(newChild, oldChild);
 			RemoveChild(oldChild);
+			newChild.Parent = this;
+			newChild.OwnerDocument = OwnerDocument;
 			return newChild;
 		}
 
@@ -134,6 +140,14 @@ namespace WebBrowser.Dom
 			throw new NotImplementedException();
 		}
 
+		public void InitEvent(string type, bool canBubble, bool canCancel)
+		{
+			Type = type;
+			Cancellable = canCancel;
+			Bubbles = canBubble;
+		}
+
+		//todo: implement remains properties
 	}
 
 	

@@ -77,8 +77,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceProviders\ResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
+    <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="Tests\DocumentTests.cs" />
-    <Compile Include="Tests\EngineTests.cs" />
+    <Compile Include="EngineExtension.cs" />
+    <Compile Include="Tests\EngineTests\EngineGeneralTests.cs" />
+    <Compile Include="Tests\EngineTests\EngineWithJQueryTests.cs" />
+    <Compile Include="Tests\EngineTests\EngineWithKnockoutTests.cs" />
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
   </ItemGroup>
@@ -98,6 +102,7 @@
     <Content Include="Resources\clrBridge.js" />
     <Content Include="Resources\jquery-2.1.3.js" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,4 +1,6 @@
-﻿namespace WebBrowser.Dom
+﻿using WebBrowser.Dom.Elements;
+
+namespace WebBrowser.Dom
 {
 	public class DocumentFragment : Element
 	{

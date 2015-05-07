@@ -68,7 +68,20 @@ namespace WebBrowser.Dom
 				childNode.Parent = this;
 			}
 
-			DispatchEvent(CreateEvent("DOMContentLoaded"));
+			foreach (var childNode in DocumentElement.Flatten())
+			{
+				childNode.OwnerDocument = this;
+			}
+
+			Trigger("DOMContentLoaded");
+			
+		}
+
+		private void Trigger(string type)
+		{
+			var evt = CreateEvent("Event");
+			evt.InitEvent(type, false, false);
+			DispatchEvent(evt);
 		}
 
 		private void RegisterDelayed(IEnumerable<INode> elements)
@@ -90,7 +103,7 @@ namespace WebBrowser.Dom
 				delayedResource.Load(_resourceProvider);
 			}
 			_unresolvedDelayedResources.Clear();
-			DispatchEvent(CreateEvent("load"));
+			Trigger("load");
 		}
 
 		internal void RunScripts(IScriptExecutor executor)
@@ -149,7 +162,13 @@ namespace WebBrowser.Dom
 
 		public Event CreateEvent(string type)
 		{
-			return new Event(){Type = type};
+			if (type == null) throw new ArgumentNullException("type");
+			if(type == "Event")
+				return new Event();
+
+			//todo: UIEvent
+
+			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
 	}
 }
