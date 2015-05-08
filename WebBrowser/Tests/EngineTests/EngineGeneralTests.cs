@@ -1,11 +1,9 @@
 ﻿#if NUNIT
 using System;
 using NUnit.Framework;
-using WebBrowser.Properties;
-using WebBrowser.ScriptExecuting;
 using Text = WebBrowser.Dom.Text;
 
-namespace WebBrowser.Tests
+namespace WebBrowser.Tests.EngineTests
 {
 	[TestFixture]
 	public class EngineGeneralTests
@@ -38,6 +36,18 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
 			var elem = engine.Document.GetElementById("c3");
 			Assert.IsNotNull(elem);
+		}
+
+		[Test]
+		public void Text()
+		{
+			var engine = new Engine();
+			ScriptExecuting.ScriptExecutor.Log = o => Console.WriteLine(o);
+			engine.Load("<html><head><script>"+
+			@"var c2 = document.getElementById('content1').innerHTML = 'Hello';" +
+				"</script></head><body><span id='content1'></span></body></html>");
+			var elem = engine.Document.GetElementById("content1");
+			Assert.AreEqual("Hello", elem.InnerHtml);
 		}
 	}
 }

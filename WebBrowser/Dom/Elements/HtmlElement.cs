@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WebBrowser.Dom.Elements
+﻿namespace WebBrowser.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/2012/WD-html5-20121025/elements.html#htmlelement

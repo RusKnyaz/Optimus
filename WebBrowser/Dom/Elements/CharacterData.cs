@@ -4,7 +4,7 @@ namespace WebBrowser.Dom
 {
 	public abstract class CharacterData : Node
 	{
-		public string Data;
+		public string Data { get; set; }
 
 		public string NodeValue { get { return Data; } set { Data = value; } }
 

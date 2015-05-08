@@ -26,6 +26,15 @@ namespace WebBrowser.Tests
 			var el = document.CreateElement("div");
 			Assert.AreEqual("div", el.TagName);
 		}
+
+		[Test]
+		public void InputChecked()
+		{
+			var document = new Document(null);
+			document.Write("<html><body><input id='i' type='checkbox' checked='true'></input></body></html>");
+			var el = (HtmlInputElement)document.GetElementById("i");
+			Assert.IsTrue(el.Checked);
+		}
 	}
 }
 #endif

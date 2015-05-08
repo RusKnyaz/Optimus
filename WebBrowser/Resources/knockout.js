@@ -2149,6 +2149,7 @@ ko.exportSymbol('toJSON', ko.toJSON);
                     if ((value === null) || (value === undefined))
                         value = "";
                     element.value = value;
+	                
                     break;
             }
         }
@@ -2983,11 +2984,13 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                 }
 
                 try {
-                    // Run init, ignoring any dependencies
-                    if (typeof handlerInitFn == "function") {
-                        ko.dependencyDetection.ignore(function() {
+                	// Run init, ignoring any dependencies
+	                
+                	if (typeof handlerInitFn == "function") {
+                		ko.dependencyDetection.ignore(function () {
+                			
                             var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
-
+                            
                             // If this binding handler claims to control descendant bindings, make a note of this
                             if (initResult && initResult['controlsDescendantBindings']) {
                                 if (bindingHandlerThatControlsDescendantBindings !== undefined)
@@ -2996,7 +2999,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                             }
                         });
                     }
-
+	                
                     // Run update in its own computed wrapper
                     if (typeof handlerUpdateFn == "function") {
                         ko.dependentObservable(

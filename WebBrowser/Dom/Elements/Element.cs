@@ -121,8 +121,5 @@ namespace WebBrowser.Dom.Elements
 		{
 			return DocumentBuilder.Build(ToString()).Single();
 		}
-
-		
-		
 	}
 }

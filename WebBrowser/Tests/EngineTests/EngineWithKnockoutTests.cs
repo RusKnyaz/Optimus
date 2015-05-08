@@ -1,6 +1,6 @@
 ﻿#if NUNIT
 using System;
-using System.Text;
+using System.Linq;
 using NUnit.Framework;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Properties;
@@ -13,6 +13,12 @@ namespace WebBrowser.Tests.EngineTests
 	[TestFixture]
 	public class EngineWithKnockoutTests
 	{
+		[SetUp]
+		public void SetUp()
+		{
+			ScriptExecutor.Log = o => Console.WriteLine(o.ToString());
+		}
+
 		[Test]
 		public void KnockoutInclude()
 		{
@@ -67,7 +73,8 @@ ko.applyBindings(new VM());
 			Assert.AreEqual("Hello", ((Dom.Text)span.FirstChild).Data);
 			Assert.AreEqual("Hello", span.InnerHtml);
 
-			var evt = engine.Document.CreateEvent("click");
+			var evt = engine.Document.CreateEvent("Event");
+			evt.InitEvent("click", false, false);
 			span.DispatchEvent(evt);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("World", ((Dom.Text)span.FirstChild).Data);
@@ -107,6 +114,33 @@ ko.applyBindings(new VM());";
 			input.EnterText("Lord");
 
 			Assert.AreEqual("Hello, Lord", ((Dom.Text)span.FirstChild).Data);
+		}
+
+		[Test]
+		public void KnockoutInputCheckbox()
+		{
+			var vm =
+@"function VM() {
+	var _this = this;	
+	this.Checked = ko.observable(true);
+	this.Click = function(){_this.Checked(!_this.Checked());};
+}
+ko.applyBindings(new VM());";
+
+			var engine = new Engine();
+			engine.Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>" +
+				"<body>" +
+				"<input type='checkbox' data-bind='checked:Checked' id='in'/>" +
+				"<div id = 'button' data-bind='click:Click'>Click me</div>" +
+				"</body></html>");
+
+			var div = (HtmlElement)engine.Document.Body.GetElementsByTagName("div").First();
+			var checkbox = (HtmlInputElement) engine.Document.Body.GetElementsByTagName("input").First();
+			Assert.IsNotNull(checkbox);
+			Assert.IsNotNull(div);
+			Assert.IsTrue(checkbox.Checked);
+			div.Click();
+			Assert.IsFalse(checkbox.Checked);
 		}
 	}
 }

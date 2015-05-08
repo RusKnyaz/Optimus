@@ -34,13 +34,13 @@ namespace WebBrowser.Html
 				{
 					case HtmlChunkTypes.AttributeName:
 						if(attributeName!=null)
-							elem.Attributes.Add(attributeName, "1");
+							elem.Attributes.Add(attributeName.ToLowerInvariant(), null);
 						attributeName = htmlChunk.Value.ToLower();		
 						break;
 					case HtmlChunkTypes.AttributeValue:
 						if (string.IsNullOrEmpty(attributeName))
 							throw new HtmlParseException("Unexpected attribute value.");
-						elem.Attributes.Add(attributeName, htmlChunk.Value);
+						elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
 						attributeName = null;
 						break;
 					case HtmlChunkTypes.TagStart:

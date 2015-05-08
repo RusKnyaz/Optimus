@@ -4,21 +4,42 @@
 	var netDoc = engine.Document;
 	var wrappers = {};
 
+	function upFirstLetter(string) { return string.charAt(0).toUpperCase() + string.slice(1);}
+
+	function bindProps(target, owner, propsString) {
+		var propsNames = propsString.split(' ');
+		for (var i = 0; i < propsNames.length; i++) {
+			var names = propsNames[i].split(':');
+			var jsPropName = names[0];
+			var netPropName = names[1] || upFirstLetter(jsPropName);
+			
+			var prop = {
+				get: !owner["get_" + netPropName] ? undefined:
+					function (x) { return function () { return owner[x]; }; }(netPropName),
+				set: !owner["set_" + netPropName] ? undefined:
+					function (x) { return function (v) { owner[x] = v; }; }(netPropName)
+			};
+
+			if (prop.get || prop.set)
+				Object.defineProperty(target, jsPropName, prop);
+		}
+	}
+
 	function wrapNode(node, netElem) {
+		//funcs
 		node.hasAttributes = function () { return netElem.HasAttributes(); };
 		node.removeChild = function (x) { return wrap(netElem.RemoveChild(x.netElem)); };
 		node.insertBefore = function (newNode, refNode) { return wrap(netElem.InsertBefore(newNode.netElem, refNode.netElem)); };
 		node.replaceChild = function (newNode, oldNode) { return wrap(netElem.ReplaceChild(newNode.netElem, oldNode.netElem)); };
 		node.cloneNode = function () { return wrap(netElem.CloneNode()); };
-		Object.defineProperty(node, 'nodeType', { get: function () { return netElem.NodeType; } });
+		//props
+		bindProps(node, netElem, "hasChildNodes nodeType nodeName nodeValue");
 		Object.defineProperty(node, 'nextSibling', { get: function () { return wrap(netElem.NextSibling); } });
 		Object.defineProperty(node, 'previousSibling', { get: function () { return wrap(netElem.PreviousSibling); } });
 		Object.defineProperty(node, 'childNodes', { get: function () { return wrapArray(netElem.ChildNodes.ToArray()); } });
 		Object.defineProperty(node, 'firstChild', { get: function () { return wrap(netElem.FirstChild); } });
 		Object.defineProperty(node, 'lastChild', { get: function () { return wrap(netElem.LastChild); } });
 		Object.defineProperty(node, 'parentNode', { get: function () { return wrap(netElem.Parent); } });
-		Object.defineProperty(node, 'nodeName', { get: function () { return netElem.NodeName; } });
-		Object.defineProperty(node, 'nodeValue', { get: function () { return netElem.NodeValue; }, set: function (v) { netElem.NodeValue = v; } });
 		
 		//events
 		var registeredEventsHandlers = [];
@@ -56,11 +77,10 @@
 			}
 		});
 	}
-
+	
 	function documentElement(netElem) {
 		this.netElem = netElem;
-		Object.defineProperty(this, 'innerHTML', { get: function () { return netElem.InnerHtml; }, set: function (v) { netElem.InnerHtml = v; } });
-
+		
 		this.ownerDocument = _this;
 		this.appendChild = function (node) { return wrap(netElem.AppendChild(node.netElem)); };
 		this.getElementsByTagName = function (tagName) { return wrapArray(netElem.GetElementsByTagName(tagName)); };
@@ -71,28 +91,25 @@
 		//node
 		wrapNode(this, netElem);
 		if (this.nodeType === 1) {
-			Object.defineProperty(this, 'tagName', { get: function () { return netElem.TagName; } });
-			//htmlElement
-			if (netElem.Click) this.click = function () { netElem.Click(); };
-			if (netElem.get_Value) Object.defineProperty(this, 'value', { get: function () { return netElem.Value; }, set: function (v) { netElem.Value = v; } });
-		}
+			//Element
+			bindProps(this, netElem, "innerHTML:InnerHtml tagName");
 
-		//comment
-		Object.defineProperty(this, 'text', { get: function () { return netElem.Text; } });
-		Object.defineProperty(this, 'hasChildNodes', { get: function () { return netElem.HasChildNodes; } });
-		Object.defineProperty(this, 'data', { get: function () { return netElem.Data; }, set: function (v) { netElem.Data = v; } });
+			//htmlElement
+			if (netElem.Click) this.click = function() { netElem.Click(); };
+			bindProps(this, netElem, "hidden");
+
+			//HtmlInputElement
+			bindProps(this, netElem, "value disabled required readonly type checked");
+		} else {
+			//comment
+			bindProps(this,
+				netElem, "text data");
+		}
 	}
 
 	function wrap(netElem) {
-		if (!netElem)
-			return netElem;
-		var wrapElem = wrappers[netElem.InternalId];
-		if (wrapElem)
-			return wrapElem;
-
-		wrapElem = new documentElement(netElem);
-		wrappers[netElem.InternalId] = wrapElem;
-		return wrapElem;
+		return !netElem ? null :
+			wrappers[netElem.InternalId] || (wrappers[netElem.InternalId] = new documentElement(netElem));
 	}
 
 	function wrapArray(netElems) {

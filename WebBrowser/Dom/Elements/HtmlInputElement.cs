@@ -12,5 +12,6 @@
 		public string Type { get; set; }
 		public bool Readonly { get; set; }
 		public bool Required { get; set; }
+		public bool Checked { get; set; }
 	}
 }

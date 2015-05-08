@@ -57,16 +57,23 @@ namespace WebBrowser.Dom
 				elem = new HtmlInputElement
 				{
 					Type = htmlElement.Attributes.ContainsKey("type") ? htmlElement.Attributes["type"] : "text",
-					Value = htmlElement.Attributes.ContainsKey("value") ? htmlElement.Attributes["value"] : null
+					Value = htmlElement.Attributes.ContainsKey("value") ? htmlElement.Attributes["value"] : null,
+					Checked = htmlElement.Attributes.ContainsKey("checked") && htmlElement.Attributes["checked"] == "true"
 				};
 			}
-			else if (htmlElement.Name == "span")
+			else if (htmlElement.Name == "span" || htmlElement.Name == "div")
 			{
-				elem = new HtmlElement("span");
+				elem = new HtmlElement(htmlElement.Name);
 			}
 			else
 			{
 				elem = new Element(htmlElement.Name) { Id = id };	
+			}
+
+			if (elem is HtmlElement)
+			{
+				var hElem = elem as HtmlElement;
+				hElem.Hidden = htmlElement.Attributes.ContainsKey("hidden") && htmlElement.Attributes["hidden"] == "true";
 			}
 
 			elem.Id = id;
