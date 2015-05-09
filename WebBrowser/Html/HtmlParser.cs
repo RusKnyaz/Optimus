@@ -49,7 +49,9 @@ namespace WebBrowser.Html
 					case HtmlChunkTypes.TagEnd:
 						return true;
 					case HtmlChunkTypes.Text:
-						elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
+						if(htmlChunk.Value.Replace("\r","").Replace("\n","").Replace("\t", "") != string.Empty)
+							elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
+						//todo: what we should do with whitespaces?
 						break;
 					case HtmlChunkTypes.Comment:
 						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });

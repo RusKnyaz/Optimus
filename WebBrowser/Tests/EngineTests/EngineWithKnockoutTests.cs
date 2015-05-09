@@ -140,6 +140,42 @@ ko.applyBindings(new VM());";
 		}
 
 		[Test]
+		public void ForeachBinding()
+		{
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+@"<script>
+function VM(peoples) {
+	var _this = this;	
+	this.Peoples = ko.observableArray(peoples);
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
+</script>
+</head>
+<body>
+	<!-- ko foreach: Peoples -->
+		<span data-bind='text:Name'></span>
+	<!-- /ko -->
+	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
+</body>
+</html>");
+
+			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();
+			var spans = doc.Body.GetElementsByTagName("span").ToArray();
+			Assert.AreEqual(2, spans.Length);
+			Assert.AreEqual("Ivan", spans[0].InnerHtml);
+			Assert.AreEqual("Vasil", spans[1].InnerHtml);
+
+			button.Click();
+
+			var newSpans = doc.Body.GetElementsByTagName("span").ToArray();
+			Assert.AreEqual(3, newSpans.Length);
+			Assert.AreEqual("Ivan", newSpans[0].InnerHtml);
+			Assert.AreEqual("Vasil", newSpans[1].InnerHtml);
+			Assert.AreEqual("Neo", newSpans[2].InnerHtml);
+		}
+
+		[Test]
 		public void TemplateInsideForeachBinding()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +

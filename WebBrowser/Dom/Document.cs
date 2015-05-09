@@ -128,10 +128,14 @@ namespace WebBrowser.Dom
 					throw new ArgumentOutOfRangeException("tagName");
 
 				var html = tagName.Insert(tagName.Length - 1, "/");
-				return DocumentBuilder.Build(html).Single() as Element;
+				var elem = DocumentBuilder.Build(html).Single() as Element;
+				if (elem == null)
+					return null;
+				elem.OwnerDocument = this;
+				return elem;
 			}
 			
-			return new Element(tagName);
+			return new Element(tagName) { OwnerDocument = this};
 		}
 
 		public Element GetElementById(string id)

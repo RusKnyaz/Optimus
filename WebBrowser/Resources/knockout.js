@@ -282,6 +282,7 @@ ko.utils = (function () {
         },
 
         replaceDomNodes: function (nodeToReplaceOrNodeArray, newNodesArray) {
+	        console.log("replaceDomNodes");
             var nodesToReplaceArray = nodeToReplaceOrNodeArray.nodeType ? [nodeToReplaceOrNodeArray] : nodeToReplaceOrNodeArray;
             if (nodesToReplaceArray.length > 0) {
                 var insertionPoint = nodesToReplaceArray[0];
@@ -3338,7 +3339,8 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
     }
 
     function resolveTemplate(errorCallback, templateConfig, callback) {
-        if (typeof templateConfig === 'string') {
+    	if (typeof templateConfig === 'string') {
+			
             // Markup - parse it
             callback(ko.utils.parseHtmlFragment(templateConfig));
         } else if (templateConfig instanceof Array) {
@@ -4621,6 +4623,7 @@ ko.templateEngine.prototype['makeTemplateSource'] = function(template, templateD
 };
 
 ko.templateEngine.prototype['renderTemplate'] = function (template, bindingContext, options, templateDocument) {
+	console.log('renderTemplate');
     var templateSource = this['makeTemplateSource'](template, templateDocument);
     return this['renderTemplateSource'](templateSource, bindingContext, options, templateDocument);
 };
@@ -4881,6 +4884,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
     }
 
     function executeTemplate(targetNodeOrNodeArray, renderMode, template, bindingContext, options) {
+	    console.log("executeTemplate");
         options = options || {};
         var firstTargetNode = targetNodeOrNodeArray && getFirstNodeFromPossibleArray(targetNodeOrNodeArray);
         var templateDocument = (firstTargetNode || template || {}).ownerDocument;
@@ -4972,6 +4976,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         // Since setDomNodeChildrenFromArrayMapping always calls executeTemplateForArrayItem and then
         // activateBindingsCallback for added items, we can store the binding context in the former to use in the latter.
         var arrayItemContext;
+	    console.log('renderTemplateForEach');
 
         // This will be called by setDomNodeChildrenFromArrayMapping to get the nodes to add to targetNode
         var executeTemplateForArrayItem = function (arrayValue, index) {
@@ -4981,6 +4986,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
             });
 
             var templateName = resolveTemplateName(template, arrayValue, arrayItemContext);
+            console.log('templateName: ' + (templateName || 'no'));
             return executeTemplate(null, "ignoreTargetNode", templateName, arrayItemContext, options);
         }
 
@@ -5071,7 +5077,8 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
 
             if ('foreach' in options) {
                 // Render once for each data point (treating data set as empty if shouldDisplay==false)
-                var dataArray = (shouldDisplay && options['foreach']) || [];
+            	var dataArray = (shouldDisplay && options['foreach']) || [];
+	            console.log('foreach');
                 templateComputed = ko.renderTemplateForEach(templateName || element, dataArray, options, element, bindingContext);
             } else if (!shouldDisplay) {
                 ko.virtualElements.emptyNode(element);
@@ -5083,6 +5090,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
                 templateComputed = ko.renderTemplate(templateName || element, innerBindingContext, options, element);
             }
 
+	        console.log('templateComputed: ' + (templateComputed? "t" : "f"));
             // It only makes sense to have a single template computed per element (otherwise which one should have its output displayed?)
             disposeOldComputedAndStoreNewOne(element, templateComputed);
         }
@@ -5378,6 +5386,7 @@ ko.nativeTemplateEngine.prototype['renderTemplateSource'] = function (templateSo
         templateNodes = templateNodesFunc ? templateSource['nodes']() : null;
 
     if (templateNodes) {
+    	console.log("renderTemplateSource cloneNode " + templateNodes.innerHTML);
         return ko.utils.makeArray(templateNodes.cloneNode(true).childNodes);
     } else {
         var templateText = templateSource['text']();

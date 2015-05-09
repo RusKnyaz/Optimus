@@ -44,6 +44,22 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(1, document.Body.ChildNodes.Count);
 			Assert.IsInstanceOf<Comment>(document.Body.ChildNodes[0]);
 		}
+
+		[Test]
+		public void RemoveNodeFromParrentWhenAppendToOtherNode()
+		{
+			var document = new Document(null);
+			document.Write("<html><body><div id='p1'><span id='s'></span></div><div id='p2'></div></body></html");
+			var div1 = document.GetElementById("p1");
+			var div2 = document.GetElementById("p2");
+			var span = document.GetElementById("s");
+
+			Assert.AreEqual(1, div1.ChildNodes.Count);
+			Assert.AreEqual(0, div2.ChildNodes.Count);
+			div2.AppendChild(span); 
+			Assert.AreEqual(0, div1.ChildNodes.Count);
+			Assert.AreEqual(1, div2.ChildNodes.Count);
+		}
 	}
 }
 #endif

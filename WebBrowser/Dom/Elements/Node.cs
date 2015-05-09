@@ -6,7 +6,20 @@ namespace WebBrowser.Dom.Elements
 {
 	public abstract class Node : INode
 	{
-		public Document OwnerDocument { get; set; }
+		private Document _ownerDocument;
+
+		public Document OwnerDocument
+		{
+			get { return _ownerDocument; }
+			set
+			{
+				_ownerDocument = value;
+				foreach (var childNode in ChildNodes)
+				{
+					childNode.OwnerDocument = value;
+				}
+			}
+		}
 
 		public INode AppendChild(INode node)
 		{
@@ -19,6 +32,8 @@ namespace WebBrowser.Dom.Elements
 			}
 			else
 			{
+				if(node.Parent != null)
+					node.Parent.ChildNodes.Remove(node);
 				ChildNodes.Add(node);
 				node.Parent = this;
 				node.OwnerDocument = OwnerDocument;
