@@ -9,22 +9,20 @@ namespace WebBrowser.Html
 		{
 			using(var enumerator = HtmlReader.Read(stream).GetEnumerator())
 			{
-				while(enumerator.MoveNext())
-				{
-					var htmlChunk = enumerator.Current;
-					if (htmlChunk.Type == HtmlChunkTypes.TagStart)
-						yield return BuildElement(htmlChunk, enumerator);
+				var rootElem = new HtmlElement();
 
-					if(htmlChunk.Type == HtmlChunkTypes.Text)
-						yield return new HtmlText(){Value = htmlChunk.Value};
-				}
+				var moreExist = true;
+				do
+				{
+					moreExist = ParseElement(rootElem, enumerator);
+				} while (moreExist);
+
+				return rootElem.Children;
 			}
 		}
 
-		private static IHtmlElement BuildElement(HtmlChunk tagStart, IEnumerator<HtmlChunk> enumerator)
+		private static bool ParseElement(HtmlElement elem, IEnumerator<HtmlChunk> enumerator)
 		{
-			var elem = new HtmlElement() { Name = tagStart.Value.ToLower() };
-
 			string attributeName = null;
 
 			while(enumerator.MoveNext())
@@ -44,18 +42,27 @@ namespace WebBrowser.Html
 						attributeName = null;
 						break;
 					case HtmlChunkTypes.TagStart:
-						elem.Children.Add(BuildElement(htmlChunk, enumerator));
+						var childElem = new HtmlElement() {Name = htmlChunk.Value.ToLower()};
+						ParseElement(childElem, enumerator);
+						elem.Children.Add(childElem);
 						break;
 					case HtmlChunkTypes.TagEnd:
-						return elem;
+						return true;
 					case HtmlChunkTypes.Text:
 						elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
 						break;
+					case HtmlChunkTypes.Comment:
+						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });
+						break;
 				}
 			}
-
-			return elem;
+			return false;
 		}
+	}
+
+	internal class HtmlComment : IHtmlNode
+	{
+		public string Text;
 	}
 
 	internal class HtmlElement : IHtmlElement

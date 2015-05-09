@@ -13,7 +13,7 @@ namespace WebBrowser.Tests.Html
 	[TestFixture]
 	public class HtmlParserTests
 	{
-		IEnumerable<IHtmlNode> Parse(string str)
+		private IEnumerable<IHtmlNode> Parse(string str)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(str)))
 			{
@@ -27,7 +27,7 @@ namespace WebBrowser.Tests.Html
 			var elem = Parse("<p id='8'>Text</p>").Cast<IHtmlElement>().Single();
 
 			Assert.AreEqual("p", elem.Name);
-			Assert.AreEqual("Text", ((IHtmlText)elem.Children.Single()).Value);
+			Assert.AreEqual("Text", ((IHtmlText) elem.Children.Single()).Value);
 			Assert.AreEqual(1, elem.Attributes.Count);
 		}
 
@@ -35,14 +35,15 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<script>var html = '<div></div>';</script>", "var html = '<div></div>';")]
 		[TestCase("<script>var html = '<div>';</script>", "var html = '<div>';")]
 		[TestCase("<script>var html = '<div />';</script>", "var html = '<div />';")]
-		[TestCase("<script>var html = '<script>console.log(1);</script>';</script>", "var html = '<script>console.log(1);</script>';")]
+		[TestCase("<script>var html = '<script>console.log(1);</script>';</script>",
+			"var html = '<script>console.log(1);</script>';")]
 		//todo: escaped chars
 		public void EmbeddedScript(string html, string scriptText)
 		{
 			var elem = Parse(html).Cast<IHtmlElement>().Single();
 
 			Assert.AreEqual("script", elem.Name);
-			Assert.AreEqual(scriptText, ((IHtmlText)elem.Children.Single()).Value);
+			Assert.AreEqual(scriptText, ((IHtmlText) elem.Children.Single()).Value);
 			Assert.AreEqual(0, elem.Attributes.Count);
 		}
 
@@ -53,7 +54,34 @@ namespace WebBrowser.Tests.Html
 
 			Assert.AreEqual(1, elems.Length);
 			var elem = elems[0];
-			Assert.AreEqual("Hello", ((IHtmlText)elem).Value);
+			Assert.AreEqual("Hello", ((IHtmlText) elem).Value);
+		}
+
+		[Test]
+		public void Comment()
+		{
+			var elems = Parse("<!-- Hello -->").ToArray();
+			Assert.AreEqual(1, elems.Length);
+			Assert.IsInstanceOf<HtmlComment>(elems[0]);
+		}
+
+		[Test]
+		public void CommentInDiv()
+		{
+			var elems = Parse("<div><!-- Hello --></div>").ToArray();
+			var elem = elems[0] as HtmlElement;
+			Assert.IsNotNull(elem);
+			Assert.AreEqual(1, elem.Children.Count);
+			Assert.IsInstanceOf<HtmlComment>(elem.Children[0]);
+		}
+
+		[Test]
+		public void CommentFollowedByDiv()
+		{
+			var elems = Parse("<!-- Hello --><div></div>").ToArray();
+			Assert.AreEqual(2, elems.Length);
+			Assert.IsInstanceOf<HtmlComment>(elems[0]);
+			Assert.IsInstanceOf<HtmlElement>(elems[1]);
 		}
 	}
 }

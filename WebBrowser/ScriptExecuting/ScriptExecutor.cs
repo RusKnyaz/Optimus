@@ -16,7 +16,7 @@ namespace WebBrowser.ScriptExecuting
 			_engine = engine;
 			_jsEngine = new Jint.Engine()
 				.SetValue(_scopeEmbeddingObjectName, new {_engine.Document})
-				.SetValue("console", new{log = (Action<object>)OnLog});
+				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
 
 			InitializeScope();
 		}
@@ -40,16 +40,6 @@ namespace WebBrowser.ScriptExecuting
 		private void InitializeScope()
 		{
 			_jsEngine.Execute(Resources.clrBridge);
-		}
-
-
-		//todo: remove. it's for testing
-		public static Action<object> Log;
-
-		private static void OnLog(object obj)
-		{
-			if (Log != null)
-				Log(obj);
 		}
 	}
 }

@@ -111,7 +111,7 @@ namespace WebBrowser.Dom
 			//todo: what we should do if some script changes ChildNodes?
 			foreach (var documentElement in ChildNodes.SelectMany(x => x.Flatten()).OfType<IScript>().ToArray())
 			{
-				executor.Execute(documentElement.Type, documentElement.Code);
+				executor.Execute(documentElement.Type, documentElement.Text);
 			}
 		}
 

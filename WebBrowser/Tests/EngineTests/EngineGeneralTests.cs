@@ -42,7 +42,7 @@ namespace WebBrowser.Tests.EngineTests
 		public void Text()
 		{
 			var engine = new Engine();
-			ScriptExecuting.ScriptExecutor.Log = o => Console.WriteLine(o);
+			engine.Console.OnLog += System.Console.WriteLine;
 			engine.Load("<html><head><script>"+
 			@"var c2 = document.getElementById('content1').innerHTML = 'Hello';" +
 				"</script></head><body><span id='content1'></span></body></html>");

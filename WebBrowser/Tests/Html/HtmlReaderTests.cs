@@ -41,6 +41,10 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<script>for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];</script>", "TagStart:script, Text:for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];, TagEnd:script")]
 		[TestCase("<script>var a = x > 5;</script>", "TagStart:script, Text:var a = x > 5;, TagEnd:script")]
 		[TestCase("<!-- [opa <i>aa</i>] -->", "Comment: [opa <i>aa</i>] ", Description = "Comment with tags inside")]
+		[TestCase("<!-- ko foreach: Peoples --><div data-bind='template:\"itemTemplate\"'/><!-- /ko -->", "Comment, TagStart, AttributeName, AttributeValue, TagEnd, Comment")]
+		[TestCase("<script><div></div></script>", "TagStart:script, Text:<div></div>, TagEnd:script")]
+		[TestCase("<script><div></div></script><script>alert('a');</script>", "TagStart:script, Text:<div></div>, TagEnd:script, TagStart:script, Text:alert('a');, TagEnd:script")]
+		[TestCase("<script type='text/html'><div></div></script>", "TagStart:script, AttributeName:type, AttributeValue:text/html, Text:<div></div>, TagEnd:script")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{
 			var expectedChunkTypes =

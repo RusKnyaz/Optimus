@@ -5,24 +5,24 @@ namespace WebBrowser.Dom.Elements
 {
 	public interface IScript : INode
 	{
-		string Code { get; }
+		string Text { get; }
 		string Type { get; }
 	}
 
 	public class EmbeddedScript : Element, IScript
 	{
-		public EmbeddedScript(string type, string code) : base("script")
+		public EmbeddedScript(string type, string text) : base("script")
 		{
 			Type = type;
-			Code = code;
+			Text = text;
 		}
 
-		public string Code { get; private set; }
+		public string Text { get; private set; }
 		public string Type { get; private set; }
 
 		public override INode CloneNode()
 		{
-			return new EmbeddedScript(Type, Code);
+			return new EmbeddedScript(Type, Text);
 		}
 	}
 
@@ -37,14 +37,14 @@ namespace WebBrowser.Dom.Elements
 			Type = type;
 		}
 
-		public string Code { get; private set; }
+		public string Text { get; private set; }
 		public string Type { get; private set; }
 		public void Load(IResourceProvider resourceProvider)
 		{
 			var resource = resourceProvider.GetResource(new Uri(_url));
 			using (var reader = new StreamReader(resource.Stream))
 			{
-				Code = reader.ReadToEnd();
+				Text = reader.ReadToEnd();
 			}
 		}
 

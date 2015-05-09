@@ -31,11 +31,13 @@ namespace WebBrowser.Dom
 
 		private static INode BuildElem(IHtmlNode htmlNode)
 		{
+			var comment = htmlNode as HtmlComment;
+			if (comment != null)
+				return new Comment { Data = comment.Text };
+			
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
-			{
 				return new Text(){Data = txt.Value};
-			}
 
 			var htmlElement = htmlNode as IHtmlElement;
 			if (htmlElement == null)
@@ -115,4 +117,5 @@ namespace WebBrowser.Dom
 		}
 	}
 
+	
 }

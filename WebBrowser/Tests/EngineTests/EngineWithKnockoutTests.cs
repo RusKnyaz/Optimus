@@ -1,10 +1,9 @@
 ﻿#if NUNIT
-using System;
 using System.Linq;
 using NUnit.Framework;
+using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Properties;
-using WebBrowser.ScriptExecuting;
 using WebBrowser.TestingTools;
 using Text = WebBrowser.Dom.Text;
 
@@ -13,17 +12,19 @@ namespace WebBrowser.Tests.EngineTests
 	[TestFixture]
 	public class EngineWithKnockoutTests
 	{
-		[SetUp]
-		public void SetUp()
+		
+		Document Load(string html)
 		{
-			ScriptExecutor.Log = o => Console.WriteLine(o.ToString());
+			var engine = new Engine();
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load(html);
+			return engine.Document;
 		}
 
 		[Test]
 		public void KnockoutInclude()
 		{
-			var engine = new Engine();
-			engine.Load("<html><head><script> " + Resources.knockout + " </script></head><body></body></html>");
+			Load("<html><head><script> " + Resources.knockout + " </script></head><body></body></html>");
 		}
 
 		[Test]
@@ -36,12 +37,10 @@ namespace WebBrowser.Tests.EngineTests
 ko.applyBindings(new VM());
 ";
 
-			var engine = new Engine();
-			engine.Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting'/></body></html>");
+			var document = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting'/></body></html>");
 
-			var span = engine.Document.GetElementById("c1");
+			var span = document.GetElementById("c1");
 			Assert.IsNotNull(span);
-			Console.Write(engine.Document.DocumentElement.InnerHtml);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Dom.Text)span.FirstChild).Data);
 			Assert.AreEqual("Hello", span.InnerHtml);
@@ -64,16 +63,15 @@ ko.applyBindings(new VM());
 ko.applyBindings(new VM());
 ";
 
-			var engine = new Engine();
-			engine.Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body></html>");
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body></html>");
 
-			var span = (HtmlElement)engine.Document.GetElementById("c1");
+			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Dom.Text)span.FirstChild).Data);
 			Assert.AreEqual("Hello", span.InnerHtml);
 
-			var evt = engine.Document.CreateEvent("Event");
+			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", false, false);
 			span.DispatchEvent(evt);
 			Assert.AreEqual(1, span.ChildNodes.Count);
@@ -97,19 +95,18 @@ ko.applyBindings(new VM());
 }
 ko.applyBindings(new VM());";
 
-			var engine = new Engine();
-			engine.Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>"+
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>"+
 				"<body>" +
 				"<input type='text' data-bind='value:Name' id='in'/>" +
 				"<span id = 'c1' data-bind='text:Greeting'/>" +
 				"</body></html>");
 
-			var span = (HtmlElement)engine.Document.GetElementById("c1");
+			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello, World", ((Dom.Text)span.FirstChild).Data);
 
-			var input = (HtmlInputElement) engine.Document.GetElementById("in");
+			var input = (HtmlInputElement) doc.GetElementById("in");
 
 			input.EnterText("Lord");
 
@@ -127,20 +124,54 @@ ko.applyBindings(new VM());";
 }
 ko.applyBindings(new VM());";
 
-			var engine = new Engine();
-			engine.Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>" +
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>" +
 				"<body>" +
 				"<input type='checkbox' data-bind='checked:Checked' id='in'/>" +
 				"<div id = 'button' data-bind='click:Click'>Click me</div>" +
 				"</body></html>");
 
-			var div = (HtmlElement)engine.Document.Body.GetElementsByTagName("div").First();
-			var checkbox = (HtmlInputElement) engine.Document.Body.GetElementsByTagName("input").First();
+			var div = (HtmlElement)doc.Body.GetElementsByTagName("div").First();
+			var checkbox = (HtmlInputElement) doc.Body.GetElementsByTagName("input").First();
 			Assert.IsNotNull(checkbox);
 			Assert.IsNotNull(div);
 			Assert.IsTrue(checkbox.Checked);
 			div.Click();
 			Assert.IsFalse(checkbox.Checked);
+		}
+
+		[Test]
+		public void TemplateInsideForeachBinding()
+		{
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+@"<script>
+function VM(peoples) {
+	var _this = this;	
+	this.Peoples = ko.observableArray(peoples);
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
+</script>
+<script type='text/html' id='itemTemplate'>
+	<span>kkk</span>
+</script>
+</head>
+<body>
+	<!-- ko foreach: Peoples -->
+		<div data-bind='template:""itemTemplate""'></div>
+	<!-- /ko -->
+	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
+</body>
+</html>");
+
+			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();
+			var divs = doc.Body.GetElementsByTagName("div").ToArray();
+			Assert.AreEqual(2, divs.Length);
+
+			button.Click();
+
+			var newDivs = doc.Body.GetElementsByTagName("div").ToArray();
+			Assert.AreEqual(3, newDivs.Length);
+
 		}
 	}
 }

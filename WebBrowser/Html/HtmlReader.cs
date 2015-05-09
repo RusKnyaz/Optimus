@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace WebBrowser.Html
 {
@@ -34,8 +35,6 @@ namespace WebBrowser.Html
 			WaitAttributeValue,
 			ReadSpecTag,
 			ReadDocType,
-			ReadScript,
-			ReadScriptQuotation
 		}
 
 		enum ReadScriptStates
@@ -72,16 +71,35 @@ namespace WebBrowser.Html
 							}
 							else if (symbol == '<')
 							{
-								var next = reader.Read();
-								if (((char) next) == '/')
+								var end = "/script>";
+								var tmp = new char[end.Length];
+								var i = 0;
+								for (; i < end.Length; i++)
 								{
-									code = -1;
+									code = reader.Read();
+
+									if (code > 0)
+									{
+										tmp[i] = (char) code;
+									}
+									else
+									{
+										break;
+									}
+
+									if (((char) code).ToString().ToLower()[0] != end[i])
+										break;
 								}
+
+								if (i == end.Length)
+									code = -1;
 								else
 								{
 									buffer.Add(symbol);
-									symbol = (char) next;
+									buffer.AddRange(tmp.Take(i + 1));
 								}
+
+								continue;
 							}
 							else if (symbol == '/')
 							{
@@ -192,6 +210,8 @@ namespace WebBrowser.Html
 				var newState = States.ReadText;
 				var attrMarkChar = '\0';
 
+				string lastTag = string.Empty;
+
 				while (code != -1)
 				{
 					code = reader.Read();
@@ -204,17 +224,6 @@ namespace WebBrowser.Html
 
 						switch (state)
 						{
-							case States.ReadScriptQuotation:
-								if (symbol == attrMarkChar)
-								{
-									newState = States.ReadScript;
-									buffer.Add(symbol);
-									attrMarkChar = '\0';
-								}
-								break;
-							case States.ReadScript:
-								
-								break;
 							case States.ReadText:
 								if (symbol == '<')
 									newState = States.ReadTagName;
@@ -230,18 +239,8 @@ namespace WebBrowser.Html
 										break;
 									case '>':
 									{
-										if (new string(buffer.ToArray()).Trim().ToLower() == "script")
-										{
-											yield return new HtmlChunk() {Type = HtmlChunkTypes.TagStart, Value = "script"};
-											yield return ReadScript(reader);
-											buffer.Clear();
-											newState = state = States.ReadCloseTagName;
-											continue;
-										}
-										else
-										{
-											newState = States.ReadText;
-										}
+										newState = States.ReadText;
+										
 									} 
 									break;
 									case '!': newState = States.ReadSpecTag; break;
@@ -259,13 +258,7 @@ namespace WebBrowser.Html
 								switch (symbol)
 								{
 									case '/': newState = States.ReadSelfClosedTagEnd; break;
-									case '>':
-										
-											newState = new string(buffer.ToArray()).Trim().ToLower() == "script" 
-												? States.ReadScript 
-												: States.ReadText; 
-											break;
-										
+									case '>': newState = States.ReadText; break;
 									case '=': newState = States.WaitAttributeValue;break;
 								}
 								break;
@@ -294,7 +287,12 @@ namespace WebBrowser.Html
 								else if (symbol == '-')
 								{
 									yield return ReadComment(reader);
+									state = newState = States.ReadText;
 									continue;
+								}
+								else
+								{
+									throw new HtmlInvalidFormatException("Unknown spec tag.");
 								}
 								break;
 
@@ -305,7 +303,7 @@ namespace WebBrowser.Html
 						}
 					}
 
-					if (code != -1 && (state == newState || newState == States.ReadScriptQuotation))
+					if (code != -1 && (state == newState))
 					{
 						buffer.Add(symbol);
 						state = newState;
@@ -313,19 +311,23 @@ namespace WebBrowser.Html
 					}
 
 					var data = new string(buffer.ToArray());
+
 					switch (state)
 					{
-						case States.ReadScript:
 						case States.ReadText:
 							if (buffer.Count > 0 )
 								yield return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = data };
 							break;
 						case States.ReadTagName:
 							if (newState != States.ReadCloseTagName && newState != States.ReadSpecTag)
-								yield return new HtmlChunk { Type = HtmlChunkTypes.TagStart, Value = new string(buffer.ToArray()) };
+							{
+								lastTag = new string(buffer.ToArray());
+								yield return new HtmlChunk { Type = HtmlChunkTypes.TagStart, Value = lastTag };
+							}
 							break;
 						case States.ReadSelfClosedTagEnd:
 						case States.ReadCloseTagName:
+							lastTag = string.Empty;
 							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = new string(buffer.ToArray()) };
 							break;
 						case States.ReadAttributeName:
@@ -343,8 +345,17 @@ namespace WebBrowser.Html
 							break;
 					}
 
-					if (newState != States.ReadSelfClosedTagEnd &&
-						(newState != States.ReadScript || state != States.ReadScriptQuotation))
+					if (newState == States.ReadText && lastTag.ToLowerInvariant() == "script")
+					{
+						yield return ReadScript(reader);
+						yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = "script" };
+						buffer.Clear();
+						newState = state = States.ReadText;
+						lastTag = string.Empty;
+						continue;
+					}
+
+					if (newState != States.ReadSelfClosedTagEnd)
 						buffer.Clear();
 					
 					state = newState;

@@ -35,6 +35,15 @@ namespace WebBrowser.Tests
 			var el = (HtmlInputElement)document.GetElementById("i");
 			Assert.IsTrue(el.Checked);
 		}
+
+		[Test]
+		public void Comment()
+		{
+			var document = new Document(null);
+			document.Write("<html><body><!-- hello --></body></html");
+			Assert.AreEqual(1, document.Body.ChildNodes.Count);
+			Assert.IsInstanceOf<Comment>(document.Body.ChildNodes[0]);
+		}
 	}
 }
 #endif

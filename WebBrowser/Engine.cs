@@ -11,12 +11,16 @@ namespace WebBrowser
 		private IScriptExecutor _scriptExecutor;
 
 		Document _document;
+		private Console _console;
 
 		public Document Document { get { return _document; } }
+		public Console Console { get { return _console; } }
+
 
 		public Engine()
 		{
 			_resourceProvider = new ResourceProvider();
+			_console = new Console();
 		}
 
 		public void OpenUrl(string path)
@@ -44,4 +48,15 @@ namespace WebBrowser
 			_document.RunScripts(_scriptExecutor);
 		}
     }
+
+	public class Console
+	{
+		public void Log(object obj)
+		{
+			if (OnLog != null)
+				OnLog(obj);
+		}
+
+		public event Action<object> OnLog;
+	}
 }

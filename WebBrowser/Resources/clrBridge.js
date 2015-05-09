@@ -100,11 +100,9 @@
 
 			//HtmlInputElement
 			bindProps(this, netElem, "value disabled required readonly type checked");
-		} else {
-			//comment
-			bindProps(this,
-				netElem, "text data");
-		}
+		} 
+		//comment, script
+		bindProps(this, netElem, "text data");
 	}
 
 	function wrap(netElem) {
