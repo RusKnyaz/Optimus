@@ -42,7 +42,7 @@ ko.applyBindings(new VM());
 			var span = document.GetElementById("c1");
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
-			Assert.AreEqual("Hello", ((Dom.Text)span.FirstChild).Data);
+			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
 			Assert.AreEqual("Hello", span.InnerHtml);
 		}
 
@@ -68,14 +68,14 @@ ko.applyBindings(new VM());
 			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
-			Assert.AreEqual("Hello", ((Dom.Text)span.FirstChild).Data);
+			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
 			Assert.AreEqual("Hello", span.InnerHtml);
 
 			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", false, false);
 			span.DispatchEvent(evt);
 			Assert.AreEqual(1, span.ChildNodes.Count);
-			Assert.AreEqual("World", ((Dom.Text)span.FirstChild).Data);
+			Assert.AreEqual("World", ((Text)span.FirstChild).Data);
 			Assert.AreEqual("World", span.InnerHtml);
 
 			span.Click();
@@ -104,13 +104,13 @@ ko.applyBindings(new VM());";
 			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
-			Assert.AreEqual("Hello, World", ((Dom.Text)span.FirstChild).Data);
+			Assert.AreEqual("Hello, World", ((Text)span.FirstChild).Data);
 
 			var input = (HtmlInputElement) doc.GetElementById("in");
 
 			input.EnterText("Lord");
 
-			Assert.AreEqual("Hello, Lord", ((Dom.Text)span.FirstChild).Data);
+			Assert.AreEqual("Hello, Lord", ((Text)span.FirstChild).Data);
 		}
 
 		[Test]
@@ -176,6 +176,48 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 		}
 
 		[Test]
+		public void Template()
+		{
+			var vm =
+@"function VM() {
+	var _this = this;	
+	this.Greeting = ko.observable('Hello');
+	this.Click = function(){
+		if(_this.Greeting() == 'Hello')
+			_this.Greeting('World');
+		else
+			_this.Greeting('Hello');
+	};
+}
+ko.applyBindings(new VM());
+";
+
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script>" +
+@"<script type='text/html' id='tmpl'>
+<span id = 'c1' data-bind='text:Greeting, click: Click'/>
+</script>
+</head><body><div data-bind='template:""tmpl""'></div></body></html>");
+
+			var span = (HtmlElement)doc.GetElementById("c1");
+			Assert.IsNotNull(span);
+			Assert.AreEqual(1, span.ChildNodes.Count);
+			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
+			Assert.AreEqual("Hello", span.InnerHtml);
+
+			var evt = doc.CreateEvent("Event");
+			evt.InitEvent("click", false, false);
+			span.DispatchEvent(evt);
+			Assert.AreEqual(1, span.ChildNodes.Count);
+			Assert.AreEqual("World", ((Text)span.FirstChild).Data);
+			Assert.AreEqual("World", span.InnerHtml);
+
+			span.Click();
+			Assert.AreEqual(1, span.ChildNodes.Count);
+			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
+			Assert.AreEqual("Hello", span.InnerHtml);
+		}
+
+		[Test]
 		public void TemplateInsideForeachBinding()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
@@ -188,12 +230,12 @@ function VM(peoples) {
 ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 </script>
 <script type='text/html' id='itemTemplate'>
-	<span>kkk</span>
+	<span data-bind='text:Name'></span>
 </script>
 </head>
 <body>
 	<!-- ko foreach: Peoples -->
-		<div data-bind='template:""itemTemplate""'></div>
+	<div data-bind=""template:'itemTemplate'""></div>
 	<!-- /ko -->
 	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
 </body>

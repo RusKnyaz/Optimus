@@ -32,13 +32,18 @@ namespace WebBrowser.Dom.Elements
 			}
 			else
 			{
-				if(node.Parent != null)
-					node.Parent.ChildNodes.Remove(node);
+				UnattachFromParent(node);
 				ChildNodes.Add(node);
 				node.Parent = this;
 				node.OwnerDocument = OwnerDocument;
 			}
 			return node;
+		}
+
+		private void UnattachFromParent(INode node)
+		{
+			if (node.Parent != null)
+				node.Parent.ChildNodes.Remove(node);
 		}
 
 		protected Node()
@@ -59,6 +64,7 @@ namespace WebBrowser.Dom.Elements
 
 		public Node InsertBefore(Node newChild, Node refNode)
 		{
+			UnattachFromParent(newChild);
 			ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
 			newChild.Parent = this;
 			newChild.OwnerDocument = OwnerDocument;

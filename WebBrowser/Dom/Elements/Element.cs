@@ -34,10 +34,7 @@ namespace WebBrowser.Dom.Elements
 
 					var elem = child as Element;
 					if (elem != null)
-					{
-						sb.Append(elem.ToString());
-						
-					}
+						sb.Append(elem);
 				}
 
 				return sb.ToString();
@@ -119,7 +116,9 @@ namespace WebBrowser.Dom.Elements
 
 		public override INode CloneNode()
 		{
-			return DocumentBuilder.Build(ToString()).Single();
+			var node  = DocumentBuilder.Build(ToString()).Single();
+			node.OwnerDocument = OwnerDocument;
+			return node;
 		}
 	}
 }

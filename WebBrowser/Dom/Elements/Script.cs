@@ -22,7 +22,7 @@ namespace WebBrowser.Dom.Elements
 
 		public override INode CloneNode()
 		{
-			return new EmbeddedScript(Type, Text);
+			return new EmbeddedScript(Type, Text) { OwnerDocument = OwnerDocument };
 		}
 	}
 
@@ -50,7 +50,7 @@ namespace WebBrowser.Dom.Elements
 
 		public override INode CloneNode()
 		{
-			return new LinkScript(Type, _url);
+			return new LinkScript(Type, _url) {OwnerDocument = OwnerDocument};
 		}
 	}
 

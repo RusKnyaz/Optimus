@@ -112,10 +112,10 @@ namespace WebBrowser.Dom
 					?  htmlElement.Attributes["type"] 
 					: "text/JavaScript";
 
-				return new EmbeddedScript(type, ((IHtmlText)htmlElement.Children.Single()).Value);
+				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;
+				var text = htmlText != null ? htmlText.Value : string.Empty;
+				return new EmbeddedScript(type, text);
 			}
 		}
 	}
-
-	
 }

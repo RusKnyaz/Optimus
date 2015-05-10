@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace WebBrowser.Dom
+namespace WebBrowser.Dom.Elements
 {
 	public interface INode
 	{

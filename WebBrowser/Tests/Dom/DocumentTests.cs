@@ -46,7 +46,7 @@ namespace WebBrowser.Tests
 		}
 
 		[Test]
-		public void RemoveNodeFromParrentWhenAppendToOtherNode()
+		public void AppendChildRemovesNodeFromOldParrent()
 		{
 			var document = new Document(null);
 			document.Write("<html><body><div id='p1'><span id='s'></span></div><div id='p2'></div></body></html");
@@ -60,6 +60,50 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(0, div1.ChildNodes.Count);
 			Assert.AreEqual(1, div2.ChildNodes.Count);
 		}
+
+		[Test]
+		public void InsertBeforeRemovesNodeFromOldParrent()
+		{
+			var document = new Document(null);
+			document.Write("<html><body><div id='p1'><span id='s'></span></body></html");
+			var div1 = document.GetElementById("p1");
+			var span = document.GetElementById("s");
+			
+			Assert.AreEqual(1, div1.ChildNodes.Count);
+			Assert.AreEqual(1, document.Body.ChildNodes.Count);
+			document.Body.InsertBefore(span, div1);
+			Assert.AreEqual(0, div1.ChildNodes.Count);
+			Assert.AreEqual(2, document.Body.ChildNodes.Count);
+		}
+
+		[Test]
+		public void CloneNode()
+		{
+			var document = new Document(null);
+			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></body></html");
+			var div1 = document.GetElementById("p1");
+			var span = document.GetElementById("s");
+
+			Assert.AreEqual(1, document.Body.ChildNodes.Count);
+			Assert.AreEqual(1, div1.ChildNodes.Count);
+			Assert.AreEqual(1, span.ChildNodes.Count);
+
+			var clone = span.CloneNode() as HtmlElement;
+			Assert.IsNotNull(clone);
+
+			//sate of all old elements should be the same as before
+			Assert.AreEqual(1, document.Body.ChildNodes.Count);
+			Assert.AreEqual(1, div1.ChildNodes.Count);
+			Assert.AreEqual(1, span.ChildNodes.Count);
+
+			Assert.AreEqual(1, clone.ChildNodes.Count);
+			Assert.IsNotNull(clone.OwnerDocument, "Clone's ownerDocument");
+			Assert.AreEqual(span.OwnerDocument, clone.OwnerDocument, "Clone's ownerDocument");
+			Assert.IsNull(clone.Parent, "Clone's parentNode");
+			Assert.AreEqual("s", clone.Id);
+		}
+
+		
 	}
 }
 #endif

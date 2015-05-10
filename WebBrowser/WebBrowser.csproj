@@ -78,8 +78,9 @@
     <Compile Include="ResourceProviders\ResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
-    <Compile Include="Tests\DocumentTests.cs" />
+    <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
+    <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\EngineTests\EngineGeneralTests.cs" />
     <Compile Include="Tests\EngineTests\EngineWithJQueryTests.cs" />
     <Compile Include="Tests\EngineTests\EngineWithKnockoutTests.cs" />

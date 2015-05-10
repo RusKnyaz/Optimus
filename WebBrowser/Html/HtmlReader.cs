@@ -31,7 +31,6 @@ namespace WebBrowser.Html
 			ReadAttributeName,
 			ReadSelfClosedTagEnd,
 			ReadCloseTagName,
-			ReadAttributeValue,
 			WaitAttributeValue,
 			ReadSpecTag,
 			ReadDocType,
@@ -42,6 +41,41 @@ namespace WebBrowser.Html
 			Script,
 			String,
 			Comment
+		}
+
+		private static string ReadQuotation(char qMark, StreamReader reader)
+		{
+			var code = 0;
+			var buffer = new List<char>();
+
+			while (code != -1)
+			{
+				code = reader.Read();
+
+				var symbol = '\0';
+
+				if (code != -1)
+				{
+					symbol = (char)code;
+
+					if (symbol == '\\')
+					{
+						code = reader.Read();
+						if (code == -1)
+							break;
+
+						buffer.Add((char)code);
+						continue;
+					}
+
+					if (symbol == qMark)
+						break;
+				}
+				if (code != -1)
+						buffer.Add(symbol);
+			}
+
+			return new string(buffer.ToArray());
 		}
 
 		private static HtmlChunk ReadScript(StreamReader reader)
@@ -208,8 +242,6 @@ namespace WebBrowser.Html
 				var code = 0;
 				var state = States.ReadText;
 				var newState = States.ReadText;
-				var attrMarkChar = '\0';
-
 				string lastTag = string.Empty;
 
 				while (code != -1)
@@ -270,15 +302,13 @@ namespace WebBrowser.Html
 							case States.WaitAttributeValue:
 								if (symbol == '\"' || symbol == '\'')
 								{
-									newState = States.ReadAttributeValue;
-									attrMarkChar = symbol;
+									var attrValue = ReadQuotation(symbol, reader);
+									state=newState = States.ReadAttributeName;
+									yield return new HtmlChunk(){Type = HtmlChunkTypes.AttributeValue, Value = attrValue};
+									buffer.Clear();
+									continue;
 								}
 								break;
-							case States.ReadAttributeValue:
-								if (symbol == attrMarkChar)
-									newState = States.ReadAttributeName;
-								break;
-
 							case States.ReadSpecTag:
 								if (symbol == 'D')
 								{
@@ -333,9 +363,6 @@ namespace WebBrowser.Html
 						case States.ReadAttributeName:
 							if(buffer.Count > 0)
 								yield return new HtmlChunk { Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray()).Trim() };
-							break;
-						case States.ReadAttributeValue:
-							yield return new HtmlChunk { Type = HtmlChunkTypes.AttributeValue, Value = new string(buffer.ToArray()) };
 							break;
 						case States.ReadDocType:
 							if(data.Length < 7 || !data.StartsWith("OCTYPE "))
