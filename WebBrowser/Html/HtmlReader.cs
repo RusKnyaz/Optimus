@@ -43,36 +43,34 @@ namespace WebBrowser.Html
 			Comment
 		}
 
-		private static string ReadQuotation(char qMark, StreamReader reader)
+		private static string ReadAttributeValue(char qMark, StreamReader reader)
 		{
 			var code = 0;
 			var buffer = new List<char>();
 
+			var escaped = false;
+			var symbol = '\0';
 			while (code != -1)
 			{
 				code = reader.Read();
+				if (code == -1) 
+					break;
 
-				var symbol = '\0';
+				symbol = (char)code;
 
-				if (code != -1)
+				if (!escaped && symbol == '\\')
 				{
-					symbol = (char)code;
-
-					if (symbol == '\\')
-					{
-						code = reader.Read();
-						if (code == -1)
-							break;
-
-						buffer.Add((char)code);
-						continue;
-					}
-
-					if (symbol == qMark)
-						break;
+					escaped = true;
 				}
-				if (code != -1)
-						buffer.Add(symbol);
+				else if (symbol != qMark || escaped)
+				{
+					escaped = false;
+					buffer.Add(symbol);
+				}
+				else
+				{
+					break;
+				}
 			}
 
 			return new string(buffer.ToArray());
@@ -83,107 +81,99 @@ namespace WebBrowser.Html
 			var code = 0;
 			var buffer = new List<char>();
 			var state = ReadScriptStates.Script;
-			char qMark = '\0';
+			var qMark = '\0';
 
 			while (code != -1)
 			{
 				code = reader.Read();
 
-				var symbol = '\0';
+				if (code == -1) continue;
+				var symbol = (char) code;
 
-				if (code != -1)
+				switch (state)
 				{
-					symbol = (char) code;
-
-					switch (state)
-					{
-						case ReadScriptStates.Script:
-							if (symbol == '"' || symbol == '\'')
-							{
-								state = ReadScriptStates.String;
-								qMark = symbol;
-							}
-							else if (symbol == '<')
-							{
-								var end = "/script>";
-								var tmp = new char[end.Length];
-								var i = 0;
-								for (; i < end.Length; i++)
-								{
-									code = reader.Read();
-
-									if (code > 0)
-									{
-										tmp[i] = (char) code;
-									}
-									else
-									{
-										break;
-									}
-
-									if (((char) code).ToString().ToLower()[0] != end[i])
-										break;
-								}
-
-								if (i == end.Length)
-									code = -1;
-								else
-								{
-									buffer.Add(symbol);
-									buffer.AddRange(tmp.Take(i + 1));
-								}
-
-								continue;
-							}
-							else if (symbol == '/')
-							{
-								var next = reader.Read();
-								if (next == -1)
-								{
-									code = -1;
-									break;
-								}
-
-								var nextChar = (char) next;
-								if (nextChar == '/')
-								{
-									buffer.Add(symbol);
-									buffer.Add('/');
-									buffer.AddRange(reader.ReadLine());
-									buffer.Add('\r');
-									buffer.Add('\n');
-									continue;
-								}
-								if (nextChar == '*')
-								{
-									state = ReadScriptStates.Comment;
-								}
-								buffer.Add(symbol);
-								symbol = nextChar;
-							}
-						break;
-						case ReadScriptStates.String:
-							if (symbol == qMark)
-								state = ReadScriptStates.Script;
-							break;
-						case ReadScriptStates.Comment:
-							if (symbol == '*')
+					case ReadScriptStates.Script:
+						if (symbol == '"' || symbol == '\'')
+						{
+							state = ReadScriptStates.String;
+							qMark = symbol;
+						}
+						else if (symbol == '<')
+						{
+							var end = "/script>";
+							var tmp = new char[end.Length];
+							var i = 0;
+							for (; i < end.Length; i++)
 							{
 								code = reader.Read();
-								if (code == -1)
-									break;
 
-								symbol = (char)code;
-								if (symbol == '/')
-									state = ReadScriptStates.Script;
+								if (code <= 0)
+									break;
 								
-								buffer.Add('*');
+								tmp[i] = (char) code;
+
+								if (((char) code).ToString().ToLower()[0] != end[i])
+									break;
 							}
-							break;
-					}
-					if(code != -1)
-						buffer.Add(symbol);
+
+							if (i == end.Length)
+								code = -1;
+							else
+							{
+								buffer.Add(symbol);
+								buffer.AddRange(tmp.Take(i + 1));
+							}
+
+							continue;
+						}
+						else if (symbol == '/')
+						{
+							var next = reader.Read();
+							if (next == -1)
+							{
+								code = -1;
+								break;
+							}
+
+							var nextChar = (char) next;
+							if (nextChar == '/')
+							{
+								buffer.Add(symbol);
+								buffer.Add('/');
+								buffer.AddRange(reader.ReadLine());
+								buffer.Add('\r');
+								buffer.Add('\n');
+								continue;
+							}
+
+							if (nextChar == '*')
+								state = ReadScriptStates.Comment;
+							
+							buffer.Add(symbol);
+							symbol = nextChar;
+						}
+						break;
+					case ReadScriptStates.String:
+						if (symbol == qMark)
+							state = ReadScriptStates.Script;
+						break;
+					case ReadScriptStates.Comment:
+						if (symbol == '*')
+						{
+							code = reader.Read();
+							if (code == -1)
+								break;
+
+							symbol = (char)code;
+							if (symbol == '/')
+								state = ReadScriptStates.Script;
+								
+							buffer.Add('*');
+						}
+						break;
 				}
+				if(code != -1)
+					buffer.Add(symbol);
 			}
 
 			return new HtmlChunk() {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray())};
@@ -193,9 +183,6 @@ namespace WebBrowser.Html
 		{
 			
 			var buffer = new List<char>();
-			var state = ReadScriptStates.Script;
-			char qMark = '\0';
-
 			var code = reader.Read();
 
 			if(code != '-')
@@ -205,29 +192,27 @@ namespace WebBrowser.Html
 			{
 				code = reader.Read();
 
-				if (code != -1)
+				if (code == -1) continue;
+				var symbol = (char) code;
+
+				if (symbol == '-')
 				{
-					var symbol = (char) code;
+					var next = reader.Read();
+					if (next == -1)
+						throw new HtmlInvalidFormatException("Unexpected end of stream while read comment.");
 
-					if (symbol == '-')
-					{
-						var next = reader.Read();
-						if (next == -1)
-							throw new HtmlInvalidFormatException("Unexpected end of stream while read comment.");
+					var nextNext = reader.Read();
+					if (nextNext == -1)
+						throw new HtmlInvalidFormatException("Unexpected end of stream while read comment.");
 
-						var nextNext = reader.Read();
-						if (nextNext == -1)
-							throw new HtmlInvalidFormatException("Unexpected end of stream while read comment.");
-
-						if (next == '-' && nextNext == '>')
-							break;
+					if (next == '-' && nextNext == '>')
+						break;
 						
-						buffer.Add(symbol);
-						buffer.Add((char)next);
-						symbol = (char)nextNext;
-					}
 					buffer.Add(symbol);
+					buffer.Add((char)next);
+					symbol = (char)nextNext;
 				}
+				buffer.Add(symbol);
 			}
 
 			return new HtmlChunk() {Value = new string(buffer.ToArray()), Type = HtmlChunkTypes.Comment};
@@ -242,7 +227,7 @@ namespace WebBrowser.Html
 				var code = 0;
 				var state = States.ReadText;
 				var newState = States.ReadText;
-				string lastTag = string.Empty;
+				var lastTag = string.Empty;
 
 				while (code != -1)
 				{
@@ -302,7 +287,7 @@ namespace WebBrowser.Html
 							case States.WaitAttributeValue:
 								if (symbol == '\"' || symbol == '\'')
 								{
-									var attrValue = ReadQuotation(symbol, reader);
+									var attrValue = ReadAttributeValue(symbol, reader);
 									state=newState = States.ReadAttributeName;
 									yield return new HtmlChunk(){Type = HtmlChunkTypes.AttributeValue, Value = attrValue};
 									buffer.Clear();
@@ -399,8 +384,5 @@ namespace WebBrowser.Html
 
 		}
 	}
-
-
-	
 }
 
