@@ -1,16 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Net;
 
-namespace WebBrowser
+namespace WebBrowser.ResourceProviders
 {
 	internal class ResourceProvider : IResourceProvider
 	{
 		public IResource GetResource(Uri uri)
 		{
-			throw new NotImplementedException();
+			var scheme = uri.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
+			if (scheme == "http://")
+			{
+				return GetHttpResource(uri);
+			}
+
+			throw new Exception("Unsupported scheme: " + scheme);
 		}
+
+		private IResource GetHttpResource(Uri uri)
+		{
+			var request = WebRequest.CreateHttp(uri);
+			var response = request.GetResponse();
+			
+			//todo: copy resource
+			return new Response(ResourceTypes.Html, response.GetResponseStream());
+		}
+	}
+
+	public class Response : IResource
+	{
+		public Response(ResourceTypes type, Stream stream)
+		{
+			Stream = stream;
+			Type = type;
+		}
+
+		public ResourceTypes Type { get; private set; }
+		public Stream Stream { get; private set; }
 	}
 }

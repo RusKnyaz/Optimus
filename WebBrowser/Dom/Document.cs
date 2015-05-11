@@ -100,7 +100,14 @@ namespace WebBrowser.Dom
 		{
 			foreach (var delayedResource in _unresolvedDelayedResources)
 			{
-				delayedResource.Load(_resourceProvider);
+				try
+				{
+					delayedResource.Load(_resourceProvider);
+				}
+				catch
+				{
+					//todo: handle error;
+				}
 			}
 			_unresolvedDelayedResources.Clear();
 			Trigger("load");

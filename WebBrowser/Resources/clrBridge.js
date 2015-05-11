@@ -4,6 +4,22 @@
 	var netDoc = engine.Document;
 	var wrappers = {};
 
+	function wrapEvent(netEvent) {
+		return {
+			netEvent: netEvent,
+			type: netEvent.Type,
+			Target: wrap(netEvent.Target),
+			initEvent: function (type, b1, b2) { netEvent.InitEvent(type, b1, b2); }
+			//todo: remains properties
+		};
+	}
+
+	function wrapStyle(netStyle) {
+		return {
+
+		}
+	}
+
 	function upFirstLetter(string) { return string.charAt(0).toUpperCase() + string.slice(1);}
 
 	function bindProps(target, owner, propsString) {
@@ -97,6 +113,8 @@
 			//htmlElement
 			if (netElem.Click) this.click = function() { netElem.Click(); };
 			bindProps(this, netElem, "hidden");
+			if (netElem.get_Style)
+				Object.defineProperty(this, 'style', { get: function () { return wrapStyle(netElem.Style); } });
 
 			//HtmlInputElement
 			bindProps(this, netElem, "value disabled required readonly type checked");
@@ -128,16 +146,6 @@
 	this.write = function (x) { netDoc.Write(x); };
 	this.createDocumentFragment = function () { return wrap(netDoc.CreateDocumentFragment()); };
 	this.createEvent = function (type) { return wrapEvent(netDoc.CreateEvent(type)); };
-
-	function wrapEvent(netEvent) {
-		return {
-			netEvent: netEvent,
-			type: netEvent.Type,
-			Target: wrap(netEvent.Target),
-			initEvent: function (type, b1, b2) { netEvent.InitEvent(type, b1, b2); }
-			//todo: remains properties
-		};
-	}
 
 	Object.defineProperty(this, 'documentElement', { get: function () { return wrap(netDoc.DocumentElement); } });
 	Object.defineProperty(this, 'body', { get: function () { return wrap(netDoc.Body); } });

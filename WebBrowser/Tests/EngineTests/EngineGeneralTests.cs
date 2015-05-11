@@ -1,5 +1,8 @@
 ﻿#if NUNIT
 using System;
+using System.IO;
+using System.Text;
+using Moq;
 using NUnit.Framework;
 using Text = WebBrowser.Dom.Text;
 
@@ -48,6 +51,48 @@ namespace WebBrowser.Tests.EngineTests
 				"</script></head><body><span id='content1'></span></body></html>");
 			var elem = engine.Document.GetElementById("content1");
 			Assert.AreEqual("Hello", elem.InnerHtml);
+		}
+
+		[Test]
+		public void LoadPage()
+		{
+			var resourceProviderMock = new Mock<IResourceProvider>();
+			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("<html><body><div id='c'></div></body></html>")));
+
+			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<Uri>())).Returns(resource);
+
+			var engine = new Engine(resourceProviderMock.Object);
+
+			engine.OpenUrl("http://localhost");
+			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<Uri>()), Times.Once());
+
+			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Length);
+		}
+
+		[Test]
+		public void LoadScriptTest()
+		{
+			var resourceProviderMock = new Mock<IResourceProvider>();
+			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("console.log('hello');")));
+			
+			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<Uri>())).Returns(resource);
+
+			var engine = new Engine(resourceProviderMock.Object);
+
+			string loggedValue = null;
+			engine.Console.OnLog += o => loggedValue = o.ToString();
+
+			engine.Load("<html><head><script src='http://localhost/script.js'></script></head></html>");
+		
+			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<Uri>()), Times.Once());
+			Assert.AreEqual("hello", loggedValue);
+		}
+
+		[Test]
+		public void OpenUrl()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://ya.ru");
 		}
 	}
 }

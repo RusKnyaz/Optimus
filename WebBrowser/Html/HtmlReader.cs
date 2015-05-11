@@ -333,8 +333,9 @@ namespace WebBrowser.Html
 							}
 							break;
 						case States.ReadSelfClosedTagEnd:
+							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = lastTag};
+							break;
 						case States.ReadCloseTagName:
-							lastTag = string.Empty;
 							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = new string(buffer.ToArray())};
 							break;
 						case States.ReadAttributeName:

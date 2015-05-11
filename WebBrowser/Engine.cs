@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using WebBrowser.Dom;
+using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser
@@ -16,11 +17,15 @@ namespace WebBrowser
 		public Document Document { get { return _document; } }
 		public Console Console { get { return _console; } }
 
-
-		public Engine()
+		internal Engine(IResourceProvider resourceProvider)
 		{
-			_resourceProvider = new ResourceProvider();
+			_resourceProvider = resourceProvider;
 			_console = new Console();
+		}
+
+		public Engine() : this(new ResourceProvider())
+		{
+			
 		}
 
 		public void OpenUrl(string path)
@@ -48,15 +53,4 @@ namespace WebBrowser
 			_document.RunScripts(_scriptExecutor);
 		}
     }
-
-	public class Console
-	{
-		public void Log(object obj)
-		{
-			if (OnLog != null)
-				OnLog(obj);
-		}
-
-		public event Action<object> OnLog;
-	}
 }
