@@ -25,7 +25,7 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<a></a>", "TagStart:a, TagEnd:a")]
 		[TestCase("<a>Hello</a>", "TagStart:a, Text:Hello, TagEnd:a")]
 		[TestCase("<a ></a>", "TagStart:a, TagEnd:a")]
-		[TestCase("<a/>", "TagStart:a, TagEnd:a")]
+		[TestCase("<br/>", "TagStart:br, TagEnd:br")]
 		[TestCase("<a />", "TagStart, TagEnd")]
 		[TestCase("<option selected>A</option>", "TagStart, AttributeName, Text, TagEnd")]
 		[TestCase("<a/><p/>", "TagStart:a, TagEnd:a, TagStart:p, TagEnd:p")]
@@ -69,11 +69,6 @@ namespace WebBrowser.Tests.Html
 			}
 		}
 
-		[TestCase("<a/ >")]
-		public void InvalidFormat(string source)
-		{
-			Assert.Throws<HtmlInvalidFormatException>(() => Read(source).ToArray());
-		}
 	}
 }
 
