@@ -76,6 +76,7 @@ namespace WebBrowser.Html
 			var buffer = new List<char>();
 			var state = ReadScriptStates.Script;
 			var qMark = '\0';
+			var escape = false;
 
 			while (code != -1)
 			{
@@ -148,8 +149,9 @@ namespace WebBrowser.Html
 						}
 						break;
 					case ReadScriptStates.String:
-						if (symbol == qMark)
+						if (symbol == qMark && !escape)
 							state = ReadScriptStates.Script;
+						escape = !escape && symbol == '\\';
 						break;
 					case ReadScriptStates.Comment:
 						if (symbol == '*')
