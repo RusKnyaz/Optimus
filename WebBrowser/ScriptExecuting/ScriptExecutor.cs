@@ -15,7 +15,7 @@ namespace WebBrowser.ScriptExecuting
 		{
 			_engine = engine;
 			_jsEngine = new Jint.Engine()
-				.SetValue(_scopeEmbeddingObjectName, new {_engine.Document})
+				.SetValue(_scopeEmbeddingObjectName, new {_engine.Document, _engine.Window})
 				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
 
 			InitializeScope();

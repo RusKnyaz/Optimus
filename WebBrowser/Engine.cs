@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using WebBrowser.Dom;
+using WebBrowser.Environment;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
 
@@ -8,19 +9,18 @@ namespace WebBrowser
 {
 	public class Engine
     {
-		IResourceProvider _resourceProvider;
+		readonly IResourceProvider _resourceProvider;
 		private IScriptExecutor _scriptExecutor;
 
-		Document _document;
-		private Console _console;
-
-		public Document Document { get { return _document; } }
-		public Console Console { get { return _console; } }
+		public Document Document { get; private set; }
+		public Console Console { get; private set; }
+		public Window Window { get; private set; }
 
 		internal Engine(IResourceProvider resourceProvider)
 		{
 			_resourceProvider = resourceProvider;
-			_console = new Console();
+			Console = new Console();
+			Window = new Window();
 		}
 
 		public Engine() : this(new ResourceProvider())
@@ -41,16 +41,16 @@ namespace WebBrowser
 
 		public void Load(Stream stream)
 		{
-			_document = new Document(_resourceProvider);
+			Document = new Document(_resourceProvider);
 			_scriptExecutor = new ScriptExecutor(this);
 
 			
 			var elements = DocumentBuilder.Build(stream);
-			_document.Load(elements);
+			Document.Load(elements);
 
-			_document.ResolveDelayedContent();
+			Document.ResolveDelayedContent();
 
-			_document.RunScripts(_scriptExecutor);
+			Document.RunScripts(_scriptExecutor);
 		}
     }
 }

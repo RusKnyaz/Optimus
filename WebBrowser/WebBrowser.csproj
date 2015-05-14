@@ -66,6 +66,9 @@
     <Compile Include="Dom\Elements\HtmlInputElement.cs" />
     <Compile Include="Dom\Elements\Script.cs" />
     <Compile Include="Dom\Elements\Node.cs" />
+    <Compile Include="Environment\Location.cs" />
+    <Compile Include="Environment\Navigator.cs" />
+    <Compile Include="Environment\Screen.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -93,6 +96,7 @@
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
     <Compile Include="Tests\ResourceProvidersTests.cs" />
+    <Compile Include="Environment\Window.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
