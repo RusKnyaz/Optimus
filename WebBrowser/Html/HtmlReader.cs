@@ -295,6 +295,7 @@ namespace WebBrowser.Html
 								switch (symbol)
 								{
 									case 'D':
+									case 'd':
 										newState = States.ReadDocType;
 										break;
 									case '-':
@@ -345,7 +346,7 @@ namespace WebBrowser.Html
 								yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray()).Trim()};
 							break;
 						case States.ReadDocType:
-							if (data.Length < 7 || !data.StartsWith("OCTYPE "))
+							if (data.Length < 7 || !data.ToUpperInvariant().StartsWith("OCTYPE "))
 								throw new HtmlInvalidFormatException("DOCTYPE tag exptected");
 
 							yield return new HtmlChunk {Type = HtmlChunkTypes.DocType, Value = data.Substring(7)};

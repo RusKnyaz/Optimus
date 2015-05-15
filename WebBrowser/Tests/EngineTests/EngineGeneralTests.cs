@@ -89,11 +89,14 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.AreEqual("hello", loggedValue);
 		}
 
-		[Test]
-		public void OpenUrl()
+		[TestCase("http://okkamtech.com ")]
+		[TestCase("http://ya.ru")]
+		[TestCase("http://redmine.todosoft.org")]
+		[TestCase("http://google.com")]
+		public void OpenUrl(string url)
 		{
 			var engine = new Engine();
-			engine.OpenUrl("http://ya.ru");
+			engine.OpenUrl(url);
 		}
 
 		[Test]
