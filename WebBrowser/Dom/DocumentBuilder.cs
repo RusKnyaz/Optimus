@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -76,6 +77,23 @@ namespace WebBrowser.Dom
 			{
 				var hElem = elem as HtmlElement;
 				hElem.Hidden = htmlElement.Attributes.ContainsKey("hidden") && htmlElement.Attributes["hidden"] == "true";
+				//initialize style
+				if (htmlElement.Attributes.ContainsKey("style"))
+				{
+					var styleDefinitionString = htmlElement.Attributes["style"];
+					if (!string.IsNullOrEmpty(styleDefinitionString))
+					{
+						var styleParts = styleDefinitionString.Split(';');
+						foreach (var stylePart in styleParts.Where(s => !string.IsNullOrEmpty(s)))
+						{
+							var keyValue = stylePart.Split(':');
+							if (keyValue.Length != 2)
+								throw new Exception("Invalid style definition: " + stylePart);
+							//todo: handle duplicates
+							hElem.Style.Properties.Add(keyValue[0], keyValue[1]);
+						}
+					}
+				}
 			}
 
 			elem.Id = id;

@@ -48,9 +48,50 @@
 		}
 
 		function wrapStyle(netStyle) {
-			return {
+			/*var obj = {
+				getCssText: function() {
+					return "";//todo: implement
+				},
+				getLength: function() {
+					return netStyle.Properties.Count;
+				},
+				getParentRule: function() {
+					return null;//todo
+				},
+				getPropertyCSSValue: function(javapropertyName) {
+					return netStyle.Properties[javapropertyName];//todo:
+				},
+				getPropertyPriority: function(javapropertyName) {
+					return 0;//todo
+				},
+				getPropertyValue: function(propertyName) {
+					return netStyle.GetPropertyValue(propertyName);
+				},
+				removeProperty: function(propertyName) {
+					netStyle.Properties.Remove(propertyName);
+				},
+				setCssText : function(cssText){
+					throw "not implemented";//todo
+				},
+				setProperty: function(propertyName, javavalue, javapriority) {
+					netStyle.Properties[propertyName] = javavalue;
+					//todo: priority
+				}
+			};*/
 
+			var obj = [];
+
+			for (var i = 0; i < netStyle.Properties.Count; i++) {
+				obj[i] = netStyle[i];
+				obj[netStyle[i]] = netStyle[netStyle[i]];
+			}
+
+			obj.getPropertyValue = function(propertyName) {
+				return netStyle.GetPropertyValue(propertyName);
 			};
+			
+
+			return obj;
 		}
 		
 		function wrapNode(node, netElem) {
