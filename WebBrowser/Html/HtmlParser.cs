@@ -38,7 +38,8 @@ namespace WebBrowser.Html
 					case HtmlChunkTypes.AttributeValue:
 						if (string.IsNullOrEmpty(attributeName))
 							throw new HtmlParseException("Unexpected attribute value.");
-						elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
+						if(!elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))//todo:
+							elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
 						attributeName = null;
 						break;
 					case HtmlChunkTypes.TagStart:

@@ -1,4 +1,7 @@
-﻿namespace WebBrowser.Environment
+﻿using System;
+using WebBrowser.Dom.Elements;
+
+namespace WebBrowser.Environment
 {
 	public class Window
 	{
@@ -26,5 +29,27 @@
 		public Screen Screen { get; private set; }
 		public Location Location { get; private set; }
 		public Navigator Navigator { get; private set; }
+
+		private WindowTimers _timers = new WindowTimers();
+
+		public int SetTimeout(Action handler, int delay)
+		{
+			return _timers.SetTimeout(handler, delay);
+		}
+
+		public void ClearTimeout(int handle)
+		{
+			_timers.ClearTimeout(handle);
+		}
+
+		public int SetInterval(Action handler, int delay)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void ClearInterval(int handle)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

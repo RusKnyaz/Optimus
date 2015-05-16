@@ -66,6 +66,7 @@
     <Compile Include="Dom\Elements\HtmlInputElement.cs" />
     <Compile Include="Dom\Elements\Script.cs" />
     <Compile Include="Dom\Elements\Node.cs" />
+    <Compile Include="Dom\Elements\WindowTimers.cs" />
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />

@@ -24,6 +24,7 @@
 	}
 	
 	window.addEventListener = function (x, y, z) {
+		//todo: implement
 	};
 
 	bindProps(window.location = {}, engine.Window.Location, "hash host hostname href origin pathname port protocol search");
@@ -31,6 +32,14 @@
 	window.navigator.javaEnabled = function () { return engine.Window.Navigator.JavaEnabled(); };
 	bindProps(window.screen = {}, engine.Window.Screen, "width height availWidth availHeight colorDepth pixeDepth");
 	bindProps(window, engine.Window, "innerWidth innerHeight");
+	window.setTimeout = function (handler, timeout) {
+		var args = Array.prototype.slice.call(arguments, 2);
+		engine.Window.SetTimeout(function () {
+			handler.apply({}, args);
+		}, timeout);
+	};
+
+	window.clearTimeout = function(handle) { engine.Window.ClearTimeout(handle); };
 
 	window.document = new (function () {
 		var _this = this;

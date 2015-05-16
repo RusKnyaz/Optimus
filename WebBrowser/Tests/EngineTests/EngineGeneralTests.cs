@@ -89,7 +89,7 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.AreEqual("hello", loggedValue);
 		}
 
-		[TestCase("http://okkamtech.com ")]
+		[TestCase("http://okkamtech.com")]
 		[TestCase("http://ya.ru")]
 		[TestCase("http://redmine.todosoft.org")]
 		[TestCase("http://google.com")]
@@ -114,6 +114,36 @@ console.log(style['width']);
 			var elem = engine.Document.GetElementById("content1");
 			Assert.IsNotNull(elem);
 			CollectionAssert.AreEqual(new[] { "100pt", "width", "100pt" }, log);
+		}
+
+		[Test]
+		public void SetTimeout()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load("<html><head><script>" +
+@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');
+</script></head><body></body></html>");
+			Assert.AreEqual(0, log.Count);
+			System.Threading.Thread.Sleep(1000);
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("ok",  log[0]);
+		}
+
+		[Test]
+		public void ClearTimeout()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load("<html><head><script>" +
+@"var timer = window.setTimeout(function(){console.log('ok');}, 500);
+window.clearTimeout(timer);
+</script></head><body></body></html>");
+			Assert.AreEqual(0, log.Count);
+			System.Threading.Thread.Sleep(1000);
+			Assert.AreEqual(0, log.Count);
 		}
 	}
 }
