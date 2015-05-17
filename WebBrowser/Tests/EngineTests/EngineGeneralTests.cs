@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using Moq;
 using NUnit.Framework;
+using WebBrowser.Dom;
 using Text = WebBrowser.Dom.Text;
 
 namespace WebBrowser.Tests.EngineTests
@@ -52,6 +53,18 @@ namespace WebBrowser.Tests.EngineTests
 				"</script></head><body><span id='content1'></span></body></html>");
 			var elem = engine.Document.GetElementById("content1");
 			Assert.AreEqual("Hello", elem.InnerHtml);
+		}
+
+		[Test]
+		public void GetAttribute()
+		{
+			var engine = new Engine();
+			string attr = null;
+			engine.Console.OnLog += o => attr = o.ToString();
+			engine.Load("<html><head><script>" +
+			@"console.log(document.getElementById('content1').getAttribute('id'));" +
+				"</script></head><body><span id='content1'></span></body></html>");
+			Assert.AreEqual("content1", attr);
 		}
 
 		[Test]

@@ -161,9 +161,9 @@ namespace WebBrowser.Dom
 			return new Text{Data = data};	
 		}
 
-		public Comment CreateComment()
+		public Comment CreateComment(string data)
 		{
-			return new Comment();
+			return new Comment(){Data = data};
 		}
 
 		public Element Body
