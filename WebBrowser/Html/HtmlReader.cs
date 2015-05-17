@@ -380,13 +380,5 @@ namespace WebBrowser.Html
 
 		}
 	}
-
-	public static class EnumExtension
-	{
-		public static int MaxValue<T>(this T e) 
-		{
-			return Enum.GetValues(typeof(T)).Cast<int>().Max();
-		}
-	}
 }
 

@@ -158,6 +158,47 @@ window.clearTimeout(timer);
 			System.Threading.Thread.Sleep(1000);
 			Assert.AreEqual(0, log.Count);
 		}
+
+		[Test]
+		public void Ajax()
+		{
+			var resourceProviderMock = new Mock<IResourceProvider>();
+			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("hello")));
+
+			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<Uri>())).Returns(resource);
+
+			var engine = new Engine(resourceProviderMock.Object);
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load("<html><head><script>" +
+@"var client = new XMLHttpRequest();
+client.onreadystatechange = function () {
+console.log(readyState);
+  if(this.readyState == this.DONE) {
+    if(this.status == 200 ) {
+		console.log(this.responseXML);
+    }
+  }
+};
+client.open(""GET"", ""http://ya.ru/index.html"", false);
+client.send();
+</script></head><body></body></html>");
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("hello", log[0]);
+		}
+
+		[Test]
+		public void GetElementsByTagName()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load("<html><head><script>" +
+@"console.log(document.getElementsByTagName('div').length);
+</script></head><body><div></div><div></div></body></html>");
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("2", log[0]);
+		}
 	}
 }
 #endif

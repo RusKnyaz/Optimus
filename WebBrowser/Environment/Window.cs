@@ -1,4 +1,5 @@
 ﻿using System;
+using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 
 namespace WebBrowser.Environment
@@ -50,6 +51,11 @@ namespace WebBrowser.Environment
 		public void ClearInterval(int handle)
 		{
 			throw new NotImplementedException();
+		}
+
+		public XmlHttpRequest XmlHttpRequest()
+		{
+			return new XmlHttpRequest();
 		}
 	}
 }

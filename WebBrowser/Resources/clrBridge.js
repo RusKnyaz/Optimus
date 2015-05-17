@@ -16,18 +16,17 @@
 		var netFuncName = upFirstLetter(funcName);
 		var methodInfo = owner.GetType().GetMethod(netFuncName);
 		if (methodInfo) {
-			var returnTypeName = methodInfo.ReturnType.Name;
-
-			if (returnTypeName === "Void") {
-				target[funcName] = function() { owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0)); };
-			} else {
-				var converter = converters[returnTypeName];
-				if (converter) {
-					target[funcName] = function() { return converter(owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0))); };
-				} else {
-					target[funcName] = function () { return owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0));};
-				}
+			function getFunc(fn, o, acnt, conv) {
+				return function () {
+					var a = [];
+					for (var x = 0; x < acnt; x++) {
+						a[x] = x < arguments.length ? arguments[x] : null;
+					}
+					return conv(methodInfo.Invoke(owner, a));
+				};
 			}
+
+			target[funcName] = getFunc(netFuncName, owner, methodInfo.GetParameters().length, converters[methodInfo.ReturnType.Name] || function(x) { return x; });
 		}
 	}
 
@@ -199,8 +198,30 @@
 	})();
 
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
-	window.XMLHttpRequest = function() {
-		throw "Not Implemented";
+	window.XMLHttpRequest = function () {
+		var _this = this;
+		var netRequest = engine.Window.XmlHttpRequest();
+		bindFuncs(this, netRequest, "open send setRequestHeader abort getResponseHeader getAllResponseHeaders overrideMimeType");
+		bindProps(this, netRequest, "status responseXML readyState");
+		var onreadystatechange;
+		var onreadystatechangeWrapper;
+		Object.defineProperty(this, 'onreadystatechange', {
+			get: function() { return onreadystatechange;},
+			set: function(handler) {
+				if (onreadystatechange) {
+					netRequest.remove_OnReadyStateChange(onreadystatechangeWrapper);
+				}
+				onreadystatechange = handler;
+				onreadystatechangeWrapper = function() {onreadystatechange.call(_this);};
+				netRequest.add_OnReadyStateChange(onreadystatechangeWrapper);
+			}
+		});
+
+		this.UNSENT = 0;
+		this.OPENED = 1;
+		this.HEADERS_RECEIVED = 2;
+		this.LOADING = 3;
+		this.DONE = 4;
 	};
 
 })(this["A89A3DC7FB5944849D4DE0781117A595"]);
