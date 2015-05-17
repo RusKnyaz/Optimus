@@ -1,26 +1,32 @@
 ﻿var window = this;
 
 (function (engine) {
+	var converters = [];
+	converters["Document"] = function() { return window.document; };
+	converters["Element"] = wrap;
+	converters["Element[]"] = wrapArray;
+	converters["Node"] = wrap;
+	converters["DocumentFragment"] = wrap;
+	converters["Text"] = wrap;
+	converters["Comment"] = wrap;
+	converters["Event"] = wrapEvent;
+	converters["CssStyleDeclaration"] = wrapStyle;
+
 	function bindFunc(target, owner, funcName) {
 		var netFuncName = upFirstLetter(funcName);
 		var methodInfo = owner.GetType().GetMethod(netFuncName);
 		if (methodInfo) {
 			var returnTypeName = methodInfo.ReturnType.Name;
 
-			if (returnTypeName == "Element" ||
-				returnTypeName == "Node" ||
-				returnTypeName == "DocumentFragment" ||
-				returnTypeName == "Text" ||
-				returnTypeName == "Comment") {
-				target[funcName] = function() { return wrap(owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0))); };
-			} else if (returnTypeName == "Void") {
+			if (returnTypeName === "Void") {
 				target[funcName] = function() { owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0)); };
-			} else if (returnTypeName == "Event") {
-				target[funcName] = function() { wrapEvent(owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0))); };
-			}else {
-				target[funcName] = function() {
-					return owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0));
-				};
+			} else {
+				var converter = converters[returnTypeName];
+				if (converter) {
+					target[funcName] = function() { return converter(owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0))); };
+				} else {
+					target[funcName] = function () { return owner[netFuncName].apply(owner, Array.prototype.slice.call(arguments, 0));};
+				}
 			}
 		}
 	}
@@ -45,37 +51,6 @@
 	}
 
 	function wrapStyle(netStyle) {
-		/*var obj = {
-			getCssText: function() {
-				return "";//todo: implement
-			},
-			getLength: function() {
-				return netStyle.Properties.Count;
-			},
-			getParentRule: function() {
-				return null;//todo
-			},
-			getPropertyCSSValue: function(javapropertyName) {
-				return netStyle.Properties[javapropertyName];//todo:
-			},
-			getPropertyPriority: function(javapropertyName) {
-				return 0;//todo
-			},
-			getPropertyValue: function(propertyName) {
-				return netStyle.GetPropertyValue(propertyName);
-			},
-			removeProperty: function(propertyName) {
-				netStyle.Properties.Remove(propertyName);
-			},
-			setCssText : function(cssText){
-				throw "not implemented";//todo
-			},
-			setProperty: function(propertyName, javavalue, javapriority) {
-				netStyle.Properties[propertyName] = javavalue;
-				//todo: priority
-			}
-		};*/
-
 		var obj = [];
 
 		for (var i = 0; i < netStyle.Properties.Count; i++) {
@@ -83,21 +58,19 @@
 			obj[netStyle[i]] = netStyle[netStyle[i]];
 		}
 
-		obj.getPropertyValue = function (propertyName) {
-			return netStyle.GetPropertyValue(propertyName);
-		};
-
+		bindFuncs(obj, netStyle, "getPropertyValue getCssText getLength getParentRule getPropertyCSSValue getPropertyPriority removeProperty setCssText setProperty");
 
 		return obj;
 	}
 
 	function wrapNode(node, netElem) {
 		//funcs
-		node.hasAttributes = function () { return netElem.HasAttributes(); };
 		node.removeChild = function (x) { return wrap(netElem.RemoveChild(x.netElem)); };
 		node.insertBefore = function (newNode, refNode) { return wrap(netElem.InsertBefore(newNode.netElem, refNode.netElem)); };
 		node.replaceChild = function (newNode, oldNode) { return wrap(netElem.ReplaceChild(newNode.netElem, oldNode.netElem)); };
 		node.cloneNode = function () { return wrap(netElem.CloneNode()); };
+
+		bindFuncs(node, netElem, "hasAttributes");
 		//props
 		bindProps(node, netElem, "hasChildNodes nodeType nodeName nodeValue");
 		Object.defineProperty(node, 'nextSibling', { get: function () { return wrap(netElem.NextSibling); } });
@@ -152,29 +125,16 @@
 	function documentElement(netElem) {
 		this.netElem = netElem;
 
-		Object.defineProperty(this, 'ownerDocument', { get: function () { return window.document; } });
-
-		
 		this.appendChild = function (node) { return wrap(netElem.AppendChild(node.netElem)); };
-		this.getElementsByTagName = function (tagName) { return wrapArray(netElem.GetElementsByTagName(tagName)); };
-		bindFuncs(this, netElem, "getAttribute setAttribute removeAttribute hasAttribute");
+		bindFuncs(this, netElem, "getAttribute setAttribute removeAttribute hasAttribute getElementsByTagName");
 		//node
 		wrapNode(this, netElem);
 		if (this.nodeType === 1) {
-			//Element
-			bindProps(this, netElem, "innerHTML:InnerHtml tagName");
-
-			//htmlElement
-			if (netElem.Click) this.click = function () { netElem.Click(); };
-			bindProps(this, netElem, "hidden");
-			if (netElem.get_Style)
-				Object.defineProperty(this, 'style', { get: function () { return wrapStyle(netElem.Style); } });
-
-			//HtmlInputElement
-			bindProps(this, netElem, "value disabled required readonly type checked");
+			bindProps(this, netElem, "innerHTML:InnerHtml tagName hidden style value disabled required readonly type checked");
+			bindFuncs(this, netElem, "click");
 		}
 		//comment, script
-		bindProps(this, netElem, "text data");
+		bindProps(this, netElem, "ownerDocument text data");
 	}
 	
 	function wrapArray(netElems) {
@@ -195,11 +155,18 @@
 			var netPropName = names[1] || upFirstLetter(jsPropName);
 
 			var prop = {
-				get: !owner["get_" + netPropName] ? undefined :
-					function (x) { return function () { return owner[x]; }; }(netPropName),
 				set: !owner["set_" + netPropName] ? undefined :
 					function (x) { return function (v) { owner[x] = v; }; }(netPropName)
 			};
+
+			if (owner["get_" + netPropName]) {
+				var getType = owner.GetType().GetMethod("get_" + netPropName).ReturnType;
+				var converter = converters[getType.Name];
+
+				prop.get = converter
+					? function (x, c) { return function () { return c(owner[x]); }; }(netPropName, converter)
+					: function (x) { return function () { return owner[x]; }; }(netPropName);
+			}
 
 			if (prop.get || prop.set)
 				Object.defineProperty(target, jsPropName, prop);
@@ -226,15 +193,9 @@
 
 	window.document = new (function () {
 		var netDoc = engine.Document;
-		
 		wrapNode(this, netDoc);
-
-		bindFuncs(this, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent");
-
-		this.getElementsByTagName = function (tagName) { return wrapArray(netDoc.GetElementsByTagName(tagName)); };
-
-		Object.defineProperty(this, 'documentElement', { get: function () { return wrap(netDoc.DocumentElement); } });
-		Object.defineProperty(this, 'body', { get: function () { return wrap(netDoc.Body); } });
+		bindFuncs(this, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName");
+		bindProps(this, netDoc, "body documentElement");
 	})();
 
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
