@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
-using WebBrowser.Dom;
+using WebBrowser.ResourceProviders;
 using Text = WebBrowser.Dom.Text;
 
 namespace WebBrowser.Tests.EngineTests
@@ -73,12 +75,12 @@ namespace WebBrowser.Tests.EngineTests
 			var resourceProviderMock = new Mock<IResourceProvider>();
 			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("<html><body><div id='c'></div></body></html>")));
 
-			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<Uri>())).Returns(resource);
+			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns(resource);
 
 			var engine = new Engine(resourceProviderMock.Object);
 
 			engine.OpenUrl("http://localhost");
-			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<Uri>()), Times.Once());
+			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<string>()), Times.Once());
 
 			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Length);
 		}
@@ -88,8 +90,8 @@ namespace WebBrowser.Tests.EngineTests
 		{
 			var resourceProviderMock = new Mock<IResourceProvider>();
 			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("console.log('hello');")));
-			
-			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<Uri>())).Returns(resource);
+
+			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns(resource);
 
 			var engine = new Engine(resourceProviderMock.Object);
 
@@ -97,8 +99,8 @@ namespace WebBrowser.Tests.EngineTests
 			engine.Console.OnLog += o => loggedValue = o.ToString();
 
 			engine.Load("<html><head><script src='http://localhost/script.js'></script></head></html>");
-		
-			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<Uri>()), Times.Once());
+
+			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<string>()), Times.Once());
 			Assert.AreEqual("hello", loggedValue);
 		}
 
@@ -110,6 +112,17 @@ namespace WebBrowser.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.OpenUrl(url);
+		}
+
+		[Test]
+		public void BrowseOkkam()
+		{
+			var engine = new Engine();
+			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
+			engine.OpenUrl("http://okkamtech.com");
+			Thread.Sleep(5000);
+			var userName = engine.Document.GetElementById("UserName");
+			Assert.IsNotNull(userName);
 		}
 
 		[Test]
@@ -157,6 +170,46 @@ window.clearTimeout(timer);
 			Assert.AreEqual(0, log.Count);
 			System.Threading.Thread.Sleep(1000);
 			Assert.AreEqual(0, log.Count);
+		}
+
+		[Test]
+		public void Ajax()
+		{
+			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) == 
+				new HttpResponse(HttpStatusCode.OK, "hello"));
+			
+			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+			
+			var engine = new Engine(resourceProvider);
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load("<html><head><script>" +
+@"var client = new XMLHttpRequest();
+client.onreadystatechange = function () {
+  if(this.readyState == this.DONE) {
+    if(this.status == 200 ) {
+		console.log(this.responseXML);
+    }
+  }
+};
+client.open(""GET"", ""http://localhost/unicorn.xml"", false);
+client.send();
+</script></head><body></body></html>");
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("hello", log[0]);
+		}
+
+		[Test]
+		public void GetElementsByTagName()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load("<html><head><script>" +
+@"console.log(document.getElementsByTagName('div').length);
+</script></head><body><div></div><div></div></body></html>");
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("2", log[0]);
 		}
 	}
 }

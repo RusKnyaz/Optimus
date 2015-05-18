@@ -6,16 +6,34 @@ namespace WebBrowser.ResourceProviders
 {
 	internal class ResourceProvider : IResourceProvider
 	{
-		public IResource GetResource(Uri uri)
+		private readonly CookieContainer _cookies;
+
+		public ResourceProvider()
 		{
-			var scheme = uri.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
+			_cookies = new CookieContainer();
+			HttpResourceProvider = new HttpResourceProvider(_cookies);
+		}
+
+		public string Root { get; set; }
+
+		public IResource GetResource(string uri)
+		{
+			if(string.IsNullOrEmpty(uri))
+				throw new ArgumentOutOfRangeException("uri");
+
+			var u = uri[0] == '/' ? new Uri(new Uri(Root), uri) : new Uri(uri);
+
+			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
 			if (scheme == "http://")
 			{
-				return GetHttpResource(uri);
+				//todo: use HttpResourceProvider
+				return GetHttpResource(u);
 			}
 
 			throw new Exception("Unsupported scheme: " + scheme);
 		}
+
+		public IHttpResourceProvider HttpResourceProvider { get; private set; }
 
 		private IResource GetHttpResource(Uri uri)
 		{

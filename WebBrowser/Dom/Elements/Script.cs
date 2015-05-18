@@ -41,7 +41,7 @@ namespace WebBrowser.Dom.Elements
 		public string Type { get; private set; }
 		public void Load(IResourceProvider resourceProvider)
 		{
-			var resource = resourceProvider.GetResource(new Uri(_url));
+			var resource = resourceProvider.GetResource(_url);
 			using (var reader = new StreamReader(resource.Stream))
 			{
 				Text = reader.ReadToEnd();

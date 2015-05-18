@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using WebBrowser.ResourceProviders;
 
 namespace WebBrowser
 {
 	public interface IResourceProvider
 	{
-		IResource GetResource(Uri uri);
+		IResource GetResource(string uri);
+		IHttpResourceProvider HttpResourceProvider { get; }
+		string Root { get; set; }
 	}
 }
