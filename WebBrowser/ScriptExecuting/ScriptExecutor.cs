@@ -1,5 +1,6 @@
 ﻿using System;
 using Jint.Runtime;
+using WebBrowser.Dom;
 using WebBrowser.Properties;
 
 namespace WebBrowser.ScriptExecuting
@@ -15,7 +16,12 @@ namespace WebBrowser.ScriptExecuting
 		{
 			_engine = engine;
 			_jsEngine = new Jint.Engine()
-				.SetValue(_scopeEmbeddingObjectName, new {_engine.Document, _engine.Window})
+				.SetValue(_scopeEmbeddingObjectName, new
+					{
+						_engine.Document, 
+						_engine.Window,
+						XmlHttpRequest = (Func<XmlHttpRequest>)(() => new XmlHttpRequest(engine.ResourceProvider.HttpResourceProvider)) 
+					})
 				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
 
 			InitializeScope();
@@ -23,7 +29,7 @@ namespace WebBrowser.ScriptExecuting
 		
 		public void Execute(string type, string code)
 		{
-			if (type == "text/JavaScript")
+			if (type.ToLowerInvariant() == "text/javascript")
 			{
 				try
 				{
@@ -31,11 +37,14 @@ namespace WebBrowser.ScriptExecuting
 				}
 				catch (JavaScriptException e)
 				{
-					var er = _jsEngine.GetLastSyntaxNode();
+					if (OnException != null)
+						OnException(e);
 					throw;
 				}
 			}
 		}
+
+		public event Action<Exception> OnException;
 		
 		private void InitializeScope()
 		{

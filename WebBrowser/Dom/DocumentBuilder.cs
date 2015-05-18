@@ -46,16 +46,13 @@ namespace WebBrowser.Dom
 
 			var id = htmlElement.Attributes.ContainsKey("id") ? htmlElement.Attributes["id"] : string.Empty;
 
-			if (htmlElement.Name == "script")
-			{
-				var x = BuildScript(htmlElement);
-				x.Id = id;
-				return x;
-			}
-
 			Element elem = null;
 
-			if (htmlElement.Name == "input")
+			if (htmlElement.Name == "script")
+			{
+				elem = BuildScript(htmlElement);
+			}
+			else if (htmlElement.Name == "input")
 			{
 				elem = new HtmlInputElement
 				{
@@ -113,7 +110,7 @@ namespace WebBrowser.Dom
 			return elem;
 		}
 
-		private static IScript BuildScript(IHtmlElement htmlElement)
+		private static Element BuildScript(IHtmlElement htmlElement)
 		{
 			if (htmlElement.Attributes.Keys.Contains("src"))
 			{

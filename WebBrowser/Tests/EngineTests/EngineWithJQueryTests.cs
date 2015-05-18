@@ -36,7 +36,7 @@ namespace WebBrowser.Tests.EngineTests
 			var resourceProviderMock = new Mock<IResourceProvider>();
 			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("OK")));
 
-			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<Uri>())).Returns(resource);
+			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns(resource);
 
 			var engine = new Engine(resourceProviderMock.Object);
 			var log = new List<string>();

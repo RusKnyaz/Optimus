@@ -9,30 +9,29 @@ namespace WebBrowser
 {
 	public class Engine
     {
-		readonly IResourceProvider _resourceProvider;
-		private IScriptExecutor _scriptExecutor;
+		public IResourceProvider ResourceProvider { get; private set; }
+		internal IScriptExecutor ScriptExecutor { get; private set; }
 
 		public Document Document { get; private set; }
 		public Console Console { get; private set; }
 		public Window Window { get; private set; }
+		
 
 		internal Engine(IResourceProvider resourceProvider)
 		{
-			_resourceProvider = resourceProvider;
+			ResourceProvider = resourceProvider;
 			Console = new Console();
 			Window = new Window();
+			ScriptExecutor = new ScriptExecutor(this);
 		}
 
-		public Engine() : this(new ResourceProvider())
-		{
-			
-		}
+		public Engine() : this(new ResourceProvider()) { }
 
 		public void OpenUrl(string path)
 		{
-			var uri = new Uri(path);
-			var resource = _resourceProvider.GetResource(uri);
-
+			ResourceProvider.Root = (new Uri(path)).GetLeftPart(UriPartial.Path);
+			var resource = ResourceProvider.GetResource(path);
+			
 			if (resource.Type == ResourceTypes.Html)
 			{
 				Load(resource.Stream);
@@ -41,16 +40,15 @@ namespace WebBrowser
 
 		public void Load(Stream stream)
 		{
-			Document = new Document(_resourceProvider);
-			_scriptExecutor = new ScriptExecutor(this);
-
+			Document = new Document(ResourceProvider);
+			//todo: clear js runtime context
 			
 			var elements = DocumentBuilder.Build(stream);
 			Document.Load(elements);
 
 			Document.ResolveDelayedContent();
 
-			Document.RunScripts(_scriptExecutor);
+			Document.RunScripts(ScriptExecutor);
 		}
     }
 }

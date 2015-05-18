@@ -200,7 +200,7 @@
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {
 		var _this = this;
-		var netRequest = engine.Window.XmlHttpRequest();
+		var netRequest = engine.XmlHttpRequest();
 		bindFuncs(this, netRequest, "open send setRequestHeader abort getResponseHeader getAllResponseHeaders overrideMimeType");
 		bindProps(this, netRequest, "status responseXML readyState");
 		var onreadystatechange;
