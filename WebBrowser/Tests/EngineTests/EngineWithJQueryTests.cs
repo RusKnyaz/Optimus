@@ -1,5 +1,4 @@
 ﻿#if NUNIT
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -13,9 +12,10 @@ namespace WebBrowser.Tests.EngineTests
 	public class EngineWithJQueryTests
 	{
 		[Test]
-		public void JQuery()
+		public void Smoke()
 		{
 			var engine = new Engine();
+			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body></body></html>");
 		}
 

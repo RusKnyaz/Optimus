@@ -2,7 +2,7 @@
 
 (function (engine) {
 	var converters = [];
-	converters["Document"] = function() { return window.document; };
+	converters["Document"] = wrapDocument;
 	converters["Element"] = wrap;
 	converters["Element[]"] = wrapArray;
 	converters["Node"] = wrap;
@@ -11,7 +11,7 @@
 	converters["Comment"] = wrap;
 	converters["Event"] = wrapEvent;
 	converters["CssStyleDeclaration"] = wrapStyle;
-
+	
 	function bindFunc(target, owner, funcName) {
 		var netFuncName = upFirstLetter(funcName);
 		var methodInfo = owner.GetType().GetMethod(netFuncName);
@@ -171,6 +171,18 @@
 				Object.defineProperty(target, jsPropName, prop);
 		}
 	}
+	
+	var docsWrappers = [];
+	function wrapDocument(netDoc) {
+		if (docsWrappers[netDoc.GetHashCode()])
+			return docsWrappers[netDoc.GetHashCode()];
+
+		var doc = {};
+		bindFuncs(doc, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName");
+		bindProps(doc, netDoc, "body documentElement");
+		docsWrappers[netDoc.GetHashCode()] = doc;
+		return doc;
+	}
 
 	window.addEventListener = function (x, y, z) {
 		//todo: implement
@@ -189,13 +201,7 @@
 	};
 
 	bindFuncs(window, engine.Window, "clearTimeout");
-
-	window.document = new (function () {
-		var netDoc = engine.Document;
-		wrapNode(this, netDoc);
-		bindFuncs(this, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName");
-		bindProps(this, netDoc, "body documentElement");
-	})();
+	bindProps(window, engine, "document");
 
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {

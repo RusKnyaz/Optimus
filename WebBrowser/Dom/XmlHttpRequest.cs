@@ -1,25 +1,28 @@
 ﻿using System;
-using System.IO;
-using System.Net;
+using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Dom
 {
 	public class XmlHttpRequest
 	{
-		private HttpWebRequest _request;
+		private readonly IHttpResourceProvider _httpResourceProvider;
+		private HttpRequest _request;
 		private bool _async;
-		private HttpWebResponse _response;
+		private HttpResponse _response;
 
-		public XmlHttpRequest()
+		public XmlHttpRequest(IHttpResourceProvider httpResourceProvider)
 		{
+			_httpResourceProvider = httpResourceProvider;
 			ReadyState = UNSENT;
 		}
 
 		public void Open(string method, string url, bool? async, string username, string password)
 		{
-			//todo: or we should do it through resource provider???
-			_request = WebRequest.CreateHttp(url);
-			_request.Method = method;
+			_request = new HttpRequest
+				{
+					Url = url,
+					Method = method
+				};
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;
@@ -33,17 +36,7 @@ namespace WebBrowser.Dom
 
 		public int ReadyState { get; private set; }
 
-		public object ResponseXML
-		{
-			get
-			{
-				//todo: use Lazy
-				//todo: parse
-				using (var reader = new StreamReader(_response.GetResponseStream()))
-				{
-					return reader.ReadToEnd();
-				}
-			}
+		public object ResponseXML { get { return _response.Data;}
 		}
 
 		public void SetRequestHeader(string name, string value)
@@ -69,15 +62,15 @@ namespace WebBrowser.Dom
 		{
 			if (_async)
 			{
-				ReadyState = LOADING;
+			/*	ReadyState = LOADING;
 				_response = (HttpWebResponse) await _request.GetResponseAsync();
 				ReadyState = DONE;
-				FireOnReadyStateChange();
+				FireOnReadyStateChange();*/
 			}
 			else
 			{
 				ReadyState = LOADING;
-				_response = (HttpWebResponse)_request.GetResponse();
+				_response = _httpResourceProvider.SendRequest(_request);
 				ReadyState = DONE;
 				FireOnReadyStateChange();
 			}

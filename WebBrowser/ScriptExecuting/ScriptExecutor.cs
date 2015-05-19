@@ -1,6 +1,8 @@
 ﻿using System;
+using Jint;
 using Jint.Runtime;
 using WebBrowser.Dom;
+using WebBrowser.Environment;
 using WebBrowser.Properties;
 
 namespace WebBrowser.ScriptExecuting
@@ -9,22 +11,29 @@ namespace WebBrowser.ScriptExecuting
 	{
 		private string _scopeEmbeddingObjectName = "A89A3DC7FB5944849D4DE0781117A595";
 		
-		private readonly Engine _engine;
 		private Jint.Engine _jsEngine;
+
+		class EngineAdapter
+		{
+			private readonly Engine _engine;
+
+			public EngineAdapter(Engine engine)
+			{
+				_engine = engine;
+			}
+
+			public Document Document { get { return _engine.Document; } }
+			public Window Window { get { return _engine.Window; } }
+			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider.HttpResourceProvider);}
+		}
 
 		public ScriptExecutor(Engine engine)
 		{
-			_engine = engine;
-			_jsEngine = new Jint.Engine()
-				.SetValue(_scopeEmbeddingObjectName, new
-					{
-						_engine.Document, 
-						_engine.Window,
-						XmlHttpRequest = (Func<XmlHttpRequest>)(() => new XmlHttpRequest(engine.ResourceProvider.HttpResourceProvider)) 
-					})
+			_jsEngine = new Jint.Engine(o => o.AllowDebuggerStatement(true))
+				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine))
 				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
 
-			InitializeScope();
+			_jsEngine.Execute(Resources.clrBridge);
 		}
 		
 		public void Execute(string type, string code)
@@ -37,18 +46,38 @@ namespace WebBrowser.ScriptExecuting
 				}
 				catch (JavaScriptException e)
 				{
+					var ex = new ScriptExecutingException(e.Error.ToString(), e, code);
 					if (OnException != null)
-						OnException(e);
-					throw;
+						OnException(ex);
+					throw ex;
 				}
 			}
 		}
 
 		public event Action<Exception> OnException;
-		
-		private void InitializeScope()
+	}
+
+	[Serializable]
+	public class ScriptExecutingException : Exception
+	{
+		public ScriptExecutingException()
 		{
-			_jsEngine.Execute(Resources.clrBridge);
 		}
+
+		public ScriptExecutingException(string message) : base(message)
+		{
+		}
+
+		public ScriptExecutingException(string message, Exception inner) : base(message, inner)
+		{
+		}
+
+		public ScriptExecutingException(string message, Exception inner, string code)
+			: base("Script executing error.", inner)
+		{
+			Code = code;
+		}
+
+		public string Code { get; private set; }
 	}
 }

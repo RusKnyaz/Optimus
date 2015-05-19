@@ -52,10 +52,5 @@ namespace WebBrowser.Environment
 		{
 			throw new NotImplementedException();
 		}
-
-		public XmlHttpRequest XmlHttpRequest()
-		{
-			return new XmlHttpRequest();
-		}
 	}
 }
