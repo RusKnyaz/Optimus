@@ -118,22 +118,24 @@
 
 	function wrap(netElem) {
 		return !netElem ? null :
-			wrappers[netElem.InternalId] || (wrappers[netElem.InternalId] = new documentElement(netElem));
+			wrappers[netElem.InternalId] || (wrappers[netElem.InternalId] = wrapElement(netElem));
 	}
 
-	function documentElement(netElem) {
-		this.netElem = netElem;
+	function wrapElement(netElem) {
+		var elem = {};
+		elem.netElem = netElem;
 
-		this.appendChild = function (node) { return wrap(netElem.AppendChild(node.netElem)); };
-		bindFuncs(this, netElem, "getAttribute setAttribute removeAttribute hasAttribute getElementsByTagName");
+		elem.appendChild = function (node) { return wrap(netElem.AppendChild(node.netElem)); };
+		bindFuncs(elem, netElem, "getAttribute setAttribute removeAttribute hasAttribute getElementsByTagName");
 		//node
-		wrapNode(this, netElem);
-		if (this.nodeType === 1) {
-			bindProps(this, netElem, "innerHTML:InnerHtml tagName hidden style value disabled required readonly type checked");
-			bindFuncs(this, netElem, "click");
+		wrapNode(elem, netElem);
+		if (elem.nodeType === 1) {
+			bindProps(elem, netElem, "innerHTML:InnerHtml tagName hidden style value disabled required readonly type checked");
+			bindFuncs(elem, netElem, "click");
 		}
 		//comment, script
-		bindProps(this, netElem, "ownerDocument text data");
+		bindProps(elem, netElem, "ownerDocument text data");
+		return elem;
 	}
 	
 	function wrapArray(netElems) {
@@ -178,6 +180,7 @@
 			return docsWrappers[netDoc.GetHashCode()];
 
 		var doc = {};
+		wrapNode(doc, netDoc);
 		bindFuncs(doc, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName");
 		bindProps(doc, netDoc, "body documentElement");
 		docsWrappers[netDoc.GetHashCode()] = doc;
