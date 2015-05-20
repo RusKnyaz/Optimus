@@ -1,10 +1,12 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Properties;
+using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -33,12 +35,12 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Ajax()
 		{
-			var resourceProviderMock = new Mock<IResourceProvider>();
-			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("OK")));
+			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
+				new HttpResponse(HttpStatusCode.OK, "OK"));
 
-			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns(resource);
+			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
 
-			var engine = new Engine(resourceProviderMock.Object);
+			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o.ToString());
 

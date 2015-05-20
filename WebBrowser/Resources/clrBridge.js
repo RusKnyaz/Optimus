@@ -68,6 +68,7 @@
 		node.insertBefore = function (newNode, refNode) { return wrap(netElem.InsertBefore(newNode.netElem, refNode.netElem)); };
 		node.replaceChild = function (newNode, oldNode) { return wrap(netElem.ReplaceChild(newNode.netElem, oldNode.netElem)); };
 		node.cloneNode = function () { return wrap(netElem.CloneNode()); };
+		Node.compareDocumentPosition = function (node) { return netElem.CompareDocumentPosition(node.netElem); }
 
 		bindFuncs(node, netElem, "hasAttributes");
 		//props

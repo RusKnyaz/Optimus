@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace WebBrowser.Dom.Elements
 {
+	/// <summary>
+	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
+	/// </summary>
 	public abstract class Node : INode
 	{
 		private Document _ownerDocument;
@@ -139,6 +142,26 @@ namespace WebBrowser.Dom.Elements
 			if (OnEvent != null)
 				OnEvent(evt);
 			return true;//todo: what we should return?
+		}
+
+		/// <summary>
+		/// 1: No relationship, the two nodes do not belong to the same document.
+		///2: The first node (p1) is positioned after the second node (p2).
+		///4: The first node (p1) is positioned before the second node (p2).
+		///8: The first node (p1) is positioned inside the second node (p2).
+		///16: The second node (p2) is positioned inside the first node (p1).
+		///32: No relationship, or the two nodes are two attributes on the same element.
+		///Note: The return value could also be a combination of values. I.e. the returnvalue 20 means that p2 is inside p1 (16) AND p1 is positioned before p2 (4).
+
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		public int CompareDocumentPosition(Node node)
+		{
+			if (node.OwnerDocument != OwnerDocument)
+				return 1;
+
+			throw new NotImplementedException();
 		}
 
 		public event Action<Event> OnEvent;

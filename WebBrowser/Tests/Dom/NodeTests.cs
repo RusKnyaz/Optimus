@@ -29,6 +29,15 @@ namespace WebBrowser.Tests.Dom
 			Assert.AreEqual("100pt", style.GetPropertyValue("width"));
 			Assert.AreEqual("width", style[0]);
 		}
+
+		[TestCase("<div id='n1'></div><div id='n2'></div>", Result = 4)]
+		[TestCase("<div id='n2'></div><div id='n1'></div>", Result = 2)]
+		public int CompareDocumentPosition(string html)
+		{
+			var doc = new Document(null);
+			doc.Write("<html><body>"+html+"</doby></html>");
+			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById("n2"));
+		}
 	}
 }
 #endif
