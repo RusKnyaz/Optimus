@@ -61,17 +61,23 @@ namespace WebBrowser.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to var document = new (function () {
-        ///	var _this = this;
-        ///	var engine = A89A3DC7FB5944849D4DE0781117A595;
-        ///	var netDoc = engine.Document;
-        ///	var wrappers = {};
+        ///   Looks up a localized string similar to var window = this;
         ///
-        ///	function wrapNode(node, netElem) {
-        ///		node.hasAttributes = function () { return netElem.HasAttributes(); };
-        ///		node.removeChild = function (node) { return wrap(netElem.RemoveChild(node.netElem)); };
-        ///		node.insertBefore = function (newNode, refNode) { return wrap(netElem.InsertBefore(newNode.netElem, refNode.netElem)); };
-        ///		node.replaceChild = funct [rest of string was truncated]&quot;;.
+        ///(function (engine) {
+        ///	var converters = [];
+        ///	converters[&quot;Document&quot;] = wrapDocument;
+        ///	converters[&quot;Element&quot;] = wrap;
+        ///	converters[&quot;Element[]&quot;] = wrapArray;
+        ///	converters[&quot;Node&quot;] = wrap;
+        ///	converters[&quot;DocumentFragment&quot;] = wrap;
+        ///	converters[&quot;Text&quot;] = wrap;
+        ///	converters[&quot;Comment&quot;] = wrap;
+        ///	converters[&quot;Event&quot;] = wrapEvent;
+        ///	converters[&quot;CssStyleDeclaration&quot;] = wrapStyle;
+        ///	
+        ///	function bindFunc(target, owner, funcName) {
+        ///		var netFuncName = upFirstLetter(funcName);
+        ///		var methodInfo = own [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string clrBridge {
             get {
@@ -103,6 +109,31 @@ namespace WebBrowser.Properties {
         internal static string jquery_2_1_3 {
             get {
                 return ResourceManager.GetString("jquery_2_1_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /*!
+        /// * jQuery Form Plugin
+        /// * version: 3.51.0-2014.06.20
+        /// * Requires jQuery v1.5 or later
+        /// * Copyright (c) 2014 M. Alsup
+        /// * Examples and documentation at: http://malsup.com/jquery/form/
+        /// * Project repository: https://github.com/malsup/form
+        /// * Dual licensed under the MIT and GPL licenses.
+        /// * https://github.com/malsup/form#copyright-and-license
+        /// */
+        ////*global ActiveXObject */
+        ///
+        ///// AMD support
+        ///(function (factory) {
+        ///	&quot;use strict&quot;;
+        ///	if (typeof define === &apos;function&apos; &amp;&amp; define.amd) {
+        ///		// using AMD; re [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string jQuery_Form {
+            get {
+                return ResourceManager.GetString("jQuery_Form", resourceCulture);
             }
         }
         

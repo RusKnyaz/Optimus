@@ -51,6 +51,21 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("OK", log[0]);
 		}
+
+		[Test]
+		public void JQueryCreate()
+		{
+			var script = "var a = $('<input type=\"file\">');console.log(a?'ok':'error');";
+			var engine = new Engine();
+			string result = null;
+			engine.Console.OnLog += o => 
+			{ 
+				System.Console.WriteLine(o.ToString());
+				result = o.ToString();
+			};
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			Assert.AreEqual("ok", result);
+		}
 	}
 }
 #endif

@@ -20,11 +20,12 @@ namespace WebBrowser.Tests
 		}
 
 		[Test]
-		public void DocumentCreateElement()
+		public void CreateElement()
 		{
 			var document = new Document(null);
 			var el = document.CreateElement("div");
 			Assert.AreEqual("div", el.TagName);
+			Assert.AreEqual(document, el.OwnerDocument);
 		}
 
 		[Test]
@@ -103,7 +104,23 @@ namespace WebBrowser.Tests
 			Assert.AreEqual("s", clone.Id);
 		}
 
-		
+		[Test]
+		public void CreateComment()
+		{
+			var document = new Document(null);
+			var com = document.CreateComment("Com");
+			Assert.AreEqual("Com", com.Data);
+			Assert.AreEqual(document, com.OwnerDocument);
+		}
+
+		[Test]
+		public void CreateTextNode()
+		{
+			var document = new Document(null);
+			var x = document.CreateTextNode("X");
+			Assert.AreEqual("X", x.Data);
+			Assert.AreEqual(document, x.OwnerDocument);
+		}
 	}
 }
 #endif

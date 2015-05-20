@@ -11,6 +11,7 @@
 	converters["Comment"] = wrap;
 	converters["Event"] = wrapEvent;
 	converters["CssStyleDeclaration"] = wrapStyle;
+	converters["Attr"] = wrapAttr;
 	
 	function bindFunc(target, owner, funcName) {
 		var netFuncName = upFirstLetter(funcName);
@@ -38,6 +39,17 @@
 	}
 
 	var wrappers = {};
+	
+	function wrapAttr(netAttr) {
+		if (!wrappers[netAttr.InternalId]) {
+			var attr = {};
+			wrapNode(attr, netAttr);
+			bindProps(attr, "name specified value ownerElement isId schemaTypeInfo");
+			wrappers[netAttr.InternalId] = attr;
+		}
+
+		return wrappers[netAttr.InternalId];
+	}
 
 	function wrapEvent(netEvent) {
 		return {
@@ -68,7 +80,7 @@
 		node.insertBefore = function (newNode, refNode) { return wrap(netElem.InsertBefore(newNode.netElem, refNode.netElem)); };
 		node.replaceChild = function (newNode, oldNode) { return wrap(netElem.ReplaceChild(newNode.netElem, oldNode.netElem)); };
 		node.cloneNode = function () { return wrap(netElem.CloneNode()); };
-		Node.compareDocumentPosition = function (node) { return netElem.CompareDocumentPosition(node.netElem); }
+		node.compareDocumentPosition = function (node) { return netElem.CompareDocumentPosition(node.netElem); }
 
 		bindFuncs(node, netElem, "hasAttributes");
 		//props
@@ -115,6 +127,8 @@
 				typeHandlers[i](event);
 			}
 		});
+
+		node.isSameNode = function(n) { return n.netElem == node.netElem; };
 	}
 
 	function wrap(netElem) {
@@ -127,7 +141,7 @@
 		elem.netElem = netElem;
 
 		elem.appendChild = function (node) { return wrap(netElem.AppendChild(node.netElem)); };
-		bindFuncs(elem, netElem, "getAttribute setAttribute removeAttribute hasAttribute getElementsByTagName");
+		bindFuncs(elem, netElem, "getAttribute setAttribute removeAttribute hasAttribute getElementsByTagName getAttributeNode");
 		//node
 		wrapNode(elem, netElem);
 		if (elem.nodeType === 1) {
@@ -177,6 +191,9 @@
 	
 	var docsWrappers = [];
 	function wrapDocument(netDoc) {
+		if (!netDoc)
+			return netDoc;
+
 		if (docsWrappers[netDoc.GetHashCode()])
 			return docsWrappers[netDoc.GetHashCode()];
 

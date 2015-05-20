@@ -9,10 +9,10 @@ namespace WebBrowser.Dom.Elements
 		public Element()
 		{
 			NodeType = ELEMENT_NODE;
-			Attributes = new Dictionary<string, string>();
+			Attributes = new Dictionary<string, Attr>();
 		}
 		
-		public IDictionary<string, string> Attributes { get; private set; }
+		public IDictionary<string, Attr> Attributes { get; private set; }
 
 		public Element(string tagName) :this()
 		{
@@ -58,16 +58,16 @@ namespace WebBrowser.Dom.Elements
 		public string GetAttribute(string name)
 		{
 			if(Attributes.ContainsKey(name))
-				return Attributes[name];
+				return Attributes[name].Value;
 			return null;
 		}
 
 		public void SetAttribute(string name, string value)
 		{
 			if (Attributes.ContainsKey(name))
-				Attributes[name] = value;
+				Attributes[name].Value = value;
 			else
-				Attributes.Add(name, value);
+				Attributes.Add(name, new Attr(this, name, value));
 		}
 
 		public void RemoveAttribute(string name)
@@ -101,7 +101,7 @@ namespace WebBrowser.Dom.Elements
 					if (attribute.Value != null)
 					{
 						sb.Append("=\"");
-						sb.Append(attribute.Value.Replace("\"","\\\""));
+						sb.Append(attribute.Value.Value.Replace("\"","\\\""));
 						sb.Append("\"");
 					}
 				}
@@ -119,6 +119,11 @@ namespace WebBrowser.Dom.Elements
 			var node  = DocumentBuilder.Build(ToString()).Single();
 			node.OwnerDocument = OwnerDocument;
 			return node;
+		}
+
+		public Attr GetAttributeNode(string name)
+		{
+			return Attributes.ContainsKey(name) ? Attributes[name] : null;
 		}
 	}
 }

@@ -53,6 +53,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			InternalId = Guid.NewGuid().ToString();
 			ChildNodes = new List<INode>();
+			NodeType = _NODE;
 		}
 
 		public IList<INode> ChildNodes { get; protected set; }
@@ -152,16 +153,49 @@ namespace WebBrowser.Dom.Elements
 		///16: The second node (p2) is positioned inside the first node (p1).
 		///32: No relationship, or the two nodes are two attributes on the same element.
 		///Note: The return value could also be a combination of values. I.e. the returnvalue 20 means that p2 is inside p1 (16) AND p1 is positioned before p2 (4).
-
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>
-		public int CompareDocumentPosition(Node node)
+		public int CompareDocumentPosition(INode node)
 		{
-			if (node.OwnerDocument != OwnerDocument)
+			if (node.OwnerDocument != OwnerDocument 
+				|| (Parent == null && node.Parent == null))
 				return 1;
 
-			throw new NotImplementedException();
+			if (Parent == node.Parent)
+			{
+				return Parent.ChildNodes.IndexOf(this) > Parent.ChildNodes.IndexOf(node) ? 2 : 4;
+			}
+
+			//Search for shared ancestors
+			var thisAncestors = new List<INode>();
+			var otherAncestors = new List<INode>();
+
+			for (var p = (INode)this; p != null; p = p.Parent )
+				otherAncestors.Add(p);
+
+			for (var p = (INode)node; p != null && !otherAncestors.Contains(p); p = p.Parent)
+				thisAncestors.Add(p);
+
+			//node placed inside
+			if (thisAncestors.Count == 0)
+				return 10;
+
+			var sharedParent = thisAncestors.Last().Parent;
+
+			if (sharedParent == this)
+				return 20;
+
+			var sharedParentIndex = otherAncestors.IndexOf(sharedParent);
+
+			//this placed inside node
+			if (sharedParentIndex == 0)
+				return 2;
+
+			var thisPreParent = thisAncestors[thisAncestors.Count - 1];
+			var otherPreParent = otherAncestors[sharedParentIndex - 1];
+
+			return thisPreParent.CompareDocumentPosition(otherPreParent);
 		}
 
 		public event Action<Event> OnEvent;

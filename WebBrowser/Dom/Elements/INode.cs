@@ -11,6 +11,7 @@ namespace WebBrowser.Dom.Elements
 		INode Parent { get; set; }
 		Document OwnerDocument { get; set; }
 		INode CloneNode();
+		int CompareDocumentPosition(INode otherPreParent);
 	}
 
 	

@@ -97,7 +97,7 @@ namespace WebBrowser.Dom
 
 			foreach (var attribute in htmlElement.Attributes)
 			{
-				elem.Attributes.Add(attribute.Key, attribute.Value);
+				elem.SetAttribute(attribute.Key, attribute.Value);
 			}
 
 			foreach(var child in htmlElement.Children)

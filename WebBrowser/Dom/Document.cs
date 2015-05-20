@@ -129,7 +129,7 @@ namespace WebBrowser.Dom
 			if(tagName == string.Empty)
 				throw new ArgumentOutOfRangeException("tagName");
 
-			if (tagName[0] == '<')
+			/*if (tagName[0] == '<')
 			{
 				if(tagName.Last() != '>')
 					throw new ArgumentOutOfRangeException("tagName");
@@ -140,7 +140,7 @@ namespace WebBrowser.Dom
 					return null;
 				elem.OwnerDocument = this;
 				return elem;
-			}
+			}*/
 			
 			return new Element(tagName) { OwnerDocument = this};
 		}
@@ -153,17 +153,17 @@ namespace WebBrowser.Dom
 
 		public DocumentFragment CreateDocumentFragment()
 		{
-			return new DocumentFragment();
+			return new DocumentFragment{ OwnerDocument = this};
 		}
 
 		public Text CreateTextNode(string data)
 		{
-			return new Text{Data = data};	
+			return new Text{Data = data, OwnerDocument = this};	
 		}
 
 		public Comment CreateComment(string data)
 		{
-			return new Comment(){Data = data};
+			return new Comment { Data = data, OwnerDocument = this };
 		}
 
 		public Element Body
