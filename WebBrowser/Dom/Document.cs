@@ -129,20 +129,12 @@ namespace WebBrowser.Dom
 			if(tagName == string.Empty)
 				throw new ArgumentOutOfRangeException("tagName");
 
-			/*if (tagName[0] == '<')
-			{
-				if(tagName.Last() != '>')
-					throw new ArgumentOutOfRangeException("tagName");
-
-				var html = tagName.Insert(tagName.Length - 1, "/");
-				var elem = DocumentBuilder.Build(html).Single() as Element;
-				if (elem == null)
-					return null;
-				elem.OwnerDocument = this;
-				return elem;
-			}*/
-			
 			return new Element(tagName) { OwnerDocument = this};
+		}
+
+		public Attr CreateAttribute(string name)
+		{
+			return new Attr(name){OwnerDocument = this};
 		}
 
 		public Element GetElementById(string id)

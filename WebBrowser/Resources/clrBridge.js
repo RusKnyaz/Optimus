@@ -42,7 +42,7 @@
 	
 	function wrapAttr(netAttr) {
 		if (!wrappers[netAttr.InternalId]) {
-			var attr = {};
+			var attr = {netAttr:netAttr};
 			wrapNode(attr, netAttr);
 			bindProps(attr, "name specified value ownerElement isId schemaTypeInfo");
 			wrappers[netAttr.InternalId] = attr;
@@ -142,6 +142,9 @@
 
 		elem.appendChild = function (node) { return wrap(netElem.AppendChild(node.netElem)); };
 		bindFuncs(elem, netElem, "getAttribute setAttribute removeAttribute hasAttribute getElementsByTagName getAttributeNode");
+
+		elem.setAttributeNode = function (node) { return wrapAttr(netElem.SetAttributeNode(node.netAttr)); };
+		elem.removeAttributeNode = function(node) { netElem.RemoveAttributeNode(node.netAttr); };
 		//node
 		wrapNode(elem, netElem);
 		if (elem.nodeType === 1) {
@@ -199,7 +202,7 @@
 
 		var doc = {};
 		wrapNode(doc, netDoc);
-		bindFuncs(doc, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName");
+		bindFuncs(doc, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName createAttribute");
 		bindProps(doc, netDoc, "body documentElement");
 		docsWrappers[netDoc.GetHashCode()] = doc;
 		return doc;

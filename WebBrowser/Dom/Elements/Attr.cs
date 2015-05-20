@@ -1,14 +1,22 @@
-﻿namespace WebBrowser.Dom.Elements
+﻿using System;
+
+namespace WebBrowser.Dom.Elements
 {
 	public class Attr : Node
 	{
 		private string _name;
+		private Element _ownerElement;
 
 		public Attr(Element owner, string name, string value)
 		{
 			_name = name;
-			OwnerElement = owner;
+			_ownerElement = owner;
 			Value = value;
+		}
+
+		public Attr(string name)
+		{
+			_name = name;
 		}
 
 		public override INode CloneNode()
@@ -26,7 +34,16 @@
 			get { return _name; }
 		}
 
-		public Element OwnerElement { get; private set; }
+		public Element OwnerElement
+		{
+			get { return _ownerElement; }
+		}
+
+		internal void SetOwnerElement(Element element)
+		{
+			_ownerElement = element;
+		}
+
 		public string Value { get; set; }
 
 		//todo: is it right?

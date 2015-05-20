@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -62,17 +63,56 @@ namespace WebBrowser.Dom.Elements
 			return null;
 		}
 
+		public override Document OwnerDocument
+		{
+			get
+			{
+				return base.OwnerDocument;
+			}
+			set
+			{
+				base.OwnerDocument = value;
+				foreach (var attribute in Attributes)
+				{
+					attribute.Value.OwnerDocument = value;
+				}
+			}
+		}
+
+		public void RemoveAttributeNode(Attr attr)
+		{
+			if (attr.OwnerElement != this)
+				return;
+
+			Attributes.Remove(attr.Name);
+			attr.SetOwnerElement(null);
+		}
+
 		public void SetAttribute(string name, string value)
 		{
 			if (Attributes.ContainsKey(name))
 				Attributes[name].Value = value;
 			else
-				Attributes.Add(name, new Attr(this, name, value));
+				Attributes.Add(name, new Attr(this, name, value){OwnerDocument = OwnerDocument});
+		}
+
+		public Attr SetAttributeNode(Attr attr)
+		{
+			attr.SetOwnerElement(this);
+
+			if (Attributes.ContainsKey(attr.Name))
+				Attributes[attr.Name] = attr;
+			else
+				Attributes.Add(attr.Name, attr);
+
+			return attr;
 		}
 
 		public void RemoveAttribute(string name)
 		{
-			Attributes.Remove(name);
+			var attr = GetAttributeNode(name);
+			if(attr!=null)
+				RemoveAttributeNode(attr);
 		}
 
 		public bool HasAttribute(string name)
@@ -125,5 +165,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			return Attributes.ContainsKey(name) ? Attributes[name] : null;
 		}
+
+
 	}
 }

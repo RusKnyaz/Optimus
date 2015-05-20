@@ -11,7 +11,7 @@ namespace WebBrowser.Dom.Elements
 	{
 		private Document _ownerDocument;
 
-		public Document OwnerDocument
+		public virtual Document OwnerDocument
 		{
 			get { return _ownerDocument; }
 			set
@@ -161,6 +161,11 @@ namespace WebBrowser.Dom.Elements
 			if (node.OwnerDocument != OwnerDocument 
 				|| (Parent == null && node.Parent == null))
 				return 1;
+
+			if (this is Element && node is Attr)
+			{
+				
+			}
 
 			if (Parent == node.Parent)
 			{

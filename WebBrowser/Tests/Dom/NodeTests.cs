@@ -40,11 +40,102 @@ namespace WebBrowser.Tests.Dom
 		[TestCase("<div id='n1'></div><div><div id='n2'></div></div>", Result = 2)]
 		[TestCase("<div><div id='n2'></div></div><div><div id='n1'></div></div>", Result = 4)]
 		[TestCase("<div><div id='n1'></div></div><div><div id='n2'></div></div>", Result = 2)]
-		public int CompareDocumentPosition(string html)
+		public int CompareDocumentPosition_NodeNode(string html)
 		{
 			var doc = new Document(null);
 			doc.Write("<html><body>"+html+"</doby></html>");
 			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById("n2"));
+		}
+
+		[TestCase("<div id='n1'></div>", "n1", Result = 20)]
+		[TestCase("<div id='n1'><div id='n2'></div></div>", "n2", Result = 20)]
+		[TestCase("<div id='n2'><div id='n1'></div></div>", "n2", Result = 2)]
+		[TestCase("<div id='n2'></div><div id='n1'></div>", "n2", Result = 2)]
+		[TestCase("<div id='n1'></div><div id='n2'></div>", "n2", Result = 4)]
+		public int CompareDocumentPosition_NodeAttr(string html, string attrElemId)
+		{
+			var doc = new Document(null);
+			doc.Write("<html><body>" + html + "</doby></html>");
+			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById(attrElemId).GetAttributeNode("id"));
+		}
+
+		[Test]
+		public void AttributeNode()
+		{
+			var doc = new Document(null);
+			doc.Write("<html><body><div id='x'></div></doby></html>");
+			var div = doc.GetElementById("x");
+			var attr = div.GetAttributeNode("id");
+			Assert.AreEqual(doc, attr.OwnerDocument);
+			Assert.AreEqual(div, attr.OwnerElement);
+			Assert.AreEqual("x", attr.Value);
+		}
+
+		[Test]
+		public void AttributeNodeOfAddedElement()
+		{
+			var doc = new Document(null);
+			doc.Write("<html><body><div id='x'></div></doby></html>");
+
+			var span = doc.CreateElement("span");
+			span.SetAttribute("id", "s");
+
+			var attrNode = span.GetAttributeNode("id");
+			Assert.IsNotNull(attrNode);
+			Assert.AreEqual(doc, attrNode.OwnerDocument);
+		}
+
+		[Test]
+		public void SetAttributeNode()
+		{
+			var doc = new Document(null);
+
+			var span = doc.CreateElement("span");
+			var attr = doc.CreateAttribute("name");
+			Assert.AreEqual(doc, attr.OwnerDocument, "OwnerDocument of free attr");
+
+			span.SetAttributeNode(attr);
+
+			Assert.AreEqual(doc, attr.OwnerDocument, "OwnerDocument");
+			Assert.AreEqual(span , attr.OwnerElement, "OwnerElement");
+		}
+
+		[Test]
+		public void CompareDocumentPositionOfFreeNodes()
+		{
+			var doc = new Document(null);
+			var n1 = doc.CreateElement("div");
+			var n2 = doc.CreateElement("div");
+			Assert.AreEqual(1, n1.CompareDocumentPosition(n2));
+			Assert.AreEqual(1, n2.CompareDocumentPosition(n1));
+		}
+
+		[Test]
+		public void RemoveAttribute()
+		{
+			var doc = new Document(null);
+			var div = doc.CreateElement("div");
+			var attr = doc.CreateAttribute("name");
+			attr.Value = "D";
+			div.SetAttributeNode(attr);
+			Assert.AreEqual("D", div.GetAttribute("name"));
+
+			div.RemoveAttribute("name");
+			Assert.AreEqual(null, attr.OwnerElement);
+		}
+
+		[Test]
+		public void RemoveAttributeNode()
+		{
+			var doc = new Document(null);
+			var div = doc.CreateElement("div");
+			var attr = doc.CreateAttribute("name");
+			attr.Value = "D";
+			div.SetAttributeNode(attr);
+			Assert.AreEqual("D", div.GetAttribute("name"));
+
+			div.RemoveAttributeNode(attr);
+			Assert.AreEqual(null, attr.OwnerElement);
 		}
 	}
 }
