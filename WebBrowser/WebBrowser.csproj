@@ -91,6 +91,7 @@
     <Compile Include="EngineExtension.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
+    <Compile Include="SignleThreadSynchronizationContext.cs" />
     <Compile Include="Tests\EngineTests\EngineGeneralTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryFormTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryTests.cs" />

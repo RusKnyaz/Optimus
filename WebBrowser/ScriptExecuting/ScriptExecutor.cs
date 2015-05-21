@@ -1,5 +1,5 @@
 ﻿using System;
-using Jint;
+using System.Threading;
 using Jint.Runtime;
 using WebBrowser.Dom;
 using WebBrowser.Environment;
@@ -9,6 +9,8 @@ namespace WebBrowser.ScriptExecuting
 {
 	internal class ScriptExecutor : IScriptExecutor
 	{
+		private SynchronizationContext _context;
+
 		private string _scopeEmbeddingObjectName = "A89A3DC7FB5944849D4DE0781117A595";
 		
 		private Jint.Engine _jsEngine;
@@ -24,11 +26,12 @@ namespace WebBrowser.ScriptExecuting
 
 			public Document Document { get { return _engine.Document; } }
 			public Window Window { get { return _engine.Window; } }
-			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider.HttpResourceProvider);}
+			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider.HttpResourceProvider, _engine.Context);}
 		}
 
 		public ScriptExecutor(Engine engine)
 		{
+			_context = engine.Context;
 			_jsEngine = new Jint.Engine(o => o.AllowDebuggerStatement(true))
 				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine))
 				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
@@ -38,20 +41,23 @@ namespace WebBrowser.ScriptExecuting
 		
 		public void Execute(string type, string code)
 		{
-			if (type.ToLowerInvariant() == "text/javascript")
+			_context.Send(_ =>
 			{
-				try
+				if (type.ToLowerInvariant() == "text/javascript")
 				{
-					_jsEngine.Execute(code);
+					try
+					{
+						_jsEngine.Execute(code);
+					}
+					catch (JavaScriptException e)
+					{
+						var ex = new ScriptExecutingException(e.Error.ToString(), e, code);
+						if (OnException != null)
+							OnException(ex);
+						throw ex;
+					}
 				}
-				catch (JavaScriptException e)
-				{
-					var ex = new ScriptExecutingException(e.Error.ToString(), e, code);
-					if (OnException != null)
-						OnException(ex);
-					throw ex;
-				}
-			}
+			}, null);
 		}
 
 		public event Action<Exception> OnException;

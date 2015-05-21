@@ -7,11 +7,22 @@ namespace WebBrowser.Dom.Elements
 {
 	internal class WindowTimers
 	{
+		private readonly SynchronizationContext _context;
 		readonly List<Timer> _activeTimers = new List<Timer>();
+
+		public WindowTimers(SynchronizationContext context)
+		{
+			_context = context;
+		}
 
 		public int SetTimeout(Action handler, int timeout)
 		{
-			var timer = new Timer(state => {handler();}, null, timeout, Timeout.Infinite);
+			//todo: handle exceptions;
+			
+			var timer = new Timer(state =>
+			{
+				_context.Send(o => handler(), null);
+			}, null, timeout, Timeout.Infinite);
 
 			return timer.GetHashCode();
 		}

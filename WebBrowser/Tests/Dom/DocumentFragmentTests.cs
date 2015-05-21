@@ -10,7 +10,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void CreateDocumentFragment()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			var x = document.CreateDocumentFragment();
 			var el = document.CreateElement("div");
 			x.AppendChild(el);

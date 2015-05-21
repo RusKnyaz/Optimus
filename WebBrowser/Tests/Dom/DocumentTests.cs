@@ -11,7 +11,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void Element()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			document.Write("<html><body><span></span></body></html>");
 			Assert.IsNotNull(document.DocumentElement);
 			Assert.AreEqual(1, document.DocumentElement.ChildNodes.Count);
@@ -22,7 +22,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void CreateElement()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			var el = document.CreateElement("div");
 			Assert.AreEqual("div", el.TagName);
 			Assert.AreEqual(document, el.OwnerDocument);
@@ -31,7 +31,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void InputChecked()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			document.Write("<html><body><input id='i' type='checkbox' checked='true'></input></body></html>");
 			var el = (HtmlInputElement)document.GetElementById("i");
 			Assert.IsTrue(el.Checked);
@@ -40,7 +40,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void Comment()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			document.Write("<html><body><!-- hello --></body></html");
 			Assert.AreEqual(1, document.Body.ChildNodes.Count);
 			Assert.IsInstanceOf<Comment>(document.Body.ChildNodes[0]);
@@ -49,7 +49,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void AppendChildRemovesNodeFromOldParrent()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			document.Write("<html><body><div id='p1'><span id='s'></span></div><div id='p2'></div></body></html");
 			var div1 = document.GetElementById("p1");
 			var div2 = document.GetElementById("p2");
@@ -65,7 +65,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void InsertBeforeRemovesNodeFromOldParrent()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			document.Write("<html><body><div id='p1'><span id='s'></span></body></html");
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
@@ -80,7 +80,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void CloneNode()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></body></html");
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
@@ -107,7 +107,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void CreateComment()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			var com = document.CreateComment("Com");
 			Assert.AreEqual("Com", com.Data);
 			Assert.AreEqual(document, com.OwnerDocument);
@@ -116,7 +116,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void CreateTextNode()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			var x = document.CreateTextNode("X");
 			Assert.AreEqual("X", x.Data);
 			Assert.AreEqual(document, x.OwnerDocument);
@@ -125,7 +125,7 @@ namespace WebBrowser.Tests
 		[Test]
 		public void CreateDocumentFragment()
 		{
-			var document = new Document(null);
+			var document = new Document();
 			var x = document.CreateDocumentFragment();
 			Assert.AreEqual(document, x.OwnerDocument);
 		}

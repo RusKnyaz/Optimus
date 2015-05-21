@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 
@@ -6,7 +7,7 @@ namespace WebBrowser.Environment
 {
 	public class Window
 	{
-		public Window()
+		public Window(SynchronizationContext context)
 		{
 			Screen = new Screen
 				{
@@ -22,6 +23,8 @@ namespace WebBrowser.Environment
 			InnerHeight = 768;
 			Location = new Location{Href = "http://localhost"};//todo: remove the stub href value
 			Navigator = new Navigator();
+
+			_timers = new WindowTimers(context);
 		}
 
 		public int InnerWidth { get; set; }
@@ -31,7 +34,7 @@ namespace WebBrowser.Environment
 		public Location Location { get; private set; }
 		public Navigator Navigator { get; private set; }
 
-		private WindowTimers _timers = new WindowTimers();
+		private WindowTimers _timers;
 
 		public int SetTimeout(Action handler, int delay)
 		{

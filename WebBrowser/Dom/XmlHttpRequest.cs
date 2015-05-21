@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Dom
@@ -6,13 +7,15 @@ namespace WebBrowser.Dom
 	public class XmlHttpRequest
 	{
 		private readonly IHttpResourceProvider _httpResourceProvider;
+		private readonly SynchronizationContext _context;
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
 
-		public XmlHttpRequest(IHttpResourceProvider httpResourceProvider)
+		public XmlHttpRequest(IHttpResourceProvider httpResourceProvider, SynchronizationContext context)
 		{
 			_httpResourceProvider = httpResourceProvider;
+			_context = context;
 			ReadyState = UNSENT;
 		}
 
@@ -54,20 +57,23 @@ namespace WebBrowser.Dom
 		private void FireOnReadyStateChange()
 		{
 			//todo: Invoke OnReadyStateChange in JS runtime thread.
-			if (OnReadyStateChange != null)
-				OnReadyStateChange();
+			_context.Post(_ =>
+			{
+				if (OnReadyStateChange != null)
+					OnReadyStateChange();	
+			}, null);
 		}
 
 		public async void Send(object data)
 		{
-			if (_async)
+			//if (_async)
 			{
 			/*	ReadyState = LOADING;
 				_response = (HttpWebResponse) await _request.GetResponseAsync();
 				ReadyState = DONE;
 				FireOnReadyStateChange();*/
 			}
-			else
+			//else
 			{
 				ReadyState = LOADING;
 				_response = _httpResourceProvider.SendRequest(_request);

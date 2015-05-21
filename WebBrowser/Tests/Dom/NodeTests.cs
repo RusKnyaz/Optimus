@@ -1,5 +1,6 @@
 ﻿#if NUNIT
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
@@ -11,7 +12,7 @@ namespace WebBrowser.Tests.Dom
 	{
 		private Element CreateElement(string html)
 		{
-			var document = new Document(null);
+			var document = new Document();
 			var tmp = document.CreateElement("div");
 			tmp.InnerHtml = html;
 			return (Element)tmp.FirstChild;
@@ -50,7 +51,7 @@ namespace WebBrowser.Tests.Dom
 		[TestCase("<div><div id='n1'></div></div><div><div id='n2'></div></div>", Result = 2)]
 		public int CompareDocumentPosition_NodeNode(string html)
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			doc.Write("<html><body>"+html+"</doby></html>");
 			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById("n2"));
 		}
@@ -62,7 +63,7 @@ namespace WebBrowser.Tests.Dom
 		[TestCase("<div id='n1'></div><div id='n2'></div>", "n2", Result = 4)]
 		public int CompareDocumentPosition_NodeAttr(string html, string attrElemId)
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			doc.Write("<html><body>" + html + "</doby></html>");
 			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById(attrElemId).GetAttributeNode("id"));
 		}
@@ -70,7 +71,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void AttributeNode()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			doc.Write("<html><body><div id='x'></div></doby></html>");
 			var div = doc.GetElementById("x");
 			var attr = div.GetAttributeNode("id");
@@ -82,7 +83,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void AttributeNodeOfAddedElement()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			doc.Write("<html><body><div id='x'></div></doby></html>");
 
 			var span = doc.CreateElement("span");
@@ -96,7 +97,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void SetAttributeNode()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 
 			var span = doc.CreateElement("span");
 			var attr = doc.CreateAttribute("name");
@@ -111,7 +112,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void CompareDocumentPositionOfFreeNodes()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			var n1 = doc.CreateElement("div");
 			var n2 = doc.CreateElement("div");
 			Assert.AreEqual(1, n1.CompareDocumentPosition(n2));
@@ -121,7 +122,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void RemoveAttribute()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			var div = doc.CreateElement("div");
 			var attr = doc.CreateAttribute("name");
 			attr.Value = "D";
@@ -135,7 +136,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void RemoveAttributeNode()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			var div = doc.CreateElement("div");
 			var attr = doc.CreateAttribute("name");
 			attr.Value = "D";
@@ -152,7 +153,7 @@ namespace WebBrowser.Tests.Dom
 		[TestCase("<div id='a'><div><strong></strong></div></div>", Result = 1)]
 		public int GetElementsByTagName(string html)
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			doc.Write("<html><body>" + html + "</body></html>");
 
 			return doc.GetElementById("a").GetElementsByTagName("strong").Length;
@@ -161,7 +162,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void SetInnerHtml()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			var d = doc.CreateElement("<div>");
 			d.InnerHtml = "<strong></strong>";
 			Assert.AreEqual(doc, d.ChildNodes[0].OwnerDocument);
@@ -170,7 +171,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void SetAttributeFromId()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			var d = doc.CreateElement("<div>");
 			d.SetAttribute("Id", "d");
 			Assert.AreEqual("d", d.Id);

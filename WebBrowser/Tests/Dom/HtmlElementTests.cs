@@ -11,7 +11,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void SetStyleFromAttribute()
 		{
-			var doc = new Document(null);
+			var doc = new Document();
 			var elem = doc.CreateElement("div") as HtmlElement;
 			Assert.IsNotNull(elem);
 			elem.SetAttribute("style","color:black");

@@ -1,18 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using WebBrowser.Dom.Elements;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom
 {
+	class StubSynchronizationContext : SynchronizationContext
+	{
+		public override void Post(SendOrPostCallback d, object state)
+		{
+			d(state);
+		}
+
+		public override void Send(SendOrPostCallback d, object state)
+		{
+			d(state);
+		}
+	}
+
 	public class Document : DocumentFragment
 	{
 		private readonly IResourceProvider _resourceProvider;
+		private readonly SynchronizationContext _context;
 
-		internal Document(IResourceProvider resourceProvider)
+		internal Document()
+			:this(null, new StubSynchronizationContext())
+		{
+			
+		}
+
+		internal Document(IResourceProvider resourceProvider, SynchronizationContext context)
 		{
 			_resourceProvider = resourceProvider;
+			_context = context;
 			ChildNodes = new List<INode> {new Element("html"){Parent = this}};
 			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
@@ -81,7 +103,7 @@ namespace WebBrowser.Dom
 		{
 			var evt = CreateEvent("Event");
 			evt.InitEvent(type, false, false);
-			DispatchEvent(evt);
+			_context.Post(state => DispatchEvent(evt), null);
 		}
 
 		private void RegisterDelayed(IEnumerable<INode> elements)
@@ -110,6 +132,7 @@ namespace WebBrowser.Dom
 				}
 			}
 			_unresolvedDelayedResources.Clear();
+			
 			Trigger("load");
 		}
 
