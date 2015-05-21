@@ -26,10 +26,10 @@ namespace WebBrowser.Dom
 
 		public void Write(string text)
 		{
-			Load(DocumentBuilder.Build(text));
+			Load(DocumentBuilder.Build(this, text));
 		}
 
-		public void Load(IEnumerable<INode> elements)
+		internal void Load(IEnumerable<INode> elements)
 		{
 			ChildNodes.Clear();
 			
@@ -128,6 +128,19 @@ namespace WebBrowser.Dom
 				throw new ArgumentNullException("tagName");
 			if(tagName == string.Empty)
 				throw new ArgumentOutOfRangeException("tagName");
+
+			var invariantTagName = tagName.ToLowerInvariant();
+
+			switch (invariantTagName)
+			{
+				//todo: fill the list
+				case "div":
+				case "span":
+				case "b":
+					return new HtmlElement(tagName) {OwnerDocument = this};
+				case "input":
+					return new HtmlInputElement {OwnerDocument = this};
+			}
 
 			return new Element(tagName) { OwnerDocument = this};
 		}

@@ -48,6 +48,8 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<script><div></div></script><script>alert('a');</script>", "TagStart:script, Text:<div></div>, TagEnd:script, TagStart:script, Text:alert('a');, TagEnd:script")]
 		[TestCase("<script type='text/html'><div></div></script>", "TagStart:script, AttributeName:type, AttributeValue:text/html, Text:<div></div>, TagEnd:script")]
 		[TestCase("<script>console.log(\"\\\"</script>\\\"\");</script>", "TagStart:script, Text:console.log(\"\\\"</script>\\\"\");, TagEnd:script")]
+		[TestCase("<script>var a = /\\/s*[\"']/g;</script><br/>", "TagStart:script, Text:var a = /\\/s*[\"']/g;, TagEnd:script, TagStart:br, TagEnd:br", Description = "Regex with special char inside script")]
+		[TestCase("<script>//\"\r\n</script><br/>", "TagStart:script, Text://\"\r\n, TagEnd:script, TagStart:br, TagEnd:br", Description = "Regex with special char inside script")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{
 			var result = Read(source).ToArray();

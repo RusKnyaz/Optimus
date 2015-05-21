@@ -58,6 +58,7 @@
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
     <Compile Include="Dom\Elements\DocumentFragment.cs" />
     <Compile Include="Dom\Elements\Element.cs" />
+    <Compile Include="Dom\Elements\Event.cs" />
     <Compile Include="Dom\Elements\HtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlInputElement.cs" />
     <Compile Include="Dom\Elements\Script.cs" />
@@ -85,13 +86,16 @@
     <Compile Include="ResourceProviders\ResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
+    <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
+    <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\EngineTests\EngineGeneralTests.cs" />
-    <Compile Include="Tests\EngineTests\EngineJQueryFormTests.cs" />
-    <Compile Include="Tests\EngineTests\EngineWithJQueryTests.cs" />
-    <Compile Include="Tests\EngineTests\EngineWithKnockoutTests.cs" />
+    <Compile Include="Tests\EngineTests\JQueryFormTests.cs" />
+    <Compile Include="Tests\EngineTests\JQueryTests.cs" />
+    <Compile Include="Tests\EngineTests\KnockoutTests.cs" />
+    <Compile Include="Tests\EngineTests\RequirejsTests.cs" />
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
     <Compile Include="Tests\ResourceProvidersTests.cs" />
@@ -113,6 +117,7 @@
     <Content Include="Resources\clrBridge.js" />
     <Content Include="Resources\jquery-2.1.3.js" />
     <Content Include="Resources\jQuery.Form.js" />
+    <Content Include="Resources\requirejs.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\jint-master\Jint\Jint.csproj">

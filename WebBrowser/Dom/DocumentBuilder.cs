@@ -1,100 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Html;
-using HtmlElement = WebBrowser.Dom.Elements.HtmlElement;
 
 namespace WebBrowser.Dom
 {
 	internal class DocumentBuilder
 	{
-		public static IEnumerable<INode> Build(string htmlString)
+		public static IEnumerable<INode> Build(Document doc, string htmlString)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
-				return Build(stream).ToList();
+				return Build(doc, stream);
 			}
 		}
 
-		public static IEnumerable<INode> Build(Stream htmlStream)
+		public static IEnumerable<INode> Build(Document doc, Stream stream)
 		{
-			var html = HtmlParser.Parse(htmlStream);
-			return Build(html);
+			var html = HtmlParser.Parse(stream);
+			return Build(doc, html).ToList();
 		}
 
-		public static IEnumerable<INode> Build(IEnumerable<IHtmlNode> htmlElements)
+		public static IEnumerable<INode> Build(Document doc, IEnumerable<IHtmlNode> htmlElements)
 		{
-			return htmlElements.Select(BuildElem);
+			return htmlElements.Select(x => BuildElem(doc, x));
 		}
 
-		private static INode BuildElem(IHtmlNode htmlNode)
+		private static INode BuildElem(Document doc, IHtmlNode htmlNode)
 		{
 			var comment = htmlNode as HtmlComment;
 			if (comment != null)
-				return new Comment { Data = comment.Text };
+				return doc.CreateComment(comment.Text);
 			
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
-				return new Text(){Data = txt.Value};
+				return doc.CreateTextNode(txt.Value);
 
 			var htmlElement = htmlNode as IHtmlElement;
 			if (htmlElement == null)
 				return null;
 
-			var id = htmlElement.Attributes.ContainsKey("id") ? htmlElement.Attributes["id"] : string.Empty;
-
-			Element elem = null;
-
-			if (htmlElement.Name == "script")
-			{
-				elem = BuildScript(htmlElement);
-			}
-			else if (htmlElement.Name == "input")
-			{
-				elem = new HtmlInputElement
-				{
-					Type = htmlElement.Attributes.ContainsKey("type") ? htmlElement.Attributes["type"] : "text",
-					Value = htmlElement.Attributes.ContainsKey("value") ? htmlElement.Attributes["value"] : null,
-					Checked = htmlElement.Attributes.ContainsKey("checked") && htmlElement.Attributes["checked"] == "true"
-				};
-			}
-			else if (htmlElement.Name == "span" || htmlElement.Name == "div")
-			{
-				elem = new HtmlElement(htmlElement.Name);
-			}
-			else
-			{
-				elem = new Element(htmlElement.Name) { Id = id };	
-			}
-
-			if (elem is HtmlElement)
-			{
-				var hElem = elem as HtmlElement;
-				hElem.Hidden = htmlElement.Attributes.ContainsKey("hidden") && htmlElement.Attributes["hidden"] == "true";
-				//initialize style
-				if (htmlElement.Attributes.ContainsKey("style"))
-				{
-					var styleDefinitionString = htmlElement.Attributes["style"];
-					if (!string.IsNullOrEmpty(styleDefinitionString))
-					{
-						var styleParts = styleDefinitionString.Split(';');
-						foreach (var stylePart in styleParts.Where(s => !string.IsNullOrEmpty(s)))
-						{
-							var keyValue = stylePart.Split(':');
-							if (keyValue.Length != 2)
-								throw new Exception("Invalid style definition: " + stylePart);
-							//todo: handle duplicates
-							hElem.Style.Properties.Add(keyValue[0], keyValue[1]);
-						}
-					}
-				}
-			}
-
-			elem.Id = id;
-
+			var elem = htmlElement.Name == "script" 
+				? BuildScript(htmlElement) 
+				: doc.CreateElement(htmlElement.Name);
+			
 			foreach (var attribute in htmlElement.Attributes)
 			{
 				elem.SetAttribute(attribute.Key, attribute.Value);
@@ -102,9 +53,9 @@ namespace WebBrowser.Dom
 
 			foreach(var child in htmlElement.Children)
 			{
-				var cn = BuildElem(child);
+				var cn = BuildElem(doc, child);
 				cn.Parent = elem;
-				elem.ChildNodes.Add(cn);
+				elem.AppendChild(cn);
 			}
 
 			return elem;

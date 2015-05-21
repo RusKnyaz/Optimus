@@ -122,6 +122,13 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(document, x.OwnerDocument);
 		}
 
+		[Test]
+		public void CreateDocumentFragment()
+		{
+			var document = new Document(null);
+			var x = document.CreateDocumentFragment();
+			Assert.AreEqual(document, x.OwnerDocument);
+		}
 	}
 }
 #endif

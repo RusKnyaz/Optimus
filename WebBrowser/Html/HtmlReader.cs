@@ -140,10 +140,21 @@ namespace WebBrowser.Html
 								buffer.Add('\n');
 								continue;
 							}
-
 							if (nextChar == '*')
+							{
 								state = ReadScriptStates.Comment;
+							}
+							else //regexp
+							{
+								qMark = '/';
+								state = ReadScriptStates.String;
+								escape = nextChar == '\\';
+								buffer.Add(symbol);
+								buffer.Add(nextChar);
+								continue;
+							}
 							
+
 							buffer.Add(symbol);
 							symbol = nextChar;
 						}

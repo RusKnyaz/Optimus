@@ -11,7 +11,7 @@ using WebBrowser.ResourceProviders;
 namespace WebBrowser.Tests.EngineTests
 {
 	[TestFixture]
-	public class EngineWithJQueryTests
+	public class JQueryTests
 	{
 		[Test]
 		public void Smoke()

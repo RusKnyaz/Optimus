@@ -218,6 +218,8 @@
 	bindProps(window.screen = {}, engine.Window.Screen, "width height availWidth availHeight colorDepth pixeDepth");
 	bindProps(window, engine.Window, "innerWidth innerHeight");
 	window.setTimeout = function (handler, timeout) {
+		if (!handler)
+			return;
 		var args = Array.prototype.slice.call(arguments, 2);
 		return engine.Window.SetTimeout(function () {
 			handler.apply({}, args);

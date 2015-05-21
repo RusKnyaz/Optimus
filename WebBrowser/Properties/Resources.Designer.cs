@@ -74,10 +74,10 @@ namespace WebBrowser.Properties {
         ///	converters[&quot;Comment&quot;] = wrap;
         ///	converters[&quot;Event&quot;] = wrapEvent;
         ///	converters[&quot;CssStyleDeclaration&quot;] = wrapStyle;
+        ///	converters[&quot;Attr&quot;] = wrapAttr;
         ///	
         ///	function bindFunc(target, owner, funcName) {
-        ///		var netFuncName = upFirstLetter(funcName);
-        ///		var methodInfo = own [rest of string was truncated]&quot;;.
+        ///		var netFuncName = upFirstLetter(f [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string clrBridge {
             get {
@@ -156,6 +156,24 @@ namespace WebBrowser.Properties {
         internal static string knockout {
             get {
                 return ResourceManager.GetString("knockout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /** vim: et:ts=4:sw=4:sts=4
+        /// * @license RequireJS 2.1.17 Copyright (c) 2010-2015, The Dojo Foundation All Rights Reserved.
+        /// * Available via the MIT or new BSD license.
+        /// * see: http://github.com/jrburke/requirejs for details
+        /// */
+        /////Not using strict: uneven strict support in browsers, #392, and causes
+        /////problems with requirejs.exec()/transpiler plugins that may not be strict.
+        ////*jslint regexp: true, nomen: true, sloppy: true */
+        ////*global window, navigator, document, importScripts, setTimeout, opera */
+        ///        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string requirejs {
+            get {
+                return ResourceManager.GetString("requirejs", resourceCulture);
             }
         }
     }

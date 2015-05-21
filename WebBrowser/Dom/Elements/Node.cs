@@ -127,8 +127,7 @@ namespace WebBrowser.Dom.Elements
 		public const ushort DOCUMENT_TYPE_NODE = 10;
 		public const ushort DOCUMENT_FRAGMENT_NODE = 11;
 		public const ushort NOTATION_NODE = 12;
-
-
+		
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
 		{
 			throw new NotImplementedException();
@@ -158,13 +157,40 @@ namespace WebBrowser.Dom.Elements
 		/// <returns></returns>
 		public int CompareDocumentPosition(INode node)
 		{
+			//todo: rewrite the sketch, consider to move to Extension
+
 			if (node.OwnerDocument != OwnerDocument 
 				|| (Parent == null && node.Parent == null))
 				return 1;
 
 			if (this is Element && node is Attr)
 			{
-				
+				var el = (Element) this;
+				var attr = (Attr)node;
+				return el.GetAttributeNode(attr.Name) == attr 
+					? 20 
+					: CompareDocumentPosition(attr.OwnerElement) & (255 - 8);
+			}
+			
+			if(this is Attr && node is Element)
+			{
+				var attr = (Attr) this;
+				var el = (Element) node;
+				return el.GetAttributeNode(attr.Name) == attr 
+					? 10 : 
+					attr.OwnerElement.CompareDocumentPosition(el) & (255 - 8);
+			}
+
+			if (this is Attr && node is Attr)
+			{
+				var attr1 = (Attr) this;
+				var attr2 = (Attr) node;
+				if (attr1.OwnerElement == attr2.OwnerElement)
+				{
+					var attrList = attr1.OwnerElement.Attributes.Values.ToList();
+					return attrList.IndexOf(attr1) > attrList.IndexOf(attr2) ? 2 : 4;
+				}
+				return attr1.OwnerElement.CompareDocumentPosition(attr2.OwnerElement);
 			}
 
 			if (Parent == node.Parent)
@@ -205,33 +231,4 @@ namespace WebBrowser.Dom.Elements
 
 		public event Action<Event> OnEvent;
 	}
-
-	public class Event
-	{
-		public string Type;
-		public Node Target;
-		public ushort EventPhase;
-		public bool Bubbles;
-		public bool Cancellable;
-		public void StopPropagation()
-		{
-			throw new NotImplementedException();
-		}
-
-		public void PreventDefault()
-		{
-			throw new NotImplementedException();
-		}
-
-		public void InitEvent(string type, bool canBubble, bool canCancel)
-		{
-			Type = type;
-			Cancellable = canCancel;
-			Bubbles = canBubble;
-		}
-
-		//todo: implement remains properties
-	}
-
-	
 }

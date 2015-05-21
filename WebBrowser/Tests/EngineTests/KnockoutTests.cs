@@ -10,7 +10,7 @@ using Text = WebBrowser.Dom.Text;
 namespace WebBrowser.Tests.EngineTests
 {
 	[TestFixture]
-	public class EngineWithKnockoutTests
+	public class KnockoutTests
 	{
 		
 		Document Load(string html)

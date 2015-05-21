@@ -43,10 +43,10 @@ namespace WebBrowser.Dom.Elements
 			set
 			{
 				ChildNodes.Clear();
-				var items = DocumentBuilder.Build(value);
+				var items = DocumentBuilder.Build(OwnerDocument, value);
 				foreach (var it in items)
 				{
-					ChildNodes.Add(it);
+					AppendChild(it);
 				}
 			} 
 		}
@@ -90,20 +90,35 @@ namespace WebBrowser.Dom.Elements
 
 		public void SetAttribute(string name, string value)
 		{
-			if (Attributes.ContainsKey(name))
-				Attributes[name].Value = value;
+			var invariantName = name.ToLowerInvariant();
+			if (Attributes.ContainsKey(invariantName))
+				Attributes[invariantName].Value = value;
 			else
-				Attributes.Add(name, new Attr(this, name, value){OwnerDocument = OwnerDocument});
+				Attributes.Add(invariantName, new Attr(this, name, value) { OwnerDocument = OwnerDocument });
+
+			UpdatePropertyFromAttribute(value, invariantName);
+		}
+
+		protected virtual void UpdatePropertyFromAttribute(string value, string invariantName)
+		{
+			if (invariantName == "id")
+			{
+				Id = value;
+			}
 		}
 
 		public Attr SetAttributeNode(Attr attr)
 		{
 			attr.SetOwnerElement(this);
 
-			if (Attributes.ContainsKey(attr.Name))
-				Attributes[attr.Name] = attr;
+			var invariantName = attr.Name.ToLowerInvariant();
+
+			if (Attributes.ContainsKey(invariantName))
+				Attributes[invariantName] = attr;
 			else
-				Attributes.Add(attr.Name, attr);
+				Attributes.Add(invariantName, attr);
+
+			UpdatePropertyFromAttribute(attr.Value, invariantName);
 
 			return attr;
 		}
@@ -156,7 +171,7 @@ namespace WebBrowser.Dom.Elements
 
 		public override INode CloneNode()
 		{
-			var node  = DocumentBuilder.Build(ToString()).Single();
+			var node  = DocumentBuilder.Build(OwnerDocument, ToString()).Single();
 			node.OwnerDocument = OwnerDocument;
 			return node;
 		}
@@ -165,7 +180,5 @@ namespace WebBrowser.Dom.Elements
 		{
 			return Attributes.ContainsKey(name) ? Attributes[name] : null;
 		}
-
-
 	}
 }

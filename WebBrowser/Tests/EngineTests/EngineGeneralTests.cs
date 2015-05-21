@@ -1,6 +1,7 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -38,7 +39,12 @@ namespace WebBrowser.Tests.EngineTests
 		public void DomManipulation()
 		{
 			var engine = new Engine();
-			engine.Load("<html><head><script>var c2 = document.getElementById('content2');document.documentElement.getElementsByTagName('body')[0].insertBefore(document.createElement('<div id=\"c3\">'), c2);</script></head><body><div id='content1'></div><div id='content2'></div></body></html>");
+			engine.Load("<html><head><script>" +
+				"var div = document.createElement('div');" +
+				"div.setAttribute('id', 'c3');" +
+				"var c2 = document.getElementById('content2');" +
+				"document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);" +
+				"</script></head><body><div id='content1'></div><div id='content2'></div></body></html>");
 			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
 			var elem = engine.Document.GetElementById("c3");
 			Assert.IsNotNull(elem);
@@ -107,10 +113,26 @@ namespace WebBrowser.Tests.EngineTests
 		[TestCase("http://ya.ru")]
 		[TestCase("http://redmine.todosoft.org")]
 		[TestCase("http://google.com")]
+		[TestCase("https://html5test.com")]
 		public void OpenUrl(string url)
 		{
 			var engine = new Engine();
 			engine.OpenUrl(url);
+		}
+
+		[Test]
+		public void Html5Score()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("https://html5test.com");
+
+			var score = engine.Document.GetElementById("score");
+			Assert.IsNotNull(score, "score");
+
+			Thread.Sleep(1000);//wait calculation
+			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
+			Assert.IsNotNull(tagWithValue, "strong");
+			System.Console.WriteLine(tagWithValue.InnerHtml);
 		}
 
 		[Test]
@@ -151,7 +173,7 @@ console.log(style['width']);
 @"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');
 </script></head><body></body></html>");
 			Assert.AreEqual(0, log.Count);
-			System.Threading.Thread.Sleep(1000);
+			Thread.Sleep(1000);
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("ok",  log[0]);
 		}
@@ -167,7 +189,7 @@ console.log(style['width']);
 window.clearTimeout(timer);
 </script></head><body></body></html>");
 			Assert.AreEqual(0, log.Count);
-			System.Threading.Thread.Sleep(1000);
+			Thread.Sleep(1000);
 			Assert.AreEqual(0, log.Count);
 		}
 
@@ -210,7 +232,6 @@ client.send();
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("2", log[0]);
 		}
-
 	}
 }
 #endif

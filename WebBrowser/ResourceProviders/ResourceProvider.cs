@@ -24,7 +24,7 @@ namespace WebBrowser.ResourceProviders
 			var u = uri[0] == '/' ? new Uri(new Uri(Root), uri) : new Uri(uri);
 
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
-			if (scheme == "http://")
+			if (scheme == "http://" || scheme == "https://")
 			{
 				//todo: use HttpResourceProvider
 				return GetHttpResource(u);

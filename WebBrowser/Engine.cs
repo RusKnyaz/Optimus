@@ -2,6 +2,7 @@
 using System.IO;
 using WebBrowser.Dom;
 using WebBrowser.Environment;
+using WebBrowser.Html;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
 
@@ -43,7 +44,7 @@ namespace WebBrowser
 			Document = new Document(ResourceProvider);
 			//todo: clear js runtime context
 			
-			var elements = DocumentBuilder.Build(stream);
+			var elements = DocumentBuilder.Build(Document, stream);
 			Document.Load(elements);
 
 			Document.ResolveDelayedContent();

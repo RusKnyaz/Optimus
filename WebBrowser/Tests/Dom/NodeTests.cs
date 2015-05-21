@@ -9,10 +9,18 @@ namespace WebBrowser.Tests.Dom
 	[TestFixture]
 	public class NodeTests
 	{
+		private Element CreateElement(string html)
+		{
+			var document = new Document(null);
+			var tmp = document.CreateElement("div");
+			tmp.InnerHtml = html;
+			return (Element)tmp.FirstChild;
+		}
+
 		[Test]
 		public void CloneNodeAttributeWithQuotes()
 		{
-			var elem = (Element)DocumentBuilder.Build("<div data-bind='template:\"itemTemplate\"'></div>").Single();
+			var elem =CreateElement("<div data-bind='template:\"itemTemplate\"'></div>");
 			var clone = (Element)elem.CloneNode();
 			Assert.AreEqual("template:\"itemTemplate\"", elem.GetAttribute("data-bind"));
 			Assert.AreEqual("template:\"itemTemplate\"", clone.GetAttribute("data-bind"));
@@ -21,7 +29,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void GetStyleTest()
 		{
-			var elem = (HtmlElement)DocumentBuilder.Build("<div style='width:100pt'></div>").Single();
+			var elem = (HtmlElement)CreateElement("<div style='width:100pt'></div>");
 			var style = elem.Style;
 
 			Assert.AreEqual(1, style.Properties.Count);
@@ -136,6 +144,36 @@ namespace WebBrowser.Tests.Dom
 
 			div.RemoveAttributeNode(attr);
 			Assert.AreEqual(null, attr.OwnerElement);
+		}
+
+		[TestCase("<div id='a'></div>", Result = 0)]
+		[TestCase("<div id='a'><strong></strong></div>", Result = 1)]
+		[TestCase("<div id='a'><strong><strong></strong></strong></div>", Result = 2)]
+		[TestCase("<div id='a'><div><strong></strong></div></div>", Result = 1)]
+		public int GetElementsByTagName(string html)
+		{
+			var doc = new Document(null);
+			doc.Write("<html><body>" + html + "</body></html>");
+
+			return doc.GetElementById("a").GetElementsByTagName("strong").Length;
+		}
+
+		[Test]
+		public void SetInnerHtml()
+		{
+			var doc = new Document(null);
+			var d = doc.CreateElement("<div>");
+			d.InnerHtml = "<strong></strong>";
+			Assert.AreEqual(doc, d.ChildNodes[0].OwnerDocument);
+		}
+
+		[Test]
+		public void SetAttributeFromId()
+		{
+			var doc = new Document(null);
+			var d = doc.CreateElement("<div>");
+			d.SetAttribute("Id", "d");
+			Assert.AreEqual("d", d.Id);
 		}
 	}
 }
