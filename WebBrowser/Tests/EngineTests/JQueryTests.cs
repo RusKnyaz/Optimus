@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Properties;
@@ -33,21 +34,29 @@ namespace WebBrowser.Tests.EngineTests
 		}
 
 		[Test]
-		public void Ajax()
+		public void Post()
 		{
-			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
-				new HttpResponse(HttpStatusCode.OK, "OK"));
+			var t = new Task<HttpResponse>(() => new HttpResponse(HttpStatusCode.OK, "OK", null));
+			t.Start();
+
+			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequestAsync(It.IsAny<HttpRequest>()) ==
+				t);
 
 			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o.ToString());
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine(o ?? "<null>");
+				log.Add(o.ToString());
+			};
 
-			var script = "$.post('http://localhost/data').done(function(x){console.log(x)});";
+			var script = "$.post('http://localhost/data').done(function(x){console.log(x);});";
 
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
+			Mock.Get(httpResourceProvider).Verify(x=> x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once);
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("OK", log[0]);
 		}

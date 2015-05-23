@@ -4,6 +4,9 @@ using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Dom
 {
+	/// <summary>
+	/// https://xhr.spec.whatwg.org/
+	/// </summary>
 	public class XmlHttpRequest
 	{
 		private readonly IHttpResourceProvider _httpResourceProvider;
@@ -39,47 +42,60 @@ namespace WebBrowser.Dom
 
 		public int ReadyState { get; private set; }
 
-		public object ResponseXML { get { return _response.Data;}
-		}
+		public object ResponseXML { get { return _response.Data;}}
+		public string ResponseText { get { return _response.Data; } }
 
 		public void SetRequestHeader(string name, string value)
 		{
 			_request.Headers.Add(name, value);
 		}
 
-		public int Status
+		public string GetAllResponseHeaders()
 		{
-			get { return (int)_response.StatusCode; }
+			if (_response.Headers == null)
+				return "";
+			//todo: check
+			return _response.Headers.ToString();
 		}
+
+		public string StatusText { get { return _response.StatusCode.ToString(); } }//todo: is it right?
+		public int Status { get { return (int)_response.StatusCode; } }
 
 		public event Action OnReadyStateChange;
-
-		private void FireOnReadyStateChange()
-		{
-			//todo: Invoke OnReadyStateChange in JS runtime thread.
-			_context.Post(_ =>
-			{
-				if (OnReadyStateChange != null)
-					OnReadyStateChange();	
-			}, null);
-		}
+		public event Action OnLoad;
+		public event Action OnError;
 
 		public async void Send(object data)
 		{
-			//if (_async)
+			if (_async)
 			{
-			/*	ReadyState = LOADING;
-				_response = (HttpWebResponse) await _request.GetResponseAsync();
+				ReadyState = LOADING;
+				_response = await _httpResourceProvider.SendRequestAsync(_request);
 				ReadyState = DONE;
-				FireOnReadyStateChange();*/
+				Fire(OnReadyStateChange);
+				Fire(OnLoad);
 			}
-			//else
+			else
 			{
 				ReadyState = LOADING;
 				_response = _httpResourceProvider.SendRequest(_request);
 				ReadyState = DONE;
-				FireOnReadyStateChange();
+				Fire(OnReadyStateChange);
+				Fire(OnLoad);
 			}
 		}
+
+		private void Fire(Action action)
+		{
+			_context.Post(x => ((Action)x).Fire(), action);
+		}
 	}
-}
+
+	public static class ActionExtension
+	{
+		public static void Fire(this Action action)
+		{
+			if (action != null) action();
+		}
+	}
+} 

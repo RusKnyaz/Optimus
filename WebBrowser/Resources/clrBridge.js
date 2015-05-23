@@ -229,25 +229,34 @@
 	bindFuncs(window, engine.Window, "clearTimeout");
 	bindProps(window, engine, "document");
 
+    function bindEvent(target, owner, name) {
+        var names = name.split(':');
+        var jsName = names[0];
+        var netName = names[1] || upFirstLetter(jsName);
+
+        var jsHandler;
+        var jsHandlerWrapper;
+        Object.defineProperty(target, jsName, {
+            get: function () { return jsHandler; },
+            set: function (handler) {
+                if (jsHandler) {
+                    owner["remove_"+netName](jsHandlerWrapper);
+                }
+                jsHandler = handler;
+                jsHandlerWrapper = function () { jsHandler.call(target); };
+                owner["add_"+netName](jsHandlerWrapper);
+            }
+        });
+    }
+
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {
-		var _this = this;
 		var netRequest = engine.XmlHttpRequest();
 		bindFuncs(this, netRequest, "open send setRequestHeader abort getResponseHeader getAllResponseHeaders overrideMimeType");
-		bindProps(this, netRequest, "status responseXML readyState");
-		var onreadystatechange;
-		var onreadystatechangeWrapper;
-		Object.defineProperty(this, 'onreadystatechange', {
-			get: function() { return onreadystatechange;},
-			set: function(handler) {
-				if (onreadystatechange) {
-					netRequest.remove_OnReadyStateChange(onreadystatechangeWrapper);
-				}
-				onreadystatechange = handler;
-				onreadystatechangeWrapper = function() {onreadystatechange.call(_this);};
-				netRequest.add_OnReadyStateChange(onreadystatechangeWrapper);
-			}
-		});
+		bindProps(this, netRequest, "status responseXML responseText readyState");
+		bindEvent(this, netRequest, "onreadystatechange:OnReadyStateChange");
+		bindEvent(this, netRequest, "onload:OnLoad");
+		bindEvent(this, netRequest, "onerror:OnError");
 
 		this.UNSENT = 0;
 		this.OPENED = 1;

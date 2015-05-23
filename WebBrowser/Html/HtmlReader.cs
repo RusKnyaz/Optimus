@@ -101,12 +101,10 @@ namespace WebBrowser.Html
 							for (; i < end.Length; i++)
 							{
 								code = reader.Read();
-
 								if (code <= 0)
 									break;
 								
 								tmp[i] = (char) code;
-
 								if (((char) code).ToString().ToLower()[0] != end[i])
 									break;
 							}

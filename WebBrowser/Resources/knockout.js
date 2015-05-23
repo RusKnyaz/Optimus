@@ -2841,7 +2841,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
 
     function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, bindingContextMayDifferFromDomParentElement) {
         var shouldBindDescendants = true;
-
+        
         // Perf optimisation: Apply bindings only if...
         // (1) We need to store the binding context on this node (because it may differ from the DOM parent node's binding context)
         //     Note that we can't store binding contexts on non-elements (e.g., text nodes), as IE doesn't allow expando properties for those

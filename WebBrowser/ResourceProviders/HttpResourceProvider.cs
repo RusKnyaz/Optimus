@@ -21,11 +21,19 @@ namespace WebBrowser.ResourceProviders
 			return MakeResponse(response);
 		}
 
+		public async Task<HttpResponse> SendRequestAsync(HttpRequest request)
+		{
+			var webRequest = MakeWebRequest(request);
+			var response = await webRequest.GetResponseAsync();
+			return MakeResponse((HttpWebResponse)response);
+
+		}
+
 		private HttpResponse MakeResponse(HttpWebResponse response)
 		{
 			using (var reader = new StreamReader(response.GetResponseStream()))
 			{
-				return new HttpResponse(response.StatusCode, reader.ReadToEnd());
+				return new HttpResponse(response.StatusCode, reader.ReadToEnd(), response.Headers);
 			}
 		}
 
@@ -41,6 +49,7 @@ namespace WebBrowser.ResourceProviders
 	public interface IHttpResourceProvider
 	{
 		HttpResponse SendRequest(HttpRequest request);
+		Task<HttpResponse> SendRequestAsync(HttpRequest request);
 	}
 
 	public class HttpRequest
@@ -58,13 +67,15 @@ namespace WebBrowser.ResourceProviders
 
 	public class HttpResponse
 	{
-		public HttpResponse(HttpStatusCode statusCode, string data)
+		public HttpResponse(HttpStatusCode statusCode, string data, WebHeaderCollection headers)
 		{
 			StatusCode = statusCode;
 			Data = data;
+			Headers = headers;
 		}
 
 		public HttpStatusCode StatusCode { get; private set; }
 		public string Data { get; private set; }
+		public WebHeaderCollection Headers { get; private set; }
 	}
 }

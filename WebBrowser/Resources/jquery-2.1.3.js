@@ -7902,8 +7902,7 @@ jQuery.extend({
 
 	// Main method
 	ajax: function( url, options ) {
-
-		// If url is an object, simulate pre-1.5 signature
+	    // If url is an object, simulate pre-1.5 signature
 		if ( typeof url === "object" ) {
 			options = url;
 			url = undefined;
@@ -8161,8 +8160,8 @@ jQuery.extend({
 			}
 
 			try {
-				state = 1;
-				transport.send( requestHeaders, done );
+			    state = 1;
+				transport.send(requestHeaders, done);
 			} catch ( e ) {
 				// Propagate exception as error if not done
 				if ( state < 2 ) {
@@ -8175,7 +8174,7 @@ jQuery.extend({
 		}
 
 		// Callback for when everything is done
-		function done( status, nativeStatusText, responses, headers ) {
+		function done(status, nativeStatusText, responses, headers) {
 			var isSuccess, success, error, response, modified,
 				statusText = nativeStatusText;
 
@@ -8552,7 +8551,7 @@ jQuery.ajaxTransport(function( options ) {
 	// Cross domain only allowed if supported through XMLHttpRequest
 	if ( support.cors || xhrSupported && !options.crossDomain ) {
 		return {
-			send: function( headers, complete ) {
+		    send: function (headers, complete) {
 				var i,
 					xhr = options.xhr(),
 					id = ++xhrId;
@@ -8586,9 +8585,9 @@ jQuery.ajaxTransport(function( options ) {
 				}
 
 				// Callback
-				callback = function( type ) {
-					return function() {
-						if ( callback ) {
+				callback = function (type) {
+				    return function () {
+				        if (callback) {
 							delete xhrCallbacks[ id ];
 							callback = xhr.onload = xhr.onerror = null;
 
@@ -8601,7 +8600,7 @@ jQuery.ajaxTransport(function( options ) {
 									xhr.statusText
 								);
 							} else {
-								complete(
+                                complete(
 									xhrSuccessStatus[ xhr.status ] || xhr.status,
 									xhr.statusText,
 									// Support: IE9
@@ -8625,7 +8624,7 @@ jQuery.ajaxTransport(function( options ) {
 				callback = xhrCallbacks[ id ] = callback("abort");
 
 				try {
-					// Do send the request (this may raise an exception)
+				    // Do send the request (this may raise an exception
 					xhr.send( options.hasContent && options.data || null );
 				} catch ( e ) {
 					// #14683: Only rethrow if this hasn't been notified as an error yet
@@ -8679,7 +8678,7 @@ jQuery.ajaxTransport( "script", function( s ) {
 	if ( s.crossDomain ) {
 		var script, callback;
 		return {
-			send: function( _, complete ) {
+		    send: function (_, complete) {
 				script = jQuery("<script>").prop({
 					async: true,
 					charset: s.scriptCharset,

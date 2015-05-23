@@ -197,7 +197,7 @@ window.clearTimeout(timer);
 		public void Ajax()
 		{
 			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) == 
-				new HttpResponse(HttpStatusCode.OK, "hello"));
+				new HttpResponse(HttpStatusCode.OK, "hello", null));
 			
 			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
 			
@@ -216,6 +216,7 @@ client.onreadystatechange = function () {
 client.open(""GET"", ""http://localhost/unicorn.xml"", false);
 client.send();
 </script></head><body></body></html>");
+			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("hello", log[0]);
 		}
