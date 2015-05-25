@@ -8,7 +8,7 @@ namespace WebBrowser.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
-	public abstract class Node : INode
+	public abstract class Node : INode, IEventTarget 
 	{
 		protected Node(Document ownerDocument)
 		{
@@ -240,6 +240,14 @@ namespace WebBrowser.Dom.Elements
 		}
 
 		public event Action<Event> OnEvent;
+	}
+
+	[DomItem]
+	public interface IEventTarget
+	{
+		void AddEventListener(string type, Action<Event> listener, bool useCapture);
+		void RemoveEventListener(string type, Action<Event> listener, bool useCapture);
+		bool DispatchEvent(Event evt);
 	}
 
 	[DomItem]

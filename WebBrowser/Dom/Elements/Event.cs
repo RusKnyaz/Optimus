@@ -1,8 +1,9 @@
 ﻿using System;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
-	public class Event
+	public class Event : IEvent
 	{
 		public string Type;
 		public Node Target;
@@ -27,5 +28,14 @@ namespace WebBrowser.Dom.Elements
 		}
 
 		//todo: implement remains properties
+	}
+
+	/// <summary>
+	/// http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event
+	/// </summary>
+	[DomItem]
+	public interface IEvent
+	{
+		void InitEvent(string type, bool canBubble, bool canCancel);
 	}
 }

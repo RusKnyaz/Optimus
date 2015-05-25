@@ -23,6 +23,47 @@ namespace WebBrowser.Tests.EngineTests
 			return _engine;
 		}
 
+		private Engine CreateEngine(string body, string js){
+			_engine.Load("<html><head><script>" + js + "</script></head><body>"+body+"</body></html>");
+			return _engine;
+		}
+
+		[Test]
+		public void NodeTest()
+		{
+			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+@"var e = document.getElementById('d');
+console.log(e != null);
+console.log(e == document.getElementById('d'));
+console.log(e.tagName);
+console.log(e.firstChild != null);
+console.log(e.firstChild.tagName);
+console.log(e.lastChild != null);
+console.log(e.lastChild.tagName);
+console.log(e.parentNode != null);
+console.log(e.parentNode.tagName);
+console.log(e.ownerDocument == document);
+console.log(e.getAttribute('id'));");
+
+			CollectionAssert.AreEqual(new object[] { true, true, "div", true, "h1", true, "h3", true, "body", true, "d" }, _log);
+		}
+
+		[Test]
+		public void NodeEventsTest()
+		{
+			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+				@"var e = document.getElementById('d');
+console.log(e.addEventListener != null);
+console.log(e.removeEventListener != null);
+console.log(e.dispatchEvent != null);
+e.addEventListener('click', function(){console.log('click');}, true);
+var ev = document.createEvent('Event');
+ev.initEvent('click', false, false);
+e.dispatchEvent(ev);");
+
+			CollectionAssert.AreEqual(new object[] { true, true, true, "click" }, _log);
+		}
+
 		[Test]
 		public void CreateDivTest()
 		{
