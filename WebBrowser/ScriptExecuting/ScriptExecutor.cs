@@ -31,8 +31,9 @@ namespace WebBrowser.ScriptExecuting
 
 		public ScriptExecutor(Engine engine)
 		{
+			
 			_context = engine.Context;
-			_jsEngine = new Jint.Engine(o => o.AllowDebuggerStatement(true))
+			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(new DomConverter(() => _jsEngine)))
 				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine))
 				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
 
@@ -62,6 +63,7 @@ namespace WebBrowser.ScriptExecuting
 
 		public event Action<Exception> OnException;
 	}
+
 
 	[Serializable]
 	public class ScriptExecutingException : Exception

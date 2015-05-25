@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
-	public class Element : Node
+	public class Element : Node, IElement
 	{
 		public Element(Document ownerDocument) : base(ownerDocument)
 		{
@@ -179,5 +180,21 @@ namespace WebBrowser.Dom.Elements
 		{
 			return Attributes.ContainsKey(name) ? Attributes[name] : null;
 		}
+	}
+
+	[DomItem]
+	public interface IElement
+	{
+		string TagName { get; }
+		string InnerHtml { get; set; }
+		Element[] GetElementsByTagName(string tagName);
+		Attr GetAttributeNode(string name);
+		string GetAttribute(string name);
+		void RemoveAttribute(string name);
+		void SetAttribute(string name, string value);
+		Attr SetAttributeNode(Attr attr);
+		void RemoveAttributeNode(Attr attr);
+		bool HasAttribute(string name);
+		bool HasAttributes();
 	}
 }

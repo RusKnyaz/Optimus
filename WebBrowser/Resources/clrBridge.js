@@ -1,51 +1,9 @@
 ﻿var window = this;
 
 (function (engine) {
-    function internalId(net) { return net.InternalId; }
-    var wrappers = {};
-    var wrap = cached(wrappers, wrapElement, internalId);
-    var docsWrappers = [];
-
 	var converters = [];
-	converters["Document"] = cached(docsWrappers, wrapDocument);
-	converters["Element"] = wrap;
-	converters["HtmlElement"] = wrap;
-	converters["Body"] = wrap;
-	converters["Head"] = wrap;
-    converters["HtmlInputElement"] = cached(wrappers, wrapHtmlInputElement);
-
-    converters["Script"] = cached(wrappers, wrapScript, internalId);
-	converters["Element[]"] = wrapArray;
-	converters["Node"] = wrap;
-	converters["DocumentFragment"] = wrap;
-	converters["Text"] = wrap;
-	converters["Comment"] = wrap;
-	converters["Event"] = wrapEvent;
-	converters["CssStyleDeclaration"] = wrapStyle;
-	converters["Attr"] = cached(wrappers, wrapAttr, internalId);
-
-	function cached(cache, wrapper, keyGetter) {
-	    keyGetter = keyGetter || function(x) { return x.GetHashCode(); };
-	    return function (net) {
-	        if (net == null)
-	            return null;
-	        var key = keyGetter(net);
-	        return cache[key] || (cache[key] = wrapper(net));
-	    };
-	}
-
-    function wrapHtmlInputElement(netElement) {
-        var el = wrapElement(netElement);
-        bindProps(el, netElement, "value disabled type readonly required checked");
-        return el;
-    }
-
-    function wrapScript(netScript) {
-        var result = wrapElement(netScript);
-        bindEvent(result, netScript, "onload:OnLoad");
-        bindProps(result, netScript, "src type charset text");
-        return result;
-    }
+	
+	Object.defineProperty(window, 'document', { get: function () { return engine.Document; } });
 	
 	function bindFunc(target, owner, funcName) {
 		var netFuncName = upFirstLetter(funcName);
@@ -87,16 +45,6 @@
 			initEvent: function (type, b1, b2) { netEvent.InitEvent(type, b1, b2); }
 			//todo: remains properties
 		};
-	}
-
-	function wrapStyle(netStyle) {
-		var obj = [];
-		for (var i = 0; i < netStyle.Properties.Count; i++) {
-			obj[i] = netStyle[i];
-			obj[netStyle[i]] = netStyle[netStyle[i]];
-		}
-		bindFuncs(obj, netStyle, "getPropertyValue getCssText getLength getParentRule getPropertyCSSValue getPropertyPriority removeProperty setCssText setProperty");
-		return obj;
 	}
 
 	function wrapNode(node, netElem) {
@@ -206,14 +154,6 @@
 		}
 	}
 	
-	function wrapDocument(netDoc) {
-		var doc = {};
-		wrapNode(doc, netDoc);
-		bindFuncs(doc, netDoc, "createElement createTextNode getElementById createComment write createDocumentFragment createEvent getElementsByTagName createAttribute");
-		bindProps(doc, netDoc, "head body documentElement");
-		return doc;
-	}
-
 	window.addEventListener = function (x, y, z) {
 		//todo: implement
 	};
@@ -233,8 +173,7 @@
 	};
 
 	bindFuncs(window, engine.Window, "clearTimeout");
-	bindProps(window, engine, "document");
-
+	
     function bindEvent(target, owner, name) {
         var names = name.split(':');
         var jsName = names[0];

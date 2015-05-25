@@ -75,6 +75,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ScriptExecuting\DomConverter.cs" />
     <Compile Include="ScriptExecuting\IScriptExecutor.cs" />
     <Compile Include="Html\HtmlParser.cs" />
     <Compile Include="Html\HtmlReader.cs" />
@@ -128,7 +129,7 @@
     <Content Include="Resources\requirejs.js" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\jint-master\Jint\Jint.csproj">
+    <ProjectReference Include="..\..\..\..\temp\jint-master\Jint\Jint.csproj">
       <Project>{678738da-f723-4920-b9e5-cad667104bda}</Project>
       <Name>Jint</Name>
     </ProjectReference>

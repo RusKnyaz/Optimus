@@ -29,7 +29,7 @@ namespace WebBrowser.Dom
 	/// http://www.w3.org/html/wg/drafts/html/master/dom.html#document
 	/// http://dev.w3.org/html5/spec-preview/dom.html
 	/// </summary>
-	public class Document : DocumentFragment
+	public class Document : DocumentFragment, IDocument
 	{
 		private readonly IResourceProvider _resourceProvider;
 		public readonly SynchronizationContext Context;
@@ -45,7 +45,7 @@ namespace WebBrowser.Dom
 			_resourceProvider = resourceProvider;
 			Context = context ?? new StubSynchronizationContext();
 			_scriptExecutor = scriptExecutor;
-			ChildNodes = new List<Node> {new Element(this, "html"){Parent = this}};
+			ChildNodes = new List<Node> {new Element(this, "html"){ParentNode = this}};
 			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
 		}
@@ -55,7 +55,7 @@ namespace WebBrowser.Dom
 		public override string NodeName { get { return "#document"; }}
 
 		private readonly List<IDelayedResource> _unresolvedDelayedResources;
-
+		
 		public void Write(string text)
 		{
 			Load(DocumentBuilder.Build(this, text));
@@ -67,7 +67,7 @@ namespace WebBrowser.Dom
 			
 			foreach(var element in elements)
 			{
-				element.Parent = this;
+				element.ParentNode = this;
 				ChildNodes.Add(element);
 				HandleNodeAdded(this, element);
 			}
@@ -77,10 +77,10 @@ namespace WebBrowser.Dom
 				var rootElem = ChildNodes[0] as Element;
 				if (rootElem == null || rootElem.TagName != "html")
 				{
-					rootElem = new Element(this, "html"){Parent = this};
+					rootElem = new Element(this, "html"){ParentNode = this};
 					foreach (var element in ChildNodes)
 					{
-						element.Parent = rootElem;
+						element.ParentNode = rootElem;
 						rootElem.ChildNodes.Add(element);	
 						ChildNodes.Clear();
 						ChildNodes.Add(rootElem);
@@ -88,11 +88,11 @@ namespace WebBrowser.Dom
 				}
 			}
 
-			DocumentElement = ChildNodes.FirstOrDefault() as Element ?? new Element(this, "html"){Parent = this};
+			DocumentElement = ChildNodes.FirstOrDefault() as Element ?? new Element(this, "html"){ParentNode = this};
 
 			foreach (var childNode in ChildNodes)
 			{
-				childNode.Parent = this;
+				childNode.ParentNode = this;
 			}
 
 			foreach (var childNode in DocumentElement.Flatten())
@@ -231,5 +231,21 @@ namespace WebBrowser.Dom
 				RunScripts(newChild.Flatten().OfType<Script>());
 			}
 		}
+	}
+
+	[DomItem]
+	public interface IDocument
+	{
+		Element CreateElement(string tagName);
+		Element DocumentElement { get; }
+		void Write(string text);
+		Event CreateEvent(string type);
+		Head Head { get; }
+		Element Body { get; }
+		Comment CreateComment(string data);
+		Text CreateTextNode(string data);
+		DocumentFragment CreateDocumentFragment();
+		Element GetElementById(string id);
+		Attr CreateAttribute(string name);
 	}
 }

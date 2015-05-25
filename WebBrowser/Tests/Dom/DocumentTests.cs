@@ -13,7 +13,7 @@ namespace WebBrowser.Tests
 		{
 			var document = new Document();
 			Assert.IsNull(document.OwnerDocument);
-			Assert.IsNull(document.Parent);
+			Assert.IsNull(document.ParentNode);
 		}
 
 		[Test]
@@ -25,7 +25,7 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(1, document.DocumentElement.ChildNodes.Count);
 			Assert.AreEqual("body", ((Element)document.DocumentElement.FirstChild).TagName);
 			Assert.AreEqual("span", ((Element)((Element)document.DocumentElement.FirstChild).FirstChild).TagName);
-			Assert.AreEqual(document, document.DocumentElement.Parent);
+			Assert.AreEqual(document, document.DocumentElement.ParentNode);
 			Assert.AreEqual(document, document.DocumentElement.OwnerDocument);
 		}
 
@@ -110,7 +110,7 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(1, clone.ChildNodes.Count);
 			Assert.IsNotNull(clone.OwnerDocument, "Clone's ownerDocument");
 			Assert.AreEqual(span.OwnerDocument, clone.OwnerDocument, "Clone's ownerDocument");
-			Assert.IsNull(clone.Parent, "Clone's parentNode");
+			Assert.IsNull(clone.ParentNode, "Clone's parentNode");
 			Assert.AreEqual("s", clone.Id);
 		}
 

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
-	public abstract class Node
+	public abstract class Node : INode
 	{
 		protected Node(Document ownerDocument)
 		{
@@ -50,15 +51,15 @@ namespace WebBrowser.Dom.Elements
 
 		private void RegisterNode(Node node)
 		{
-			node.Parent = this;
+			node.ParentNode = this;
 			node.OwnerDocument = OwnerDocument;
 			OwnerDocument.HandleNodeAdded(this, node);
 		}
 
 		private void UnattachFromParent(Node node)
 		{
-			if (node.Parent != null)
-				node.Parent.ChildNodes.Remove(node);
+			if (node.ParentNode != null)
+				node.ParentNode.ChildNodes.Remove(node);
 		}
 
 		protected Node()
@@ -99,26 +100,26 @@ namespace WebBrowser.Dom.Elements
 		public Node LastChild { get { return ChildNodes.LastOrDefault(); } }
 		public Node NextSibling { get
 		{
-			if (Parent == null)
+			if (ParentNode == null)
 				return null;
 			
-			var idx = Parent.ChildNodes.IndexOf(this);
-			if (idx == Parent.ChildNodes.Count - 1)
+			var idx = ParentNode.ChildNodes.IndexOf(this);
+			if (idx == ParentNode.ChildNodes.Count - 1)
 				return null;
-			return Parent.ChildNodes[idx + 1];} }
+			return ParentNode.ChildNodes[idx + 1];} }
 
 		public Node PreviousSibling
 		{
 			get
 			{
-				var idx = Parent.ChildNodes.IndexOf(this);
+				var idx = ParentNode.ChildNodes.IndexOf(this);
 				if (idx == 0)
 					return null;
-				return Parent.ChildNodes[idx- 1];
+				return ParentNode.ChildNodes[idx- 1];
 			}
 		}
 
-		public Node Parent { get; set; }
+		public Node ParentNode { get; set; }
 		public abstract Node CloneNode();
 
 		public int NodeType { get; protected set; }
@@ -169,7 +170,7 @@ namespace WebBrowser.Dom.Elements
 			//todo: rewrite the sketch, consider to move to Extension
 
 			if (node.OwnerDocument != OwnerDocument 
-				|| (Parent == null && node.Parent == null))
+				|| (ParentNode == null && node.ParentNode == null))
 				return 1;
 
 			if (this is Element && node is Attr)
@@ -202,26 +203,26 @@ namespace WebBrowser.Dom.Elements
 				return attr1.OwnerElement.CompareDocumentPosition(attr2.OwnerElement);
 			}
 
-			if (Parent == node.Parent)
+			if (ParentNode == node.ParentNode)
 			{
-				return Parent.ChildNodes.IndexOf(this) > Parent.ChildNodes.IndexOf(node) ? 2 : 4;
+				return ParentNode.ChildNodes.IndexOf(this) > ParentNode.ChildNodes.IndexOf(node) ? 2 : 4;
 			}
 
 			//Search for shared ancestors
 			var thisAncestors = new List<Node>();
 			var otherAncestors = new List<Node>();
 
-			for (var p = (Node)this; p != null; p = p.Parent )
+			for (var p = (Node)this; p != null; p = p.ParentNode )
 				otherAncestors.Add(p);
 
-			for (var p = (Node)node; p != null && !otherAncestors.Contains(p); p = p.Parent)
+			for (var p = (Node)node; p != null && !otherAncestors.Contains(p); p = p.ParentNode)
 				thisAncestors.Add(p);
 
 			//node placed inside
 			if (thisAncestors.Count == 0)
 				return 10;
 
-			var sharedParent = thisAncestors.Last().Parent;
+			var sharedParent = thisAncestors.Last().ParentNode;
 
 			if (sharedParent == this)
 				return 20;
@@ -239,5 +240,26 @@ namespace WebBrowser.Dom.Elements
 		}
 
 		public event Action<Event> OnEvent;
+	}
+
+	[DomItem]
+	public interface INode
+	{
+		Document OwnerDocument { get; }
+		Node AppendChild(Node node);
+		string Id { get; }
+		Node RemoveChild(Node node);
+		Node InsertBefore(Node newChild, Node refNode);
+		bool HasChildNodes { get; }
+		Node ReplaceChild(Node newChild, Node oldChild);
+		Node FirstChild { get; }
+		Node LastChild { get; }
+		Node NextSibling { get; }
+		Node PreviousSibling { get; }
+		Node ParentNode { get; }
+		Node CloneNode();
+		int NodeType { get; }
+		string NodeName { get; }
+		int CompareDocumentPosition(Node node);
 	}
 }

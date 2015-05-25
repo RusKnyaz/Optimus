@@ -1,9 +1,11 @@
-﻿namespace WebBrowser.Dom.Elements
+﻿using WebBrowser.ScriptExecuting;
+
+namespace WebBrowser.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
-	public class HtmlInputElement : HtmlElement
+	public class HtmlInputElement : HtmlElement, IHtmlInputElement
 	{
 		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, "input")
 		{
@@ -34,5 +36,12 @@
 					break;
 			}
 		}
+	}
+
+	[DomItem]
+	public interface IHtmlInputElement
+	{
+		string Value { get; set; }
+		bool Disabled { get; set; }
 	}
 }

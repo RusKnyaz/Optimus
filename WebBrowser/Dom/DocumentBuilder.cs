@@ -38,7 +38,7 @@ namespace WebBrowser.Dom
 			if (txt != null)
 				return doc.CreateTextNode(txt.Value);
 
-			var htmlElement = htmlNode as IHtmlElement;
+			var htmlElement = htmlNode as Html.IHtmlElement;
 			if (htmlElement == null)
 				return null;
 
@@ -58,7 +58,7 @@ namespace WebBrowser.Dom
 			foreach(var child in htmlElement.Children)
 			{
 				var cn = BuildElem(doc, child);
-				cn.Parent = elem;
+				cn.ParentNode = elem;
 				elem.AppendChild(cn);
 			}
 

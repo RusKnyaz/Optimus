@@ -1,13 +1,30 @@
 ﻿using System;
 using System.Threading;
 using WebBrowser.ResourceProviders;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom
 {
+	[DomItem]
+	public interface IXmlHttpRequest
+	{
+		void Open(string method, string url, bool? async, string username, string password);
+		int ReadyState { get; }
+		object ResponseXML { get; }
+		string ResponseText { get; }
+		string StatusText { get; }
+		int Status { get; }
+		void SetRequestHeader(string name, string value);
+		string GetAllResponseHeaders();
+		event Action OnReadyStateChange;
+		event Action OnLoad;
+		event Action OnError;
+	}
+
 	/// <summary>
 	/// https://xhr.spec.whatwg.org/
 	/// </summary>
-	public class XmlHttpRequest
+	public class XmlHttpRequest : IXmlHttpRequest
 	{
 		private readonly IHttpResourceProvider _httpResourceProvider;
 		private readonly SynchronizationContext _context;

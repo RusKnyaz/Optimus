@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/2012/WD-html5-20121025/elements.html#htmlelement
 	/// </summary>
-	public class HtmlElement : Element
+	public class HtmlElement : Element, IHtmlElement
 	{
 		public HtmlElement(Document ownerDocument, string tagName)
 			: base(ownerDocument, tagName)
@@ -48,5 +49,11 @@ namespace WebBrowser.Dom.Elements
 				Hidden = value == "true";
 			}
 		}
+	}
+
+	[DomItem]
+	public interface IHtmlElement
+	{
+		bool Hidden { get; set; }
 	}
 }
