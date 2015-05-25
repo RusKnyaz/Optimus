@@ -20,28 +20,38 @@ namespace WebBrowser.Dom
 		}
 	}
 
+	public enum DocumentReadyStates
+	{
+		Loading, Interactive, Complete
+	}
+
+	/// <summary>
+	/// http://www.w3.org/html/wg/drafts/html/master/dom.html#document
+	/// http://dev.w3.org/html5/spec-preview/dom.html
+	/// </summary>
 	public class Document : DocumentFragment
 	{
 		private readonly IResourceProvider _resourceProvider;
-		private readonly SynchronizationContext _context;
+		public readonly SynchronizationContext Context;
+		private readonly IScriptExecutor _scriptExecutor;
 
-		internal Document()
-			:this(null, new StubSynchronizationContext())
+		internal Document() :this(null, null, null)
 		{
-			
+			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		internal Document(IResourceProvider resourceProvider, SynchronizationContext context)
+		internal Document(IResourceProvider resourceProvider, SynchronizationContext context, IScriptExecutor scriptExecutor):base(null)
 		{
 			_resourceProvider = resourceProvider;
-			_context = context;
-			ChildNodes = new List<INode> {new Element("html"){Parent = this}};
+			Context = context ?? new StubSynchronizationContext();
+			_scriptExecutor = scriptExecutor;
+			ChildNodes = new List<Node> {new Element(this, "html"){Parent = this}};
 			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
 		}
 
 		public Element DocumentElement { get; private set; }
-
+		public DocumentReadyStates ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
 
 		private readonly List<IDelayedResource> _unresolvedDelayedResources;
@@ -51,7 +61,7 @@ namespace WebBrowser.Dom
 			Load(DocumentBuilder.Build(this, text));
 		}
 
-		internal void Load(IEnumerable<INode> elements)
+		internal void Load(IEnumerable<Node> elements)
 		{
 			ChildNodes.Clear();
 			
@@ -59,12 +69,7 @@ namespace WebBrowser.Dom
 			{
 				element.Parent = this;
 				ChildNodes.Add(element);
-
-				var delayed = element as IDelayedResource;
-				if (delayed != null)
-					_unresolvedDelayedResources.Add(delayed);
-
-				RegisterDelayed(element.ChildNodes);
+				HandleNodeAdded(this, element);
 			}
 
 			if (ChildNodes.Count > 1)
@@ -72,7 +77,7 @@ namespace WebBrowser.Dom
 				var rootElem = ChildNodes[0] as Element;
 				if (rootElem == null || rootElem.TagName != "html")
 				{
-					rootElem = new Element("html"){Parent = this};
+					rootElem = new Element(this, "html"){Parent = this};
 					foreach (var element in ChildNodes)
 					{
 						element.Parent = rootElem;
@@ -83,7 +88,7 @@ namespace WebBrowser.Dom
 				}
 			}
 
-			DocumentElement = ChildNodes.FirstOrDefault() as Element ?? new Element("html");
+			DocumentElement = ChildNodes.FirstOrDefault() as Element ?? new Element(this, "html"){Parent = this};
 
 			foreach (var childNode in ChildNodes)
 			{
@@ -96,26 +101,19 @@ namespace WebBrowser.Dom
 			}
 
 			Trigger("DOMContentLoaded");
-			
+			//todo: check is it right
+			ReadyState = DocumentReadyStates.Complete;
+
+			ResolveDelayedContent();
+
+			RunScripts(ChildNodes.SelectMany(x => x.Flatten()).OfType<Script>());
 		}
 
 		private void Trigger(string type)
 		{
 			var evt = CreateEvent("Event");
 			evt.InitEvent(type, false, false);
-			_context.Post(state => DispatchEvent(evt), null);
-		}
-
-		private void RegisterDelayed(IEnumerable<INode> elements)
-		{
-			foreach (var documentElement in elements)
-			{
-				var delayed = documentElement as IDelayedResource;
-				if (delayed != null)
-					_unresolvedDelayedResources.Add(delayed);
-
-				RegisterDelayed(documentElement.ChildNodes);
-			}
+			Context.Post(state => DispatchEvent(evt), null);
 		}
 
 		public void ResolveDelayedContent()
@@ -124,7 +122,8 @@ namespace WebBrowser.Dom
 			{
 				try
 				{
-					delayedResource.Load(_resourceProvider);
+					if(!delayedResource.Loaded)
+						delayedResource.Load(_resourceProvider);
 				}
 				catch
 				{
@@ -136,12 +135,16 @@ namespace WebBrowser.Dom
 			Trigger("load");
 		}
 
-		internal void RunScripts(IScriptExecutor executor)
+
+		internal void RunScripts(IEnumerable<Script> scripts)
 		{
-			//todo: what we should do if some script changes ChildNodes?
-			foreach (var documentElement in ChildNodes.SelectMany(x => x.Flatten()).OfType<IScript>().ToArray())
+				//todo: what we should do if some script changes ChildNodes?
+				//todo: optimize (create queue of not executed scripts);
+			foreach (var documentElement in scripts.ToArray())
 			{
-				executor.Execute(documentElement.Type, documentElement.Text);
+				if (documentElement.Executed) continue;
+				_scriptExecutor.Execute(documentElement.Type, documentElement.InnerHtml);
+				documentElement.Executed = true;
 			}
 		}
 
@@ -159,13 +162,14 @@ namespace WebBrowser.Dom
 				//todo: fill the list
 				case "div":
 				case "span":
-				case "b":
-					return new HtmlElement(tagName) {OwnerDocument = this};
-				case "input":
-					return new HtmlInputElement {OwnerDocument = this};
+				case "b": return new HtmlElement(this, tagName);
+				case "input": return new HtmlInputElement(this);
+				case "script": return new Script(this);
+				case "head":return new Head(this);
+				case"body":return new Body(this);
 			}
 
-			return new Element(tagName) { OwnerDocument = this};
+			return new Element(this, tagName) { OwnerDocument = this};
 		}
 
 		public Attr CreateAttribute(string name)
@@ -181,7 +185,7 @@ namespace WebBrowser.Dom
 
 		public DocumentFragment CreateDocumentFragment()
 		{
-			return new DocumentFragment{ OwnerDocument = this};
+			return new DocumentFragment(this);
 		}
 
 		public Text CreateTextNode(string data)
@@ -199,6 +203,11 @@ namespace WebBrowser.Dom
 			get { return DocumentElement.GetElementsByTagName("body").FirstOrDefault(); }
 		}
 
+		public Head Head
+		{
+			get { return (Head)DocumentElement.GetElementsByTagName("head").FirstOrDefault(); }
+		}
+
 		public Event CreateEvent(string type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
@@ -208,6 +217,19 @@ namespace WebBrowser.Dom
 			//todo: UIEvent
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);
+		}
+
+		internal void HandleNodeAdded(Node node, Node newChild)
+		{
+			_unresolvedDelayedResources.AddRange(newChild.Flatten()
+				.OfType<IDelayedResource>()
+				.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded));
+
+			if (ReadyState == DocumentReadyStates.Complete)
+			{
+				ResolveDelayedContent();
+				RunScripts(newChild.Flatten().OfType<Script>());
+			}
 		}
 	}
 }

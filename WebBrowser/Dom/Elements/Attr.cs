@@ -19,7 +19,7 @@ namespace WebBrowser.Dom.Elements
 			_name = name;
 		}
 
-		public override INode CloneNode()
+		public override Node CloneNode()
 		{
 			return new Attr(null, Name, Value);
 		}

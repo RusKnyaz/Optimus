@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -7,7 +6,7 @@ namespace WebBrowser.Dom.Elements
 {
 	public class Element : Node
 	{
-		public Element()
+		public Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
 			Attributes = new Dictionary<string, Attr>();
@@ -15,14 +14,14 @@ namespace WebBrowser.Dom.Elements
 		
 		public IDictionary<string, Attr> Attributes { get; private set; }
 
-		public Element(string tagName) :this()
+		public Element(Document ownerDocument, string tagName) :this(ownerDocument)
 		{
 			TagName = tagName;
 		}
 
 		public string TagName { get; private set; }
 
-		public string InnerHtml
+		public virtual string InnerHtml
 		{
 			get
 			{
@@ -169,7 +168,7 @@ namespace WebBrowser.Dom.Elements
 			return sb.ToString();
 		}
 
-		public override INode CloneNode()
+		public override Node CloneNode()
 		{
 			var node  = DocumentBuilder.Build(OwnerDocument, ToString()).Single();
 			node.OwnerDocument = OwnerDocument;

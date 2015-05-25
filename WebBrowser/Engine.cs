@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using WebBrowser.Dom;
 using WebBrowser.Environment;
-using WebBrowser.Html;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
 using WebBrowser.Tests.Dom;
@@ -46,15 +45,12 @@ namespace WebBrowser
 
 		public void Load(Stream stream)
 		{
-			Document = new Document(ResourceProvider, Context);
+			Document = new Document(ResourceProvider, Context, ScriptExecutor);
 			//todo: clear js runtime context
 			
 			var elements = DocumentBuilder.Build(Document, stream);
 			Document.Load(elements);
 
-			Document.ResolveDelayedContent();
-
-			Document.RunScripts(ScriptExecutor);
 		}
     }
 }

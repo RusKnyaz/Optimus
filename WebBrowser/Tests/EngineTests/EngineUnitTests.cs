@@ -7,13 +7,15 @@ using System.Text;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
+using WebBrowser.Dom;
+using WebBrowser.Dom.Elements;
 using WebBrowser.ResourceProviders;
 using Text = WebBrowser.Dom.Text;
 
 namespace WebBrowser.Tests.EngineTests
 {
 	[TestFixture]
-	public class EngineGeneralTests
+	public class EngineUnitTests
 	{
 		[Test]
 		public void EmptyHtml()
@@ -91,6 +93,19 @@ namespace WebBrowser.Tests.EngineTests
 		}
 
 		[Test]
+		public void NonJsScript()
+		{
+			var engine = new Engine();
+
+			string loggedValue = null;
+			engine.Console.OnLog += o => loggedValue = o.ToString();
+
+			engine.Load("<html><head><script id='template' type='text/html'><div>a</div></script></head></html>");
+			var script = engine.Document.GetElementById("template");
+			Assert.AreEqual("<div>a</div>", script.InnerHtml);
+		}
+
+		[Test]
 		public void LoadScriptTest()
 		{
 			var resourceProviderMock = new Mock<IResourceProvider>();
@@ -109,41 +124,34 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.AreEqual("hello", loggedValue);
 		}
 
-		[TestCase("http://okkamtech.com")]
-		[TestCase("http://ya.ru")]
-		[TestCase("http://redmine.todosoft.org")]
-		[TestCase("http://google.com")]
-		[TestCase("https://html5test.com")]
-		public void OpenUrl(string url)
+		[Test]
+		public void DocumentRadyStateComplete()
 		{
 			var engine = new Engine();
-			engine.OpenUrl(url);
+			engine.Load("<html><body></body></html>");
+			Assert.AreEqual(DocumentReadyStates.Complete, engine.Document.ReadyState);
 		}
 
 		[Test]
-		public void Html5Score()
+		public void LoadAndRunScriptAddedInRuntime()
 		{
-			var engine = new Engine();
-			engine.OpenUrl("https://html5test.com");
+			var resourceProvider =
+				Mock.Of<IResourceProvider>(
+					x => x.GetResource(It.IsAny<string>()).Stream == new MemoryStream(Encoding.UTF8.GetBytes("console.log('hello');")));
 
-			var score = engine.Document.GetElementById("score");
-			Assert.IsNotNull(score, "score");
+			var engine = new Engine(resourceProvider);
 
-			Thread.Sleep(1000);//wait calculation
-			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
-			Assert.IsNotNull(tagWithValue, "strong");
-			System.Console.WriteLine(tagWithValue.InnerHtml);
-		}
+			string loggedValue = null;
+			engine.Console.OnLog += o => loggedValue = o.ToString();
 
-		[Test]
-		public void BrowseOkkam()
-		{
-			var engine = new Engine();
-			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
-			engine.OpenUrl("http://okkamtech.com");
-			Thread.Sleep(5000);
-			var userName = engine.Document.GetElementById("UserName");
-			Assert.IsNotNull(userName);
+			engine.Load("<html><head></head></html>");
+
+			var script = (Script)engine.Document.CreateElement("script");
+			script.Src = "http://localhost/script.js";
+			engine.Document.Head.AppendChild(script);
+
+			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://localhost/script.js"), Times.Once());
+			Assert.AreEqual("hello", loggedValue);
 		}
 
 		[Test]
@@ -158,7 +166,7 @@ console.log(style.getPropertyValue('width'));
 console.log(style[0]);
 console.log(style['width']);
 </script></head><body><span id='content1' style='width:100pt; heigth:100pt'></span></body></html>");
-			var elem = engine.Document.GetElementById("content1");
+			var elem = engine.Document.GetElementById("contdent1");
 			Assert.IsNotNull(elem);
 			CollectionAssert.AreEqual(new[] { "100pt", "width", "100pt" }, log);
 		}

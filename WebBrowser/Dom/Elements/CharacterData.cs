@@ -17,7 +17,7 @@ namespace WebBrowser.Dom
 			NodeType = TEXT_NODE;
 		}
 
-		public override INode CloneNode()
+		public override Node CloneNode()
 		{
 			//todo: attributes
 			return new Text() { Data = Data };
@@ -43,7 +43,7 @@ namespace WebBrowser.Dom
 
 		public string Text { get { return Data; } }
 
-		public override INode CloneNode()
+		public override Node CloneNode()
 		{
 			//todo: attributes
 			return new Comment() { Data = Data };

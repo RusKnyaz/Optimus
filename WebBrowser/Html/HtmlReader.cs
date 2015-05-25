@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using WebBrowser.Tools;
 
 namespace WebBrowser.Html
 {
@@ -93,31 +94,14 @@ namespace WebBrowser.Html
 							state = ReadScriptStates.String;
 							qMark = symbol;
 						}
-						else if (symbol == '<')
+						else if (symbol == '>')
 						{
-							var end = "/script>";
-							var tmp = new char[end.Length];
-							var i = 0;
-							for (; i < end.Length; i++)
+							var lastWord = new string(buffer.Last(8).ToArray()).ToLowerInvariant();
+							if (lastWord ==  "</script")
 							{
-								code = reader.Read();
-								if (code <= 0)
-									break;
-								
-								tmp[i] = (char) code;
-								if (((char) code).ToString().ToLower()[0] != end[i])
-									break;
+								buffer.RemoveRange(buffer.Count-8, 8);
+								return new HtmlChunk() { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()) };
 							}
-
-							if (i == end.Length)
-								code = -1;
-							else
-							{
-								buffer.Add(symbol);
-								buffer.AddRange(tmp.Take(i + 1));
-							}
-
-							continue;
 						}
 						else if (symbol == '/')
 						{
@@ -144,12 +128,15 @@ namespace WebBrowser.Html
 							}
 							else //regexp
 							{
-								qMark = '/';
-								state = ReadScriptStates.String;
-								escape = nextChar == '\\';
-								buffer.Add(symbol);
-								buffer.Add(nextChar);
-								continue;
+								if (buffer.Last() != '<')
+								{
+									qMark = '/';
+									state = ReadScriptStates.String;
+									escape = nextChar == '\\';
+									buffer.Add(symbol);
+									buffer.Add(nextChar);
+									continue;
+								}
 							}
 							
 

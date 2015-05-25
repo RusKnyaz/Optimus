@@ -1,61 +1,73 @@
 ﻿using System;
 using System.IO;
+using WebBrowser.TestingTools;
 
 namespace WebBrowser.Dom.Elements
 {
-	public interface IScript : INode
+	public class Script : Element, IDelayedResource
 	{
-		string Text { get; }
-		string Type { get; }
-	}
-
-	public class EmbeddedScript : Element, IScript
-	{
-		public EmbeddedScript(string type, string text) : base("script")
-		{
-			Type = type;
-			Text = text;
-		}
-
-		public string Text { get; private set; }
+		private bool _hasDelayedContent;
+		private string _src;
+		public string Charset { get; private set; }
 		public string Type { get; private set; }
 
-		public override INode CloneNode()
-		{
-			return new EmbeddedScript(Type, Text) { OwnerDocument = OwnerDocument };
-		}
-	}
+		public Script(Document ownerDocument) : base(ownerDocument, "script") { }
 
-	public class LinkScript : Element, IScript, IDelayedResource
-	{
-		private readonly string _url;
-
-		public LinkScript(string type, string url)
-			: base("script")
+		/// <summary>
+		/// Uri
+		/// </summary>
+		public string Src
 		{
-			_url = url;
-			Type = type;
-		}
-
-		public string Text { get; private set; }
-		public string Type { get; private set; }
-		public void Load(IResourceProvider resourceProvider)
-		{
-			var resource = resourceProvider.GetResource(_url);
-			using (var reader = new StreamReader(resource.Stream))
+			get { return _src; }
+			set
 			{
-				Text = reader.ReadToEnd();
+				_src = value;
+				_hasDelayedContent = !string.IsNullOrEmpty(_src);
 			}
 		}
 
-		public override INode CloneNode()
+		public override string InnerHtml { get; set; }
+
+		public string Text { get { return InnerHtml; } set { InnerHtml = value; } }
+
+		public bool HasDelayedContent { get { return _hasDelayedContent; } }
+
+		public void Load(IResourceProvider resourceProvider)
 		{
-			return new LinkScript(Type, _url) {OwnerDocument = OwnerDocument};
+			if(string.IsNullOrEmpty(Src))
+				throw new InvalidOperationException("Src not set.");
+			var resource = resourceProvider.GetResource(Src);
+			using (var reader = new StreamReader(resource.Stream))
+			{
+				InnerHtml = reader.ReadToEnd();
+				Loaded = true;
+			}
+			OwnerDocument.Context.Send(OnLoad);
+		}
+
+		public bool Loaded { get; private set; }
+		public bool Executed { get; set; }
+
+		public event Action OnLoad;
+
+		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
+		{
+			base.UpdatePropertyFromAttribute(value, invariantName);
+
+			switch (invariantName)
+			{
+				case "src": Src = value; break;
+				case "type": Type = value; break;
+				case "charset": Charset = value; break;
+			}
 		}
 	}
+
 
 	internal interface IDelayedResource
 	{
 		void Load(IResourceProvider resourceProvider);
+		bool Loaded { get; }
+		bool HasDelayedContent { get; }
 	}
 }

@@ -43,7 +43,7 @@ namespace WebBrowser.ScriptExecuting
 		{
 			_context.Send(_ =>
 			{
-				if (type.ToLowerInvariant() == "text/javascript")
+				if (string.IsNullOrEmpty(type) || type.ToLowerInvariant() == "text/javascript")
 				{
 					try
 					{

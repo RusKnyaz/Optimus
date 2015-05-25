@@ -8,7 +8,8 @@ namespace WebBrowser.Dom.Elements
 	/// </summary>
 	public class HtmlElement : Element
 	{
-		public HtmlElement(string tagName):base(tagName)
+		public HtmlElement(Document ownerDocument, string tagName)
+			: base(ownerDocument, tagName)
 		{
 			Style = new CssStyleDeclaration();
 		}

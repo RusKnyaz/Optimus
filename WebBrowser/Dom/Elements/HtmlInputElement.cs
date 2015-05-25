@@ -5,7 +5,7 @@
 	/// </summary>
 	public class HtmlInputElement : HtmlElement
 	{
-		public HtmlInputElement() : base("input")
+		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, "input")
 		{
 			Type = "text";
 		}

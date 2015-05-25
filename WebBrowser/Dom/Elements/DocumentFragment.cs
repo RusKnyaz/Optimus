@@ -4,7 +4,7 @@ namespace WebBrowser.Dom
 {
 	public class DocumentFragment : Element
 	{
-		public DocumentFragment()
+		public DocumentFragment(Document ownerDocument): base(ownerDocument)
 		{
 			NodeType = DOCUMENT_FRAGMENT_NODE;
 		}

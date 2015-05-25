@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 
 namespace WebBrowser.Environment

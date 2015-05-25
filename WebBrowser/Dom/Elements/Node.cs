@@ -7,8 +7,14 @@ namespace WebBrowser.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
-	public abstract class Node : INode
+	public abstract class Node
 	{
+		protected Node(Document ownerDocument)
+		{
+			_ownerDocument = ownerDocument;
+			ChildNodes = new List<Node>();
+		}
+	
 		private Document _ownerDocument;
 
 		public virtual Document OwnerDocument
@@ -24,7 +30,7 @@ namespace WebBrowser.Dom.Elements
 			}
 		}
 
-		public INode AppendChild(INode node)
+		public Node AppendChild(Node node)
 		{
 			if (node is DocumentFragment)
 			{
@@ -37,13 +43,19 @@ namespace WebBrowser.Dom.Elements
 			{
 				UnattachFromParent(node);
 				ChildNodes.Add(node);
-				node.Parent = this;
-				node.OwnerDocument = OwnerDocument;
+				RegisterNode(node);
 			}
 			return node;
 		}
 
-		private void UnattachFromParent(INode node)
+		private void RegisterNode(Node node)
+		{
+			node.Parent = this;
+			node.OwnerDocument = OwnerDocument;
+			OwnerDocument.HandleNodeAdded(this, node);
+		}
+
+		private void UnattachFromParent(Node node)
 		{
 			if (node.Parent != null)
 				node.Parent.ChildNodes.Remove(node);
@@ -52,11 +64,11 @@ namespace WebBrowser.Dom.Elements
 		protected Node()
 		{
 			InternalId = Guid.NewGuid().ToString();
-			ChildNodes = new List<INode>();
+			ChildNodes = new List<Node>();
 			NodeType = _NODE;
 		}
 
-		public IList<INode> ChildNodes { get; protected set; }
+		public IList<Node> ChildNodes { get; protected set; }
 		public string InternalId { get; private set; }
 		public string Id { get; set; }
 
@@ -70,8 +82,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			UnattachFromParent(newChild);
 			ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
-			newChild.Parent = this;
-			newChild.OwnerDocument = OwnerDocument;
+			RegisterNode(newChild);
 			return newChild;
 		}
 
@@ -81,14 +92,12 @@ namespace WebBrowser.Dom.Elements
 		{
 			InsertBefore(newChild, oldChild);
 			RemoveChild(oldChild);
-			newChild.Parent = this;
-			newChild.OwnerDocument = OwnerDocument;
 			return newChild;
 		}
 
-		public INode FirstChild { get { return ChildNodes.FirstOrDefault(); } }
-		public INode LastChild { get { return ChildNodes.LastOrDefault(); } }
-		public INode NextSibling { get
+		public Node FirstChild { get { return ChildNodes.FirstOrDefault(); } }
+		public Node LastChild { get { return ChildNodes.LastOrDefault(); } }
+		public Node NextSibling { get
 		{
 			if (Parent == null)
 				return null;
@@ -98,7 +107,7 @@ namespace WebBrowser.Dom.Elements
 				return null;
 			return Parent.ChildNodes[idx + 1];} }
 
-		public INode PreviousSibling
+		public Node PreviousSibling
 		{
 			get
 			{
@@ -109,8 +118,8 @@ namespace WebBrowser.Dom.Elements
 			}
 		}
 
-		public INode Parent { get; set; }
-		public abstract INode CloneNode();
+		public Node Parent { get; set; }
+		public abstract Node CloneNode();
 
 		public int NodeType { get; protected set; }
 		public abstract string NodeName { get; }
@@ -155,7 +164,7 @@ namespace WebBrowser.Dom.Elements
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>
-		public int CompareDocumentPosition(INode node)
+		public int CompareDocumentPosition(Node node)
 		{
 			//todo: rewrite the sketch, consider to move to Extension
 
@@ -199,13 +208,13 @@ namespace WebBrowser.Dom.Elements
 			}
 
 			//Search for shared ancestors
-			var thisAncestors = new List<INode>();
-			var otherAncestors = new List<INode>();
+			var thisAncestors = new List<Node>();
+			var otherAncestors = new List<Node>();
 
-			for (var p = (INode)this; p != null; p = p.Parent )
+			for (var p = (Node)this; p != null; p = p.Parent )
 				otherAncestors.Add(p);
 
-			for (var p = (INode)node; p != null && !otherAncestors.Contains(p); p = p.Parent)
+			for (var p = (Node)node; p != null && !otherAncestors.Contains(p); p = p.Parent)
 				thisAncestors.Add(p);
 
 			//node placed inside

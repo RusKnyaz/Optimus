@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="Dom\Elements\Attr.cs" />
+    <Compile Include="Dom\Elements\Body.cs" />
     <Compile Include="Dom\Elements\CharacterData.cs" />
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Dom\Elements\DocumentFragment.cs" />
     <Compile Include="Dom\Elements\Element.cs" />
     <Compile Include="Dom\Elements\Event.cs" />
+    <Compile Include="Dom\Elements\Head.cs" />
     <Compile Include="Dom\Elements\HtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlInputElement.cs" />
     <Compile Include="Dom\Elements\Script.cs" />
@@ -86,13 +88,18 @@
     <Compile Include="ResourceProviders\ResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
+    <Compile Include="TestingTools\SynchronizationContextExtension.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
-    <Compile Include="SignleThreadSynchronizationContext.cs" />
-    <Compile Include="Tests\EngineTests\EngineGeneralTests.cs" />
+    <Compile Include="Tests\Dom\ScriptTests.cs" />
+    <Compile Include="Tests\EngineTests\EngineJsTests.cs" />
+    <Compile Include="Tests\EngineTests\EngineOpenSites.cs" />
+    <Compile Include="Tools\ListExtension.cs" />
+    <Compile Include="Tools\SignleThreadSynchronizationContext.cs" />
+    <Compile Include="Tests\EngineTests\EngineUnitTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryFormTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryTests.cs" />
     <Compile Include="Tests\EngineTests\KnockoutTests.cs" />

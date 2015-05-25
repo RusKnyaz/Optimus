@@ -9,7 +9,7 @@ namespace WebBrowser.Dom
 {
 	internal class DocumentBuilder
 	{
-		public static IEnumerable<INode> Build(Document doc, string htmlString)
+		public static IEnumerable<Node> Build(Document doc, string htmlString)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
@@ -17,18 +17,18 @@ namespace WebBrowser.Dom
 			}
 		}
 
-		public static IEnumerable<INode> Build(Document doc, Stream stream)
+		public static IEnumerable<Node> Build(Document doc, Stream stream)
 		{
 			var html = HtmlParser.Parse(stream);
 			return Build(doc, html).ToList();
 		}
 
-		public static IEnumerable<INode> Build(Document doc, IEnumerable<IHtmlNode> htmlElements)
+		public static IEnumerable<Node> Build(Document doc, IEnumerable<IHtmlNode> htmlElements)
 		{
 			return htmlElements.Select(x => BuildElem(doc, x));
 		}
 
-		private static INode BuildElem(Document doc, IHtmlNode htmlNode)
+		private static Node BuildElem(Document doc, IHtmlNode htmlNode)
 		{
 			var comment = htmlNode as HtmlComment;
 			if (comment != null)
@@ -42,9 +42,13 @@ namespace WebBrowser.Dom
 			if (htmlElement == null)
 				return null;
 
-			var elem = htmlElement.Name == "script" 
-				? BuildScript(htmlElement) 
-				: doc.CreateElement(htmlElement.Name);
+			var elem = doc.CreateElement(htmlElement.Name);
+
+			if (elem is Script)
+			{
+				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;
+				elem.InnerHtml = htmlText != null ? htmlText.Value : string.Empty;
+			}
 			
 			foreach (var attribute in htmlElement.Attributes)
 			{
@@ -61,27 +65,6 @@ namespace WebBrowser.Dom
 			return elem;
 		}
 
-		private static Element BuildScript(IHtmlElement htmlElement)
-		{
-			if (htmlElement.Attributes.Keys.Contains("src"))
-			{
-				var type = htmlElement.Attributes.ContainsKey("type") 
-					?  htmlElement.Attributes["type"] 
-					: "text/JavaScript"; //todo: get type from url
-
-
-				return new LinkScript(type, htmlElement.Attributes["src"]);
-			}
-			else
-			{
-				var type = htmlElement.Attributes.ContainsKey("type") 
-					?  htmlElement.Attributes["type"] 
-					: "text/JavaScript";
-
-				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;
-				var text = htmlText != null ? htmlText.Value : string.Empty;
-				return new EmbeddedScript(type, text);
-			}
-		}
+		
 	}
 }

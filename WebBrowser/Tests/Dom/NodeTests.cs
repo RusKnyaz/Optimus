@@ -1,6 +1,4 @@
 ﻿#if NUNIT
-using System.Threading;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
