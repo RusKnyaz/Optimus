@@ -143,7 +143,7 @@ namespace WebBrowser.Dom
 			foreach (var documentElement in scripts.ToArray())
 			{
 				if (documentElement.Executed) continue;
-				_scriptExecutor.Execute(documentElement.Type, documentElement.InnerHtml);
+				_scriptExecutor.Execute(documentElement.Type, documentElement.InnerHTML);
 				documentElement.Executed = true;
 			}
 		}

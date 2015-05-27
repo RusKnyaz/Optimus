@@ -120,7 +120,11 @@ namespace WebBrowser.Dom.Elements
 		}
 
 		public Node ParentNode { get; set; }
-		public abstract Node CloneNode();
+		public Node CloneNode()
+		{
+			return CloneNode(false);
+		}
+		public abstract Node CloneNode(bool deep);
 
 		public int NodeType { get; protected set; }
 		public abstract string NodeName { get; }
@@ -137,20 +141,36 @@ namespace WebBrowser.Dom.Elements
 		public const ushort DOCUMENT_TYPE_NODE = 10;
 		public const ushort DOCUMENT_FRAGMENT_NODE = 11;
 		public const ushort NOTATION_NODE = 12;
+
+		Dictionary<string, List<Action<Event>>> _listeners = new Dictionary<string, List<Action<Event>>>();
+
+		List<Action<Event>> GetListeners(string type)
+		{
+			return _listeners.ContainsKey(type) ? _listeners[type] : (_listeners[type] = new List<Action<Event>>());
+		}
 		
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
 		{
-			throw new NotImplementedException();
-		}
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
-		{
-			throw new NotImplementedException();
+			GetListeners(type).Add(listener);
 		}
 
-		public bool DispatchEvent(Event evt)
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
+		{
+			//todo: test it
+			GetListeners(type).Remove(listener);
+		}
+
+		public virtual bool DispatchEvent(Event evt)
 		{
 			if (OnEvent != null)
 				OnEvent(evt);
+
+			foreach (var listener in GetListeners(evt.Type))
+			{
+				//todo: handle errors
+				listener(evt);
+			}
+
 			return true;//todo: what we should return?
 		}
 

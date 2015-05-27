@@ -30,7 +30,7 @@ namespace WebBrowser.Tests.EngineTests
 			engine.Console.OnLog +=o => System.Console.WriteLine(o.ToString());
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			var ucaDiv = engine.Document.GetElementById("uca");
-			Assert.AreEqual("zaza", ucaDiv.InnerHtml);
+			Assert.AreEqual("zaza", ucaDiv.InnerHTML);
 		}
 
 		[Test]

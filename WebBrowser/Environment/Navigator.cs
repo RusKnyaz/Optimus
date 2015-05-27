@@ -1,9 +1,26 @@
-﻿namespace WebBrowser.Environment
+﻿using WebBrowser.ScriptExecuting;
+
+namespace WebBrowser.Environment
 {
+	[DomItem]
+	public interface INavigator
+	{
+		string AppCodeName { get; }
+		string AppName { get; }
+		string AppVersion { get; }
+		bool CookieEnabled { get; }
+		string Geolocation { get; }
+		bool OnLine { get; }
+		string Platform { get; }
+		string Product { get; }
+		string UserAgent { get; }
+		bool JavaEnabled();
+	}
+
 	/// <summary>
 	/// http://www.w3schools.com/jsref/obj_navigator.asp
 	/// </summary>
-	public class Navigator
+	public class Navigator : INavigator
 	{
 		public string AppCodeName{get { return "Tinto Browser"; }}
 		public string AppName{get { return "Tinto"; }}

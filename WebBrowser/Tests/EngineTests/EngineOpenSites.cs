@@ -30,7 +30,7 @@ namespace WebBrowser.Tests.EngineTests
 			Thread.Sleep(1000);//wait calculation
 			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
-			System.Console.WriteLine(tagWithValue.InnerHtml);
+			System.Console.WriteLine(tagWithValue.InnerHTML);
 		}
 
 		[Test]

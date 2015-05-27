@@ -22,7 +22,7 @@ namespace WebBrowser.Dom.Elements
 
 		public string TagName { get; private set; }
 
-		public virtual string InnerHtml
+		public virtual string InnerHTML
 		{
 			get
 			{
@@ -144,6 +144,11 @@ namespace WebBrowser.Dom.Elements
 
 		public override string ToString()
 		{
+			return ToString(true);
+		}
+
+		private string ToString(bool deep)
+		{
 			var sb = new StringBuilder();
 			sb.Append("<");
 			sb.Append(TagName);
@@ -156,22 +161,23 @@ namespace WebBrowser.Dom.Elements
 					if (attribute.Value != null)
 					{
 						sb.Append("=\"");
-						sb.Append(attribute.Value.Value.Replace("\"","\\\""));
+						sb.Append(attribute.Value.Value.Replace("\"", "\\\""));
 						sb.Append("\"");
 					}
 				}
 			}
 			sb.Append(">");
-			sb.Append(InnerHtml);
+			if(deep)
+				sb.Append(InnerHTML);
 			sb.Append("</");
 			sb.Append(TagName);
 			sb.Append(">");
 			return sb.ToString();
 		}
 
-		public override Node CloneNode()
+		public override Node CloneNode(bool deep)
 		{
-			var node  = DocumentBuilder.Build(OwnerDocument, ToString()).Single();
+			var node  = DocumentBuilder.Build(OwnerDocument, ToString(deep)).Single();
 			node.OwnerDocument = OwnerDocument;
 			return node;
 		}
@@ -186,7 +192,7 @@ namespace WebBrowser.Dom.Elements
 	public interface IElement
 	{
 		string TagName { get; }
-		string InnerHtml { get; set; }
+		string InnerHTML { get; set; }
 		Element[] GetElementsByTagName(string tagName);
 		Attr GetAttributeNode(string name);
 		string GetAttribute(string name);

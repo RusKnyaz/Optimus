@@ -26,9 +26,9 @@ namespace WebBrowser.Dom.Elements
 			}
 		}
 
-		public override string InnerHtml { get; set; }
+		public override string InnerHTML { get; set; }
 
-		public string Text { get { return InnerHtml; } set { InnerHtml = value; } }
+		public string Text { get { return InnerHTML; } set { InnerHTML = value; } }
 
 		public bool HasDelayedContent { get { return _hasDelayedContent; } }
 
@@ -39,7 +39,7 @@ namespace WebBrowser.Dom.Elements
 			var resource = resourceProvider.GetResource(Src);
 			using (var reader = new StreamReader(resource.Stream))
 			{
-				InnerHtml = reader.ReadToEnd();
+				InnerHTML = reader.ReadToEnd();
 				Loaded = true;
 			}
 			OwnerDocument.Context.Send(OnLoad);

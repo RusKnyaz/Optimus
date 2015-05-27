@@ -5,49 +5,6 @@
 	
 	Object.defineProperty(window, 'document', { get: function () { return engine.Document; } });
 	
-	function bindFunc(target, owner, funcName) {
-		var netFuncName = upFirstLetter(funcName);
-		var methodInfo = owner.GetType().GetMethod(netFuncName);
-		if (methodInfo) {
-			function getFunc(fn, o, acnt, conv) {
-				return function () {
-					var a = [];
-					for (var x = 0; x < acnt; x++) {
-						a[x] = x < arguments.length ? arguments[x] : null;
-					}
-					return conv(methodInfo.Invoke(owner, a));
-				};
-			}
-
-			target[funcName] = getFunc(netFuncName, owner, methodInfo.GetParameters().length, converters[methodInfo.ReturnType.Name] || function(x) { return x; });
-		}
-	}
-
-	function bindFuncs(target, owner, funcs) {
-		var funcNames = funcs.split(' ');
-		for (var i = 0; i < funcNames.length; i++) {
-			bindFunc(target, owner, funcNames[i]);
-		}
-	}
-	
-	function wrapAttr(netAttr) {
-	    var attr = {};
-	    wrapNode(attr, netAttr);
-	    bindProps(attr, "name specified value ownerElement isId schemaTypeInfo");
-	    return attr;
-	}
-
-	function wrapEvent(netEvent) {
-		return {
-			netEvent: netEvent,
-			type: netEvent.Type,
-			Target: wrap(netEvent.Target),
-			initEvent: function (type, b1, b2) { netEvent.InitEvent(type, b1, b2); }
-			//todo: remains properties
-		};
-	}
-
-	
 	function upFirstLetter(string) { return string.charAt(0).toUpperCase() + string.slice(1); }
 
 	function bindProps(target, owner, propsString) {
@@ -75,15 +32,10 @@
 				Object.defineProperty(target, jsPropName, prop);
 		}
 	}
-	
-	window.addEventListener = function (x, y, z) {
-		//todo: implement
-	};
 
-	bindProps(window.location = {}, engine.Window.Location, "hash host hostname href origin pathname port protocol search");
-	bindProps(window.navigator = {}, engine.Window.Navigator, "appCodeName appName appVersion cookieEnabled geolocation onLine platform product userAgent");
-	window.navigator.javaEnabled = function () { return engine.Window.Navigator.JavaEnabled(); };
-	bindProps(window.screen = {}, engine.Window.Screen, "width height availWidth availHeight colorDepth pixeDepth");
+	window.addEventListener = function () { };//todo: implement
+	window.clearTimeout = engine.Window.clearTimeout;
+
 	bindProps(window, engine.Window, "innerWidth innerHeight");
 	window.setTimeout = function (handler, timeout) {
 		if (!handler)
@@ -93,43 +45,16 @@
 			handler.apply({}, args);
 		}, timeout);
 	};
-
-	bindFuncs(window, engine.Window, "clearTimeout");
 	
-    function bindEvent(target, owner, name) {
-        var names = name.split(':');
-        var jsName = names[0];
-        var netName = names[1] || upFirstLetter(jsName);
-
-        var jsHandler;
-        var jsHandlerWrapper;
-        Object.defineProperty(target, jsName, {
-            get: function () { return jsHandler; },
-            set: function (handler) {
-                if (jsHandler) {
-                    owner["remove_"+netName](jsHandlerWrapper);
-                }
-                jsHandler = handler;
-                jsHandlerWrapper = function () { jsHandler.call(target); };
-                owner["add_"+netName](jsHandlerWrapper);
-            }
-        });
-    }
-
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {
-		var netRequest = engine.XmlHttpRequest();
-		bindFuncs(this, netRequest, "open send setRequestHeader abort getResponseHeader getAllResponseHeaders overrideMimeType");
-		bindProps(this, netRequest, "status responseXML responseText readyState");
-		bindEvent(this, netRequest, "onreadystatechange:OnReadyStateChange");
-		bindEvent(this, netRequest, "onload:OnLoad");
-		bindEvent(this, netRequest, "onerror:OnError");
-
-		this.UNSENT = 0;
-		this.OPENED = 1;
-		this.HEADERS_RECEIVED = 2;
-		this.LOADING = 3;
-		this.DONE = 4;
+		var r = engine.XmlHttpRequest();
+		r.UNSENT = 0;
+		r.OPENED = 1;
+		r.HEADERS_RECEIVED = 2;
+		r.LOADING = 3;
+		r.DONE = 4;
+		return r;
 	};
 
 })(this["A89A3DC7FB5944849D4DE0781117A595"]);

@@ -23,6 +23,17 @@ namespace WebBrowser.Dom.Elements
 			DispatchEvent(evt);
 		}
 
+		public event Action OnClick;
+
+		public override bool DispatchEvent(Event evt)
+		{
+			if (evt.Type == "click" && OnClick != null)
+				OnClick();
+
+			
+			return base.DispatchEvent(evt);
+		}
+
 		public CssStyleDeclaration Style { get; private set; }
 
 		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
@@ -55,5 +66,7 @@ namespace WebBrowser.Dom.Elements
 	public interface IHtmlElement
 	{
 		bool Hidden { get; set; }
+		void Click();
+		event Action OnClick;
 	}
 }

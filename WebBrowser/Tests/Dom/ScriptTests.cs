@@ -17,7 +17,7 @@ namespace WebBrowser.Tests.Dom
 			var document = new Document(null, null, Mock.Of<IScriptExecutor>());
 			document.Write(html);
 			var s = document.GetElementById("s");
-			Assert.AreEqual(expectedInnerHtml, s.InnerHtml);
+			Assert.AreEqual(expectedInnerHtml, s.InnerHTML);
 		}
 
 		[Test]

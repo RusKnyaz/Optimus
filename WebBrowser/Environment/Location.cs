@@ -1,6 +1,22 @@
-﻿namespace WebBrowser.Environment
+﻿using WebBrowser.ScriptExecuting;
+
+namespace WebBrowser.Environment
 {
-	public class Location
+	[DomItem]
+	public interface ILocation
+	{
+		string Href { get; set; }
+		string Hash { get; set; }
+		string Host { get; set; }
+		string Hostname { get; set; }
+		string Origin { get; }
+		string Pathname { get; set; }
+		string Port { get; set; }
+		string Protocol { get; set; }
+		string Search { get; set; }
+	}
+
+	public class Location : ILocation
 	{
 		public string Href { get; set; }
 		public string Hash { get; set; }

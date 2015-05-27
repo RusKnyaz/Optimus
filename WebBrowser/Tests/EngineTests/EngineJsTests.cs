@@ -29,6 +29,41 @@ namespace WebBrowser.Tests.EngineTests
 		}
 
 		[Test]
+		public void StoreValueInElement()
+		{
+			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+				@"var e = document.getElementById('d');
+e.someVal = 'x';
+console.log(e.someVal == 'x');
+var e2 = document.getElementById('d');
+console.log(e2.someVal == 'x');");
+			
+			CollectionAssert.AreEqual(new object[] { true, true}, _log);
+		}
+
+		[Test]
+		public void PassElementValueToClr()
+		{
+			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+				@"var e = document.getElementById('d');
+e.someVal = 'x';
+console.log(e.someVal);");
+
+			CollectionAssert.AreEqual(new object[] { "x"}, _log);
+		}
+
+		[Test]
+		public void SetInnerHtml()
+		{
+			var engine = CreateEngine("<div id='d'></div>",
+				@"var e = document.getElementById('d');
+console.log(e.hasChildNodes);
+e.innerHTML = '<h1>1</h1><h2>2</h2><h3>3</h3>';
+console.log(e.hasChildNodes);");
+			CollectionAssert.AreEqual(new object[] { false, true }, _log);
+		}
+
+		[Test]
 		public void NodeTest()
 		{
 			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
@@ -49,7 +84,7 @@ console.log(e.getAttribute('id'));");
 		}
 
 		[Test]
-		public void NodeEventsTest()
+		public void NodeAddEventListenerTest()
 		{
 			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
@@ -62,6 +97,23 @@ ev.initEvent('click', false, false);
 e.dispatchEvent(ev);");
 
 			CollectionAssert.AreEqual(new object[] { true, true, true, "click" }, _log);
+		}
+
+		[Test]
+		public void EventSubscribeTests()
+		{
+			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+				@"var e = document.getElementById('d');
+var handler = function(){console.log('click');};
+e.onclick = handler;
+console.log(e.onclick == handler);
+var ev = document.createEvent('Event');
+ev.initEvent('click', false, false);
+e.dispatchEvent(ev);
+e.onclick = function(){console.log('click2');};
+e.click();");
+
+			CollectionAssert.AreEqual(new object[] { true, "click", "click2" }, _log);
 		}
 
 		[Test]
@@ -105,6 +157,27 @@ console.log(e.removeChild != null);
 console.log(e.appendChild != null);");
 
 			CollectionAssert.AreEqual(new object[] { true, true, true, true, true }, _log);
+		}
+
+		[Test]
+		public void GetElementsByTagName()
+		{
+			var engine = CreateEngine("<div id='d'></div><div></div><span></span>",
+				@"var elems = document.body.getElementsByTagName('div');
+console.log(elems.length);");
+
+			CollectionAssert.AreEqual(new object[] { 2 }, _log);
+		}
+
+		[Test]
+		public void ChildNodes()
+		{
+			var engine = CreateEngine("<div id='d'></div><div></div><span></span>",
+				@"var elems = document.body.childNodes;
+console.log(elems.length);
+console.log(elems[0] != null);");
+
+			CollectionAssert.AreEqual(new object[] { 3, true }, _log);
 		}
 	}
 }

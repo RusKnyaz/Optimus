@@ -1,11 +1,20 @@
 ﻿using System.Collections.Specialized;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
+	[DomItem]
+	public interface ICssStyleDeclaration
+	{
+		string this[string name] { get; }
+		string this[int idx] { get; }
+		string GetPropertyValue(string propertyName);
+	}
+
 	/// <summary>
 	/// http://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/css/CSSStyleDeclaration.html
 	/// </summary>
-	public class CssStyleDeclaration
+	public class CssStyleDeclaration : ICssStyleDeclaration
 	{
 		public CssStyleDeclaration()
 		{

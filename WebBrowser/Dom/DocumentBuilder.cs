@@ -47,7 +47,7 @@ namespace WebBrowser.Dom
 			if (elem is Script)
 			{
 				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;
-				elem.InnerHtml = htmlText != null ? htmlText.Value : string.Empty;
+				elem.InnerHTML = htmlText != null ? htmlText.Value : string.Empty;
 			}
 			
 			foreach (var attribute in htmlElement.Attributes)

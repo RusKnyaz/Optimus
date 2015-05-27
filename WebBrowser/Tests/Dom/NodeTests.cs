@@ -12,7 +12,7 @@ namespace WebBrowser.Tests.Dom
 		{
 			var document = new Document();
 			var tmp = document.CreateElement("div");
-			tmp.InnerHtml = html;
+			tmp.InnerHTML = html;
 			return (Element)tmp.FirstChild;
 		}
 
@@ -162,7 +162,7 @@ namespace WebBrowser.Tests.Dom
 		{
 			var doc = new Document();
 			var d = doc.CreateElement("<div>");
-			d.InnerHtml = "<strong></strong>";
+			d.InnerHTML = "<strong></strong>";
 			Assert.AreEqual(doc, d.ChildNodes[0].OwnerDocument);
 		}
 

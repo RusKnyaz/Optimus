@@ -1,8 +1,9 @@
 ﻿using System;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
-	public class Attr : Node
+	public class Attr : Node, IAttr
 	{
 		private string _name;
 		private Element _ownerElement;
@@ -19,7 +20,7 @@ namespace WebBrowser.Dom.Elements
 			_name = name;
 		}
 
-		public override Node CloneNode()
+		public override Node CloneNode(bool deep)
 		{
 			return new Attr(null, Name, Value);
 		}
@@ -51,5 +52,14 @@ namespace WebBrowser.Dom.Elements
 		//todo: is it right?
 		public bool Specified { get { return true; } }
 		//todo: TypeInfo SchemaTypeInfo {get{}}
+	}
+
+	[DomItem]
+	public interface IAttr
+	{
+		string Value { get; set; }
+		string Name { get; }
+		bool IsId { get; }
+		bool Specified { get; }
 	}
 }

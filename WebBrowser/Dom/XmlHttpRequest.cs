@@ -39,6 +39,16 @@ namespace WebBrowser.Dom
 			ReadyState = UNSENT;
 		}
 
+		public void Open(string method, string url)
+		{
+			Open(method, url, true, null, null);
+		}
+
+		public void Open(string method, string url, bool? async)
+		{
+			Open(method, url, async, null, null);
+		}
+
 		public void Open(string method, string url, bool? async, string username, string password)
 		{
 			_request = new HttpRequest
@@ -83,6 +93,27 @@ namespace WebBrowser.Dom
 		public event Action OnError;
 
 		public async void Send(object data)
+		{
+			//todo: use data
+			if (_async)
+			{
+				ReadyState = LOADING;
+				_response = await _httpResourceProvider.SendRequestAsync(_request);
+				ReadyState = DONE;
+				Fire(OnReadyStateChange);
+				Fire(OnLoad);
+			}
+			else
+			{
+				ReadyState = LOADING;
+				_response = _httpResourceProvider.SendRequest(_request);
+				ReadyState = DONE;
+				Fire(OnReadyStateChange);
+				Fire(OnLoad);
+			}
+		}
+
+		public async void Send()
 		{
 			if (_async)
 			{

@@ -87,6 +87,8 @@
     <Compile Include="ResourceProviders\IResourceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceProviders\ResourceProvider.cs" />
+    <Compile Include="ScriptExecuting\ClrObject.cs" />
+    <Compile Include="ScriptExecuting\ListAdapter.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="TestingTools\SynchronizationContextExtension.cs" />

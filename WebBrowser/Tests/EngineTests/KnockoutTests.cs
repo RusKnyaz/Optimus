@@ -43,7 +43,7 @@ ko.applyBindings(new VM());
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("Hello", span.InnerHtml);
+			Assert.AreEqual("Hello", span.InnerHTML);
 		}
 
 		[Test]
@@ -69,19 +69,19 @@ ko.applyBindings(new VM());
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("Hello", span.InnerHtml);
+			Assert.AreEqual("Hello", span.InnerHTML);
 
 			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", false, false);
 			span.DispatchEvent(evt);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("World", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("World", span.InnerHtml);
+			Assert.AreEqual("World", span.InnerHTML);
 
 			span.Click();
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("Hello", span.InnerHtml);
+			Assert.AreEqual("Hello", span.InnerHTML);
 		}
 
 		[Test]
@@ -163,16 +163,16 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();
 			var spans = doc.Body.GetElementsByTagName("span").ToArray();
 			Assert.AreEqual(2, spans.Length);
-			Assert.AreEqual("Ivan", spans[0].InnerHtml);
-			Assert.AreEqual("Vasil", spans[1].InnerHtml);
+			Assert.AreEqual("Ivan", spans[0].InnerHTML);
+			Assert.AreEqual("Vasil", spans[1].InnerHTML);
 
 			button.Click();
 
 			var newSpans = doc.Body.GetElementsByTagName("span").ToArray();
 			Assert.AreEqual(3, newSpans.Length);
-			Assert.AreEqual("Ivan", newSpans[0].InnerHtml);
-			Assert.AreEqual("Vasil", newSpans[1].InnerHtml);
-			Assert.AreEqual("Neo", newSpans[2].InnerHtml);
+			Assert.AreEqual("Ivan", newSpans[0].InnerHTML);
+			Assert.AreEqual("Vasil", newSpans[1].InnerHTML);
+			Assert.AreEqual("Neo", newSpans[2].InnerHTML);
 		}
 
 		[Test]
@@ -202,19 +202,19 @@ ko.applyBindings(new VM());
 			Assert.IsNotNull(span);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("Hello", span.InnerHtml);
+			Assert.AreEqual("Hello", span.InnerHTML);
 
 			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", false, false);
 			span.DispatchEvent(evt);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("World", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("World", span.InnerHtml);
+			Assert.AreEqual("World", span.InnerHTML);
 
 			span.Click();
 			Assert.AreEqual(1, span.ChildNodes.Count);
 			Assert.AreEqual("Hello", ((Text)span.FirstChild).Data);
-			Assert.AreEqual("Hello", span.InnerHtml);
+			Assert.AreEqual("Hello", span.InnerHTML);
 		}
 
 		[Test]
