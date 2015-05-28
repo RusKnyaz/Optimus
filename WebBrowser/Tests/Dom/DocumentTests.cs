@@ -87,8 +87,9 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(2, document.Body.ChildNodes.Count);
 		}
 
-		[Test]
-		public void CloneNode()
+		[TestCase(true, 1)]
+		[TestCase(false, 0)]
+		public void CloneNode(bool deep, int expectedChildCount)
 		{
 			var document = new Document();
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></body></html");
@@ -99,7 +100,7 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(1, div1.ChildNodes.Count);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 
-			var clone = span.CloneNode() as HtmlElement;
+			var clone = span.CloneNode(deep) as HtmlElement;
 			Assert.IsNotNull(clone);
 
 			//sate of all old elements should be the same as before
@@ -107,7 +108,7 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(1, div1.ChildNodes.Count);
 			Assert.AreEqual(1, span.ChildNodes.Count);
 
-			Assert.AreEqual(1, clone.ChildNodes.Count);
+			Assert.AreEqual(expectedChildCount, clone.ChildNodes.Count);
 			Assert.IsNotNull(clone.OwnerDocument, "Clone's ownerDocument");
 			Assert.AreEqual(span.OwnerDocument, clone.OwnerDocument, "Clone's ownerDocument");
 			Assert.IsNull(clone.ParentNode, "Clone's parentNode");
