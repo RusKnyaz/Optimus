@@ -29,8 +29,15 @@ namespace WebBrowser.Dom.Elements
 			{
 				int number;
 				if (int.TryParse(name, out number))
-					return Properties.AllKeys[number];
-				return Properties[name];
+					return Properties.AllKeys[number]; //return key
+				return Properties[name]; //return value
+			}
+			set
+			{
+				int number;
+				if (int.TryParse(name, out number))
+					Properties.AllKeys[number] = value;//todo: check behavior
+				Properties[name] = value;
 			}
 		}
 

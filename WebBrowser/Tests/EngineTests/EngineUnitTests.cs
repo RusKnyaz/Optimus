@@ -154,23 +154,7 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.AreEqual("hello", loggedValue);
 		}
 
-		[Test]
-		public void StyleTest()
-		{
-			var engine = new Engine();
-			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
-			engine.Load("<html><head><script>" +
-@"var style = document.getElementById('content1').style;
-console.log(style.getPropertyValue('width'));
-console.log(style[0]);
-console.log(style['width']);
-</script></head><body><span id='content1' style='width:100pt; heigth:100pt'></span></body></html>");
-			var elem = engine.Document.GetElementById("content1");
-			Assert.IsNotNull(elem);
-			CollectionAssert.AreEqual(new[] { "100pt", "width", "100pt" }, log);
-		}
-
+		
 		[Test]
 		public void SetTimeout()
 		{

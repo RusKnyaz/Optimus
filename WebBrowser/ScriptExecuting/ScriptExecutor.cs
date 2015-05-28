@@ -32,12 +32,11 @@ namespace WebBrowser.ScriptExecuting
 		public ScriptExecutor(Engine engine)
 		{
 			_context = engine.Context;
-			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(new DomConverter(() => _jsEngine)))
-				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine))
-				.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))})
-				.SetValue("location", engine.Window.Location)
-				.SetValue("navigator", engine.Window.Navigator)
-				.SetValue("screen", engine.Window.Screen);
+			var typeConverter = new DomConverter(() => _jsEngine);
+			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(typeConverter))
+				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine));
+			
+			_jsEngine.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
 
 			_jsEngine.Execute(Resources.clrBridge);
 		}

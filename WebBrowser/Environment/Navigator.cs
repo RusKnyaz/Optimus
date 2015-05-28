@@ -22,20 +22,19 @@ namespace WebBrowser.Environment
 	/// </summary>
 	public class Navigator : INavigator
 	{
-		public string AppCodeName{get { return "Tinto Browser"; }}
-		public string AppName{get { return "Tinto"; }}
+		public string AppCodeName { get { return "Optimus Browser"; } }
+		public string AppName { get { return "Optimus"; } }
 		public string AppVersion{get { return "1.0"; }}
 		public bool CookieEnabled{get{ return true; }}
 		public string Geolocation{get { return null; /*todo*/ }}
 		public bool OnLine{get { return true; }}
 		public string Platform{get { return ".NET"; /*todo*/ }}
-		public string Product{get { return "Tinto"; }}
-		public string UserAgent{get { return "Tinto"; /*todo*/ }}
+		public string Product { get { return "Optimus"; } }
+		public string UserAgent{get { return "Optimus"; /*todo*/ }}
 
 		public bool JavaEnabled()
 		{
 			return true;
 		}
-
 	}
 }

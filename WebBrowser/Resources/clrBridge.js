@@ -35,7 +35,10 @@
 
 	window.addEventListener = function () { };//todo: implement
 	window.clearTimeout = engine.Window.clearTimeout;
-
+	window.location = engine.Window.Location;
+	window.navigator = engine.Window.Navigator;
+	window.screen = engine.Window.Screen;
+    
 	bindProps(window, engine.Window, "innerWidth innerHeight");
 	window.setTimeout = function (handler, timeout) {
 		if (!handler)

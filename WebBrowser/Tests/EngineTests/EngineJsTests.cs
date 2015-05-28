@@ -179,5 +179,49 @@ console.log(elems[0] != null);");
 
 			CollectionAssert.AreEqual(new object[] { 3, true }, _log);
 		}
+
+		[Test]
+		public void Navigator()
+		{
+			var engine = CreateEngineWithScript(@"
+console.log(navigator != null);
+console.log(navigator.userAgent);");
+
+			CollectionAssert.AreEqual(new object[] { true, "Optimus" }, _log);
+		}
+
+		[Test]
+		public void SetChildNode()
+		{
+			var engine = CreateEngine("<div id='a'><span></span></div>",
+@"var d = document.getElementById('a');
+d.childNodes[0] = document.createElement('p');
+console.log(d.childNodes[0].tagName);");
+
+			CollectionAssert.AreEqual(new object[] { "p" }, _log);
+		}
+
+		[Test]
+		public void StyleRead()
+		{
+			var engine = CreateEngine("<span id='content1' style='width:100pt; heigth:100pt'></span>",
+@"var style = document.getElementById('content1').style;
+console.log(style.getPropertyValue('width'));
+console.log(style[0]);
+console.log(style['width']);");
+
+			CollectionAssert.AreEqual(new[] { "100pt", "width", "100pt" }, _log);
+		}
+
+		[Test]
+		public void StyleWrite()
+		{
+			var engine = CreateEngine("<span id='content1' style='width:100pt; heigth:100pt'></span>",
+@"var style = document.getElementById('content1').style;
+style['width'] = '200pt';
+console.log(style['width']);");
+
+			CollectionAssert.AreEqual(new[] { "200pt" }, _log);
+		}
 	}
 }

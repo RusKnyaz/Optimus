@@ -12,12 +12,14 @@ namespace WebBrowser.Dom.Elements
 		public bool Cancellable;
 		public void StopPropagation()
 		{
-			throw new NotImplementedException();
+			//todo: implement
+			//throw new NotImplementedException();
 		}
 
 		public void PreventDefault()
 		{
-			throw new NotImplementedException();
+			//todo: implement
+			//throw new NotImplementedException();
 		}
 
 		public void InitEvent(string type, bool canBubble, bool canCancel)
