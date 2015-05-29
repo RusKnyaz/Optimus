@@ -39,9 +39,7 @@ namespace WebBrowser.Tests.EngineTests
 			var t = new Task<HttpResponse>(() => new HttpResponse(HttpStatusCode.OK, "OK", null));
 			t.Start();
 
-			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequestAsync(It.IsAny<HttpRequest>()) ==
-				t);
-
+			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequestAsync(It.IsAny<HttpRequest>()) == t);
 			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
 
 			var engine = new Engine(resourceProvider);
