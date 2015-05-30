@@ -1,5 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text;
+using Moq;
 using NUnit.Framework;
+using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -178,6 +183,31 @@ console.log(elems.length);
 console.log(elems[0] != null);");
 
 			CollectionAssert.AreEqual(new object[] { 3, true }, _log);
+		}
+
+		[Test]
+		public void AddScriptAndExecute()
+		{
+			var resourceProvider = Mock.Of<IResourceProvider>(x => 
+				x.GetResource("http://localhost/module") == new Response(ResourceTypes.Html, new MemoryStream(Encoding.UTF8.GetBytes("console.log('hi from module');"))));
+
+			var engine = new Engine(resourceProvider);
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine(o ?? "<null>");
+				log.Add(o.ToString());
+			};
+
+			var script = 
+@"var s = document.createElement('script');
+s.setAttribute('src', 'http://localhost/module');
+document.head.appendChild(s);";
+
+			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			System.Threading.Thread.Sleep(1000);
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("hi from module", log[0]);
 		}
 	}
 }
