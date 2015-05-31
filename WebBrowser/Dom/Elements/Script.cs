@@ -15,8 +15,8 @@ namespace WebBrowser.Dom.Elements
 		private readonly AttributeMappedValue<string> _type;
 		private readonly AttributeMappedValue<string> _charset;
 		private readonly AttributeMappedValue<string> _src;
-		private readonly AttributeMappedValue<bool> _async;
-		private readonly AttributeMappedValue<bool> _defer;
+		private readonly AttributeMappedBoolValue _async;
+		private readonly AttributeMappedBoolValue _defer;
 
 		public string Charset { get { return _charset.Value; } set { _charset.Value = value; } }
 		public bool Async { get { return _async.Value; } set { _async.Value = value; } }
@@ -31,15 +31,15 @@ namespace WebBrowser.Dom.Elements
 			_type = new AttributeMappedValue<string>(this, "type");
 			_charset = new AttributeMappedValue<string>(this, "charset");
 			_src = new AttributeMappedValue<string>(this, "src");
-			_async = new AttributeMappedValue<bool>(this, "async");
-			_defer = new AttributeMappedValue<bool>(this, "defer");
+			_async = new AttributeMappedBoolValue(this, "async");
+			_defer = new AttributeMappedBoolValue(this, "defer");
 		}
 
 		public override string InnerHTML { get; set; }
 
 		public string Text { get { return InnerHTML; } set { InnerHTML = value; } }
 
-		public bool HasDelayedContent { get { return _hasDelayedContent; } }
+		public bool HasDelayedContent { get { return !string.IsNullOrEmpty(Src); } }
 
 		public void Load(IResourceProvider resourceProvider)
 		{

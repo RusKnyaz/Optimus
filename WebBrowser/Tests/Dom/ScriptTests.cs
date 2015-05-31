@@ -19,16 +19,6 @@ namespace WebBrowser.Tests.Dom
 			var s = document.GetElementById("s");
 			Assert.AreEqual(expectedInnerHtml, s.InnerHTML);
 		}
-
-		[Test]
-		public void GetSrc()
-		{
-			var document = new Document(null, null, Mock.Of<IScriptExecutor>());
-			document.Write("<html><head><script type='text/javascript' src='/script.js' id='s'/></head></html>");
-			var s = (Script)document.GetElementById("s");
-			Assert.AreEqual("/script.js", s.Src);
-			Assert.AreEqual("text/javascript", s.Type);
-		}
 	}
 }
 #endif

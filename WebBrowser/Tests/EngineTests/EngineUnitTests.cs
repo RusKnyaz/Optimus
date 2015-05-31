@@ -70,7 +70,7 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			string attr = null;
 			engine.Console.OnLog += o => attr = o.ToString();
-			engine.Load("<html><head><script>" +
+			engine.Load("<html><head><script defer>" +
 			@"console.log(document.getElementById('content1').getAttribute('id'));" +
 				"</script></head><body><span id='content1'></span></body></html>");
 			Assert.AreEqual("content1", attr);

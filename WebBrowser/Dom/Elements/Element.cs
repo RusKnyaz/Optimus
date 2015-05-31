@@ -174,10 +174,17 @@ namespace WebBrowser.Dom.Elements
 
 		public override Node CloneNode(bool deep)
 		{
-			/*var node  = DocumentBuilder.Build(OwnerDocument, ToString(deep)).Single();
-			node.OwnerDocument = OwnerDocument;
-			return node;*/
-			throw new NotImplementedException();
+			var node = OwnerDocument.CreateElement(TagName);
+			foreach (var attribute in Attributes)
+			{
+				node.SetAttributeNode((Attr)attribute.Value.CloneNode());
+			}
+
+			foreach (var childNode in ChildNodes)
+			{
+				node.AppendChild(childNode.CloneNode());
+			}
+			return node;
 		}
 
 		public Attr GetAttributeNode(string name)

@@ -192,14 +192,50 @@ namespace WebBrowser.Dom
 
 		internal void HandleNodeAdded(Node node, Node newChild)
 		{
-			_unresolvedDelayedResources.AddRange(newChild.Flatten()
-				.OfType<IDelayedResource>()
-				.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded));
-
-			if (ReadyState == DocumentReadyStates.Complete)
+			foreach (var script in newChild.Flatten().OfType<Script>())
 			{
-				ResolveDelayedContent();
-				RunScripts(newChild.Flatten().OfType<Script>());
+				if (script.Async)
+				{
+					if (script.HasDelayedContent)
+					{
+						//todo: get resourceAsync
+						var resource = _resourceProvider.GetResource(script.Src);
+
+						using (var reader = new StreamReader(resource.Stream))
+						{
+							script.Text = reader.ReadToEnd();
+						}
+						//todo: async execution
+						_scriptExecutor.Execute(script.Type, script.Text);
+						script.Executed = true;
+					}
+					else if(!string.IsNullOrEmpty(script.Text))
+					{
+						//todo: async execution
+						_scriptExecutor.Execute(script.Type, script.Text);
+						script.Executed = true;
+					}
+				}
+				else if (script.Defer && ReadyState != DocumentReadyStates.Complete)
+				{
+					_unresolvedDelayedResources.AddRange(newChild.Flatten()
+						.OfType<IDelayedResource>()
+						.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded));
+				}
+				else
+				{
+					if (script.HasDelayedContent)
+					{
+						script.Load(_resourceProvider);
+						_scriptExecutor.Execute(script.Type, script.Text);
+						script.Executed = true;
+					}
+					else if (!string.IsNullOrEmpty(script.Text))
+					{
+						_scriptExecutor.Execute(script.Type, script.Text);
+						script.Executed = true;
+					}
+				}
 			}
 		}
 	}
