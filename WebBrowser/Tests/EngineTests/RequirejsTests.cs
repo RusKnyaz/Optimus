@@ -1,6 +1,8 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Properties;
@@ -22,9 +24,8 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Require()
 		{
-			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(
-				x => x.SendRequest(It.IsAny<HttpRequest>()) == new HttpResponse(HttpStatusCode.OK, "OK", null));
-			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+			var resourceProvider = Mock.Of<IResourceProvider>(x => x.GetResource(It.IsAny<string>()) == 
+				new Response(ResourceTypes.Html, new MemoryStream(Encoding.UTF8.GetBytes("console.log('OK');"))));
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -37,8 +38,8 @@ namespace WebBrowser.Tests.EngineTests
 			var script = @"require(['data'], function(x){console.log('OK');});";
 
 			engine.Load("<html><head><script> " + Resources.requirejs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
-			System.Threading.Thread.Sleep(15000);
-			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once);
+			System.Threading.Thread.Sleep(1000);
+			Mock.Get(resourceProvider).Verify(x => x.GetResource(It.IsAny<string>()), Times.Once);
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("OK", log[0]);
 		}

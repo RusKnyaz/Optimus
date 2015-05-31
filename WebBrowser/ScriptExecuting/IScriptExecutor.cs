@@ -6,5 +6,6 @@ namespace WebBrowser.ScriptExecuting
 	{
 		void Execute(string type, string code);
 		event Action<Exception> OnException;
+		void Clear();
 	}
 }

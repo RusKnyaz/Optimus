@@ -26,15 +26,19 @@ namespace WebBrowser
 
 			ResourceProvider = resourceProvider;
 			Console = new Console();
-			Window = new Window(Context);
+			Window = new Window(Context, this);
 			ScriptExecutor = new ScriptExecutor(this);
 		}
 
 		public Engine() : this(new ResourceProvider()) { }
 
+		public Uri Uri { get; private set; }
+
 		public void OpenUrl(string path)
 		{
-			ResourceProvider.Root = (new Uri(path)).GetLeftPart(UriPartial.Path);
+			ScriptExecutor.Clear();
+			Uri = new Uri(path);
+			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path);
 			var resource = ResourceProvider.GetResource(path);
 			
 			if (resource.Type == ResourceTypes.Html)

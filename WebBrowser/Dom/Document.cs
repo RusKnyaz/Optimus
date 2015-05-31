@@ -28,6 +28,7 @@ namespace WebBrowser.Dom
 	/// <summary>
 	/// http://www.w3.org/html/wg/drafts/html/master/dom.html#document
 	/// http://dev.w3.org/html5/spec-preview/dom.html
+	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
 	public class Document : DocumentFragment, IDocument
 	{
@@ -134,7 +135,6 @@ namespace WebBrowser.Dom
 			
 			Trigger("load");
 		}
-
 
 		internal void RunScripts(IEnumerable<Script> scripts)
 		{

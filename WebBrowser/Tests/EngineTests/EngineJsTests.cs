@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.ResourceProviders;
@@ -201,13 +202,15 @@ console.log(elems[0] != null);");
 
 			var script = 
 @"var s = document.createElement('script');
+s.onload = function(){console.log('load');};
 s.setAttribute('src', 'http://localhost/module');
 document.head.appendChild(s);";
 
 			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
-			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("hi from module", log[0]);
+			Assert.AreEqual(2, log.Count);
+			Assert.AreEqual("load", log[0]);
+			Assert.AreEqual("hi from module", log[1]);
 		}
 
 		[Test]
@@ -252,6 +255,32 @@ style['width'] = '200pt';
 console.log(style['width']);");
 
 			CollectionAssert.AreEqual(new[] { "200pt" }, _log);
+		}
+
+		[Test]
+		public void Location()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org", 
+				Mocks.Page("console.log(window.location.href);console.log(window.location.protocol);"));
+			var engine = new Engine(resourceProvider);
+			engine.Console.OnLog+= x => _log.Add(x.ToString());
+			engine.OpenUrl("http://todosoft.org");
+			CollectionAssert.AreEqual(new[] { "http://todosoft.org", "http:" }, _log);
+		}
+
+		[Test]
+		public void SetLocationHref()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org",
+				Mocks.Page("window.location.href = 'http://todosoft.org/sub';"))
+				.Resource("http://todosoft.org/sub", Mocks.Page("console.log(window.location.href);console.log(window.location.protocol);"));
+			var engine = new Engine(resourceProvider);
+			engine.OpenUrl("http://todosoft.org");
+
+			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.org"), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.org/sub"), Times.Once());
+
+			Assert.AreEqual("http://todosoft.org/sub", engine.Window.Location.Href);
 		}
 	}
 }

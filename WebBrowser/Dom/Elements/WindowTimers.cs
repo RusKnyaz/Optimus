@@ -21,7 +21,14 @@ namespace WebBrowser.Dom.Elements
 			
 			var timer = new Timer(state =>
 			{
-				_context.Send(o => handler(), null);
+				try
+				{
+					_context.Send(o => handler(), null);
+				}
+				catch(Exception e)
+				{
+					//todo raise event
+				}
 			}, null, timeout, Timeout.Infinite);
 
 			return timer.GetHashCode();

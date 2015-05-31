@@ -820,7 +820,7 @@ var requirejs, require, define;
 			},
 
 			load: function () {
-				var url = this.map.url;
+			    var url = this.map.url;
 
 				//Regular dependency.
 				if (!urlFetched[url]) {
@@ -1371,7 +1371,7 @@ var requirejs, require, define;
 			},
 
 			makeRequire: function (relMap, options) {
-				options = options || {};
+			    options = options || {};
 
 				function localRequire(deps, callback, errback) {
 					var id, map, requireMod;

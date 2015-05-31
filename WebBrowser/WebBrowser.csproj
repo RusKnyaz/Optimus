@@ -100,6 +100,7 @@
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\EngineTests\EngineJsTests.cs" />
     <Compile Include="Tests\EngineTests\EngineOpenSites.cs" />
+    <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tools\ListExtension.cs" />
     <Compile Include="Tools\SignleThreadSynchronizationContext.cs" />
     <Compile Include="Tests\EngineTests\EngineUnitTests.cs" />

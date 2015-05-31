@@ -43,5 +43,17 @@ namespace WebBrowser.Tests.EngineTests
 			var userName = engine.Document.GetElementById("UserName");
 			Assert.IsNotNull(userName);
 		}
+
+		[Test]
+		public void BrowseKwinto()
+		{
+			var engine = new Engine();
+			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
+			engine.OpenUrl("http://192.168.1.36:8891");
+			Thread.Sleep(15000);
+			var userName = engine.Document.GetElementById("UserName");
+
+			Assert.IsNotNull(userName);
+		}
 	}
 }

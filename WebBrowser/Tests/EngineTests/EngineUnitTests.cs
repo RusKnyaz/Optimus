@@ -214,6 +214,26 @@ client.send();
 		}
 
 		[Test]
+		public void Location()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://todosoft.ru", "");
+			var engine = new Engine(resourceProvider);
+			engine.OpenUrl("http://todosoft.ru");
+			Assert.AreEqual("http://todosoft.ru", engine.Window.Location.Href);
+			Assert.AreEqual("http:", engine.Window.Location.Protocol);
+		}
+
+		[Test]
+		public void SetLocationHref()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://todosoft.ru", "");
+			var engine = new Engine(resourceProvider);
+			//todo: write similar test on js
+			engine.Window.Location.Href = "http://todosoft.ru";
+			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.ru"), Times.Once());
+		}
+
+		[Test]
 		public void GetElementsByTagName()
 		{
 			var engine = new Engine();
@@ -225,6 +245,8 @@ client.send();
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("2", log[0]);
 		}
+
+		
 	}
 }
 #endif

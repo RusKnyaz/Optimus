@@ -58,7 +58,6 @@ namespace WebBrowser.Dom
 			foreach(var child in htmlElement.Children)
 			{
 				var cn = BuildElem(doc, child);
-				cn.ParentNode = elem;
 				elem.AppendChild(cn);
 			}
 

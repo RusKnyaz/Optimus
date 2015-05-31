@@ -9,6 +9,7 @@ namespace WebBrowser.ScriptExecuting
 {
 	internal class ScriptExecutor : IScriptExecutor
 	{
+		private readonly Engine _engine;
 		private SynchronizationContext _context;
 
 		private string _scopeEmbeddingObjectName = "A89A3DC7FB5944849D4DE0781117A595";
@@ -31,16 +32,23 @@ namespace WebBrowser.ScriptExecuting
 
 		public ScriptExecutor(Engine engine)
 		{
+			_engine = engine;
 			_context = engine.Context;
+			CreateEngine(engine);
+		}
+
+		private void CreateEngine(Engine engine)
+		{
 			var typeConverter = new DomConverter(() => _jsEngine);
+
 			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(typeConverter))
 				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine));
-			
-			_jsEngine.SetValue("console", new {log = (Action<object>)(o => engine.Console.Log(o))});
+
+			_jsEngine.SetValue("console", new {log = (Action<object>) (o => engine.Console.Log(o))});
 
 			_jsEngine.Execute(Resources.clrBridge);
 		}
-		
+
 		public void Execute(string type, string code)
 		{
 			_context.Send(_ =>
@@ -63,6 +71,10 @@ namespace WebBrowser.ScriptExecuting
 		}
 
 		public event Action<Exception> OnException;
+		public void Clear()
+		{
+			CreateEngine(_engine);
+		}
 	}
 
 

@@ -1,4 +1,5 @@
-﻿using WebBrowser.ScriptExecuting;
+﻿using System;
+using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Environment
 {
@@ -11,21 +12,134 @@ namespace WebBrowser.Environment
 		string Hostname { get; set; }
 		string Origin { get; }
 		string Pathname { get; set; }
-		string Port { get; set; }
-		string Protocol { get; set; }
+		int Port { get; set; }
+		string Protocol { get; }
 		string Search { get; set; }
+		void Assign(string uri);
+		void Replace();
+		void Reload(string uri);
 	}
 
 	public class Location : ILocation
 	{
-		public string Href { get; set; }
-		public string Hash { get; set; }
-		public string Host { get; set; }
-		public string Hostname { get; set; }
-		public string Origin { get; private set; }
-		public string Pathname { get; set; }
-		public string Port { get; set; }
-		public string Protocol { get; set; }
-		public string Search { get; set; }
+		private readonly Engine _engine;
+
+		public Location(Engine engine)
+		{
+			_engine = engine;
+		}
+
+		public string Href
+		{
+			get
+			{
+				return _engine.Uri.OriginalString;
+			} 
+			set
+			{
+				_engine.OpenUrl(value);	
+			}
+		}
+
+		public string Hash
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		public string Host
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+		public string Hostname
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+		public string Origin
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+		public string Pathname
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		public int Port
+		{
+			get { return _engine.Uri.Port; }
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		public string Protocol
+		{
+			get { return _engine.Uri.Scheme + ":"; }
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		public string Search
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
+			set
+			{
+				throw new NotImplementedException();
+			}
+		}
+		public void Assign(string uri)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Replace()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Reload(string uri)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

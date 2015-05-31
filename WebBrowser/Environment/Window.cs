@@ -4,9 +4,12 @@ using WebBrowser.Dom.Elements;
 
 namespace WebBrowser.Environment
 {
+	/// <summary>
+	/// http://www.w3.org/TR/html5/browsers.html#window
+	/// </summary>
 	public class Window
 	{
-		public Window(SynchronizationContext context)
+		public Window(SynchronizationContext context, Engine engine)
 		{
 			Screen = new Screen
 				{
@@ -20,7 +23,7 @@ namespace WebBrowser.Environment
 
 			InnerWidth = 1024;
 			InnerHeight = 768;
-			Location = new Location{Href = "http://localhost"};//todo: remove the stub href value
+			Location = new Location(engine);//todo: remove the stub href value
 			Navigator = new Navigator();
 
 			_timers = new WindowTimers(context);
