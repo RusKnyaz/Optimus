@@ -22,7 +22,12 @@ namespace WebBrowser.Tests
 
 		public static string Page(string script)
 		{
-			return "<html><head><script>" + script + "</script></head><body></body></html>";
+			return "<html><head><script defer>" + script + "</script></head><body></body></html>";
+		}
+
+		public static string Page(string script, string body)
+		{
+			return "<html><head><script defer>" + script + "</script></head><body>"+body+"</body></html>";
 		}
 	}
 }

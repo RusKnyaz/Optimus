@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using WebBrowser.Dom;
 using System.IO;
 using WebBrowser.Html;
-using Text = WebBrowser.Dom.Text;
 
 namespace WebBrowser.Tests.Html
 {
@@ -82,6 +80,16 @@ namespace WebBrowser.Tests.Html
 			Assert.AreEqual(2, elems.Length);
 			Assert.IsInstanceOf<HtmlComment>(elems[0]);
 			Assert.IsInstanceOf<HtmlElement>(elems[1]);
+		}
+
+		[Test]
+		public void AttributeWithoutValue()
+		{
+			var elems = Parse("<script defer></script>").ToArray();
+			Assert.AreEqual(1, elems.Length);
+			var e = (HtmlElement)elems.FirstOrDefault();
+			Assert.IsNotNull(e);
+			Assert.AreEqual(1, e.Attributes.Count);
 		}
 	}
 }

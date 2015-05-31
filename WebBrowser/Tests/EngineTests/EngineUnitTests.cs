@@ -1,7 +1,6 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -28,7 +27,7 @@ namespace WebBrowser.Tests.EngineTests
 		public void GenerateContent()
 		{
 			var engine = new Engine();
-			engine.Load("<html><head><script>var elem = document.getElementById('content');elem.innerHTML = 'Hello';</script></head><body><div id='content'></div></body></html>");
+			engine.Load(Mocks.Page("var elem = document.getElementById('content');elem.innerHTML = 'Hello';", "<div id='content'></div>"));
 			var contentDiv = engine.Document.GetElementById("content");
 			Assert.AreEqual("Hello", contentDiv.InnerHTML);
 			Assert.AreEqual(1, contentDiv.ChildNodes.Count);
@@ -41,12 +40,12 @@ namespace WebBrowser.Tests.EngineTests
 		public void DomManipulation()
 		{
 			var engine = new Engine();
-			engine.Load("<html><head><script>" +
+			engine.Load(Mocks.Page(
 				"var div = document.createElement('div');" +
 				"div.setAttribute('id', 'c3');" +
 				"var c2 = document.getElementById('content2');" +
-				"document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);" +
-				"</script></head><body><div id='content1'></div><div id='content2'></div></body></html>");
+				"document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);",
+				"<div id='content1'></div><div id='content2'></div>"));
 			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
 			var elem = engine.Document.GetElementById("c3");
 			Assert.IsNotNull(elem);
@@ -57,9 +56,7 @@ namespace WebBrowser.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += System.Console.WriteLine;
-			engine.Load("<html><head><script>"+
-			@"var c2 = document.getElementById('content1').innerHTML = 'Hello';" +
-				"</script></head><body><span id='content1'></span></body></html>");
+			engine.Load(Mocks.Page(@"var c2 = document.getElementById('content1').innerHTML = 'Hello';", "<span id='content1'></span>"));
 			var elem = engine.Document.GetElementById("content1");
 			Assert.AreEqual("Hello", elem.InnerHTML);
 		}
@@ -70,9 +67,8 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			string attr = null;
 			engine.Console.OnLog += o => attr = o.ToString();
-			engine.Load("<html><head><script defer>" +
-			@"console.log(document.getElementById('content1').getAttribute('id'));" +
-				"</script></head><body><span id='content1'></span></body></html>");
+			engine.Load(Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
+				"<span id='content1'></span>"));
 			Assert.AreEqual("content1", attr);
 		}
 
@@ -161,9 +157,7 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
-			engine.Load("<html><head><script>" +
-@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');
-</script></head><body></body></html>");
+			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
 			Assert.AreEqual(0, log.Count);
 			Thread.Sleep(1000);
 			Assert.AreEqual(1, log.Count);
@@ -176,10 +170,9 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
-			engine.Load("<html><head><script>" +
+			engine.Load(Mocks.Page(
 @"var timer = window.setTimeout(function(){console.log('ok');}, 500);
-window.clearTimeout(timer);
-</script></head><body></body></html>");
+window.clearTimeout(timer);"));
 			Assert.AreEqual(0, log.Count);
 			Thread.Sleep(1000);
 			Assert.AreEqual(0, log.Count);
@@ -196,7 +189,7 @@ window.clearTimeout(timer);
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
-			engine.Load("<html><head><script>" +
+			engine.Load(Mocks.Page(
 @"var client = new XMLHttpRequest();
 client.onreadystatechange = function () {
   if(this.readyState == this.DONE) {
@@ -206,8 +199,7 @@ client.onreadystatechange = function () {
   }
 };
 client.open(""GET"", ""http://localhost/unicorn.xml"", false);
-client.send();
-</script></head><body></body></html>");
+client.send();"));
 			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("hello", log[0]);
@@ -239,14 +231,10 @@ client.send();
 			var engine = new Engine();
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
-			engine.Load("<html><head><script>" +
-@"console.log(document.getElementsByTagName('div').length);
-</script></head><body><div></div><div></div></body></html>");
+			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("2", log[0]);
 		}
-
-		
 	}
 }
 #endif

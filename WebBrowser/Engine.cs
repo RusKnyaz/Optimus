@@ -49,6 +49,10 @@ namespace WebBrowser
 
 		public void Load(Stream stream)
 		{
+			//todo: fix protocol
+			if(Uri == null)
+				Uri = new Uri("http://localhost");
+
 			Document = new Document(ResourceProvider, Context, ScriptExecutor);
 			//todo: clear js runtime context
 			

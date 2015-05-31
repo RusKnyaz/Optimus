@@ -37,7 +37,7 @@ namespace WebBrowser.Tests.EngineTests
 ko.applyBindings(new VM());
 ";
 
-			var document = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting'/></body></html>");
+			var document = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting'/></body></html>");
 
 			var span = document.GetElementById("c1");
 			Assert.IsNotNull(span);
@@ -63,7 +63,7 @@ ko.applyBindings(new VM());
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body></html>");
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
@@ -95,7 +95,7 @@ ko.applyBindings(new VM());
 }
 ko.applyBindings(new VM());";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>"+
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head>"+
 				"<body>" +
 				"<input type='text' data-bind='value:Name' id='in'/>" +
 				"<span id = 'c1' data-bind='text:Greeting'/>" +
@@ -124,7 +124,7 @@ ko.applyBindings(new VM());";
 }
 ko.applyBindings(new VM());";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script></head>" +
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head>" +
 				"<body>" +
 				"<input type='checkbox' data-bind='checked:Checked' id='in'/>" +
 				"<div id = 'button' data-bind='click:Click'>Click me</div>" +
@@ -143,7 +143,7 @@ ko.applyBindings(new VM());";
 		public void ForeachBinding()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
-@"<script>
+@"<script defer>
 function VM(peoples) {
 	var _this = this;	
 	this.Peoples = ko.observableArray(peoples);

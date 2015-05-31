@@ -48,6 +48,8 @@ namespace WebBrowser.Html
 						elem.Children.Add(childElem);
 						break;
 					case HtmlChunkTypes.TagEnd:
+						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
+							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
 						return true;
 					case HtmlChunkTypes.Text:
 						if(htmlChunk.Value.Replace("\r","").Replace("\n","").Replace("\t", "") != string.Empty)

@@ -275,7 +275,8 @@ namespace WebBrowser.Html
 								break;
 
 							case States.ReadCloseTagName:
-								if (symbol == '>') newState = States.ReadText;
+								if (symbol == '>')
+									newState = States.ReadText;
 								break;
 							case States.WaitAttributeValue:
 								if (symbol == '\"' || symbol == '\'')
@@ -333,9 +334,11 @@ namespace WebBrowser.Html
 							break;
 						case States.ReadSelfClosedTagEnd:
 							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = lastTag};
+							lastTag = null;
 							break;
 						case States.ReadCloseTagName:
 							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = new string(buffer.ToArray())};
+							lastTag = null;
 							break;
 						case States.ReadAttributeName:
 							if (buffer.Count > 0)
@@ -349,7 +352,7 @@ namespace WebBrowser.Html
 							break;
 					}
 
-					if (newState == States.ReadText && lastTag.ToLowerInvariant() == "script")
+					if (newState == States.ReadText && lastTag != null && lastTag.ToLowerInvariant() == "script")
 					{
 						yield return ReadScript(reader);
 						yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = "script"};

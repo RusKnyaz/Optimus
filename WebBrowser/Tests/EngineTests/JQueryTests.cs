@@ -1,8 +1,6 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -28,7 +26,7 @@ namespace WebBrowser.Tests.EngineTests
 			var script = "$('#uca').html('zaza');";
 			var engine = new Engine();
 			engine.Console.OnLog +=o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			var ucaDiv = engine.Document.GetElementById("uca");
 			Assert.AreEqual("zaza", ucaDiv.InnerHTML);
 		}
@@ -52,7 +50,7 @@ namespace WebBrowser.Tests.EngineTests
 
 			var script = "$.post('http://localhost/data').done(function(x){console.log(x);});";
 
-			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
 			Mock.Get(httpResourceProvider).Verify(x=> x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once);
 			Assert.AreEqual(1, log.Count);
@@ -70,7 +68,7 @@ namespace WebBrowser.Tests.EngineTests
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			Assert.AreEqual("ok", result);
 		}
 	}
