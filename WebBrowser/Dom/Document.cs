@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using WebBrowser.Dom.Elements;
 using WebBrowser.ScriptExecuting;
@@ -46,9 +48,11 @@ namespace WebBrowser.Dom
 			_resourceProvider = resourceProvider;
 			Context = context ?? new StubSynchronizationContext();
 			_scriptExecutor = scriptExecutor;
-			ChildNodes = new List<Node> {new Element(this, "html"){ParentNode = this}};
 			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
+
+			DocumentElement = new Element(this, "html"){ParentNode = this};
+			ChildNodes = new List<Node> { DocumentElement };
 		}
 
 		public Element DocumentElement { get; private set; }
@@ -59,48 +63,14 @@ namespace WebBrowser.Dom
 		
 		public void Write(string text)
 		{
-			Load(DocumentBuilder.Build(this, text));
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(text)))
+			{
+				DocumentBuilder.Build(this, stream);
+			}
 		}
 
-		internal void Load(IEnumerable<Node> elements)
+		internal void Complete()
 		{
-			ChildNodes.Clear();
-			
-			foreach(var element in elements)
-			{
-				element.ParentNode = this;
-				ChildNodes.Add(element);
-				HandleNodeAdded(this, element);
-			}
-
-			if (ChildNodes.Count > 1)
-			{
-				var rootElem = ChildNodes[0] as Element;
-				if (rootElem == null || rootElem.TagName != "html")
-				{
-					rootElem = new Element(this, "html"){ParentNode = this};
-					foreach (var element in ChildNodes)
-					{
-						element.ParentNode = rootElem;
-						rootElem.ChildNodes.Add(element);	
-						ChildNodes.Clear();
-						ChildNodes.Add(rootElem);
-					}
-				}
-			}
-
-			DocumentElement = ChildNodes.FirstOrDefault() as Element ?? new Element(this, "html"){ParentNode = this};
-
-			foreach (var childNode in ChildNodes)
-			{
-				childNode.ParentNode = this;
-			}
-
-			foreach (var childNode in DocumentElement.Flatten())
-			{
-				childNode.OwnerDocument = this;
-			}
-
 			Trigger("DOMContentLoaded");
 			//todo: check is it right
 			ReadyState = DocumentReadyStates.Complete;
@@ -143,7 +113,8 @@ namespace WebBrowser.Dom
 			foreach (var documentElement in scripts.ToArray())
 			{
 				if (documentElement.Executed) continue;
-				_scriptExecutor.Execute(documentElement.Type, documentElement.InnerHTML);
+				if(!string.IsNullOrEmpty(documentElement.Text))
+					_scriptExecutor.Execute(documentElement.Type, documentElement.Text);
 				documentElement.Executed = true;
 			}
 		}

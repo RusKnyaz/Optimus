@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using WebBrowser.ScriptExecuting;
@@ -43,11 +44,7 @@ namespace WebBrowser.Dom.Elements
 			set
 			{
 				ChildNodes.Clear();
-				var items = DocumentBuilder.Build(OwnerDocument, value);
-				foreach (var it in items)
-				{
-					AppendChild(it);
-				}
+				DocumentBuilder.Build(this, value);
 			} 
 		}
 
@@ -177,9 +174,10 @@ namespace WebBrowser.Dom.Elements
 
 		public override Node CloneNode(bool deep)
 		{
-			var node  = DocumentBuilder.Build(OwnerDocument, ToString(deep)).Single();
+			/*var node  = DocumentBuilder.Build(OwnerDocument, ToString(deep)).Single();
 			node.OwnerDocument = OwnerDocument;
-			return node;
+			return node;*/
+			throw new NotImplementedException();
 		}
 
 		public Attr GetAttributeNode(string name)

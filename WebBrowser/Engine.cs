@@ -52,9 +52,8 @@ namespace WebBrowser
 			Document = new Document(ResourceProvider, Context, ScriptExecutor);
 			//todo: clear js runtime context
 			
-			var elements = DocumentBuilder.Build(Document, stream);
-			Document.Load(elements);
-
+			DocumentBuilder.Build(Document, stream);
+			Document.Complete();
 		}
     }
 }

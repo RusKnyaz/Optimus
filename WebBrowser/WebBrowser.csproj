@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="Dom\Elements\Attr.cs" />
+    <Compile Include="Dom\AttributeMappedValue.cs" />
     <Compile Include="Dom\Elements\Body.cs" />
     <Compile Include="Dom\Elements\CharacterData.cs" />
     <Compile Include="Dom\Document.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Dom\Elements\Script.cs" />
     <Compile Include="Dom\Elements\Node.cs" />
     <Compile Include="Dom\Elements\WindowTimers.cs" />
+    <Compile Include="Dom\TagsNames.cs" />
     <Compile Include="Dom\XmlHttpRequest.cs" />
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />

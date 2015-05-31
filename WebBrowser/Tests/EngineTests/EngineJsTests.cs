@@ -189,9 +189,7 @@ console.log(elems[0] != null);");
 		[Test]
 		public void AddScriptAndExecute()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>(x => 
-				x.GetResource("http://localhost/module") == new Response(ResourceTypes.Html, new MemoryStream(Encoding.UTF8.GetBytes("console.log('hi from module');"))));
-
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/module", "console.log('hi from module');");
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
 			engine.Console.OnLog += o =>
@@ -207,7 +205,8 @@ s.setAttribute('src', 'http://localhost/module');
 document.head.appendChild(s);";
 
 			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
-			System.Threading.Thread.Sleep(1000);
+
+			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://localhost/module"), Times.Once());
 			Assert.AreEqual(2, log.Count);
 			Assert.AreEqual("load", log[0]);
 			Assert.AreEqual("hi from module", log[1]);

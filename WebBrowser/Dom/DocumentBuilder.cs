@@ -9,40 +9,68 @@ namespace WebBrowser.Dom
 {
 	internal class DocumentBuilder
 	{
-		public static IEnumerable<Node> Build(Document doc, string htmlString)
+		public static void Build(Node parentNode, string htmlString)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
-				return Build(doc, stream);
+				Build(parentNode, stream);
 			}
 		}
 
-		public static IEnumerable<Node> Build(Document doc, Stream stream)
+		public static void Build(Node parentNode, Stream stream)
 		{
 			var html = HtmlParser.Parse(stream);
-			return Build(doc, html).ToList();
+			Build(parentNode, html);
 		}
 
-		public static IEnumerable<Node> Build(Document doc, IEnumerable<IHtmlNode> htmlElements)
+		public static void Build(Document parentNode, Stream stream)
 		{
-			return htmlElements.Select(x => BuildElem(doc, x));
+			var html = ExpandHtmlTag(HtmlParser.Parse(stream));
+			Build(parentNode.DocumentElement, html);
 		}
 
-		private static Node BuildElem(Document doc, IHtmlNode htmlNode)
+		private static IEnumerable<IHtmlNode> ExpandHtmlTag(IEnumerable<IHtmlNode> parse)
+		{
+			foreach (var htmlNode in parse)
+			{
+				var tag = htmlNode as Html.HtmlElement;
+				if (tag != null && tag.Name.ToLowerInvariant() == "html")
+				{
+					foreach (var child in tag.Children)
+					{
+						yield return child;
+					}
+				}
+				else
+				{
+					yield return htmlNode;
+				}
+			}
+		}
+
+		public static void Build(Node parentNode, IEnumerable<IHtmlNode> htmlElements)
+		{
+			foreach (var htmlElement in htmlElements)
+			{
+				BuildElem(parentNode, htmlElement);
+			}
+		}
+
+		private static Node BuildElem(Node node, IHtmlNode htmlNode)
 		{
 			var comment = htmlNode as HtmlComment;
 			if (comment != null)
-				return doc.CreateComment(comment.Text);
+				return node.OwnerDocument.CreateComment(comment.Text);
 			
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
-				return doc.CreateTextNode(txt.Value);
+				return node.OwnerDocument.CreateTextNode(txt.Value);
 
 			var htmlElement = htmlNode as Html.IHtmlElement;
 			if (htmlElement == null)
 				return null;
 
-			var elem = doc.CreateElement(htmlElement.Name);
+			var elem = node.OwnerDocument.CreateElement(htmlElement.Name);
 
 			if (elem is Script)
 			{
@@ -55,15 +83,11 @@ namespace WebBrowser.Dom
 				elem.SetAttribute(attribute.Key, attribute.Value);
 			}
 
-			foreach(var child in htmlElement.Children)
-			{
-				var cn = BuildElem(doc, child);
-				elem.AppendChild(cn);
-			}
+			node.AppendChild(elem);
+
+			Build(elem, htmlElement.Children);
 
 			return elem;
 		}
-
-		
 	}
 }
