@@ -143,35 +143,80 @@ namespace WebBrowser.Dom.Elements
 		public const ushort NOTATION_NODE = 12;
 
 		Dictionary<string, List<Action<Event>>> _listeners = new Dictionary<string, List<Action<Event>>>();
+		Dictionary<string, List<Action<Event>>> _capturingListeners = new Dictionary<string, List<Action<Event>>>();
 
 		List<Action<Event>> GetListeners(string type)
 		{
 			return _listeners.ContainsKey(type) ? _listeners[type] : (_listeners[type] = new List<Action<Event>>());
 		}
+
+		List<Action<Event>> GetCapturingListeners(string type)
+		{
+			return _capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
+		}
 		
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
 		{
-			GetListeners(type).Add(listener);
+			(useCapture ? GetCapturingListeners(type): GetListeners(type)).Add(listener);
 		}
 
 		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
 		{
 			//todo: test it
-			GetListeners(type).Remove(listener);
+			(useCapture ? GetCapturingListeners(type) : GetListeners(type)).Remove(listener);
 		}
 
 		public virtual bool DispatchEvent(Event evt)
 		{
-			if (OnEvent != null)
-				OnEvent(evt);
+			if (evt.Target == null)
+			{
+				evt.Target = this;
+
+				var branch = new Stack<Node>();
+				for(var x = this; x != null; x = x.ParentNode)
+					branch.Push(x);
+
+				while (branch.Count > 0 && !evt.IsPropagationStopped())
+				{
+					var n = branch.Pop();
+					evt.CurrentTarget = n;
+					foreach (var listener in n.GetCapturingListeners(evt.Type))
+					{
+						try
+						{
+							listener(evt);
+						}
+						catch
+						{
+							//Any exceptions thrown inside an EventListener will not stop propagation of the event. It will continue processing any additional EventListener in the described manner.
+						}
+					}
+				}
+
+				if (evt.IsPropagationStopped())
+					return !evt.Cancelled;
+			}
+
+			evt.CurrentTarget = this;
 
 			foreach (var listener in GetListeners(evt.Type))
 			{
-				//todo: handle errors
-				listener(evt);
+				try
+				{
+					listener(evt);
+				}
+				catch
+				{
+					//Any exceptions thrown inside an EventListener will not stop propagation of the event. It will continue processing any additional EventListener in the described manner.
+				}
 			}
 
-			return true;//todo: what we should return?
+			if (evt.Bubbles && !evt.IsPropagationStopped() && ParentNode!=null)
+				ParentNode.DispatchEvent(evt);
+
+			//todo: handle default action;
+
+			return !evt.Cancelled;
 		}
 
 		/// <summary>
@@ -258,8 +303,6 @@ namespace WebBrowser.Dom.Elements
 
 			return thisPreParent.CompareDocumentPosition(otherPreParent);
 		}
-
-		public event Action<Event> OnEvent;
 	}
 
 	[DomItem]
@@ -289,5 +332,15 @@ namespace WebBrowser.Dom.Elements
 		int NodeType { get; }
 		string NodeName { get; }
 		int CompareDocumentPosition(Node node);
+	}
+
+	public static class NodeExtension
+	{
+		public static bool RaiseEvent(this Node node, string eventType, bool bubblable, bool cancellable)
+		{
+			var e = node.OwnerDocument.CreateEvent("Event");
+			e.InitEvent(eventType, bubblable, cancellable);
+			return node.DispatchEvent(e);
+		}
 	}
 }

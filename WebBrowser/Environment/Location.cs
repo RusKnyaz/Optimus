@@ -55,10 +55,7 @@ namespace WebBrowser.Environment
 
 		public string Host
 		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+			get { return _engine.Uri.GetComponents(UriComponents.Host, UriFormat.Unescaped); }
 			set
 			{
 				throw new NotImplementedException();
@@ -120,7 +117,7 @@ namespace WebBrowser.Environment
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return _engine.Uri.GetComponents(UriComponents.Scheme, UriFormat.Unescaped);
 			}
 			set
 			{

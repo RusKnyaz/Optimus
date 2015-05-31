@@ -19,7 +19,8 @@ namespace WebBrowser.Dom.Elements
 		
 		public void Click()
 		{
-			var evt = new Event { Type = "click", Target = this };
+			var evt = OwnerDocument.CreateEvent("Event");
+			evt.InitEvent("click", true, true);
 			DispatchEvent(evt);
 		}
 

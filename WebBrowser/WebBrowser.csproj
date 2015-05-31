@@ -95,6 +95,7 @@
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
+    <Compile Include="Tests\Dom\EventsTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
