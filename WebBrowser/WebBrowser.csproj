@@ -94,6 +94,7 @@
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="TestingTools\SynchronizationContextExtension.cs" />
+    <Compile Include="Tests\AssertObjectExtension.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
@@ -135,7 +136,7 @@
     <Content Include="Resources\requirejs.js" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\jint-master\Jint\Jint.csproj">
+    <ProjectReference Include="..\..\..\..\temp\jint-master\Jint\Jint.csproj">
       <Project>{678738da-f723-4920-b9e5-cad667104bda}</Project>
       <Name>Jint</Name>
     </ProjectReference>

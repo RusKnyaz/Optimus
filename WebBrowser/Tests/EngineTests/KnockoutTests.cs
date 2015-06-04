@@ -192,7 +192,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script>" + vm + "</script>" +
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script>" +
 @"<script type='text/html' id='tmpl'>
 <span id = 'c1' data-bind='text:Greeting, click: Click'/>
 </script>
@@ -221,7 +221,7 @@ ko.applyBindings(new VM());
 		public void TemplateInsideForeachBinding()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
-@"<script>
+@"<script defer>
 function VM(peoples) {
 	var _this = this;	
 	this.Peoples = ko.observableArray(peoples);

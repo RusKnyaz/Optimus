@@ -1,11 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Threading;
 using Moq;
 using NUnit.Framework;
-using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -30,7 +25,7 @@ namespace WebBrowser.Tests.EngineTests
 		}
 
 		private Engine CreateEngine(string body, string js){
-			_engine.Load("<html><head><script>" + js + "</script></head><body>"+body+"</body></html>");
+			_engine.Load("<html><head><script defer>" + js + "</script></head><body>"+body+"</body></html>");
 			return _engine;
 		}
 

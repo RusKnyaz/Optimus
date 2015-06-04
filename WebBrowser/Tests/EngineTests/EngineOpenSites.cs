@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace WebBrowser.Tests.EngineTests
 {
-	[TestFixture]
+	[TestFixture, Ignore]
 	public class EngineOpenSites
 	{
 		[TestCase("http://okkamtech.com")]

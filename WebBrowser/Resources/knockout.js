@@ -2834,8 +2834,8 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
 
         while (currentChild = nextInQueue) {
             // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
-            nextInQueue = ko.virtualElements.nextSibling(currentChild);
-            applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, bindingContextsMayDifferFromDomParentElement);
+        	nextInQueue = ko.virtualElements.nextSibling(currentChild);
+	        applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, bindingContextsMayDifferFromDomParentElement);
         }
     }
 

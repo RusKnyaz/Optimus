@@ -179,10 +179,12 @@ namespace WebBrowser.Dom.Elements
 			{
 				node.SetAttributeNode((Attr)attribute.Value.CloneNode());
 			}
-
-			foreach (var childNode in ChildNodes)
+			if (deep)
 			{
-				node.AppendChild(childNode.CloneNode());
+				foreach (var childNode in ChildNodes)
+				{
+					node.AppendChild(childNode.CloneNode());
+				}
 			}
 			return node;
 		}

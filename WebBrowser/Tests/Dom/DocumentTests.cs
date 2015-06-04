@@ -96,17 +96,19 @@ namespace WebBrowser.Tests
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
 
-			Assert.AreEqual(1, document.Body.ChildNodes.Count);
-			Assert.AreEqual(1, div1.ChildNodes.Count);
-			Assert.AreEqual(1, span.ChildNodes.Count);
+			document.Assert(doc => 
+				doc.Body.ChildNodes.Count == 1 &&
+				doc.GetElementById("p1").ChildNodes.Count == 1 &&
+				doc.GetElementById("s").ChildNodes.Count == 1);
 
 			var clone = span.CloneNode(deep) as HtmlElement;
 			Assert.IsNotNull(clone);
 
 			//sate of all old elements should be the same as before
-			Assert.AreEqual(1, document.Body.ChildNodes.Count);
-			Assert.AreEqual(1, div1.ChildNodes.Count);
-			Assert.AreEqual(1, span.ChildNodes.Count);
+			document.Assert(doc =>
+				doc.Body.ChildNodes.Count == 1 &&
+				doc.GetElementById("p1").ChildNodes.Count == 1 &&
+				doc.GetElementById("s").ChildNodes.Count == 1);
 
 			Assert.AreEqual(expectedChildCount, clone.ChildNodes.Count);
 			Assert.IsNotNull(clone.OwnerDocument, "Clone's ownerDocument");

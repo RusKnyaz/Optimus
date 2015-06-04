@@ -56,19 +56,25 @@ namespace WebBrowser.Dom
 			}
 		}
 
-		private static Node BuildElem(Node node, IHtmlNode htmlNode)
+		private static void BuildElem(Node node, IHtmlNode htmlNode)
 		{
 			var comment = htmlNode as HtmlComment;
 			if (comment != null)
-				return node.OwnerDocument.CreateComment(comment.Text);
-			
+			{
+				node.AppendChild(node.OwnerDocument.CreateComment(comment.Text));
+				return;
+			}
+
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
-				return node.OwnerDocument.CreateTextNode(txt.Value);
+			{
+				node.AppendChild(node.OwnerDocument.CreateTextNode(txt.Value));
+				return;
+			}
 
 			var htmlElement = htmlNode as Html.IHtmlElement;
 			if (htmlElement == null)
-				return null;
+				return;
 
 			var elem = node.OwnerDocument.CreateElement(htmlElement.Name);
 
@@ -86,8 +92,6 @@ namespace WebBrowser.Dom
 			node.AppendChild(elem);
 
 			Build(elem, htmlElement.Children);
-
-			return elem;
 		}
 	}
 }
