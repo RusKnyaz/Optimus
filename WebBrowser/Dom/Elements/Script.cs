@@ -45,11 +45,19 @@ namespace WebBrowser.Dom.Elements
 		{
 			if(string.IsNullOrEmpty(Src))
 				throw new InvalidOperationException("Src not set.");
-			var resource = resourceProvider.GetResource(Src);
-			using (var reader = new StreamReader(resource.Stream))
+			try
 			{
-				InnerHTML = reader.ReadToEnd();
-				Loaded = true;
+				var resource = resourceProvider.GetResource(Src);
+				using (var reader = new StreamReader(resource.Stream))
+				{
+					InnerHTML = reader.ReadToEnd();
+					Loaded = true;
+				}
+			}
+			catch (Exception ex)
+			{
+				OwnerDocument.Context.Send(OnError);
+				return;
 			}
 			OwnerDocument.Context.Send(OnLoad);
 		}
@@ -58,6 +66,7 @@ namespace WebBrowser.Dom.Elements
 		public bool Executed { get; set; }
 
 		public event Action OnLoad;
+		public event Action OnError;
 	}
 
 	[DomItem]

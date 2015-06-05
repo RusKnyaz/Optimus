@@ -178,32 +178,7 @@ window.clearTimeout(timer);"));
 			Assert.AreEqual(0, log.Count);
 		}
 
-		[Test]
-		public void Ajax()
-		{
-			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) == 
-				new HttpResponse(HttpStatusCode.OK, "hello", null));
-			
-			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
-			
-			var engine = new Engine(resourceProvider);
-			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
-			engine.Load(Mocks.Page(
-@"var client = new XMLHttpRequest();
-client.onreadystatechange = function () {
-  if(this.readyState == this.DONE) {
-    if(this.status == 200 ) {
-		console.log(this.responseXML);
-    }
-  }
-};
-client.open(""GET"", ""http://localhost/unicorn.xml"", false);
-client.send();"));
-			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
-			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("hello", log[0]);
-		}
+		
 
 		[Test]
 		public void Location()
@@ -234,6 +209,38 @@ client.send();"));
 			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("2", log[0]);
+		}
+
+		[Test]
+		public void Ajax()
+		{
+			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
+				new HttpResponse(HttpStatusCode.OK, "hello", null));
+
+			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+
+			var engine = new Engine(resourceProvider);
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+
+			var client = new XmlHttpRequest(engine.ResourceProvider.HttpResourceProvider, engine.Context);
+
+			client.OnReadyStateChange += () =>
+				{
+					if (client.ReadyState == XmlHttpRequest.DONE)
+					{
+						if (client.Status == 200)
+						{
+							engine.Console.Log(client.ResponseText);
+						}
+					}
+				};
+			client.Open("GET", "http://localhost/unicorn.xml", false);
+			client.Send();
+			
+			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
+			Assert.AreEqual(1, log.Count);
+			Assert.AreEqual("hello", log[0]);
 		}
 	}
 }

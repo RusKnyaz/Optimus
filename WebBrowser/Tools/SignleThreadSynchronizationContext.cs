@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WebBrowser.Tests.Dom
+namespace WebBrowser.Tools
 {
 	class SignleThreadSynchronizationContext : SynchronizationContext
 	{

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using Moq;
 using NUnit.Framework;
+using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -275,6 +277,35 @@ console.log(style['width']);");
 			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.org/sub"), Times.Once());
 
 			Assert.AreEqual("http://todosoft.org/sub", engine.Window.Location.Href);
+		}
+
+		[Test]
+		public void Ajax()
+		{
+			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
+				new HttpResponse(HttpStatusCode.OK, "hello", null));
+
+			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+
+			var engine = new Engine(resourceProvider);
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load(Mocks.Page(
+@"var client = new XMLHttpRequest();
+client.onreadystatechange = function () {
+  console.log(this.readyState);
+  if(this.readyState == this.DONE) {
+		console.log(this.status);
+    if(this.status == 200 ) {
+		console.log(this.responseXML);
+		console.log(this.responseText);
+    }
+  }
+};
+client.open(""GET"", ""http://localhost/unicorn.xml"", false);
+client.send();"));
+			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
+			CollectionAssert.AreEqual(new object[]{"4", "200", "hello", "hello"}, log);
 		}
 	}
 }

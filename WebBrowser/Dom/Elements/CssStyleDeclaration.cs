@@ -6,7 +6,7 @@ namespace WebBrowser.Dom.Elements
 	[DomItem]
 	public interface ICssStyleDeclaration
 	{
-		string this[string name] { get; }
+		object this[string name] { get; }
 		string this[int idx] { get; }
 		string GetPropertyValue(string propertyName);
 	}
@@ -23,7 +23,7 @@ namespace WebBrowser.Dom.Elements
 
 		public NameValueCollection Properties { get; private set; }
 
-		public string this[string name]
+		public object this[string name]
 		{
 			get
 			{
@@ -36,8 +36,8 @@ namespace WebBrowser.Dom.Elements
 			{
 				int number;
 				if (int.TryParse(name, out number))
-					Properties.AllKeys[number] = value;//todo: check behavior
-				Properties[name] = value;
+					Properties.AllKeys[number] = value.ToString();//todo: check behavior
+				Properties[name] = value.ToString();//todo: may be do not conversion?
 			}
 		}
 

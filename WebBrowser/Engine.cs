@@ -6,15 +6,28 @@ using WebBrowser.Environment;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
 using WebBrowser.Tests.Dom;
+using WebBrowser.Tools;
 
 namespace WebBrowser
 {
 	public class Engine
     {
+		private Document _document;
 		public IResourceProvider ResourceProvider { get; private set; }
 		internal IScriptExecutor ScriptExecutor { get; private set; }
 
-		public Document Document { get; private set; }
+		public Document Document
+		{
+			get { return _document; }
+			private set
+			{
+				_document = value;
+
+				if (DocumentChanged != null)
+					DocumentChanged();
+			}
+		}
+
 		public Console Console { get; private set; }
 		public Window Window { get; private set; }
 
@@ -28,6 +41,7 @@ namespace WebBrowser
 			Console = new Console();
 			Window = new Window(Context, this);
 			ScriptExecutor = new ScriptExecutor(this);
+			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
 		}
 
 		public Engine() : this(new ResourceProvider()) { }
@@ -53,11 +67,14 @@ namespace WebBrowser
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
-			Document = new Document(ResourceProvider, Context, ScriptExecutor);
+			Document = new Document(ResourceProvider, Context, ScriptExecutor, Window);
+			Document.OnNodeException += (node, exception) => Console.Log("Node event handler exception: " + exception.Message);
 			//todo: clear js runtime context
 			
 			DocumentBuilder.Build(Document, stream);
 			Document.Complete();
 		}
+
+		public event Action DocumentChanged;
     }
 }

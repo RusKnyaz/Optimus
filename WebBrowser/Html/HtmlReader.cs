@@ -25,6 +25,8 @@ namespace WebBrowser.Html
 
 	public class HtmlReader
 	{
+		static string[] _noContentTags = new []{"meta", "br", "link"};
+
 		enum States
 		{
 			ReadText,
@@ -352,14 +354,24 @@ namespace WebBrowser.Html
 							break;
 					}
 
-					if (newState == States.ReadText && lastTag != null && lastTag.ToLowerInvariant() == "script")
+					if (newState == States.ReadText && lastTag != null)
 					{
-						yield return ReadScript(reader);
-						yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = "script"};
-						buffer.Clear();
-						newState = state = States.ReadText;
-						lastTag = string.Empty;
-						continue;
+						var tagInvariantName = lastTag.ToLowerInvariant();
+
+						if (tagInvariantName == "script")
+						{
+							yield return ReadScript(reader);
+							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = "script"};
+							buffer.Clear();
+							newState = state = States.ReadText;
+							lastTag = string.Empty;
+							continue;
+						}
+						if (_noContentTags.Contains(tagInvariantName))
+						{
+							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = lastTag };
+							lastTag = null;
+						}
 					}
 
 					if (newState != States.ReadSelfClosedTagEnd)

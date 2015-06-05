@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Jint.Runtime;
 using WebBrowser.Dom.Elements;
 
 namespace WebBrowser.Environment
@@ -7,8 +8,10 @@ namespace WebBrowser.Environment
 	/// <summary>
 	/// http://www.w3.org/TR/html5/browsers.html#window
 	/// </summary>
-	public class Window
+	public class Window : IEventTarget
 	{
+		private EventTarget _eventTarget;
+
 		public Window(SynchronizationContext context, Engine engine)
 		{
 			Screen = new Screen
@@ -27,6 +30,20 @@ namespace WebBrowser.Environment
 			Navigator = new Navigator();
 
 			_timers = new WindowTimers(context);
+			_timers.OnException += exception =>
+				{
+					var jsEx = exception as JavaScriptException;
+					if (jsEx != null)
+					{
+						engine.Console.Log("Unhandled exception in timer handler function: " + jsEx.Error.ToString());
+					}
+					else
+					{
+						engine.Console.Log("Unhandled exception in timer handler function: " + exception.Message);
+					}
+				};
+
+			_eventTarget = new EventTarget(this, () => null);
 		}
 
 		public int InnerWidth { get; set; }
@@ -56,6 +73,21 @@ namespace WebBrowser.Environment
 		public void ClearInterval(int handle)
 		{
 			throw new NotImplementedException();
+		}
+
+		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
+		{
+			_eventTarget.AddEventListener(type, listener, useCapture);
+		}
+
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
+		{
+			_eventTarget.RemoveEventListener(type, listener, useCapture);
+		}
+
+		public bool DispatchEvent(Event evt)
+		{
+			return _eventTarget.DispatchEvent(evt);
 		}
 	}
 }

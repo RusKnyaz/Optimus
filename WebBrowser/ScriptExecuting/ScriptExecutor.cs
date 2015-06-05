@@ -64,7 +64,11 @@ namespace WebBrowser.ScriptExecuting
 						var ex = new ScriptExecutingException(e.Error.ToString(), e, code);
 						if (OnException != null)
 							OnException(ex);
-						throw ex;
+					}
+					catch (Exception e)
+					{
+						if (OnException != null)
+							OnException(e);
 					}
 				}
 			}, null);
@@ -94,7 +98,7 @@ namespace WebBrowser.ScriptExecuting
 		}
 
 		public ScriptExecutingException(string message, Exception inner, string code)
-			: base("Script executing error.", inner)
+			: base(message ?? "Script executing error.", inner)
 		{
 			Code = code;
 		}

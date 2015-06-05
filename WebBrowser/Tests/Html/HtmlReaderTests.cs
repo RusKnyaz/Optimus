@@ -52,6 +52,8 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<script>var a = /\\/s*[\"']/g;</script><br/>", "TagStart:script, Text:var a = /\\/s*[\"']/g;, TagEnd:script, TagStart:br, TagEnd:br", Description = "Regex with special char inside script")]
 		[TestCase("<script>//\"\r\n</script><br/>", "TagStart:script, Text://\"\r\n, TagEnd:script, TagStart:br, TagEnd:br", Description = "Regex with special char inside script")]
 		[TestCase("<script defer/>", "TagStart:script, AttributeName:defer, TagEnd:script")]
+		[TestCase("<meta><meta>", "TagStart:meta, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
+		[TestCase("<meta name='viewport'><meta>", "TagStart:meta, AttributeName:name, AttributeValue:viewport, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{
 			var result = Read(source).ToArray();

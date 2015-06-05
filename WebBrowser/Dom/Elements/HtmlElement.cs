@@ -49,10 +49,11 @@ namespace WebBrowser.Dom.Elements
 					foreach (var stylePart in styleParts.Where(s => !string.IsNullOrEmpty(s)))
 					{
 						var keyValue = stylePart.Split(':');
-						if (keyValue.Length != 2)
-							throw new Exception("Invalid style definition: " + stylePart);
-						//todo: handle duplicates
-						Style.Properties.Add(keyValue[0], keyValue[1]);
+						if (keyValue.Length == 2)
+						{
+							//todo: handle duplicates
+							Style.Properties.Add(keyValue[0], keyValue[1]);
+						}
 					}
 				}
 			} 

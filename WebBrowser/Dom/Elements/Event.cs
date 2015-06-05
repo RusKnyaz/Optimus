@@ -6,9 +6,9 @@ namespace WebBrowser.Dom.Elements
 	public class Event : IEvent
 	{
 		public string Type { get; private set; }
-		public Node Target { get; internal set; }
-		public Node CurrentTarget { get; internal set; }
-		public ushort EventPhase { get; private set; }
+		public IEventTarget Target { get; internal set; }
+		public IEventTarget CurrentTarget { get; internal set; }
+		public ushort EventPhase { get; internal set; }
 		public bool Bubbles { get; private set; }
 		public bool Cancellable { get; private set; }
 		public DateTime TimeStamp { get; private set; }
@@ -46,9 +46,9 @@ namespace WebBrowser.Dom.Elements
 
 		//todo: implement remains properties
 		//todo: do something with const in js
-		const ushort CAPTURING_PHASE                = 1;
-		const ushort AT_TARGET                      = 2;
-		const ushort BUBBLING_PHASE                 = 3;
+		public const ushort CAPTURING_PHASE                = 1;
+		public const ushort AT_TARGET = 2;
+		public const ushort BUBBLING_PHASE = 3;
 	}
 
 	/// <summary>
@@ -61,8 +61,8 @@ namespace WebBrowser.Dom.Elements
 		void StopPropagation();
 		void PreventDefault();
 
-		Node Target { get; }
-		Node CurrentTarget { get; }
+		IEventTarget Target { get; }
+		IEventTarget CurrentTarget { get; }
 		ushort EventPhase { get; }
 		bool Bubbles { get; }
 		bool Cancellable { get; }

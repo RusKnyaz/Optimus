@@ -63,9 +63,7 @@ namespace WebBrowser.Environment
 		}
 		public string Hostname
 		{
-			get
-			{
-				throw new NotImplementedException();
+			get { return _engine.Uri.Host; //todo: check it
 			}
 			set
 			{

@@ -8,12 +8,15 @@ namespace WebBrowser.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
-	public abstract class Node : INode, IEventTarget 
+	public abstract class Node : INode, IEventTarget
 	{
+		protected EventTarget EventTarget;
+
 		protected Node(Document ownerDocument)
 		{
 			_ownerDocument = ownerDocument;
 			ChildNodes = new List<Node>();
+			EventTarget = new EventTarget(this, () => ParentNode);
 		}
 	
 		private Document _ownerDocument;
@@ -142,81 +145,19 @@ namespace WebBrowser.Dom.Elements
 		public const ushort DOCUMENT_FRAGMENT_NODE = 11;
 		public const ushort NOTATION_NODE = 12;
 
-		Dictionary<string, List<Action<Event>>> _listeners = new Dictionary<string, List<Action<Event>>>();
-		Dictionary<string, List<Action<Event>>> _capturingListeners = new Dictionary<string, List<Action<Event>>>();
-
-		List<Action<Event>> GetListeners(string type)
-		{
-			return _listeners.ContainsKey(type) ? _listeners[type] : (_listeners[type] = new List<Action<Event>>());
-		}
-
-		List<Action<Event>> GetCapturingListeners(string type)
-		{
-			return _capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
-		}
-		
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
 		{
-			(useCapture ? GetCapturingListeners(type): GetListeners(type)).Add(listener);
+			EventTarget.AddEventListener(type, listener, useCapture);
 		}
 
 		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
 		{
-			//todo: test it
-			(useCapture ? GetCapturingListeners(type) : GetListeners(type)).Remove(listener);
+			EventTarget.RemoveEventListener(type, listener, useCapture);
 		}
 
 		public virtual bool DispatchEvent(Event evt)
 		{
-			if (evt.Target == null)
-			{
-				evt.Target = this;
-
-				var branch = new Stack<Node>();
-				for(var x = this; x != null; x = x.ParentNode)
-					branch.Push(x);
-
-				while (branch.Count > 0 && !evt.IsPropagationStopped())
-				{
-					var n = branch.Pop();
-					evt.CurrentTarget = n;
-					foreach (var listener in n.GetCapturingListeners(evt.Type))
-					{
-						try
-						{
-							listener(evt);
-						}
-						catch
-						{
-							//Any exceptions thrown inside an EventListener will not stop propagation of the event. It will continue processing any additional EventListener in the described manner.
-						}
-					}
-				}
-
-				if (evt.IsPropagationStopped())
-					return !evt.Cancelled;
-			}
-
-			evt.CurrentTarget = this;
-
-			foreach (var listener in GetListeners(evt.Type))
-			{
-				try
-				{
-					listener(evt);
-				}
-				catch
-				{
-					//Any exceptions thrown inside an EventListener will not stop propagation of the event. It will continue processing any additional EventListener in the described manner.
-				}
-			}
-
-			if (evt.Bubbles && !evt.IsPropagationStopped() && ParentNode!=null)
-				ParentNode.DispatchEvent(evt);
-
-			//todo: handle default action;
-
-			return !evt.Cancelled;
+			return EventTarget.DispatchEvent(evt);
 		}
 
 		/// <summary>
@@ -303,14 +244,6 @@ namespace WebBrowser.Dom.Elements
 
 			return thisPreParent.CompareDocumentPosition(otherPreParent);
 		}
-	}
-
-	[DomItem]
-	public interface IEventTarget
-	{
-		void AddEventListener(string type, Action<Event> listener, bool useCapture);
-		void RemoveEventListener(string type, Action<Event> listener, bool useCapture);
-		bool DispatchEvent(Event evt);
 	}
 
 	[DomItem]

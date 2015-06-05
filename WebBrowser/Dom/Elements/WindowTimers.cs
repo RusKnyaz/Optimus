@@ -10,6 +10,8 @@ namespace WebBrowser.Dom.Elements
 		private readonly SynchronizationContext _context;
 		readonly List<Timer> _activeTimers = new List<Timer>();
 
+		public event Action<Exception> OnException;
+
 		public WindowTimers(SynchronizationContext context)
 		{
 			_context = context;
@@ -17,19 +19,17 @@ namespace WebBrowser.Dom.Elements
 
 		public int SetTimeout(Action handler, int timeout)
 		{
-			//todo: handle exceptions;
-			
-			var timer = new Timer(state =>
-			{
-				try
-				{
-					_context.Send(o => handler(), null);
-				}
-				catch(Exception e)
-				{
-					//todo raise event
-				}
-			}, null, timeout, Timeout.Infinite);
+			var timer = new Timer(state => _context.Send(o => { 
+				                                                  try
+				                                                  {
+					                                                  handler();
+				                                                  }
+				                                                  catch(Exception e)
+				                                                  {
+					                                                  if (OnException != null)
+						                                                  OnException(e);
+				                                                  }
+			}, null), null, timeout, Timeout.Infinite);
 
 			return timer.GetHashCode();
 		}

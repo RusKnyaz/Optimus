@@ -142,6 +142,22 @@ namespace WebBrowser.Tests
 			var x = document.CreateDocumentFragment();
 			Assert.AreEqual(document, x.OwnerDocument);
 		}
+
+		[Test]
+		public void HeadBody()
+		{
+			var document = new Document();
+			document.Write("<html><head><meta/></head><body><div></div></body></html>");
+			document.Assert(doc => doc.Body.InnerHTML == "<div></div>" && doc.Head.InnerHTML == "<meta></meta>");
+		}
+
+		[Test]
+		public void UnClosedTag()
+		{
+			var document = new Document();
+			document.Write("<html><head><meta></head><body><div></div></body></html>");
+			document.Assert(doc => doc.Body.InnerHTML == "<div></div>" && doc.Head.InnerHTML == "<meta></meta>");
+		}
 	}
 }
 #endif

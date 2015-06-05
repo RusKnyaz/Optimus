@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using WebBrowser.Dom.Elements;
+using WebBrowser.Environment;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom
@@ -38,12 +39,13 @@ namespace WebBrowser.Dom
 		public readonly SynchronizationContext Context;
 		private readonly IScriptExecutor _scriptExecutor;
 
-		internal Document() :this(null, null, null)
+		internal Document() :this(null, null, null, null)
 		{
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		internal Document(IResourceProvider resourceProvider, SynchronizationContext context, IScriptExecutor scriptExecutor):base(null)
+		internal Document(IResourceProvider resourceProvider, SynchronizationContext context, IScriptExecutor scriptExecutor, 
+			Window window):base(null)
 		{
 			_resourceProvider = resourceProvider;
 			Context = context ?? new StubSynchronizationContext();
@@ -53,6 +55,8 @@ namespace WebBrowser.Dom
 
 			DocumentElement = new Element(this, "html"){ParentNode = this};
 			ChildNodes = new List<Node> { DocumentElement };
+
+			EventTarget = new EventTarget(this, () => window);
 		}
 
 		public Element DocumentElement { get; private set; }
@@ -185,13 +189,24 @@ namespace WebBrowser.Dom
 			if(type == "Event")
 				return new Event();
 
+			if(type == "CustomEvent")
+				return new CustomEvent();
+
+			if(type == "MutationEvent")
+				return new MutationEvent();
+
 			//todo: UIEvent
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
 
+		public event Action<Node, Node> DomNodeInserted;
+
 		internal void HandleNodeAdded(Node node, Node newChild)
 		{
+			if (DomNodeInserted != null)
+				DomNodeInserted(node, newChild);
+
 			foreach (var script in newChild.Flatten().OfType<Script>())
 			{
 				if (script.Async)
@@ -238,6 +253,16 @@ namespace WebBrowser.Dom
 				}
 			}
 		}
+
+		internal void HandleNodeEventException(Node node, Exception exception)
+		{
+			if (OnNodeException != null)
+			{
+				OnNodeException(node, exception);
+			}
+		}
+
+		public event Action<Node, Exception> OnNodeException;
 	}
 
 	[DomItem]

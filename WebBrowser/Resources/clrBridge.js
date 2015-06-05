@@ -33,7 +33,9 @@
 		}
 	}
 
-	window.addEventListener = function () { };//todo: implement
+	window.addEventListener = function(a, b, c) { engine.Window.AddEventListener(a, b, c); };
+	window.removeEventListener = function (a, b, c) { engine.Window.RemoveEventListener(a, b, c); };
+	window.dispatchEvent = function (x) { return engine.Window.DispatchEvent(x); };
 	window.clearTimeout = engine.Window.clearTimeout;
 	window.location = engine.Window.Location;
 	window.navigator = engine.Window.Navigator;
