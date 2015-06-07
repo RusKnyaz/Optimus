@@ -115,11 +115,11 @@ namespace WebBrowser.WfApp.Controls
 				
 			var treeNode = new TreeNode(name) {Tag = node};
 
-
-			foreach (var child in node.ChildNodes.Select(x => CreateBranch(x)).Where(x => x!=null))
+/*
+			foreach (var child in node.ChildNodes.ToArray().Select(x => CreateBranch(x)).Where(x => x!=null))
 			{
 				treeNode.Nodes.Add(child);
-			}
+			}*/
 			if(!_nodes.ContainsKey(node))
 				_nodes.Add(node, treeNode);
 			return treeNode;

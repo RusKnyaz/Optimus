@@ -1,6 +1,7 @@
 ﻿#if NUNIT
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Moq;
 
 namespace WebBrowser.Tests
@@ -15,8 +16,9 @@ namespace WebBrowser.Tests
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, string data)
 		{
 			Mock.Get(resourceProvider)
-				.Setup(x => x.GetResource(url))
-				.Returns(() => Mock.Of<IResource>(y => y.Stream == new MemoryStream(Encoding.UTF8.GetBytes(data)) && y.Type == ResourceTypes.Html));
+				.Setup(x => x.GetResourceAsync(url))
+				.Returns(() =>Task.Run(() =>
+						Mock.Of<IResource>(y => y.Stream == new MemoryStream(Encoding.UTF8.GetBytes(data)) && y.Type == ResourceTypes.Html)));
 			return resourceProvider;
 		}
 

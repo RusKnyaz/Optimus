@@ -37,6 +37,21 @@ namespace WebBrowser.Tests.Dom
 			Assert.AreEqual("width", style[0]);
 		}
 
+		[Test]
+		public void SetStyle()
+		{
+			var element = (HtmlElement) CreateElement("<div></div>");
+			element.Style["width"] = "10pt";
+			Assert.AreEqual("10pt", element.Style["width"]);
+		}
+
+		[Test]
+		public void GetNoStyle()
+		{
+			var element = (HtmlElement)CreateElement("<div></div>");
+			Assert.AreEqual("", element.Style[0]);
+		}
+
 		[TestCase("<div id='n1'></div><div id='n2'></div>", Result = 4)]
 		[TestCase("<div id='n2'></div><div id='n1'></div>", Result = 2)]
 		[TestCase("<div id='n2'><div id='n1'></div></div>", Result = 10)]

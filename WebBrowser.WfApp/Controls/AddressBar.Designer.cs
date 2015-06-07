@@ -35,18 +35,20 @@
 			// 
 			this.textBoxUrl.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textBoxUrl.Location = new System.Drawing.Point(0, 0);
+			this.textBoxUrl.Margin = new System.Windows.Forms.Padding(4);
 			this.textBoxUrl.Name = "textBoxUrl";
-			this.textBoxUrl.Size = new System.Drawing.Size(674, 20);
+			this.textBoxUrl.Size = new System.Drawing.Size(899, 22);
 			this.textBoxUrl.TabIndex = 0;
 			this.textBoxUrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxUrl_KeyDown);
 			// 
 			// AddressBar
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.textBoxUrl);
+			this.Margin = new System.Windows.Forms.Padding(4);
 			this.Name = "AddressBar";
-			this.Size = new System.Drawing.Size(674, 32);
+			this.Size = new System.Drawing.Size(899, 39);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

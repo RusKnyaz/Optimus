@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using WebBrowser.ScriptExecuting;
 using WebBrowser.TestingTools;
 
@@ -41,32 +42,56 @@ namespace WebBrowser.Dom.Elements
 
 		public bool HasDelayedContent { get { return !string.IsNullOrEmpty(Src); } }
 
-		public void Load(IResourceProvider resourceProvider)
-		{
-			if(string.IsNullOrEmpty(Src))
-				throw new InvalidOperationException("Src not set.");
-			try
-			{
-				var resource = resourceProvider.GetResource(Src);
-				using (var reader = new StreamReader(resource.Stream))
-				{
-					InnerHTML = reader.ReadToEnd();
-					Loaded = true;
-				}
-			}
-			catch (Exception ex)
-			{
-				OwnerDocument.Context.Send(OnError);
-				return;
-			}
-			OwnerDocument.Context.Send(OnLoad);
-		}
-
 		public bool Loaded { get; private set; }
 		public bool Executed { get; set; }
 
 		public event Action OnLoad;
 		public event Action OnError;
+
+		public Task LoadAsync(IResourceProvider resourceProvider)
+		{
+			if (string.IsNullOrEmpty(Src))
+				throw new InvalidOperationException("Src not set.");
+
+			return resourceProvider.GetResourceAsync(Src).ContinueWith(
+				resource =>
+				{
+					try
+					{
+						using (var reader = new StreamReader(resource.Result.Stream))
+						{
+							InnerHTML = reader.ReadToEnd();
+							Loaded = true;
+						}
+					}
+					catch (Exception ex)
+					{
+						RaiseError();
+						return;
+					}
+					RaiseOnLoad();
+				});
+		}
+
+		private void RaiseOnLoad()
+		{
+			//todo: raise order must be determined by subscription order
+			OwnerDocument.Context.Send(OnLoad);
+			this.RaiseEvent("load", false, false);
+		}
+
+		private void RaiseError()
+		{
+			//todo: raise order must be determined by subscription order
+			OwnerDocument.Context.Send(OnError);
+			this.RaiseEvent("error", false, false);
+		}
+
+		public void Execute(IScriptExecutor scriptExecutor)
+		{
+			scriptExecutor.Execute(Type, Text);
+			Executed = true;
+		}
 	}
 
 	[DomItem]
@@ -84,8 +109,8 @@ namespace WebBrowser.Dom.Elements
 
 	internal interface IDelayedResource
 	{
-		void Load(IResourceProvider resourceProvider);
 		bool Loaded { get; }
 		bool HasDelayedContent { get; }
+		Task LoadAsync(IResourceProvider resourceProvider);
 	}
 }

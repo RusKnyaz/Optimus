@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.ResourceProviders;
@@ -198,12 +199,13 @@ console.log(elems[0] != null);");
 			var script = 
 @"var s = document.createElement('script');
 s.onload = function(){console.log('load');};
+s.setAttribute('async','true');
 s.setAttribute('src', 'http://localhost/module');
 document.head.appendChild(s);";
 
 			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 
-			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://localhost/module"), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://localhost/module"), Times.Once());
 			Assert.AreEqual(2, log.Count);
 			Assert.AreEqual("load", log[0]);
 			Assert.AreEqual("hi from module", log[1]);
@@ -273,8 +275,8 @@ console.log(style['width']);");
 			var engine = new Engine(resourceProvider);
 			engine.OpenUrl("http://todosoft.org");
 
-			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.org"), Times.Once());
-			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.org/sub"), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.org"), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.org/sub"), Times.Once());
 
 			Assert.AreEqual("http://todosoft.org/sub", engine.Window.Location.Href);
 		}
@@ -283,7 +285,7 @@ console.log(style['width']);");
 		public void Ajax()
 		{
 			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
-				new HttpResponse(HttpStatusCode.OK, "hello", null));
+				new HttpResponse(HttpStatusCode.OK, "hello".ToStream(), null));
 
 			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
 

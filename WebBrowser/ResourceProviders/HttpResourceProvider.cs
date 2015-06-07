@@ -26,15 +26,11 @@ namespace WebBrowser.ResourceProviders
 			var webRequest = MakeWebRequest(request);
 			var response = await webRequest.GetResponseAsync();
 			return MakeResponse((HttpWebResponse)response);
-
 		}
 
 		private HttpResponse MakeResponse(HttpWebResponse response)
 		{
-			using (var reader = new StreamReader(response.GetResponseStream()))
-			{
-				return new HttpResponse(response.StatusCode, reader.ReadToEnd(), response.Headers);
-			}
+			return new HttpResponse(response.StatusCode, response.GetResponseStream(), response.Headers);
 		}
 
 		private HttpWebRequest MakeWebRequest(HttpRequest request)
@@ -59,23 +55,25 @@ namespace WebBrowser.ResourceProviders
 		public Dictionary<string, string> Headers;
 		//todo: body
 
-		public HttpRequest()
+		public HttpRequest(string method, string url)
 		{
 			Headers = new Dictionary<string, string>();
+			Method = method;
+			Url = url;
 		}
 	}
 
 	public class HttpResponse
 	{
-		public HttpResponse(HttpStatusCode statusCode, string data, WebHeaderCollection headers)
+		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers)
 		{
 			StatusCode = statusCode;
-			Data = data;
+			Stream = stream;
 			Headers = headers;
 		}
 
 		public HttpStatusCode StatusCode { get; private set; }
-		public string Data { get; private set; }
 		public WebHeaderCollection Headers { get; private set; }
+		public Stream Stream { get; private set; }
 	}
 }

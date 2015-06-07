@@ -1,4 +1,6 @@
 ﻿using System.Collections.Specialized;
+using System.Linq;
+using Jint.Runtime.Descriptors.Specialized;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
@@ -29,21 +31,26 @@ namespace WebBrowser.Dom.Elements
 			{
 				int number;
 				if (int.TryParse(name, out number))
-					return Properties.AllKeys[number]; //return key
+					return this[number];
+				
 				return Properties[name]; //return value
 			}
 			set
 			{
 				int number;
 				if (int.TryParse(name, out number))
-					Properties.AllKeys[number] = value.ToString();//todo: check behavior
-				Properties[name] = value.ToString();//todo: may be do not conversion?
+					return;
+			
+				Properties[name] = value.ToString();
 			}
 		}
 
 		public string this[int idx]
 		{
-			get { return Properties.AllKeys[idx]; }
+			get
+			{
+				return idx < 0 || idx >= Properties.Count ? string.Empty: Properties.AllKeys[idx]; 
+			}
 		}
 
 		public string GetPropertyValue(string propertyName)

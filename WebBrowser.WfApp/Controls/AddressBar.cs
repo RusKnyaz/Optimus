@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace WebBrowser.WfApp.Controls
 {
@@ -15,7 +17,8 @@ namespace WebBrowser.WfApp.Controls
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				Engine.OpenUrl(textBoxUrl.Text);
+				new Thread(new ThreadStart(() => Engine.OpenUrl(textBoxUrl.Text))).Start();
+				;
 			}
 		}
 	}

@@ -7,7 +7,7 @@ namespace WebBrowser.Dom.Elements
 	{
 		public Object Detail { get; private set; }
 
-		public void InitEvent(string type, bool canBubble, bool canCancel, object detail)
+		public void InitCustomEvent(string type, bool canBubble, bool canCancel, object detail)
 		{
 			InitEvent(type, canBubble, canBubble);
 			Detail = detail;
@@ -17,6 +17,6 @@ namespace WebBrowser.Dom.Elements
 	[DomItem]
 	public interface ICustomEvent
 	{
-		void InitEvent(string type, bool canBubble, bool canCancel, object detail);
+		void InitCustomEvent(string type, bool canBubble, bool canCancel, object detail);
 	}
 }

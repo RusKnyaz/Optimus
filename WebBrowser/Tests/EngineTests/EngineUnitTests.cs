@@ -75,15 +75,13 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void LoadPage()
 		{
-			var resourceProviderMock = new Mock<IResourceProvider>();
-			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("<html><body><div id='c'></div></body></html>")));
+			var resourceProvider = Mocks.ResourceProvider(
+				"http://localhost", "<html><body><div id='c'></div></body></html>");
 
-			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns(resource);
-
-			var engine = new Engine(resourceProviderMock.Object);
+			var engine = new Engine(resourceProvider);
 
 			engine.OpenUrl("http://localhost");
-			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<string>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync(It.IsAny<string>()), Times.Once());
 
 			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Length);
 		}
@@ -104,19 +102,15 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void LoadScriptTest()
 		{
-			var resourceProviderMock = new Mock<IResourceProvider>();
-			var resource = Mock.Of<IResource>(x => x.Stream == new MemoryStream(Encoding.UTF8.GetBytes("console.log('hello');")));
-
-			resourceProviderMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns(resource);
-
-			var engine = new Engine(resourceProviderMock.Object);
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');");
+			var engine = new Engine(resourceProvider);
 
 			string loggedValue = null;
 			engine.Console.OnLog += o => loggedValue = o.ToString();
 
 			engine.Load("<html><head><script src='http://localhost/script.js'></script></head></html>");
 
-			resourceProviderMock.Verify(x => x.GetResource(It.IsAny<string>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync(It.IsAny<string>()), Times.Once());
 			Assert.AreEqual("hello", loggedValue);
 		}
 
@@ -131,10 +125,7 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void LoadAndRunScriptAddedInRuntime()
 		{
-			var resourceProvider =
-				Mock.Of<IResourceProvider>(
-					x => x.GetResource(It.IsAny<string>()).Stream == new MemoryStream(Encoding.UTF8.GetBytes("console.log('hello');")));
-
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');");
 			var engine = new Engine(resourceProvider);
 
 			string loggedValue = null;
@@ -146,7 +137,7 @@ namespace WebBrowser.Tests.EngineTests
 			script.Src = "http://localhost/script.js";
 			engine.Document.Head.AppendChild(script);
 
-			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://localhost/script.js"), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://localhost/script.js"), Times.Once());
 			Assert.AreEqual("hello", loggedValue);
 		}
 
@@ -197,7 +188,7 @@ window.clearTimeout(timer);"));
 			var engine = new Engine(resourceProvider);
 			//todo: write similar test on js
 			engine.Window.Location.Href = "http://todosoft.ru";
-			Mock.Get(resourceProvider).Verify(x => x.GetResource("http://todosoft.ru"), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.ru"), Times.Once());
 		}
 
 		[Test]
@@ -215,7 +206,7 @@ window.clearTimeout(timer);"));
 		public void Ajax()
 		{
 			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
-				new HttpResponse(HttpStatusCode.OK, "hello", null));
+				new HttpResponse(HttpStatusCode.OK, "hello".ToStream(), null));
 
 			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
 

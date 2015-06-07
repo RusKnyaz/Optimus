@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
@@ -31,12 +32,14 @@ namespace WebBrowser.Dom
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
+		private Lazy<string> _data; 
 
 		public XmlHttpRequest(IHttpResourceProvider httpResourceProvider, SynchronizationContext context)
 		{
 			_httpResourceProvider = httpResourceProvider;
 			_context = context;
 			ReadyState = UNSENT;
+			_data = new Lazy<string>(() =>_response.Stream.ReadToEnd());
 		}
 
 		public void Open(string method, string url)
@@ -51,11 +54,7 @@ namespace WebBrowser.Dom
 
 		public void Open(string method, string url, bool? async, string username, string password)
 		{
-			_request = new HttpRequest
-				{
-					Url = url,
-					Method = method
-				};
+			_request = new HttpRequest(method, url);
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;
@@ -69,8 +68,8 @@ namespace WebBrowser.Dom
 
 		public int ReadyState { get; private set; }
 
-		public object ResponseXML { get { return _response.Data;}}
-		public string ResponseText { get { return _response.Data; } }
+		public object ResponseXML { get { return _data.Value;}}
+		public string ResponseText { get { return _data.Value; } }
 
 		public void SetRequestHeader(string name, string value)
 		{
@@ -144,6 +143,15 @@ namespace WebBrowser.Dom
 		public static void Fire(this Action action)
 		{
 			if (action != null) action();
+		}
+	}
+
+	public static class StreamExtension
+	{
+		public static string ReadToEnd(this Stream stream)
+		{
+			using (var reader = new StreamReader(stream))
+				return reader.ReadToEnd();
 		}
 	}
 } 

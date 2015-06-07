@@ -1,5 +1,4 @@
 ﻿#if NUNIT
-using System;
 using NUnit.Framework;
 using WebBrowser.ResourceProviders;
 
@@ -9,10 +8,10 @@ namespace WebBrowser.Tests
 	public class ResourceProvidersTests
 	{
 		[Test, Ignore]
-		public void HttpRequest()
+		public async void HttpRequest()
 		{
 			var provider = new ResourceProvider();
-			var res = provider.GetResource("http://google.com");
+			await provider.GetResourceAsync("http://google.com");
 		}
 	}
 }

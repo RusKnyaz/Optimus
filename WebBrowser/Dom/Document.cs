@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Environment;
 using WebBrowser.ScriptExecuting;
@@ -93,20 +94,8 @@ namespace WebBrowser.Dom
 
 		public void ResolveDelayedContent()
 		{
-			foreach (var delayedResource in _unresolvedDelayedResources)
-			{
-				try
-				{
-					if(!delayedResource.Loaded)
-						delayedResource.Load(_resourceProvider);
-				}
-				catch
-				{
-					//todo: handle error;
-				}
-			}
+			Task.WaitAll(_unresolvedDelayedResources.Where(x => !x.Loaded).Select(x => x.LoadAsync(_resourceProvider)).ToArray());
 			_unresolvedDelayedResources.Clear();
-			
 			Trigger("load");
 		}
 
@@ -209,29 +198,7 @@ namespace WebBrowser.Dom
 
 			foreach (var script in newChild.Flatten().OfType<Script>())
 			{
-				if (script.Async)
-				{
-					if (script.HasDelayedContent)
-					{
-						//todo: get resourceAsync
-						var resource = _resourceProvider.GetResource(script.Src);
-
-						using (var reader = new StreamReader(resource.Stream))
-						{
-							script.Text = reader.ReadToEnd();
-						}
-						//todo: async execution
-						_scriptExecutor.Execute(script.Type, script.Text);
-						script.Executed = true;
-					}
-					else if(!string.IsNullOrEmpty(script.Text))
-					{
-						//todo: async execution
-						_scriptExecutor.Execute(script.Type, script.Text);
-						script.Executed = true;
-					}
-				}
-				else if (script.Defer && ReadyState != DocumentReadyStates.Complete)
+				if (!script.Async && script.Defer && ReadyState != DocumentReadyStates.Complete)
 				{
 					_unresolvedDelayedResources.AddRange(newChild.Flatten()
 						.OfType<IDelayedResource>()
@@ -239,16 +206,22 @@ namespace WebBrowser.Dom
 				}
 				else
 				{
+					Task task = null;
 					if (script.HasDelayedContent)
 					{
-						script.Load(_resourceProvider);
-						_scriptExecutor.Execute(script.Type, script.Text);
-						script.Executed = true;
+						task = script
+							.LoadAsync(_resourceProvider)
+							.ContinueWith((t, s) => ((Script) s).Execute(_scriptExecutor), script);
 					}
 					else if (!string.IsNullOrEmpty(script.Text))
 					{
-						_scriptExecutor.Execute(script.Type, script.Text);
-						script.Executed = true;
+						task = new Task(s => ((Script)s).Execute(_scriptExecutor), script);
+						task.Start(TaskScheduler.Default);
+					}
+					if (task != null)
+					{
+						if (!script.Async)
+							task.Wait();
 					}
 				}
 			}
@@ -257,9 +230,7 @@ namespace WebBrowser.Dom
 		internal void HandleNodeEventException(Node node, Exception exception)
 		{
 			if (OnNodeException != null)
-			{
 				OnNodeException(node, exception);
-			}
 		}
 
 		public event Action<Node, Exception> OnNodeException;

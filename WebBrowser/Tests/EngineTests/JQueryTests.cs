@@ -1,6 +1,8 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -34,7 +36,7 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Post()
 		{
-			var t = new Task<HttpResponse>(() => new HttpResponse(HttpStatusCode.OK, "OK", null));
+			var t = new Task<HttpResponse>(() => new HttpResponse(HttpStatusCode.OK, "OK".ToStream(), null));
 			t.Start();
 
 			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequestAsync(It.IsAny<HttpRequest>()) == t);
@@ -70,6 +72,14 @@ namespace WebBrowser.Tests.EngineTests
 			};
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			Assert.AreEqual("ok", result);
+		}
+	}
+
+	public static class StringExtension
+	{
+		public static Stream ToStream(this string str)
+		{
+			return new MemoryStream(Encoding.UTF8.GetBytes(str));
 		}
 	}
 }

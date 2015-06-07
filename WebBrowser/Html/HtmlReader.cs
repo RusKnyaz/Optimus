@@ -257,8 +257,8 @@ namespace WebBrowser.Html
 							case States.ReadSelfClosedTagEnd:
 								if (symbol == '>')
 									newState = States.ReadText;
-								else
-									throw new HtmlInvalidFormatException("'>' Expected at the end of tag after '/'");
+								//else
+									//throw new HtmlInvalidFormatException("'>' Expected at the end of tag after '/'");
 								break;
 
 							case States.ReadAttributeName:
@@ -301,8 +301,8 @@ namespace WebBrowser.Html
 										yield return ReadComment(reader);
 										state = newState = States.ReadText;
 										continue;
-									default:
-										throw new HtmlInvalidFormatException("Unknown spec tag.");
+									//default:
+										//throw new HtmlInvalidFormatException("Unknown spec tag.");
 								}
 								break;
 
@@ -347,8 +347,10 @@ namespace WebBrowser.Html
 								yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray()).Trim()};
 							break;
 						case States.ReadDocType:
+/*
 							if (data.Length < 7 || !data.ToUpperInvariant().StartsWith("OCTYPE "))
 								throw new HtmlInvalidFormatException("DOCTYPE tag exptected");
+*/
 
 							yield return new HtmlChunk {Type = HtmlChunkTypes.DocType, Value = data.Substring(7)};
 							break;

@@ -154,7 +154,7 @@ namespace WebBrowser.Dom.Elements
 				{
 					sb.Append(" ");
 					sb.Append(attribute.Key);
-					if (attribute.Value != null)
+					if (attribute.Value.Value != null)
 					{
 						sb.Append("=\"");
 						sb.Append(attribute.Value.Value.Replace("\"", "\\\""));

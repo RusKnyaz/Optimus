@@ -53,8 +53,9 @@ namespace WebBrowser
 			ScriptExecutor.Clear();
 			Uri = new Uri(path);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path);
-			var resource = ResourceProvider.GetResource(path);
-			
+			var task = ResourceProvider.GetResourceAsync(path);
+			task.Wait();
+			var resource = task.Result;
 			if (resource.Type == ResourceTypes.Html)
 			{
 				Load(resource.Stream);

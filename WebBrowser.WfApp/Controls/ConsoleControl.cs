@@ -21,13 +21,24 @@ namespace WebBrowser.WfApp.Controls
 			set
 			{
 				if (_engine != null)
+				{
 					_engine.Console.OnLog -= ConsoleOnOnLog;
+					_engine.ResourceProvider.OnRequest += ResourceProviderOnOnRequest;
+				}
 
 				_engine = value;
 
 				if (_engine != null)
+				{
 					_engine.Console.OnLog += ConsoleOnOnLog;
+					_engine.ResourceProvider.OnRequest  += ResourceProviderOnOnRequest;
+				}
 			}
+		}
+
+		private void ResourceProviderOnOnRequest(string s)
+		{
+			this.SafeInvoke(() => textBoxLog.Text += "Request: " + s + "\r\n");
 		}
 
 		private void ConsoleOnOnLog(object o)

@@ -24,8 +24,8 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Require()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>(x => x.GetResource(It.IsAny<string>()) == 
-				new Response(ResourceTypes.Html, new MemoryStream(Encoding.UTF8.GetBytes("console.log('OK');"))));
+			//событие onload должно быть после загрузки или выполнения?
+			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency');});");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -35,13 +35,12 @@ namespace WebBrowser.Tests.EngineTests
 				log.Add(o.ToString());
 			};
 
-			var script = @"require(['data'], function(x){console.log('OK');});";
+			var script = @"require(['data'], function(x){console.log('main');});";
 
 			engine.Load("<html><head><script> " + Resources.requirejs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
-			Mock.Get(resourceProvider).Verify(x => x.GetResource(It.IsAny<string>()), Times.Once);
-			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("OK", log[0]);
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
+			CollectionAssert.AreEqual(new[]{"dependency", "main"}, log);
 		}
 	}
 }
