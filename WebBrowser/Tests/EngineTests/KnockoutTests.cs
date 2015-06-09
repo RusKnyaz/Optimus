@@ -251,6 +251,43 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 			Assert.AreEqual(3, newDivs.Length);
 
 		}
+
+		[Test]
+		public void BindToNode()
+		{
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+@"<script defer>
+function VM(peoples) {
+	var _this = this;	
+	this.Peoples = ko.observableArray(peoples);
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById('view'));
+</script>
+<script type='text/html' id='itemTemplate'>
+	<span data-bind='text:Name'></span>
+</script>
+</head>
+<body>
+<div id='view'>
+	<!-- ko foreach: Peoples -->
+	<div data-bind=""template:'itemTemplate'""></div>
+	<!-- /ko -->
+	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
+</div>
+</body>
+</html>");
+
+			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();
+			var divs = doc.Body.GetElementsByTagName("div").ToArray();
+			Assert.AreEqual(3, divs.Length);
+
+			button.Click();
+
+			var newDivs = doc.Body.GetElementsByTagName("div").ToArray();
+			Assert.AreEqual(4, newDivs.Length);
+
+		}
 	}
 }
 #endif
