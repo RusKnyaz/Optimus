@@ -10,6 +10,7 @@ namespace WebBrowser.ResourceProviders
 		public event Action<string> OnRequest;
 
 		private readonly CookieContainer _cookies;
+		private string _root;
 
 		public ResourceProvider()
 		{
@@ -17,7 +18,16 @@ namespace WebBrowser.ResourceProviders
 			HttpResourceProvider = new HttpResourceProvider(_cookies);
 		}
 
-		public string Root { get; set; }
+		public string Root
+		{
+			get { return _root; }
+			set
+			{
+				HttpResourceProvider.Root = value;
+				_root = value;
+			}
+		}
+
 		public Task<IResource> GetResourceAsync(string uri)
 		{
 			if (string.IsNullOrEmpty(uri))
@@ -32,8 +42,7 @@ namespace WebBrowser.ResourceProviders
 			if (scheme == "http://" || scheme == "https://")
 			{
 				var httpRequest = new HttpRequest("GET", u.OriginalString);
-				return HttpResourceProvider.SendRequestAsync(httpRequest)
-					.ContinueWith(t => (IResource)new Response(ResourceTypes.Html, t.Result.Stream));
+				return HttpResourceProvider.SendRequestAsync(httpRequest).ContinueWith(t => (IResource)t.Result);
 			}
 			throw new Exception("Unsupported scheme: " + scheme);
 		}

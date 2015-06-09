@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
@@ -205,10 +206,11 @@ document.head.appendChild(s);";
 
 			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 
+			Thread.Sleep(1000);
 			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://localhost/module"), Times.Once());
 			Assert.AreEqual(2, log.Count);
-			Assert.AreEqual("load", log[0]);
-			Assert.AreEqual("hi from module", log[1]);
+			Assert.AreEqual("load", log[1]);
+			Assert.AreEqual("hi from module", log[0]);
 		}
 
 		[Test]
@@ -291,7 +293,11 @@ console.log(style['width']);");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
 			engine.Load(Mocks.Page(
 @"var client = new XMLHttpRequest();
 client.onreadystatechange = function () {
@@ -306,8 +312,11 @@ client.onreadystatechange = function () {
 };
 client.open(""GET"", ""http://localhost/unicorn.xml"", false);
 client.send();"));
+
+			Thread.Sleep(1000);
+
 			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
-			CollectionAssert.AreEqual(new object[]{"4", "200", "hello", "hello"}, log);
+			CollectionAssert.AreEqual(new []{"4", "200", "hello", "hello"}, log);
 		}
 	}
 }

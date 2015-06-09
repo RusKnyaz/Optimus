@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace WebBrowser.ResourceProviders
 		{
 			_cookies = cookies;
 		}
+
+		public string Root { get; set; }
 
 		public HttpResponse SendRequest(HttpRequest request)
 		{
@@ -35,7 +38,9 @@ namespace WebBrowser.ResourceProviders
 
 		private HttpWebRequest MakeWebRequest(HttpRequest request)
 		{
-			var result = WebRequest.CreateHttp(request.Url);
+			var uri = request.Url;
+			var u = uri[0] == '/' ? new Uri(new Uri(Root), uri) : new Uri(uri);
+			var result = WebRequest.CreateHttp(u);
 			result.Method = request.Method;
 			result.CookieContainer = _cookies;
 			return result;
@@ -46,6 +51,7 @@ namespace WebBrowser.ResourceProviders
 	{
 		HttpResponse SendRequest(HttpRequest request);
 		Task<HttpResponse> SendRequestAsync(HttpRequest request);
+		string Root { get; set; }
 	}
 
 	public class HttpRequest
@@ -63,17 +69,19 @@ namespace WebBrowser.ResourceProviders
 		}
 	}
 
-	public class HttpResponse
+	public class HttpResponse : IResource
 	{
 		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers)
 		{
 			StatusCode = statusCode;
 			Stream = stream;
 			Headers = headers;
+			Type= ResourceTypes.Html;//todo: fix it
 		}
 
 		public HttpStatusCode StatusCode { get; private set; }
 		public WebHeaderCollection Headers { get; private set; }
+		public ResourceTypes Type { get; private set; }
 		public Stream Stream { get; private set; }
 	}
 }

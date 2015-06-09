@@ -67,9 +67,7 @@ namespace WebBrowser.Dom.Elements
 					catch (Exception ex)
 					{
 						RaiseError();
-						return;
 					}
-					RaiseOnLoad();
 				});
 		}
 
@@ -91,6 +89,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			scriptExecutor.Execute(Type, Text);
 			Executed = true;
+			RaiseOnLoad();
 		}
 	}
 

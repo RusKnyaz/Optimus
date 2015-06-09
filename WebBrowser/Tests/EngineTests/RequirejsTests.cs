@@ -25,7 +25,7 @@ namespace WebBrowser.Tests.EngineTests
 		public void Require()
 		{
 			//событие onload должно быть после загрузки или выполнения?
-			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency');});");
+			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -35,12 +35,12 @@ namespace WebBrowser.Tests.EngineTests
 				log.Add(o.ToString());
 			};
 
-			var script = @"require(['data'], function(x){console.log('main');});";
+			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
 
 			engine.Load("<html><head><script> " + Resources.requirejs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
 			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
-			CollectionAssert.AreEqual(new[]{"dependency", "main"}, log);
+			CollectionAssert.AreEqual(new[]{"dependency", "main", "val"}, log);
 		}
 	}
 }

@@ -229,6 +229,8 @@ window.clearTimeout(timer);"));
 			client.Open("GET", "http://localhost/unicorn.xml", false);
 			client.Send();
 			
+			Thread.Sleep(1000);
+
 			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("hello", log[0]);
