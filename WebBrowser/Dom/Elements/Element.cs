@@ -147,7 +147,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			var sb = new StringBuilder();
 			sb.Append("<");
-			sb.Append(TagName);
+			sb.Append(TagName ?? NodeName);
 			if (HasAttributes())
 			{
 				foreach (var attribute in Attributes)

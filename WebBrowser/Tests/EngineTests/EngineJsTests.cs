@@ -318,5 +318,57 @@ client.send();"));
 			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
 			CollectionAssert.AreEqual(new []{"4", "200", "hello", "hello"}, log);
 		}
+
+		[Test]
+		public void AddEmbeddedScriptAsync()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+			engine.Load(Mocks.Page(@"
+			document.addEventListener(""DOMNodeInserted"", function(e){
+console.log('node added ');
+}, false);
+
+var d = document.createElement('script');
+d.id='aaa';
+d.async = true;
+d.innerHTML = ""console.log('in new script');console.log(document.getElementById('aaa') != null ? 'ok' : 'null');"";
+d.onload = function(){console.log('onload');};
+document.head.appendChild(d);
+console.log('afterappend');"));
+			CollectionAssert.AreEqual(new[] { "in new script", "onload", "ok", "nodeadded", "afterappend" }, log);
+		}
+
+		[Test]
+		public void AddScriptAsync()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+			engine.Load(Mocks.Page(@"
+			document.addEventListener(""DOMNodeInserted"", function(e){
+console.log('nodeadded');
+}, false);
+
+var d = document.createElement('script');
+d.id='aaa';
+d.async = true;
+d.src = ""http://localhost/script.js"";
+d.onload = function(){console.log('onload');};
+document.head.appendChild(d);
+console.log('afterappend');"));
+
+			Thread.Sleep(1000);
+			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
+		}
 	}
 }

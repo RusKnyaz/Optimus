@@ -99,16 +99,16 @@ namespace WebBrowser.Dom
 				ReadyState = LOADING;
 				_response = await _httpResourceProvider.SendRequestAsync(_request);
 				ReadyState = DONE;
-				Fire(OnReadyStateChange);
-				Fire(OnLoad);
+				Post(OnReadyStateChange);
+				Post(OnLoad);
 			}
 			else
 			{
 				ReadyState = LOADING;
 				_response = _httpResourceProvider.SendRequest(_request);
 				ReadyState = DONE;
-				Fire(OnReadyStateChange);
-				Fire(OnLoad);
+				Post(OnReadyStateChange);
+				Post(OnLoad);
 			}
 		}
 
@@ -119,22 +119,27 @@ namespace WebBrowser.Dom
 				ReadyState = LOADING;
 				_response = await _httpResourceProvider.SendRequestAsync(_request);
 				ReadyState = DONE;
-				Fire(OnReadyStateChange);
-				Fire(OnLoad);
+				Post(OnReadyStateChange);
+				Post(OnLoad);
 			}
 			else
 			{
 				ReadyState = LOADING;
 				_response = _httpResourceProvider.SendRequest(_request);
 				ReadyState = DONE;
-				Fire(OnReadyStateChange);
-				Fire(OnLoad);
+				Send(OnReadyStateChange);
+				Send(OnLoad);
 			}
 		}
 
-		private void Fire(Action action)
+		private void Post(Action action)
 		{
 			_context.Post(x => ((Action)x).Fire(), action);
+		}
+
+		private void Send(Action action)
+		{
+			_context.Send(x => ((Action)x).Fire(), action);
 		}
 	}
 

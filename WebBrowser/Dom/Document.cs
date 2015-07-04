@@ -103,12 +103,10 @@ namespace WebBrowser.Dom
 		{
 				//todo: what we should do if some script changes ChildNodes?
 				//todo: optimize (create queue of not executed scripts);
-			foreach (var documentElement in scripts.ToArray())
+			foreach (var script in scripts.ToArray())
 			{
-				if (documentElement.Executed) continue;
-				if(!string.IsNullOrEmpty(documentElement.Text))
-					_scriptExecutor.Execute(documentElement.Type, documentElement.Text);
-				documentElement.Executed = true;
+				if (script.Executed || string.IsNullOrEmpty(script.Text)) continue;
+				ExecuteScript(script);
 			}
 		}
 
@@ -189,15 +187,23 @@ namespace WebBrowser.Dom
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
 
-		public event Action<Node, Node> DomNodeInserted;
+		public event Action<Node> DomNodeInserted;
 
 		internal void HandleNodeAdded(Node node, Node newChild)
 		{
-			if (DomNodeInserted != null)
-				DomNodeInserted(node, newChild);
+			var parent = newChild;
+			var praParent = parent;
+			while (praParent.ParentNode != null)
+				praParent = praParent.ParentNode;
+
+			if (praParent != this)
+				return;
+
+			RaiseDomNodeInserted(newChild);
 
 			foreach (var script in newChild.Flatten().OfType<Script>())
 			{
+				System.Console.WriteLine("Script added: " + script.Src);
 				if (!script.Async && script.Defer && ReadyState != DocumentReadyStates.Complete)
 				{
 					_unresolvedDelayedResources.AddRange(newChild.Flatten()
@@ -211,11 +217,11 @@ namespace WebBrowser.Dom
 					{
 						task = script
 							.LoadAsync(_resourceProvider)
-							.ContinueWith((t, s) => ((Script) s).Execute(_scriptExecutor), script);
+							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
 					}
 					else if (!string.IsNullOrEmpty(script.Text))
 					{
-						task = new Task(s => ((Script)s).Execute(_scriptExecutor), script);
+						task = new Task(s => ExecuteScript((Script)s), script);
 						task.Start(TaskScheduler.Default);
 					}
 					if (task != null)
@@ -225,6 +231,37 @@ namespace WebBrowser.Dom
 					}
 				}
 			}
+		}
+
+		private void RaiseDomNodeInserted(Node newChild)
+		{
+			if (DomNodeInserted != null)
+				DomNodeInserted(newChild);
+
+			var evt = (MutationEvent)CreateEvent("MutationEvent");
+			evt.InitMutationEvent("DOMNodeInserted", false, false, newChild.ParentNode, null, null, null, 0);
+			evt.Target = newChild;
+			DispatchEvent(evt);
+		}
+
+		private void ExecuteScript(Script script)
+		{
+			script.Execute(_scriptExecutor);
+
+			Context.Send(x => RaiseAfterScriptExecute(script), null);
+		}
+
+		public event Action<Script> AfterScriptExecute;
+
+		private void RaiseAfterScriptExecute(Script script)
+		{
+			if (AfterScriptExecute != null)
+				AfterScriptExecute(script);
+
+			var evt = CreateEvent("Event");
+			evt.InitEvent("AfterScriptExecute",false, false);
+			evt.Target = script;
+			DispatchEvent(evt);
 		}
 
 		internal void HandleNodeEventException(Node node, Exception exception)

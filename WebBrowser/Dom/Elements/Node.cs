@@ -36,9 +36,12 @@ namespace WebBrowser.Dom.Elements
 
 		public Node AppendChild(Node node)
 		{
+			if(node == this)
+				throw new InvalidOperationException();
+
 			if (node is DocumentFragment)
 			{
-				foreach (var child in node.ChildNodes)
+				foreach (var child in node.ChildNodes.ToList())
 				{
 					AppendChild(child);
 				}

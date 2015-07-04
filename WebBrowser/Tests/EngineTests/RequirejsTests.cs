@@ -24,7 +24,7 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Require()
 		{
-			//событие onload должно быть после загрузки или выполнения?
+			//событие onload должно быть после загрузки или после выполнения?
 			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});");
 
 			var engine = new Engine(resourceProvider);

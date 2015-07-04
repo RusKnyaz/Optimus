@@ -19,7 +19,7 @@ namespace WebBrowser.WfApp
 		private void DomTreeControlOnNodeSelected(TreeNode treeNode)
 		{
 			var element = treeNode.Tag as Element;
-				this.SafeInvoke(() =>
+				this.SafeBeginInvoke(() =>
 					{
 						textBox1.Text = element != null ? element.InnerHTML : string.Empty;
 					});

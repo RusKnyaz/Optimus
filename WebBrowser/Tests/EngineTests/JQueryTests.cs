@@ -55,8 +55,7 @@ namespace WebBrowser.Tests.EngineTests
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
 			Mock.Get(httpResourceProvider).Verify(x=> x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once);
-			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("OK", log[0]);
+			CollectionAssert.AreEqual(new[]{"OK"}, log);
 		}
 
 		[Test]

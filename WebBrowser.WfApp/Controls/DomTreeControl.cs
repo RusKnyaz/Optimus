@@ -33,7 +33,7 @@ namespace WebBrowser.WfApp.Controls
 		private void EngineOnDocumentChanged()
 		{
 			Document = _engine.Document;
-			this.SafeInvoke(() => treeView1.Nodes.Clear());
+			this.SafeBeginInvoke(() => treeView1.Nodes.Clear());
 		}
 
 		private Document Document
@@ -53,22 +53,14 @@ namespace WebBrowser.WfApp.Controls
 		private Dictionary<Node, TreeNode> _nodes = new Dictionary<Node, TreeNode>();
 
 		//todo: the index on node inserted should be considered.
-		private void DocumentOnDomNodeInserted(Node parent, Node child)
+		private void DocumentOnDomNodeInserted(Node child)
 		{
-			//todo: do not fire event if item not in document.
-			Node praParent = parent;
-			while (praParent.ParentNode != null)
-				praParent = praParent.ParentNode;
-
-			if (praParent != Document)
+			var targetTreeNodeCollection = FindTreeNodeCollection(child.ParentNode);
+			if (targetTreeNodeCollection == null)
 				return;
 
 			this.SafeInvoke(() =>
 				{
-					var targetTreeNodeCollection = FindTreeNodeCollection(parent);
-					if (targetTreeNodeCollection == null)
-						return;
-
 					var newTreeNode = CreateBranch(child);
 					if (newTreeNode != null)
 						targetTreeNodeCollection.Add(newTreeNode);		
@@ -115,11 +107,10 @@ namespace WebBrowser.WfApp.Controls
 				
 			var treeNode = new TreeNode(name) {Tag = node};
 
-/*
 			foreach (var child in node.ChildNodes.ToArray().Select(x => CreateBranch(x)).Where(x => x!=null))
 			{
 				treeNode.Nodes.Add(child);
-			}*/
+			}
 			if(!_nodes.ContainsKey(node))
 				_nodes.Add(node, treeNode);
 			return treeNode;
