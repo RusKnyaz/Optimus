@@ -102,7 +102,7 @@ namespace WebBrowser.Tools
 		{
 			var waiters = new WaitHandle[] {_queued, _disposed};
 
-			while (!_disposed.WaitOne(-1))
+			while (!_disposed.WaitOne(0))
 			{
 				WaitHandle.WaitAny(waiters);
 				Task[] arr;
