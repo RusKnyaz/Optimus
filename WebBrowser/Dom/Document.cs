@@ -199,12 +199,13 @@ namespace WebBrowser.Dom
 			if (praParent != this)
 				return;
 
-			RaiseDomNodeInserted(newChild);
-
 			foreach (var script in newChild.Flatten().OfType<Script>())
 			{
-				System.Console.WriteLine("Script added: " + script.Src);
-				if (!script.Async && script.Defer && ReadyState != DocumentReadyStates.Complete)
+				var remote = script.HasDelayedContent;
+				var async = script.Async && remote;
+				var defer = script.Defer && remote;
+
+				if (!async && defer && ReadyState != DocumentReadyStates.Complete)
 				{
 					_unresolvedDelayedResources.AddRange(newChild.Flatten()
 						.OfType<IDelayedResource>()
@@ -213,24 +214,26 @@ namespace WebBrowser.Dom
 				else
 				{
 					Task task = null;
-					if (script.HasDelayedContent)
+					if (remote)
 					{
 						task = script
 							.LoadAsync(_resourceProvider)
 							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
+
+						if (!async)
+							task.Wait();
 					}
 					else if (!string.IsNullOrEmpty(script.Text))
 					{
-						task = new Task(s => ExecuteScript((Script)s), script);
-						task.Start(TaskScheduler.Default);
-					}
-					if (task != null)
-					{
-						if (!script.Async)
-							task.Wait();
+						//task = new Task(s => ExecuteScript((Script)s), script);
+						//task.Start(TaskScheduler.Default);
+						ExecuteScript(script);
 					}
 				}
 			}
+
+			if(newChild.Source != NodeSources.DocumentBuilder)
+				RaiseDomNodeInserted(newChild);
 		}
 
 		private void RaiseDomNodeInserted(Node newChild)

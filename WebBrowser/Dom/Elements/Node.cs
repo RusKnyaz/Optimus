@@ -5,12 +5,20 @@ using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
+	public enum NodeSources
+	{
+		Script,
+		DocumentBuilder
+	}
+
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
 	public abstract class Node : INode, IEventTarget
 	{
 		protected EventTarget EventTarget;
+
+		public NodeSources Source;
 
 		protected Node(Document ownerDocument)
 		{

@@ -41,12 +41,18 @@ namespace WebBrowser.Tests.EngineTests
 				"<script id='t1'><div id='templateDiv'></div></script><script id='t2'></script>");
 
 			_resourceProvider.Resource("http://localhost/index.html",
-@"<html><head><script src='require.js'/><script src='template.js'/><script>require(['template!/template.htm'], function(){ console('loaded');});</script></head><body></html>");
+@"<html>
+<head>
+<script src='require.js'/>
+<script src='template.js'/>
+<script>require(['template!/template.htm'], function(){ console('loaded');});</script>
+</head>
+<body></body></html>");
 
 			var engine = CreateEngine();
 			engine.OpenUrl("http://localhost/index.html");
 
-			Thread.Sleep(10000);
+			Thread.Sleep(1000);
 
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("http://localhost/index.html"), Times.Once());
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("require.js"), Times.Once());

@@ -24,7 +24,6 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Require()
 		{
-			//событие onload должно быть после загрузки или после выполнения?
 			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});");
 
 			var engine = new Engine(resourceProvider);
@@ -38,7 +37,7 @@ namespace WebBrowser.Tests.EngineTests
 			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
 
 			engine.Load("<html><head><script> " + Resources.requirejs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
-			System.Threading.Thread.Sleep(1000);
+			System.Threading.Thread.Sleep(5000);
 			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
 			CollectionAssert.AreEqual(new[]{"dependency", "main", "val"}, log);
 		}

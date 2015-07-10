@@ -68,7 +68,9 @@ namespace WebBrowser.Dom
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
 			{
-				node.AppendChild(node.OwnerDocument.CreateTextNode(txt.Value));
+				var c = node.OwnerDocument.CreateTextNode(txt.Value);
+				c.Source = NodeSources.DocumentBuilder;
+				node.AppendChild(c);
 				return;
 			}
 
@@ -77,7 +79,8 @@ namespace WebBrowser.Dom
 				return;
 
 			var elem = node.OwnerDocument.CreateElement(htmlElement.Name);
-
+			elem.Source = NodeSources.DocumentBuilder;
+			
 			if (elem is Script)
 			{
 				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;

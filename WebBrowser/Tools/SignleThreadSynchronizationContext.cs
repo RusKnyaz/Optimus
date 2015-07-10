@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,60 +8,123 @@ namespace WebBrowser.Tools
 {
 	class SignleThreadSynchronizationContext : SynchronizationContext
 	{
-		/*private Thread _thread;
+		public override void Send(SendOrPostCallback d, object state)
+		{
+			Action a = () => d(state);
 
-		private ConcurrentQueue<Tuple<Action<object>, object>> _queue;
+			//avoid deadlocks;
+			if (_thread.ManagedThreadId == Thread.CurrentThread.ManagedThreadId)
+			{
+				TryExecuteTask(a);
+				return;
+			}
+
+			var completeSignal = new ManualResetEvent(false);
+
+			QueueTask(() =>
+			{
+				TryExecuteTask(a);
+				completeSignal.Set();
+			});
+			completeSignal.WaitOne();
+		}
+
+		public override void Post(SendOrPostCallback d, object state)
+		{
+			Action a = () => d(state);
+
+			//avoid deadlocks;
+			if (_thread.ManagedThreadId == Thread.CurrentThread.ManagedThreadId)
+			{
+				TryExecuteTask(a);
+				return;
+			}
+
+			QueueTask(a);
+		}
+
+		protected void QueueTask(Action task)
+		{
+			if (Thread.CurrentThread.ManagedThreadId == _thread.ManagedThreadId)
+			{
+				TryExecuteTask(task);
+				return;
+			}
+
+			lock (_tasks)
+			{
+				_tasks.AddLast(task);
+				_queued.Set();
+			}
+		}
+
+		private void TryExecuteTask(Action task)
+		{
+			try
+			{
+				task();
+			}
+			catch
+			{
+				//todo: handle error
+			}
+		}
+
+		private readonly LinkedList<Action> _tasks = new LinkedList<Action>(); // protected by lock(_tasks) 
+		Thread _thread;
+		private AutoResetEvent _queued = new AutoResetEvent(false);
+		private ManualResetEvent _disposed = new ManualResetEvent(false);
 
 		public SignleThreadSynchronizationContext()
 		{
-			_queue = new ConcurrentQueue<Tuple<Action<object>, object>>();
-
-			_thread = new Thread(Start);
+			_thread = new Thread(Work);
 			_thread.Start();
 		}
 
-		private void Start()
+		~SignleThreadSynchronizationContext()
 		{
-			Tuple<Action<object>, object> tuple;
-			while (_queue.TryDequeue(out tuple))
+			if(!_disposed.WaitOne(0))
+				_disposed.Set();
+		}
+
+		private void Work()
+		{
+			var waiters = new WaitHandle[] { _queued, _disposed };
+
+			while (!_disposed.WaitOne(0))
 			{
-				try
+				WaitHandle.WaitAny(waiters);
+				Action[] arr;
+				lock (_tasks)
 				{
-					tuple.Item1(tuple.Item2);
+					arr = _tasks.ToArray();
+					_tasks.Clear();
+					_queued.Reset();
 				}
-				catch (Exception exception)
+
+				foreach (var task in arr)
 				{
-					
+					TryExecuteTask(task);
 				}
 			}
+		}
 
-			
-		}*/
+	}
 
-		//private readonly TaskFactory _taskFactory;
 
+/*
+	class SignleThreadSynchronizationContext : SynchronizationContext
+	{
 		private int _threadId;
 		private SingleThreadTaskScheduler sched;
 
 		public SignleThreadSynchronizationContext()
 		{
-			sched = new SingleThreadTaskScheduler();//new ConcurrentExclusiveSchedulerPair();
-			//var exclSched = sched.ExclusiveScheduler;
-			//_taskFactory = new TaskFactory(exclSched);
-			//_taskFactory.StartNew(x => _threadId = Thread.CurrentThread.ManagedThreadId, null).Wait();
+			sched = new SingleThreadTaskScheduler();
 		}
 
 		public override void Send(SendOrPostCallback d, object state)
 		{
-			//avoid deadlocks;
-			/*if (_threadId == Thread.CurrentThread.ManagedThreadId)
-			{
-				d(state);
-				return;
-			}*/
-
-			//var task = _taskFactory.StartNew(, state);
-			//task.Wait();
 			var t = new Task(() => d(state));
 			t.Start(sched);
 			t.Wait();
@@ -76,6 +138,7 @@ namespace WebBrowser.Tools
 		}
 	}
 
+*/
 
 	public class SingleThreadTaskScheduler : TaskScheduler, IDisposable
 	{
@@ -89,12 +152,11 @@ namespace WebBrowser.Tools
 		public SingleThreadTaskScheduler()
 		{
 			_thread = new Thread(Work);
-
 		}
 
 		~SingleThreadTaskScheduler()
 		{
-			if(_disposed.WaitOne(-1))
+			if(_disposed.WaitOne(0))
 				_disposed.Set();
 		}
 
@@ -105,6 +167,7 @@ namespace WebBrowser.Tools
 			while (!_disposed.WaitOne(0))
 			{
 				WaitHandle.WaitAny(waiters);
+				System.Console.WriteLine("Work ThreadId: " + System.Threading.Thread.CurrentThread.ManagedThreadId);
 				Task[] arr;
 				lock (_tasks)
 				{

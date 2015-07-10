@@ -12,12 +12,19 @@ namespace WebBrowser.Tests.EngineTests
 	[TestFixture]
 	public class KnockoutTests
 	{
-		
 		Document Load(string html)
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.Load(html);
+			return engine.Document;
+		}
+
+		Document Load(string script, string body)
+		{
+			var engine = new Engine();
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load("<html><head><script>" + Resources.knockout + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
 			return engine.Document;
 		}
 
@@ -30,14 +37,11 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void KnockoutViewModel()
 		{
-			var vm =
-@"function VM() {
+			var document = Load(@"function VM() {
 	this.Greeting = ko.observable('Hello');
 }
 ko.applyBindings(new VM());
-";
-
-			var document = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting'/></body></html>");
+", "<span id = 'c1' data-bind='text:Greeting'/>");
 
 			var span = document.GetElementById("c1");
 			Assert.IsNotNull(span);
@@ -63,7 +67,8 @@ ko.applyBindings(new VM());
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body></html>");
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
+						   "<script>" + vm + "</script></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
@@ -95,11 +100,11 @@ ko.applyBindings(new VM());
 }
 ko.applyBindings(new VM());";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head>"+
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>"+
 				"<body>" +
 				"<input type='text' data-bind='value:Name' id='in'/>" +
 				"<span id = 'c1' data-bind='text:Greeting'/>" +
-				"</body></html>");
+				"</body><script>" + vm + "</script></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
@@ -116,19 +121,14 @@ ko.applyBindings(new VM());";
 		[Test]
 		public void KnockoutInputCheckbox()
 		{
-			var vm =
-@"function VM() {
+			var doc = Load(@"function VM() {
 	var _this = this;	
 	this.Checked = ko.observable(true);
 	this.Click = function(){_this.Checked(!_this.Checked());};
 }
-ko.applyBindings(new VM());";
-
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script></head>" +
-				"<body>" +
+ko.applyBindings(new VM());",
 				"<input type='checkbox' data-bind='checked:Checked' id='in'/>" +
-				"<div id = 'button' data-bind='click:Click'>Click me</div>" +
-				"</body></html>");
+				"<div id = 'button' data-bind='click:Click'>Click me</div>");
 
 			var div = (HtmlElement)doc.Body.GetElementsByTagName("div").First();
 			var checkbox = (HtmlInputElement) doc.Body.GetElementsByTagName("input").First();
@@ -142,23 +142,17 @@ ko.applyBindings(new VM());";
 		[Test]
 		public void ForeachBinding()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
-@"<script defer>
-function VM(peoples) {
+			var doc = Load(
+@"function VM(peoples) {
 	var _this = this;	
 	this.Peoples = ko.observableArray(peoples);
 	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
 }
-ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
-</script>
-</head>
-<body>
-	<!-- ko foreach: Peoples -->
+ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));",
+@"<!-- ko foreach: Peoples -->
 		<span data-bind='text:Name'></span>
 	<!-- /ko -->
-	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
-</body>
-</html>");
+	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>");
 
 			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();
 			var spans = doc.Body.GetElementsByTagName("span").ToArray();
@@ -192,11 +186,11 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script><script defer>" + vm + "</script>" +
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
 @"<script type='text/html' id='tmpl'>
 <span id = 'c1' data-bind='text:Greeting, click: Click'/>
 </script>
-</head><body><div data-bind='template:""tmpl""'></div></body></html>");
+</head><body><div data-bind='template:""tmpl""'></div></body><script>" + vm + "</script></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
 			Assert.IsNotNull(span);
@@ -221,14 +215,7 @@ ko.applyBindings(new VM());
 		public void TemplateInsideForeachBinding()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
-@"<script defer>
-function VM(peoples) {
-	var _this = this;	
-	this.Peoples = ko.observableArray(peoples);
-	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
-}
-ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
-</script>
+@"
 <script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
 </script>
@@ -239,6 +226,14 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 	<!-- /ko -->
 	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
 </body>
+<script>
+function VM(peoples) {
+	var _this = this;	
+	this.Peoples = ko.observableArray(peoples);
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
+</script>
 </html>");
 
 			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();
@@ -256,15 +251,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 		public void BindToNode()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
-@"<script defer>
-function VM(peoples) {
-	var _this = this;	
-	this.Peoples = ko.observableArray(peoples);
-	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
-}
-ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById('view'));
-</script>
-<script type='text/html' id='itemTemplate'>
+@"<script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
 </script>
 </head>
@@ -276,6 +263,14 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 	<input type='button' id = 'button' data-bind='click:Click' value='Click me'/>
 </div>
 </body>
+<script>
+function VM(peoples) {
+	var _this = this;	
+	this.Peoples = ko.observableArray(peoples);
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById('view'));
+</script>
 </html>");
 
 			var button = (HtmlInputElement)doc.Body.GetElementsByTagName("input").First();

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.ResourceProviders;
@@ -13,12 +12,14 @@ namespace WebBrowser.Tests.EngineTests
 	{
 		private List<object> _log;
 		private Engine _engine;
+		private IResourceProvider _resourceProvider;
 
 		[SetUp]
 		public void SetUp()
 		{
 			_log =new List<object>();
-			_engine = new Engine();
+			_resourceProvider = Mock.Of<IResourceProvider>();
+			_engine = new Engine(_resourceProvider);
 			_engine.Console.OnLog += _log.Add;
 		}
 
@@ -28,8 +29,10 @@ namespace WebBrowser.Tests.EngineTests
 			return _engine;
 		}
 
-		private Engine CreateEngine(string body, string js){
-			_engine.Load("<html><head><script defer>" + js + "</script></head><body>"+body+"</body></html>");
+		private Engine CreateEngine(string body, string js)
+		{
+			_resourceProvider.Resource("test.js", js);
+			_engine.Load("<html><head><script src='test.js' defer/></head><body>"+body+"</body></html>");
 			return _engine;
 		}
 
@@ -316,11 +319,11 @@ client.send();"));
 			Thread.Sleep(1000);
 
 			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
-			CollectionAssert.AreEqual(new []{"4", "200", "hello", "hello"}, log);
+			CollectionAssert.AreEqual(new []{"1", "4", "200", "hello", "hello"}, log);
 		}
 
 		[Test]
-		public void AddEmbeddedScriptAsync()
+		public void AddEmbeddedScriptInsideEmbedded()
 		{
 			var engine = new Engine();
 			var log = new List<string>();
@@ -331,7 +334,7 @@ client.send();"));
 			};
 			engine.Load(Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
-console.log('node added ');
+console.log('node added');
 }, false);
 
 var d = document.createElement('script');
@@ -341,7 +344,10 @@ d.innerHTML = ""console.log('in new script');console.log(document.getElementById
 d.onload = function(){console.log('onload');};
 document.head.appendChild(d);
 console.log('afterappend');"));
-			CollectionAssert.AreEqual(new[] { "in new script", "onload", "ok", "nodeadded", "afterappend" }, log);
+
+			Thread.Sleep(1000);
+
+			CollectionAssert.AreEqual(new[] { "in new script", "ok", "node added", "afterappend" }, log);
 		}
 
 		[Test]

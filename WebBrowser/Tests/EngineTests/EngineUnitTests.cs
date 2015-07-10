@@ -1,8 +1,6 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -16,19 +14,28 @@ namespace WebBrowser.Tests.EngineTests
 	[TestFixture]
 	public class EngineUnitTests
 	{
+		private IResourceProvider _resourceProvider;
+		private Engine _engine;
+
+		[SetUp]
+		public void SetUp()
+		{
+			_resourceProvider = Mock.Of<IResourceProvider>();
+			_engine = new Engine(_resourceProvider);
+		}
+
 		[Test]
 		public void EmptyHtml()
 		{
-			var engine = new Engine();
-			engine.Load("<html></html>");
+			_engine.Load("<html></html>");
 		}
 		
 		[Test]
 		public void GenerateContent()
 		{
-			var engine = new Engine();
-			engine.Load(Mocks.Page("var elem = document.getElementById('content');elem.innerHTML = 'Hello';", "<div id='content'></div>"));
-			var contentDiv = engine.Document.GetElementById("content");
+			_resourceProvider.Resource("test.js", "var elem = document.getElementById('content');elem.innerHTML = 'Hello';");
+			_engine.Load("<html><head><script src='test.js' defer/></head><body><div id='content'></div></body></html>");
+			var contentDiv = _engine.Document.GetElementById("content");
 			Assert.AreEqual("Hello", contentDiv.InnerHTML);
 			Assert.AreEqual(1, contentDiv.ChildNodes.Count);
 			var text = contentDiv.ChildNodes[0] as Text;
@@ -39,13 +46,13 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void DomManipulation()
 		{
-			var engine = new Engine();
-			engine.Load(Mocks.Page(
-				"var div = document.createElement('div');" +
-				"div.setAttribute('id', 'c3');" +
-				"var c2 = document.getElementById('content2');" +
-				"document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);",
-				"<div id='content1'></div><div id='content2'></div>"));
+			var resourceProvider = Mock.Of<IResourceProvider>();
+			resourceProvider.Resource("test.js", "var div = document.createElement('div');" +
+			                                     "div.setAttribute('id', 'c3');" +
+			                                     "var c2 = document.getElementById('content2');" +
+			                                     "document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);");
+			var engine = new Engine(resourceProvider);
+			engine.Load("<html><head><script src='test.js' defer/></head><body><div id='content1'></div><div id='content2'></div></body></html");
 			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
 			var elem = engine.Document.GetElementById("c3");
 			Assert.IsNotNull(elem);
@@ -64,10 +71,9 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void GetAttribute()
 		{
-			var engine = new Engine();
 			string attr = null;
-			engine.Console.OnLog += o => attr = o.ToString();
-			engine.Load(Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
+			_engine.Console.OnLog += o => attr = o.ToString();
+			_engine.Load(Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
 				"<span id='content1'></span>"));
 			Assert.AreEqual("content1", attr);
 		}

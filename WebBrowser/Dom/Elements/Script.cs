@@ -66,6 +66,7 @@ namespace WebBrowser.Dom.Elements
 					}
 					catch (Exception ex)
 					{
+						//todo: raise in script thread
 						RaiseError();
 					}
 				});
@@ -73,16 +74,26 @@ namespace WebBrowser.Dom.Elements
 
 		private void RaiseOnLoad()
 		{
-			//todo: raise order must be determined by subscription order
-			OwnerDocument.Context.Send(OnLoad);
-			this.RaiseEvent("load", false, false);
+			if (HasDelayedContent)
+			{
+				OwnerDocument.Context.Send(() =>
+				{
+					if(OnLoad!= null)
+						OnLoad();
+					this.RaiseEvent("load", false, false);
+				});
+			}
 		}
 
 		private void RaiseError()
 		{
 			//todo: raise order must be determined by subscription order
-			OwnerDocument.Context.Send(OnError);
-			this.RaiseEvent("error", false, false);
+			OwnerDocument.Context.Send(() =>
+			{
+				if (OnError != null)
+					OnError();
+				this.RaiseEvent("error", false, false);
+			});
 		}
 
 		public void Execute(IScriptExecutor scriptExecutor)

@@ -32,7 +32,8 @@ namespace WebBrowser.Dom
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
-		private Lazy<string> _data; 
+		private Lazy<string> _data;
+		private int _readyState;
 
 		public XmlHttpRequest(IHttpResourceProvider httpResourceProvider, SynchronizationContext context)
 		{
@@ -66,7 +67,15 @@ namespace WebBrowser.Dom
 		public const ushort LOADING = 3;
 		public const ushort DONE = 4;
 
-		public int ReadyState { get; private set; }
+		public int ReadyState
+		{
+			get { return _readyState; }
+			private set
+			{
+				_readyState = value; 
+				CallInContext(OnReadyStateChange);
+			}
+		}
 
 		public object ResponseXML { get { return _data.Value;}}
 		public string ResponseText { get { return _data.Value; } }
@@ -97,47 +106,41 @@ namespace WebBrowser.Dom
 			if (_async)
 			{
 				ReadyState = LOADING;
-				_response = await _httpResourceProvider.SendRequestAsync(_request);
+				try
+				{
+					_response = await _httpResourceProvider.SendRequestAsync(_request);
+				}
+				catch (Exception e)
+				{
+					ReadyState = DONE;
+					CallInContext(OnError);
+					return;
+				}
 				ReadyState = DONE;
-				Post(OnReadyStateChange);
-				Post(OnLoad);
+				CallInContext(OnLoad);
 			}
 			else
 			{
-				ReadyState = LOADING;
-				_response = _httpResourceProvider.SendRequest(_request);
+				try
+				{
+					_response = _httpResourceProvider.SendRequest(_request);
+				}
+				catch (Exception exception)
+				{
+					ReadyState = DONE;
+					CallInContext(OnError);
+				}
 				ReadyState = DONE;
-				Post(OnReadyStateChange);
-				Post(OnLoad);
+				CallInContext(OnLoad);
 			}
 		}
 
-		public async void Send()
+		public void Send()
 		{
-			if (_async)
-			{
-				ReadyState = LOADING;
-				_response = await _httpResourceProvider.SendRequestAsync(_request);
-				ReadyState = DONE;
-				Post(OnReadyStateChange);
-				Post(OnLoad);
-			}
-			else
-			{
-				ReadyState = LOADING;
-				_response = _httpResourceProvider.SendRequest(_request);
-				ReadyState = DONE;
-				Send(OnReadyStateChange);
-				Send(OnLoad);
-			}
+			Send(null);
 		}
 
-		private void Post(Action action)
-		{
-			_context.Post(x => ((Action)x).Fire(), action);
-		}
-
-		private void Send(Action action)
+		private void CallInContext(Action action)
 		{
 			_context.Send(x => ((Action)x).Fire(), action);
 		}

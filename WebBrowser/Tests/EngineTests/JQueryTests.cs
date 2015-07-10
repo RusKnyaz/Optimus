@@ -22,15 +22,27 @@ namespace WebBrowser.Tests.EngineTests
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body></body></html>");
 		}
 
-		[Test]
-		public void JQueryIdSelector()
+		[TestCase(true, Result = "zaza")]
+		[TestCase(false, Result = "")]
+		public string JQueryIdSelectorInDeferScript(bool defer)
 		{
-			var script = "$('#uca').html('zaza');";
-			var engine = new Engine();
+			var resourceProvider = Mock.Of<IResourceProvider>().Resource("test.js", "$('#uca').html('zaza');");
+			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog +=o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script src='test.js' "+ (defer?"defer":"") + "/></head><body><div id='uca'></div></body></html>");
 			var ucaDiv = engine.Document.GetElementById("uca");
-			Assert.AreEqual("zaza", ucaDiv.InnerHTML);
+			return ucaDiv.InnerHTML;
+		}
+
+		[Test]
+		public void JQueryIdSelectorIn()
+		{
+			var resourceProvider = Mock.Of<IResourceProvider>().Resource("test.js", "$('#uca').html('zaza');");
+			var engine = new Engine(resourceProvider);
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script src='test.js'/></head><body><div id='uca'></div></body></html>");
+			var ucaDiv = engine.Document.GetElementById("uca");
+			Assert.AreEqual("", ucaDiv.InnerHTML);
 		}
 
 		[Test]
@@ -41,6 +53,7 @@ namespace WebBrowser.Tests.EngineTests
 
 			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequestAsync(It.IsAny<HttpRequest>()) == t);
 			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+			resourceProvider.Resource("test.js", "$.post('http://localhost/data').done(function(x){console.log(x);});");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -50,9 +63,7 @@ namespace WebBrowser.Tests.EngineTests
 				log.Add(o.ToString());
 			};
 
-			var script = "$.post('http://localhost/data').done(function(x){console.log(x);});";
-
-			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
 			Mock.Get(httpResourceProvider).Verify(x=> x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once);
 			CollectionAssert.AreEqual(new[]{"OK"}, log);
