@@ -217,5 +217,28 @@ namespace WebBrowser.Properties {
                 return ResourceManager.GetString("template", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to /**
+        /// * @license RequireJS text 2.0.10 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
+        /// * Available via the MIT or new BSD license.
+        /// * see: http://github.com/requirejs/text for details
+        /// */
+        ////*jslint regexp: true */
+        ////*global require, XMLHttpRequest, ActiveXObject,
+        ///  define, window, process, Packages,
+        ///  java, location, Components, FileUtils */
+        ///
+        ///define([&apos;module&apos;], function (module) {
+        ///    &apos;use strict&apos;;
+        ///
+        ///    var text, fs, Cc, Ci, xpcIsWindows,
+        ///        progIds = [&apos;Msxml2.XMLHTTP&apos;, &apos;Microsoft.XMLH [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string text {
+            get {
+                return ResourceManager.GetString("text", resourceCulture);
+            }
+        }
     }
 }

@@ -89,7 +89,7 @@ namespace WebBrowser.Dom
 		{
 			var evt = CreateEvent("Event");
 			evt.InitEvent(type, false, false);
-			Context.Post(state => DispatchEvent(evt), null);
+			Context.Send(state => DispatchEvent(evt), null);
 		}
 
 		public void ResolveDelayedContent()

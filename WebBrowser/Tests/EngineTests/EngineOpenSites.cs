@@ -39,7 +39,7 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
 			engine.OpenUrl("http://okkamtech.com");
-			Thread.Sleep(1000);
+			Thread.Sleep(10000);
 			var userName = engine.Document.GetElementById("UserName");
 			Assert.IsNotNull(userName);
 		}

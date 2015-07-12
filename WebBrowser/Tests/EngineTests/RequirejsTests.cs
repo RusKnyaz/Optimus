@@ -1,12 +1,8 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Properties;
-using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -22,7 +18,7 @@ namespace WebBrowser.Tests.EngineTests
 		}
 
 		[Test]
-		public void Require()
+		public void RequireEmbededLib()
 		{
 			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});");
 
@@ -40,6 +36,28 @@ namespace WebBrowser.Tests.EngineTests
 			System.Threading.Thread.Sleep(5000);
 			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
 			CollectionAssert.AreEqual(new[]{"dependency", "main", "val"}, log);
+		}
+
+		[Test]
+		public void Require()
+		{
+			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});")
+				.Resource("require.js", Resources.requirejs);
+
+			var engine = new Engine(resourceProvider);
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine(o ?? "<null>");
+				log.Add(o.ToString());
+			};
+
+			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
+
+			engine.Load("<html><head><script src='require.js'/><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			System.Threading.Thread.Sleep(5000);
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
+			CollectionAssert.AreEqual(new[] { "dependency", "main", "val" }, log);
 		}
 	}
 }

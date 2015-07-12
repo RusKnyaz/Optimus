@@ -42,11 +42,25 @@ namespace WebBrowser.WfApp.Controls
 			set
 			{
 				if (_document != null)
+				{
 					_document.DomNodeInserted -= DocumentOnDomNodeInserted;
-					
+					_document.RemoveEventListener("DOMContentLoaded",  OnDocumentLoaded, false);
+				}
+
 				_document = value;
-				if(_document != null)
+				if (_document != null)
+				{
 					_document.DomNodeInserted += DocumentOnDomNodeInserted;
+					_document.AddEventListener("DOMContentLoaded", OnDocumentLoaded, false);
+				}
+			}
+		}
+
+		private void OnDocumentLoaded(Event @event)
+		{
+			foreach (var childNode in _document.DocumentElement.ChildNodes)
+			{
+				DocumentOnDomNodeInserted(childNode);
 			}
 		}
 

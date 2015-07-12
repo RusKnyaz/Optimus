@@ -31,6 +31,7 @@ namespace WebBrowser.Tests.EngineTests
 				.Resource("knockout.js", Resources.knockout)
 				.Resource("require.js", Resources.requirejs)
 				.Resource("template.js", Resources.template)
+				.Resource("./text.js", Resources.text)
 				.Resource("./stringTemplateEngine.js", Resources.stringTemplateEngine);
 		}
 
@@ -52,11 +53,13 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = CreateEngine();
 			engine.OpenUrl("http://localhost/index.html");
 
-			Thread.Sleep(1000);
+			Thread.Sleep(5000);
 
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("http://localhost/index.html"), Times.Once());
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("require.js"), Times.Once());
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("template.js"), Times.Once());
+			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("./text.js"), Times.Once());
+			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("./stringTemplateEngine.js"), Times.Once());
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("template.htm"), Times.Once());
 
 			var template1 = engine.Document.GetElementById("t1");

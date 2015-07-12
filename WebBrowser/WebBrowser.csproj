@@ -140,6 +140,7 @@
     <Content Include="Resources\requirejs.js" />
     <Content Include="Resources\stringTemplateEngine.js" />
     <Content Include="Resources\template.js" />
+    <Content Include="Resources\text.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\jint-master\Jint\Jint.csproj">

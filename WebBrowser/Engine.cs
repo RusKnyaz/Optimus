@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using WebBrowser.Dom;
 using WebBrowser.Environment;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
-using WebBrowser.Tests.Dom;
 using WebBrowser.Tools;
 
 namespace WebBrowser
 {
-	public class Engine
+	public class Engine: IDisposable
+
     {
 		private Document _document;
 		public IResourceProvider ResourceProvider { get; private set; }
@@ -77,5 +78,11 @@ namespace WebBrowser
 		}
 
 		public event Action DocumentChanged;
+		public void Dispose()
+		{
+			var disposableContext = Context as IDisposable;
+			if (disposableContext != null)
+				disposableContext.Dispose();
+		}
     }
 }

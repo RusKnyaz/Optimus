@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
 using WebBrowser.Dom.Elements;
 using WebBrowser.WfApp.Controls;
 
@@ -23,6 +24,12 @@ namespace WebBrowser.WfApp
 					{
 						textBox1.Text = element != null ? element.InnerHTML : string.Empty;
 					});
+		}
+
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			Engine.Dispose();
+			base.OnClosing(e);
 		}
 
 		private Engine Engine
