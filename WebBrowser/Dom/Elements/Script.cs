@@ -11,8 +11,6 @@ namespace WebBrowser.Dom.Elements
 	/// </summary>
 	public class Script : HtmlElement, IDelayedResource, IHtmlScriptElement
 	{
-		private bool _hasDelayedContent;
-
 		private readonly AttributeMappedValue<string> _type;
 		private readonly AttributeMappedValue<string> _charset;
 		private readonly AttributeMappedValue<string> _src;
@@ -98,7 +96,7 @@ namespace WebBrowser.Dom.Elements
 
 		public void Execute(IScriptExecutor scriptExecutor)
 		{
-			scriptExecutor.Execute(Type, Text);
+			scriptExecutor.Execute(Type ?? "text/javascript", Text);
 			Executed = true;
 			RaiseOnLoad();
 		}

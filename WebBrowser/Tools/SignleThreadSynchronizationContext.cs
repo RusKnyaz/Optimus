@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace WebBrowser.Tools
 {
@@ -77,7 +76,7 @@ namespace WebBrowser.Tools
 
 		public SignleThreadSynchronizationContext()
 		{
-			_thread = new Thread(Work);
+			_thread = new Thread(Work) { Name = "SignleThreadSynchronizationContext thread" };
 			_thread.Start();
 		}
 

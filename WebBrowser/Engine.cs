@@ -53,7 +53,7 @@ namespace WebBrowser
 		{
 			ScriptExecutor.Clear();
 			Uri = new Uri(path);
-			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path);
+			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
 			var task = ResourceProvider.GetResourceAsync(path);
 			task.Wait();
 			var resource = task.Result;

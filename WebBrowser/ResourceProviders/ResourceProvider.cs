@@ -35,8 +35,8 @@ namespace WebBrowser.ResourceProviders
 
 			if (OnRequest != null)
 				OnRequest(uri);
-
-			var u = uri[0] == '/' ? new Uri(new Uri(Root), uri) : new Uri(uri);
+			
+			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
 			if (scheme == "http://" || scheme == "https://")
