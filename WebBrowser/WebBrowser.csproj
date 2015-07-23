@@ -66,9 +66,11 @@
     <Compile Include="Dom\Elements\HtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlInputElement.cs" />
     <Compile Include="Dom\Elements\IEventTarget.cs" />
+    <Compile Include="Dom\Elements\KeyboardEvent.cs" />
     <Compile Include="Dom\Elements\MutationEvent.cs" />
     <Compile Include="Dom\Elements\Script.cs" />
     <Compile Include="Dom\Elements\Node.cs" />
+    <Compile Include="Dom\Elements\UIEvent.cs" />
     <Compile Include="Dom\Elements\WindowTimers.cs" />
     <Compile Include="Dom\TagsNames.cs" />
     <Compile Include="Dom\XmlHttpRequest.cs" />

@@ -182,7 +182,11 @@ namespace WebBrowser.Dom
 			if(type == "MutationEvent")
 				return new MutationEvent();
 
-			//todo: UIEvent
+			if(type == "UIEvent")
+				return new UIEvent();
+
+			if(type == "KeyboardEvent")
+				return new KeyboardEvent();
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
@@ -202,7 +206,7 @@ namespace WebBrowser.Dom
 			foreach (var script in newChild.Flatten().OfType<Script>())
 			{
 				var remote = script.HasDelayedContent;
-				var async = script.Async && remote;
+				var async = script.Async && remote || script.Source == NodeSources.Script;
 				var defer = script.Defer && remote;
 
 				if (!async && defer && ReadyState != DocumentReadyStates.Complete)
