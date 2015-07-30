@@ -17,6 +17,7 @@ namespace WebBrowser.ScriptExecuting
 			: base(engine)
 		{
 			Target = obj;
+			//todo: specify valid prototype
 			Prototype = engine.Object;
 			Extensible = true;
 		}

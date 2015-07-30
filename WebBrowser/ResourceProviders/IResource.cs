@@ -15,5 +15,7 @@ namespace WebBrowser
 	public enum ResourceTypes
 	{
 		Html,
+		Text,
+		JavaScript
 	}
 }

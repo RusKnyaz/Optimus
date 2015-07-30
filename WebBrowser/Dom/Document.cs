@@ -229,8 +229,9 @@ namespace WebBrowser.Dom
 					}
 					else if (!string.IsNullOrEmpty(script.Text))
 					{
-						//task = new Task(s => ExecuteScript((Script)s), script);
-						//task.Start(TaskScheduler.Default);
+						//embedded script should be executed only after all previous scripts
+						Task.WaitAll(_unresolvedDelayedResources.Where(x => !x.Loaded).Select(x => x.LoadAsync(_resourceProvider)).ToArray());
+						_unresolvedDelayedResources.Clear();
 						ExecuteScript(script);
 					}
 				}

@@ -54,10 +54,10 @@ namespace WebBrowser.ResourceProviders
 		string Root { get; set; }
 	}
 
-	public class HttpRequest
+	public class HttpRequest : IRequest
 	{
 		public string Method;
-		public string Url;
+		public string Url { get; set; }
 		public Dictionary<string, string> Headers;
 		//todo: body
 
@@ -67,6 +67,11 @@ namespace WebBrowser.ResourceProviders
 			Method = method;
 			Url = url;
 		}
+	}
+
+	public interface IRequest
+	{
+		string Url { get; }
 	}
 
 	public class HttpResponse : IResource

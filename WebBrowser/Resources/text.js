@@ -70,7 +70,6 @@ define(['module'], function (module) {
                     }
                 }
             }
-
             return xhr;
         },
 

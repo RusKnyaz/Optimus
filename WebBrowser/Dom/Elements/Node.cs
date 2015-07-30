@@ -214,7 +214,7 @@ namespace WebBrowser.Dom.Elements
 				var attr2 = (Attr) node;
 				if (attr1.OwnerElement == attr2.OwnerElement)
 				{
-					var attrList = attr1.OwnerElement.Attributes.Values.ToList();
+					var attrList = attr1.OwnerElement.Attributes.ToList();
 					return attrList.IndexOf(attr1) > attrList.IndexOf(attr2) ? 2 : 4;
 				}
 				return attr1.OwnerElement.CompareDocumentPosition(attr2.OwnerElement);

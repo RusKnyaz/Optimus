@@ -1,5 +1,4 @@
 ﻿#if NUNIT
-using System.Text;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -62,6 +61,7 @@ namespace WebBrowser.Tests.EngineTests
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("./stringTemplateEngine.js"), Times.Once());
 			Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("template.htm"), Times.Once());
 
+			
 			var template1 = engine.Document.GetElementById("t1");
 			var template2 = engine.Document.GetElementById("t2");
 			Assert.IsNotNull(template1, "template1 != null");

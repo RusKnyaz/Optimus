@@ -323,6 +323,21 @@ client.send();"));
 		}
 
 		[Test]
+		public void AjaxExist()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+			engine.Load(Mocks.Page(@"console.log(typeof XMLHttpRequest !== 'undefined');"));
+
+			CollectionAssert.AreEqual(new[] { "True" }, log);
+		}
+
+		[Test]
 		public void AddEmbeddedScriptInsideEmbedded()
 		{
 			var engine = new Engine();
@@ -375,6 +390,16 @@ console.log('afterappend');"));
 
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
+		}
+
+		[Test]
+		public void InstanceOfHtmlElement()
+		{
+			var engine = CreateEngine("<div id='d'></div>",
+				@"console.log(document.body instanceof Element);
+console.log(document.body instanceof HTMLElement);");
+
+			CollectionAssert.AreEqual(new object[] { true, true }, _log);
 		}
 	}
 }

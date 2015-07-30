@@ -1,19 +1,86 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
+	public class AttributesCollection : IEnumerable<Attr>
+	{
+		public AttributesCollection()
+		{
+			Properties = new OrderedDictionary();
+		}
+
+		public OrderedDictionary Properties { get; private set; }
+
+		public Attr this[string name]
+		{
+			get
+			{
+				int number;
+				if (int.TryParse(name, out number))
+					return this[number];
+				
+				return (Attr)Properties[name]; //return value
+			}
+			set
+			{
+				int number;
+				if (int.TryParse(name, out number))
+					return;
+			
+				Properties[name] = value;
+			}
+		}
+
+		public Attr this[int idx]
+		{
+			get
+			{
+				return idx < 0 || idx >= Properties.Count ? null : (Attr)Properties[idx];
+			}
+		}
+
+		public bool ContainsKey(string name)
+		{
+			return Properties.Contains(name);
+		}
+
+		public IEnumerator<Attr> GetEnumerator()
+		{
+			return Properties.Values.Cast<Attr>().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return Properties.GetEnumerator();
+		}
+
+		public void Remove(string name)
+		{
+			Properties.Remove(name);
+		}
+
+		public void Add(string invariantName, Attr attr)
+		{
+			Properties.Add(invariantName, attr);
+		}
+
+		public int Count { get { return Properties.Count; } }
+	}
+
 	public class Element : Node, IElement
 	{
 		public Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
-			Attributes = new Dictionary<string, Attr>();
+			Attributes = new AttributesCollection();
 		}
 		
-		public IDictionary<string, Attr> Attributes { get; private set; }
+		public AttributesCollection Attributes { get; private set; }
 
 		public Element(Document ownerDocument, string tagName) :this(ownerDocument)
 		{
@@ -70,7 +137,7 @@ namespace WebBrowser.Dom.Elements
 				base.OwnerDocument = value;
 				foreach (var attribute in Attributes)
 				{
-					attribute.Value.OwnerDocument = value;
+					attribute.OwnerDocument = value;
 				}
 			}
 		}
@@ -153,11 +220,11 @@ namespace WebBrowser.Dom.Elements
 				foreach (var attribute in Attributes)
 				{
 					sb.Append(" ");
-					sb.Append(attribute.Key);
-					if (attribute.Value.Value != null)
+					sb.Append(attribute.Name);//todo: use invariant name
+					if (attribute.Value != null)
 					{
 						sb.Append("=\"");
-						sb.Append(attribute.Value.Value.Replace("\"", "\\\""));
+						sb.Append(attribute.Value.Replace("\"", "\\\""));
 						sb.Append("\"");
 					}
 				}
@@ -176,7 +243,7 @@ namespace WebBrowser.Dom.Elements
 			var node = OwnerDocument.CreateElement(TagName);
 			foreach (var attribute in Attributes)
 			{
-				node.SetAttributeNode((Attr)attribute.Value.CloneNode());
+				node.SetAttributeNode((Attr)attribute.CloneNode());
 			}
 			if (deep)
 			{

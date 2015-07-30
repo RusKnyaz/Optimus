@@ -26,6 +26,7 @@ namespace WebBrowser.WfApp.Controls
 				{
 					_engine.Console.OnLog -= ConsoleOnOnLog;
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnOnRequest;
+					_engine.ResourceProvider.OnRequest -= ResourceProviderOnReceived;
 					_engine.DocumentChanged-=EngineOnDocumentChanged;
 				}
 
@@ -34,7 +35,7 @@ namespace WebBrowser.WfApp.Controls
 				if (_engine != null)
 				{
 					_engine.Console.OnLog += ConsoleOnOnLog;
-					_engine.ResourceProvider.OnRequest += ResourceProviderOnOnRequest;
+					_engine.ResourceProvider.OnRequest += ResourceProviderOnReceived;
 					_engine.DocumentChanged += EngineOnDocumentChanged;
 				}
 				else
@@ -71,6 +72,11 @@ namespace WebBrowser.WfApp.Controls
 		private void ResourceProviderOnOnRequest(string s)
 		{
 			Log("Request: " + s);
+		}
+
+		private void ResourceProviderOnReceived(string s)
+		{
+			Log("Received: " + s);
 		}
 
 		private void ConsoleOnOnLog(object o)

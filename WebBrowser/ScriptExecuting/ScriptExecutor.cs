@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading;
+using Jint.Native;
 using Jint.Runtime;
+using Jint.Runtime.Interop;
 using WebBrowser.Dom;
+using WebBrowser.Dom.Elements;
 using WebBrowser.Environment;
 using WebBrowser.Properties;
 
@@ -27,7 +30,7 @@ namespace WebBrowser.ScriptExecuting
 
 			public Document Document { get { return _engine.Document; } }
 			public Window Window { get { return _engine.Window; } }
-			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider.HttpResourceProvider, _engine.Context);}
+			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider, _engine.Context);}
 		}
 
 		public ScriptExecutor(Engine engine)
@@ -47,6 +50,9 @@ namespace WebBrowser.ScriptExecuting
 			_jsEngine.SetValue("console", new {log = (Action<object>) (o => engine.Console.Log(o))});
 
 			_jsEngine.Execute(Resources.clrBridge);
+
+			_jsEngine.Global.FastAddProperty("HTMLElement", new JsValue(TypeReference.CreateTypeReference(_jsEngine, typeof(HtmlElement))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Element", new JsValue(TypeReference.CreateTypeReference(_jsEngine, typeof(Element))), false, false, false);
 		}
 
 		public void Execute(string type, string code)

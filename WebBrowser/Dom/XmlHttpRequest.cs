@@ -27,7 +27,7 @@ namespace WebBrowser.Dom
 	/// </summary>
 	public class XmlHttpRequest : IXmlHttpRequest
 	{
-		private readonly IHttpResourceProvider _httpResourceProvider;
+		private readonly IResourceProvider _resourceProvider;
 		private readonly SynchronizationContext _context;
 		private HttpRequest _request;
 		private bool _async;
@@ -35,9 +35,9 @@ namespace WebBrowser.Dom
 		private Lazy<string> _data;
 		private int _readyState;
 
-		public XmlHttpRequest(IHttpResourceProvider httpResourceProvider, SynchronizationContext context)
+		public XmlHttpRequest(IResourceProvider resourceProvider, SynchronizationContext context)
 		{
-			_httpResourceProvider = httpResourceProvider;
+			_resourceProvider = resourceProvider;
 			_context = context;
 			ReadyState = UNSENT;
 			_data = new Lazy<string>(() =>_response.Stream.ReadToEnd());
@@ -108,7 +108,7 @@ namespace WebBrowser.Dom
 				ReadyState = LOADING;
 				try
 				{
-					_response = await _httpResourceProvider.SendRequestAsync(_request);
+					_response = (HttpResponse)await _resourceProvider.GetResourceAsync(_request);
 				}
 				catch (Exception e)
 				{
@@ -123,7 +123,9 @@ namespace WebBrowser.Dom
 			{
 				try
 				{
-					_response = _httpResourceProvider.SendRequest(_request);
+					var t = _resourceProvider.GetResourceAsync(_request);
+					t.Wait();
+					_response = (HttpResponse)t.Result;
 				}
 				catch (Exception exception)
 				{
