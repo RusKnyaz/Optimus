@@ -2,13 +2,42 @@
 using System.Linq;
 using System.Reflection;
 using Jint.Native;
+using Jint.Native.Function;
 using Jint.Native.Object;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
+using Jint.Runtime.Environments;
 using Jint.Runtime.Interop;
 
 namespace WebBrowser.ScriptExecuting
 {
+	public class ClrPrototype : FunctionInstance
+	{
+		private readonly Type _type;
+
+		public ClrPrototype(Jint.Engine engine, Type type) : 
+			base(engine, null, null, false)
+		{
+			_type = type;
+		}
+
+		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool HasInstance(JsValue v)
+		{
+			var clrObject = v.TryCast<ClrObject>();
+			if (clrObject != null && clrObject.Target != null)
+			{
+				return _type.IsInstanceOfType(clrObject.Target);
+			}
+
+			return base.HasInstance(v);
+		}
+	}
+
 	public class ClrObject : ObjectInstance, IObjectWrapper
 	{
 		public Object Target { get; set; }
@@ -17,8 +46,8 @@ namespace WebBrowser.ScriptExecuting
 			: base(engine)
 		{
 			Target = obj;
-			//todo: specify valid prototype
-			Prototype = engine.Object;
+			//todo: use static prototypes
+			Prototype = new ClrPrototype(engine, obj.GetType());
 			Extensible = true;
 		}
 

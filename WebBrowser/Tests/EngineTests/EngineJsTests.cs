@@ -396,10 +396,12 @@ console.log('afterappend');"));
 		public void InstanceOfHtmlElement()
 		{
 			var engine = CreateEngine("<div id='d'></div>",
-				@"console.log(document.body instanceof Element);
+				@"
+console.log(document.body instanceof String);
+console.log(document.body instanceof Element);
 console.log(document.body instanceof HTMLElement);");
 
-			CollectionAssert.AreEqual(new object[] { true, true }, _log);
+			CollectionAssert.AreEqual(new object[] { false, true, true }, _log);
 		}
 	}
 }

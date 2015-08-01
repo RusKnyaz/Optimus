@@ -2,6 +2,7 @@
 using System.Threading;
 using Jint.Native;
 using Jint.Runtime;
+using Jint.Runtime.Descriptors;
 using Jint.Runtime.Interop;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
@@ -51,8 +52,12 @@ namespace WebBrowser.ScriptExecuting
 
 			_jsEngine.Execute(Resources.clrBridge);
 
-			_jsEngine.Global.FastAddProperty("HTMLElement", new JsValue(TypeReference.CreateTypeReference(_jsEngine, typeof(HtmlElement))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Element", new JsValue(TypeReference.CreateTypeReference(_jsEngine, typeof(Element))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Node", new JsValue(new ClrPrototype(_jsEngine, typeof(Node))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Element", new JsValue(new ClrPrototype(_jsEngine, typeof(Element))), false, false, false);
+			_jsEngine.Global.FastAddProperty("HTMLElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlElement))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Body", new JsValue(new ClrPrototype(_jsEngine, typeof(Body))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Comment", new JsValue(new ClrPrototype(_jsEngine, typeof(Comment))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Document", new JsValue(new ClrPrototype(_jsEngine, typeof(Document))), false, false, false);
 		}
 
 		public void Execute(string type, string code)
