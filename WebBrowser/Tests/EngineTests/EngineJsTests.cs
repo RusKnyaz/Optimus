@@ -403,5 +403,16 @@ console.log(document.body instanceof HTMLElement);");
 
 			CollectionAssert.AreEqual(new object[] { false, true, true }, _log);
 		}
+
+		[Test]
+		public void AttributesTest()
+		{
+			var engine = CreateEngine("<div id='d'></div>",
+				@"
+console.log(document.getElementById('d').attributes['id'].name);
+console.log(document.getElementById('d').attributes[0].name);");
+
+			CollectionAssert.AreEqual(new object[] { "id", "id" }, _log);
+		}
 	}
 }

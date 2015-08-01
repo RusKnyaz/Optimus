@@ -7,7 +7,18 @@ using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
-	public class AttributesCollection : IEnumerable<Attr>
+	[DomItem]
+	public interface IAttributesCollection:  IEnumerable<Attr>
+	{
+		Attr this[string name]{get; set; }
+		Attr this[int idx] { get; }
+		bool ContainsKey(string name);
+		void Remove(string name);
+		void Add(string invariantName, Attr attr);
+		int Count { get; }
+	}
+
+	public class AttributesCollection : IAttributesCollection
 	{
 		public AttributesCollection()
 		{
@@ -46,6 +57,10 @@ namespace WebBrowser.Dom.Elements
 
 		public bool ContainsKey(string name)
 		{
+			int number;
+			if (int.TryParse(name, out number))
+				return number >= 0  && number < Count;
+
 			return Properties.Contains(name);
 		}
 
@@ -74,13 +89,18 @@ namespace WebBrowser.Dom.Elements
 
 	public class Element : Node, IElement
 	{
+		private readonly IAttributesCollection _attributes;
+
 		public Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
-			Attributes = new AttributesCollection();
+			_attributes = new AttributesCollection();
 		}
-		
-		public AttributesCollection Attributes { get; private set; }
+
+		public IAttributesCollection Attributes
+		{
+			get { return _attributes; }
+		}
 
 		public Element(Document ownerDocument, string tagName) :this(ownerDocument)
 		{

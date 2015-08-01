@@ -39,6 +39,7 @@
 			this.textBoxUrl.Name = "textBoxUrl";
 			this.textBoxUrl.Size = new System.Drawing.Size(899, 22);
 			this.textBoxUrl.TabIndex = 0;
+			this.textBoxUrl.Text = "https://html5test.com";
 			this.textBoxUrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxUrl_KeyDown);
 			// 
 			// AddressBar

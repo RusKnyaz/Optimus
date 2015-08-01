@@ -1,6 +1,4 @@
 ﻿using System.Collections.Specialized;
-using System.Linq;
-using Jint.Runtime.Descriptors.Specialized;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
