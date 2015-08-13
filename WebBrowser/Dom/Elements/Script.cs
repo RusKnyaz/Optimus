@@ -64,7 +64,6 @@ namespace WebBrowser.Dom.Elements
 					}
 					catch (Exception ex)
 					{
-						//todo: raise in script thread
 						RaiseError();
 					}
 				});
@@ -85,7 +84,6 @@ namespace WebBrowser.Dom.Elements
 
 		private void RaiseError()
 		{
-			//todo: raise order must be determined by subscription order
 			OwnerDocument.Context.Send(() =>
 			{
 				if (OnError != null)

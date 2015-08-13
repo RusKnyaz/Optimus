@@ -130,7 +130,7 @@ namespace WebBrowser.Dom.Elements
 			set
 			{
 				ChildNodes.Clear();
-				DocumentBuilder.Build(this, value);
+				DocumentBuilder.Build(this, value, NodeSources.Script);
 			} 
 		}
 

@@ -118,7 +118,6 @@ namespace WebBrowser.Dom
 				throw new ArgumentOutOfRangeException("tagName");
 
 			var invariantTagName = tagName.ToLowerInvariant();
-
 			switch (invariantTagName)
 			{
 				//todo: fill the list
@@ -251,6 +250,8 @@ namespace WebBrowser.Dom
 
 		private void ExecuteScript(Script script)
 		{
+			Context.Send(x => RaiseBeforeScriptExecute(script), null);
+
 			script.Execute(_scriptExecutor);
 
 			Context.Send(x => RaiseAfterScriptExecute(script), null);
@@ -265,6 +266,17 @@ namespace WebBrowser.Dom
 
 			var evt = CreateEvent("Event");
 			evt.InitEvent("AfterScriptExecute",false, false);
+			evt.Target = script;
+			DispatchEvent(evt);
+		}
+
+		private void RaiseBeforeScriptExecute(Script script)
+		{
+			if (AfterScriptExecute != null)
+				AfterScriptExecute(script);
+
+			var evt = CreateEvent("Event");
+			evt.InitEvent("BeforeScriptExecute", false, false);
 			evt.Target = script;
 			DispatchEvent(evt);
 		}

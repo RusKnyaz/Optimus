@@ -19,7 +19,11 @@ namespace WebBrowser.ResourceProviders
 		{
 			_cookies = new CookieContainer();
 			HttpResourceProvider = new HttpResourceProvider(_cookies);
+			FileResourceProvider = new FileResourceProvider();
 		}
+
+		protected FileResourceProvider FileResourceProvider { get; private set; }
+		public IHttpResourceProvider HttpResourceProvider { get; private set; }
 
 		public string Root
 		{
@@ -44,57 +48,61 @@ namespace WebBrowser.ResourceProviders
 				return new Task<IResource>(() => new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
 			}
 
-			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
+			var u = GetUri(uri);
 
-			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
-			if (scheme == "http://" || scheme == "https://")
-			{
-				var httpRequest = CreateRequest<HttpRequest>(u.OriginalString);
-				return GetResourceAsync(httpRequest);
-			}
-			
-			throw new Exception("Unsupported scheme: " + scheme);
+			var provider = GetResourceProvider(u);
+			var req = provider.CreateRequest(u.OriginalString);
+			return GetResourceAsync(req);
 		}
 
-		public T CreateRequest<T>(string url) where T : class, IRequest
+		private Uri GetUri(string uri)
 		{
-			if (typeof (T) == typeof (HttpRequest))
-			{
-				return new HttpRequest("GET", url) as T;
-			}
+			return Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
+		}
 
-			throw new Exception("Unknown request type specified");
+		private ISpecResourceProvider GetResourceProvider(Uri u)
+		{
+			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
+
+			switch (scheme)
+			{
+				case "http://":
+				case "https://":
+					return HttpResourceProvider;
+				case "file://":
+					return FileResourceProvider;
+				default:
+					throw new Exception("Unsupported scheme: " + scheme);
+			}
 		}
 
 		public Task<IResource> GetResourceAsync(IRequest req)
 		{
 			if (OnRequest != null)
 				OnRequest(req.Url);
+			
+			var u = GetUri(req.Url);
 
-			var httpRequest = req as HttpRequest;
-			if(req != null)
-				return HttpResourceProvider.SendRequestAsync(httpRequest).ContinueWith(t =>
+			var provider = GetResourceProvider(u);
+
+			return provider.SendRequestAsync(req).ContinueWith(t =>
 					{
 						if (Received != null)
 							Received(req.Url);
-						return (IResource) t.Result;
+						return t.Result;
 					});
-
-			throw new Exception("Invalid request type");
 		}
-
-		public IHttpResourceProvider HttpResourceProvider { get; private set; }
 	}
 
 	public class Response : IResource
 	{
-		public Response(ResourceTypes type, Stream stream)
+		public Response(string type, Stream stream)
 		{
 			Stream = stream;
 			Type = type;
 		}
 
-		public ResourceTypes Type { get; private set; }
+		public string Type { get; private set; }
 		public Stream Stream { get; private set; }
 	}
 }

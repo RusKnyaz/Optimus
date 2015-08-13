@@ -7,20 +7,116 @@ using WebBrowser.Html;
 
 namespace WebBrowser.Dom
 {
-	internal class DocumentBuilder
+	//todo: chose one
+
+	//Build document parsed by HtmlAgilityPack
+	/*internal class DocumentBuilder
 	{
 		public static void Build(Node parentNode, string htmlString)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
-				Build(parentNode, stream);
+				var html = Parse(stream);
+				Build(parentNode, html);
 			}
 		}
 
-		public static void Build(Node parentNode, Stream stream)
+		private static IEnumerable<HtmlNode> Parse(Stream stream)
 		{
-			var html = HtmlParser.Parse(stream);
-			Build(parentNode, html);
+			var doc = new HtmlDocument();
+			doc.Load(stream);
+
+			return doc.DocumentNode.ChildNodes;
+			//return HtmlParser.Parse(stream);
+		}
+
+		public static void Build(Document parentNode, Stream stream)
+		{
+			var html = ExpandHtmlTag(Parse(stream));
+			Build(parentNode.DocumentElement, html);
+		}
+
+		private static IEnumerable<HtmlNode> ExpandHtmlTag(IEnumerable<HtmlNode> parse)
+		{
+			foreach (var htmlNode in parse)
+			{
+				if (htmlNode != null && htmlNode.Name.ToLowerInvariant() == "html")
+				{
+					foreach (var child in htmlNode.ChildNodes)
+					{
+						yield return child;
+					}
+				}
+				else
+				{
+					yield return htmlNode;
+				}
+			}
+		}
+
+		private static void Build(Node parentNode, IEnumerable<HtmlNode> htmlElements)
+		{
+			foreach (var htmlElement in htmlElements)
+			{
+				BuildElem(parentNode, htmlElement);
+			}
+		}
+
+		private static void BuildElem(Node node, HtmlNode htmlNode)
+		{
+			var comment = htmlNode as HtmlCommentNode;
+			if (comment != null)
+			{
+				node.AppendChild(node.OwnerDocument.CreateComment(comment.Comment));
+				return;
+			}
+
+			var txt = htmlNode as HtmlTextNode;
+			if (txt != null)
+			{
+				var c = node.OwnerDocument.CreateTextNode(txt.Text);
+				c.Source = NodeSources.DocumentBuilder;
+				node.AppendChild(c);
+				return;
+			}
+
+			if (!string.IsNullOrEmpty(htmlNode.Name))
+			{
+				var elem = node.OwnerDocument.CreateElement(htmlNode.Name);
+				elem.Source = NodeSources.DocumentBuilder;
+
+				if (elem is Script)
+				{
+					var htmlText = htmlNode.ChildNodes.FirstOrDefault() as HtmlTextNode;
+					elem.InnerHTML = htmlText != null ? htmlText.Text : string.Empty;
+				}
+
+				foreach (var attribute in htmlNode.Attributes)
+				{
+					elem.SetAttribute(attribute.Name, attribute.Value);
+				}
+
+				node.AppendChild(elem);
+
+				Build(elem, htmlNode.ChildNodes);
+			}
+			else
+			{
+				Build(node, htmlNode.ChildNodes);
+			}
+		}
+	}*/
+
+	//Build document using own parser
+	internal class DocumentBuilder
+	{
+		public static void Build(Node parentNode, string htmlString, NodeSources source = NodeSources.DocumentBuilder)
+		{
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
+			{
+				var html = HtmlParser.Parse(stream);
+				Build(parentNode, html, source);
+			}
 		}
 
 		public static void Build(Document parentNode, Stream stream)
@@ -48,15 +144,15 @@ namespace WebBrowser.Dom
 			}
 		}
 
-		public static void Build(Node parentNode, IEnumerable<IHtmlNode> htmlElements)
+		private static void Build(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
 		{
 			foreach (var htmlElement in htmlElements)
 			{
-				BuildElem(parentNode, htmlElement);
+				BuildElem(parentNode, htmlElement, source);
 			}
 		}
 
-		private static void BuildElem(Node node, IHtmlNode htmlNode)
+		private static void BuildElem(Node node, IHtmlNode htmlNode, NodeSources source)
 		{
 			var comment = htmlNode as HtmlComment;
 			if (comment != null)
@@ -69,7 +165,7 @@ namespace WebBrowser.Dom
 			if (txt != null)
 			{
 				var c = node.OwnerDocument.CreateTextNode(txt.Value);
-				c.Source = NodeSources.DocumentBuilder;
+				c.Source = source;
 				node.AppendChild(c);
 				return;
 			}
@@ -79,7 +175,7 @@ namespace WebBrowser.Dom
 				return;
 
 			var elem = node.OwnerDocument.CreateElement(htmlElement.Name);
-			elem.Source = NodeSources.DocumentBuilder;
+			elem.Source = source;
 			
 			if (elem is Script)
 			{
@@ -94,7 +190,7 @@ namespace WebBrowser.Dom
 
 			node.AppendChild(elem);
 
-			Build(elem, htmlElement.Children);
+			Build(elem, htmlElement.Children, source);
 		}
 	}
 }

@@ -48,12 +48,9 @@ namespace WebBrowser.Tests.EngineTests
 		[Test]
 		public void Post()
 		{
-			var t = new Task<HttpResponse>(() => new HttpResponse(HttpStatusCode.OK, "OK".ToStream(), null));
-			t.Start();
-
-			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequestAsync(It.IsAny<HttpRequest>()) == t);
-			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+			var resourceProvider = Mock.Of<IResourceProvider>();
 			resourceProvider.Resource("test.js", "$.post('http://localhost/data').done(function(x){console.log(x);});");
+			resourceProvider.Resource("data", "OK");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -65,7 +62,7 @@ namespace WebBrowser.Tests.EngineTests
 
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
-			Mock.Get(httpResourceProvider).Verify(x=> x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once);
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync(It.IsAny<HttpRequest>()), Times.Once);
 			CollectionAssert.AreEqual(new[]{"OK"}, log);
 		}
 

@@ -19,7 +19,6 @@ namespace WebBrowser.Dom
 
 		public override Node CloneNode(bool deep)
 		{
-			//todo: attributes
 			return new Text() { Data = Data };
 		}
 
@@ -45,8 +44,7 @@ namespace WebBrowser.Dom
 
 		public override Node CloneNode(bool deep)
 		{
-			//todo: attributes
-			return new Comment() { Data = Data };
+			return new Comment { Data = Data };
 		}
 
 		public override string NodeName
