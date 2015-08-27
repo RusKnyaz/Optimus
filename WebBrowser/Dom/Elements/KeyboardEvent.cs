@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
 	public class KeyboardEvent : UIEvent
 	{
+		public KeyboardEvent()
+		{
+			Debug.Fail("Not implemented");
+		}
     // KeyLocationCode
     /*const unsigned long DOM_KEY_LOCATION_STANDARD = 0x00;
     const unsigned long DOM_KEY_LOCATION_LEFT = 0x01;
