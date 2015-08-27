@@ -28,6 +28,7 @@ namespace WebBrowser.WfApp.Controls
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnOnRequest;
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnReceived;
 					_engine.DocumentChanged-=EngineOnDocumentChanged;
+					_engine.Window.OnAlert -= OnAlert;
 				}
 
 				_engine = value;
@@ -37,12 +38,18 @@ namespace WebBrowser.WfApp.Controls
 					_engine.Console.OnLog += ConsoleOnOnLog;
 					_engine.ResourceProvider.OnRequest += ResourceProviderOnReceived;
 					_engine.DocumentChanged += EngineOnDocumentChanged;
+					_engine.Window.OnAlert += OnAlert;
 				}
 				else
 				{
 					EngineOnDocumentChanged();
 				}
 			}
+		}
+
+		private void OnAlert(string obj)
+		{
+			Log("Alert: " + obj);
 		}
 
 		private Document _document = null;
@@ -52,6 +59,8 @@ namespace WebBrowser.WfApp.Controls
 			if (_document != null)
 			{
 				_document.RemoveEventListener("AfterScriptExecute", OnScriptExecuted, false);
+				_document.RemoveEventListener("BeforeScriptExecute", OnScriptExecuting, false);
+				_document.ScriptExecutionError += DocumentOnScriptExecutionError;
 			}
 			if(_engine == null)
 				return;
@@ -60,13 +69,25 @@ namespace WebBrowser.WfApp.Controls
 			if (_document != null)
 			{
 				_document.AddEventListener("AfterScriptExecute", OnScriptExecuted, false);
+				_document.AddEventListener("BeforeScriptExecute", OnScriptExecuting, false);
 			}
+		}
+
+		private void DocumentOnScriptExecutionError(Script script, Exception exception)
+		{
+			Log("Script execution error: " + (script.Src ?? script.Id ?? "...") + " Ex: " + exception.Message);
 		}
 
 		private void OnScriptExecuted(Event @event)
 		{
 			var script = (Script) @event.Target;
-			Log("Execute: " + (script.Src ?? script.Id ?? "..."));
+			Log("Executed: " + (script.Src ?? script.Id ?? "..."));
+		}
+
+		private void OnScriptExecuting(Event @event)
+		{
+			var script = (Script)@event.Target;
+			Log("Executing: " + (script.Src ?? script.Id ?? "..."));
 		}
 
 		private void ResourceProviderOnOnRequest(string s)

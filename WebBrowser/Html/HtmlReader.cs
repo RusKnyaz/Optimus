@@ -360,7 +360,7 @@ namespace WebBrowser.Html
 					{
 						var tagInvariantName = lastTag.ToLowerInvariant();
 
-						if (tagInvariantName == "script")
+						if (tagInvariantName == "script" || tagInvariantName == "style")
 						{
 							yield return ReadScript(reader);
 							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = "script"};

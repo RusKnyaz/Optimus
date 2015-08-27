@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<script src='jquery-2.1.1.min.js'></script>
+	<script src="knockout-3.2.0.js" type="text/javascript"></script>
+	<script src='require.js'></script>
+    
+	<script>
+		require.config({
+			paths: {
+				"knockout": "knockout-3.2.0"
+			},waitSeconds: 15
+		});
+
+		$(function(){
+			require(['script.js'], function (subVm) {
+				ko.applyBindings({
+					hereIs: ko.observable("Template below:"),
+					vm : subVm
+				}, document.body);
+			});
+		});
+	</script>
+	<body>
+		<span data-bind="text: hereIs"></span>
+		<div data-bind='template:{name:"greetingtemplate", data:vm}'></div>
+	</body>
+</html>

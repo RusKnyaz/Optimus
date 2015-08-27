@@ -17,8 +17,18 @@ namespace WebBrowser.WfApp.Controls
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				new Thread(new ThreadStart(() => Engine.OpenUrl(textBoxUrl.Text))).Start();
-				;
+				new Thread(() =>
+					{
+						try
+						{
+							Engine.OpenUrl(textBoxUrl.Text);
+						}
+						catch (Exception ex)
+						{
+							MessageBox.Show(ex.ToString());
+						}
+					}).Start();
+				
 			}
 		}
 	}

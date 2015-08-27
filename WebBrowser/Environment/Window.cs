@@ -89,5 +89,13 @@ namespace WebBrowser.Environment
 		{
 			return _eventTarget.DispatchEvent(evt);
 		}
+
+		public void Alert(string message)
+		{
+			if (OnAlert != null)
+				OnAlert(message);
+		}
+
+		public event Action<string> OnAlert;
 	}
 }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WebBrowser.Dom.Elements;
+using WebBrowser.Dom.Events;
 using WebBrowser.Environment;
 using WebBrowser.ScriptExecuting;
 
@@ -118,7 +119,6 @@ namespace WebBrowser.Dom
 				throw new ArgumentOutOfRangeException("tagName");
 
 			var invariantTagName = tagName.ToLowerInvariant();
-
 			switch (invariantTagName)
 			{
 				//todo: fill the list
@@ -188,6 +188,9 @@ namespace WebBrowser.Dom
 			if(type == "KeyboardEvent")
 				return new KeyboardEvent();
 
+			if(type == "Error")
+				return new ErrorEvent();
+
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
 
@@ -251,12 +254,33 @@ namespace WebBrowser.Dom
 
 		private void ExecuteScript(Script script)
 		{
-			script.Execute(_scriptExecutor);
+			Context.Send(x => RaiseBeforeScriptExecute(script), null);
+
+			try
+			{
+				script.Execute(_scriptExecutor);
+			}
+			catch (Exception ex)
+			{
+				Context.Send(x => RaiseScriptExecutionError(script, ex), null);
+			}
 
 			Context.Send(x => RaiseAfterScriptExecute(script), null);
 		}
 
 		public event Action<Script> AfterScriptExecute;
+		public event Action<Script, Exception> ScriptExecutionError;
+		
+		private void RaiseScriptExecutionError(Script script, Exception ex)
+		{
+			if (ScriptExecutionError != null)
+				ScriptExecutionError(script, ex);
+
+			var evt = (ErrorEvent)CreateEvent("ErrorEvent");
+			evt.ErrorEventInit(ex.Message, script.Src ?? "...", 0, 0, ex);
+			evt.Target = script;
+			DispatchEvent(evt);
+		}
 
 		private void RaiseAfterScriptExecute(Script script)
 		{
@@ -265,6 +289,17 @@ namespace WebBrowser.Dom
 
 			var evt = CreateEvent("Event");
 			evt.InitEvent("AfterScriptExecute",false, false);
+			evt.Target = script;
+			DispatchEvent(evt);
+		}
+
+		private void RaiseBeforeScriptExecute(Script script)
+		{
+			if (AfterScriptExecute != null)
+				AfterScriptExecute(script);
+
+			var evt = CreateEvent("Event");
+			evt.InitEvent("BeforeScriptExecute", false, false);
 			evt.Target = script;
 			DispatchEvent(evt);
 		}

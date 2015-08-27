@@ -40,6 +40,7 @@
 	window.location = engine.Window.Location;
 	window.navigator = engine.Window.Navigator;
 	window.screen = engine.Window.Screen;
+	window.alert = engine.Window.Alert;
     
 	bindProps(window, engine.Window, "innerWidth innerHeight");
 	window.setTimeout = function (handler, timeout) {
@@ -62,4 +63,5 @@
 		return r;
 	};
 
+	
 })(this["A89A3DC7FB5944849D4DE0781117A595"]);

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<script src='jquery-2.1.1.min.js'></script>
+	<script src='require.js'></script>
+	<script>
+		$(function(){
+			require(['script.js'], function(){
+				$("#det").html("OK");
+			});
+		});
+	</script>
+	<body>
+		<p id='greeting'></p>
+		<p id='det'></p>
+	</body>
+</html>

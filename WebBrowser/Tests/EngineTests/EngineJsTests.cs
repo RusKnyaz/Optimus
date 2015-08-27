@@ -289,10 +289,8 @@ console.log(style['width']);");
 		[Test]
 		public void Ajax()
 		{
-			var httpResourceProvider = Mock.Of<IHttpResourceProvider>(x => x.SendRequest(It.IsAny<HttpRequest>()) ==
-				new HttpResponse(HttpStatusCode.OK, "hello".ToStream(), null));
-
-			var resourceProvider = Mock.Of<IResourceProvider>(x => x.HttpResourceProvider == httpResourceProvider);
+			var resourceProvider = Mock.Of<IResourceProvider>();
+			resourceProvider.Resource("http://localhost/unicorn.xml", "hello");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -318,7 +316,7 @@ client.send();"));
 
 			Thread.Sleep(1000);
 
-			Mock.Get(httpResourceProvider).Verify(x => x.SendRequest(It.IsAny<HttpRequest>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync(It.IsAny<HttpRequest>()), Times.Once());
 			CollectionAssert.AreEqual(new []{"1", "4", "200", "hello", "hello"}, log);
 		}
 

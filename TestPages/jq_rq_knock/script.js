@@ -1,0 +1,1 @@
+define(["template!template.htm"], function(){	var vm = { Greeting: ko.observable('Hello, Browser!')};	return vm;});

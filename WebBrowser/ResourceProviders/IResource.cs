@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
+﻿using System.IO;
 namespace WebBrowser
 {
 	public interface IResource
 	{
-		ResourceTypes Type { get; }
+		string Type { get; }
 		Stream Stream { get; }
 	}
 
-	public enum ResourceTypes
+	public static class ResourceTypes
 	{
-		Html,
-		Text,
-		JavaScript
+		public const string Html = "text/html";
+		public const string Text = "text/plain";
+		public const string JavaScript = "text/javascript";
 	}
 }

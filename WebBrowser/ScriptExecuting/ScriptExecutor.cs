@@ -55,9 +55,13 @@ namespace WebBrowser.ScriptExecuting
 			_jsEngine.Global.FastAddProperty("Node", new JsValue(new ClrPrototype(_jsEngine, typeof(Node))), false, false, false);
 			_jsEngine.Global.FastAddProperty("Element", new JsValue(new ClrPrototype(_jsEngine, typeof(Element))), false, false, false);
 			_jsEngine.Global.FastAddProperty("HTMLElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlElement))), false, false, false);
+			_jsEngine.Global.FastAddProperty("HTMLInputElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlInputElement))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Script", new JsValue(new ClrPrototype(_jsEngine, typeof(Script))), false, false, false);
 			_jsEngine.Global.FastAddProperty("Body", new JsValue(new ClrPrototype(_jsEngine, typeof(Body))), false, false, false);
 			_jsEngine.Global.FastAddProperty("Comment", new JsValue(new ClrPrototype(_jsEngine, typeof(Comment))), false, false, false);
 			_jsEngine.Global.FastAddProperty("Document", new JsValue(new ClrPrototype(_jsEngine, typeof(Document))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Text", new JsValue(new ClrPrototype(_jsEngine, typeof(Text))), false, false, false);
+			_jsEngine.Global.FastAddProperty("Attr", new JsValue(new ClrPrototype(_jsEngine, typeof(Attr))), false, false, false);
 		}
 
 		public void Execute(string type, string code)

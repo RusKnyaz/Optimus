@@ -27,7 +27,7 @@ namespace WebBrowser.Tests.EngineTests
 			var score = engine.Document.GetElementById("score");
 			Assert.IsNotNull(score, "score");
 
-			Thread.Sleep(1000);//wait calculation
+			Thread.Sleep(10000);//wait calculation
 			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
 			System.Console.WriteLine(tagWithValue.InnerHTML);
