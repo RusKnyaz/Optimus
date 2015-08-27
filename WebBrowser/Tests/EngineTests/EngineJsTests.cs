@@ -412,5 +412,45 @@ console.log(document.getElementById('d').attributes[0].name);");
 
 			CollectionAssert.AreEqual(new object[] { "id", "id" }, _log);
 		}
+
+		[Test, Description("The sample come from jquer source code")]
+		public void PushApply()
+		{
+			var engine = CreateEngine("<div></div>", @"var arr = [];
+var push = arr.push;
+var slice = arr.slice;
+var preferredDoc = document;
+push.apply(
+		(arr = slice.call(preferredDoc.childNodes)),
+		preferredDoc.childNodes
+	);
+console.log(arr[ preferredDoc.childNodes.length ].nodeType);");
+			CollectionAssert.AreEqual(new object[] {"10"}, _log);
+		}
+
+		[Test]
+		public void ArrayPush()
+		{
+			var engine = CreateEngine("<div></div>", @"var arr = [];
+arr.push('x');
+console.log(arr.length);");
+			CollectionAssert.AreEqual(new object[] { 1 }, _log);
+		}
+
+		[Test]
+		public void SliceCall()
+		{
+			var engine = CreateEngine("<div></div>", @"var arr = ['a'];
+console.log(arr.slice().length);
+console.log([].slice.call(arr).length);");
+			CollectionAssert.AreEqual(new object[] { 1,1 }, _log);
+		}
+
+		[Test]
+		public void ChildNodesSlice()
+		{
+			var engine = CreateEngine("<div></div>", @"console.log(document.childNodes.slice().length);");
+			CollectionAssert.AreEqual(new object[] { 1}, _log);
+		}
 	}
 }

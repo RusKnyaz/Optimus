@@ -46,7 +46,11 @@ namespace WebBrowser.ResourceProviders
 		private HttpWebRequest MakeWebRequest(HttpRequest request)
 		{
 			var uri = request.Url;
-			var u = uri[0] == '/' ? new Uri(new Uri(Root), uri) : new Uri(uri);
+
+			if (uri.Substring(0, 2) == "./")
+				uri = uri.Remove(0, 2);
+
+			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri); ;
 			var result = WebRequest.CreateHttp(u);
 			result.Timeout = request.Timeout == 0 ? Timeout.Infinite : request.Timeout;
 			result.Method = request.Method;

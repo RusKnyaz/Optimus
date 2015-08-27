@@ -80,6 +80,23 @@ namespace WebBrowser.Tests.EngineTests
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			Assert.AreEqual("ok", result);
 		}
+
+		[Test]
+		public void JQueryFind()
+		{
+			var script = "var tmpDiv = $('<div><script type=\"text/html\">A</script></div>');" +
+						 "var res = tmpDiv.find(\"script[type='text/html']\");" +
+			             "console.log(res.length);";
+			var engine = new Engine();
+			string result = null;
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine(o.ToString());
+				result = o.ToString();
+			};
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			Assert.AreEqual(1, result);
+		}
 	}
 
 	public static class StringExtension
