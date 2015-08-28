@@ -40,7 +40,12 @@ namespace WebBrowser.ResourceProviders
 
 		private HttpResponse MakeResponse(HttpWebResponse response)
 		{
-			return new HttpResponse(response.StatusCode, response.GetResponseStream(), response.Headers, response.ContentType.ToLowerInvariant().Split(';')[0]);
+			return new HttpResponse(
+				response.StatusCode, 
+				response.GetResponseStream(), 
+				response.Headers, 
+				response.ContentType.ToLowerInvariant().Split(';')[0],
+				response.ResponseUri);
 		}
 
 		private HttpWebRequest MakeWebRequest(HttpRequest request)
@@ -88,20 +93,22 @@ namespace WebBrowser.ResourceProviders
 
 	public class HttpResponse : IResource
 	{
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers, string contentType)
+		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers, string contentType, Uri uri)
 		{
 			StatusCode = statusCode;
 			Stream = stream;
 			Headers = headers;
 			Type = contentType;
+			Uri = uri;
 		}
 
 		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers)
-			:this(statusCode, stream, headers, ResourceTypes.Html) { }
+			:this(statusCode, stream, headers, ResourceTypes.Html, null) { }
 
 		public HttpStatusCode StatusCode { get; private set; }
 		public WebHeaderCollection Headers { get; private set; }
 		public string Type { get; private set; }
 		public Stream Stream { get; private set; }
+		public Uri Uri { get; private set; }
 	}
 }

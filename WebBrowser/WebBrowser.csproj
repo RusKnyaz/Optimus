@@ -151,9 +151,9 @@
     <Content Include="Resources\text.js" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\jint-master\Jint\jin12.csproj">
-      <Project>{931f63d4-9b8f-4ce2-a903-83c54605e811}</Project>
-      <Name>jin12</Name>
+    <ProjectReference Include="..\..\jint-master\Jint\Jint.csproj">
+      <Project>{678738da-f723-4920-b9e5-cad667104bda}</Project>
+      <Name>Jint</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

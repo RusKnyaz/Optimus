@@ -57,6 +57,10 @@ namespace WebBrowser
 			var resource = task.Result;
 			if (resource.Type == ResourceTypes.Html)
 			{
+				var httpResponse = resource as HttpResponse;
+				if(httpResponse != null)
+					Uri = httpResponse.Uri;
+
 				Load(resource.Stream);
 			}
 		}

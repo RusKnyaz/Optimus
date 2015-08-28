@@ -109,12 +109,20 @@ namespace WebBrowser.Dom
 			if (_response.Headers == null)
 				return "";
 			//todo: check
-			Debug.Fail("Call to unteset method");
+			Debug.Fail("Call to untestet method");
 			return _response.Headers.ToString();
 		}
 
-		public string StatusText { get { return _response.StatusCode.ToString(); } }
-
+		public string StatusText
+		{
+			get
+			{
+				if (ReadyState != DONE || _response == null)
+					return null;
+				return _response.StatusCode.ToString();
+			}
+		}
+		
 		public string ResponseType
 		{
 			get
