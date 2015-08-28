@@ -60,7 +60,7 @@ namespace WebBrowser.Dom
 
 		public void Open(string method, string url, bool? async, string username, string password)
 		{
-			_request = new HttpRequest(method, url);
+			_request = (HttpRequest)_resourceProvider.CreateRequest(url);
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;
@@ -94,8 +94,13 @@ namespace WebBrowser.Dom
 
 		public string ResponseText { get { return _data; } }
 
+		
+
 		public void SetRequestHeader(string name, string value)
 		{
+			if(ReadyState != OPENED)
+				throw new Exception("The object state must be OPENEND");
+
 			_request.Headers.Add(name, value);
 		}
 
@@ -162,6 +167,7 @@ namespace WebBrowser.Dom
 					var t = _resourceProvider.GetResourceAsync(_request);
 					t.Wait();
 					_response = (HttpResponse)t.Result;
+					_data = _response.Stream.ReadToEnd();
 				}
 				catch (Exception exception)
 				{

@@ -50,7 +50,7 @@ namespace WebBrowser.Tests.EngineTests
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>();
 			resourceProvider.Resource("test.js", "$.post('http://localhost/data').done(function(x){console.log(x);});");
-			resourceProvider.Resource("data", "OK");
+			resourceProvider.Resource("http://localhost/data", "OK");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -62,7 +62,6 @@ namespace WebBrowser.Tests.EngineTests
 
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
-			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync(It.IsAny<HttpRequest>()), Times.Once);
 			CollectionAssert.AreEqual(new[]{"OK"}, log);
 		}
 
@@ -95,7 +94,7 @@ namespace WebBrowser.Tests.EngineTests
 				result = o.ToString();
 			};
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
-			Assert.AreEqual(1, result);
+			Assert.AreEqual("1", result);
 		}
 	}
 

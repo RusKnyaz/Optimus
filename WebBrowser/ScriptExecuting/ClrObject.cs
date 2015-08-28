@@ -6,7 +6,6 @@ using Jint.Native.Function;
 using Jint.Native.Object;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
-using Jint.Runtime.Environments;
 using Jint.Runtime.Interop;
 
 namespace WebBrowser.ScriptExecuting
@@ -19,6 +18,7 @@ namespace WebBrowser.ScriptExecuting
 			base(engine, null, null, false)
 		{
 			_type = type;
+			Prototype = engine.Object;
 		}
 
 		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
@@ -54,7 +54,6 @@ namespace WebBrowser.ScriptExecuting
 		public override PropertyDescriptor GetOwnProperty(string propertyName)
 		{
 			//todo: check indexers (for example in CssStyleDeclaration)
-
 			PropertyDescriptor x;
 			if (Properties.TryGetValue(propertyName, out x))
 				return x;

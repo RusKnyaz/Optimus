@@ -1,8 +1,10 @@
 ﻿#if NUNIT
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Moq;
+using WebBrowser.ResourceProviders;
 
 namespace WebBrowser.Tests
 {
@@ -15,10 +17,13 @@ namespace WebBrowser.Tests
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, string data)
 		{
+			var request = new HttpRequest("GET", url);
+
 			Mock.Get(resourceProvider)
-				.Setup(x => x.GetResourceAsync(url))
-				.Returns(() =>Task.Run(() =>
-						Mock.Of<IResource>(y => y.Stream == new MemoryStream(Encoding.UTF8.GetBytes(data)) && y.Type == ResourceTypes.Html)));
+				.Setup(x => x.CreateRequest(url)).Returns(request);
+			Mock.Get(resourceProvider)
+				.Setup(x => x.GetResourceAsync(request))
+				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(Encoding.UTF8.GetBytes(data)), null)));
 			return resourceProvider;
 		}
 

@@ -100,7 +100,7 @@ namespace WebBrowser.ScriptExecuting
 					_list[index] = value.ToObject();
 			}
 
-			base.Put(propertyName, value, throwOnError);
+			//base.Put(propertyName, value, throwOnError);
 		}
 
 		public override JsValue Get(string propertyName)

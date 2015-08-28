@@ -35,26 +35,6 @@ namespace WebBrowser.ResourceProviders
 			}
 		}
 
-		public Task<IResource> GetResourceAsync(string uri)
-		{
-			if (string.IsNullOrEmpty(uri))
-				throw new ArgumentOutOfRangeException("uri");
-			
-			if (uri.StartsWith("data:"))
-			{
-				var data = uri.Substring(5);
-				var type = new string(data.TakeWhile(c => c != ',').ToArray());
-				var content = data.Substring(type.Length);
-				return new Task<IResource>(() => new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
-			}
-
-			var u = GetUri(uri);
-
-			var provider = GetResourceProvider(u);
-			var req = provider.CreateRequest(u.OriginalString);
-			return GetResourceAsync(req);
-		}
-
 		private Uri GetUri(string uri)
 		{
 			return Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
@@ -71,9 +51,16 @@ namespace WebBrowser.ResourceProviders
 					return HttpResourceProvider;
 				case "file://":
 					return FileResourceProvider;
+				case "data:":
+					return new DataResourceProvider();
 				default:
 					throw new Exception("Unsupported scheme: " + scheme);
 			}
+		}
+
+		public IRequest CreateRequest(string uri)
+		{
+			return GetResourceProvider(GetUri(uri)).CreateRequest(uri);
 		}
 
 		public Task<IResource> GetResourceAsync(IRequest req)
@@ -92,6 +79,33 @@ namespace WebBrowser.ResourceProviders
 						return t.Result;
 					});
 		}
+
+		class DataResourceProvider : ISpecResourceProvider
+		{
+			public IRequest CreateRequest(string url)
+			{
+				return new DataRequest(url);
+			}
+
+			public Task<IResource> SendRequestAsync(IRequest request)
+			{
+				var uri = request.Url;
+				var data = uri.Substring(5);
+				var type = new string(data.TakeWhile(c => c != ',').ToArray());
+				var content = data.Substring(type.Length);
+				return new Task<IResource>(() => new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
+			}
+
+			class DataRequest : IRequest
+			{
+				public DataRequest(string url)
+				{
+					Url = url;
+				}
+
+				public string Url { get; private set; }
+			}
+		}		
 	}
 
 	public class Response : IResource
