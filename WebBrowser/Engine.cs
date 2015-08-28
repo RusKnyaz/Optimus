@@ -10,8 +10,7 @@ using WebBrowser.Tools;
 namespace WebBrowser
 {
 	public class Engine: IDisposable
-
-    {
+	{
 		private Document _document;
 		public IResourceProvider ResourceProvider { get; private set; }
 		internal IScriptExecutor ScriptExecutor { get; private set; }

@@ -425,7 +425,7 @@ push.apply(
 		preferredDoc.childNodes
 	);
 console.log(arr[ preferredDoc.childNodes.length ].nodeType);");
-			CollectionAssert.AreEqual(new object[] {"10"}, _log);
+			CollectionAssert.AreEqual(new object[] {1}, _log);
 		}
 
 		[Test]
@@ -449,8 +449,10 @@ console.log([].slice.call(arr).length);");
 		[Test]
 		public void ChildNodesSlice()
 		{
-			var engine = CreateEngine("<div></div>", @"console.log(document.childNodes.slice().length);");
-			CollectionAssert.AreEqual(new object[] { 1}, _log);
+			var engine = CreateEngine("<div></div>", @"
+console.log(document.body.childNodes.length);
+console.log([].slice.call(document.body.childNodes).length);");
+			CollectionAssert.AreEqual(new object[] {1, 1}, _log);
 		}
 	}
 }
