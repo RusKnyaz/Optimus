@@ -128,6 +128,7 @@
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
     <Compile Include="Tests\ResourceProvidersTests.cs" />
     <Compile Include="Environment\Window.cs" />
+    <Compile Include="Dom\DocumentScripting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

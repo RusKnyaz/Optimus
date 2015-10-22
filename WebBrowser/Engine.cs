@@ -15,6 +15,8 @@ namespace WebBrowser
 		public IResourceProvider ResourceProvider { get; private set; }
 		internal IScriptExecutor ScriptExecutor { get; private set; }
 
+		public DocumentScripting Scripting	{get; private set;}
+
 		public Document Document
 		{
 			get { return _document; }
@@ -24,6 +26,17 @@ namespace WebBrowser
 
 				if (DocumentChanged != null)
 					DocumentChanged();
+
+				if (Scripting != null)
+				{
+					Scripting.Dispose ();
+					Scripting = null;
+				}
+
+				if (_document != null)
+				{
+					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
+				}
 			}
 		}
 

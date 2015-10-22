@@ -75,15 +75,18 @@ namespace WebBrowser.Dom
 			}
 		}
 
+		public event Action<IDocument> DomContentLoaded;
+
 		internal void Complete()
 		{
+			if (DomContentLoaded != null)
+				DomContentLoaded (this);
+
 			Trigger("DOMContentLoaded");
 			//todo: check is it right
 			ReadyState = DocumentReadyStates.Complete;
 
-			ResolveDelayedContent();
-
-			RunScripts(ChildNodes.SelectMany(x => x.Flatten()).OfType<Script>());
+			Trigger("load");
 		}
 
 		private void Trigger(string type)
@@ -91,24 +94,6 @@ namespace WebBrowser.Dom
 			var evt = CreateEvent("Event");
 			evt.InitEvent(type, false, false);
 			Context.Send(state => DispatchEvent(evt), null);
-		}
-
-		public void ResolveDelayedContent()
-		{
-			Task.WaitAll(_unresolvedDelayedResources.Where(x => !x.Loaded).Select(x => x.LoadAsync(_resourceProvider)).ToArray());
-			_unresolvedDelayedResources.Clear();
-			Trigger("load");
-		}
-
-		internal void RunScripts(IEnumerable<Script> scripts)
-		{
-				//todo: what we should do if some script changes ChildNodes?
-				//todo: optimize (create queue of not executed scripts);
-			foreach (var script in scripts.ToArray())
-			{
-				if (script.Executed || string.IsNullOrEmpty(script.Text)) continue;
-				ExecuteScript(script);
-			}
 		}
 
 		public Element CreateElement(string tagName)
@@ -195,47 +180,16 @@ namespace WebBrowser.Dom
 		}
 
 		public event Action<Node> DomNodeInserted;
+		public event Action<Node> NodeInserted;
 
-		internal void HandleNodeAdded(Node node, Node newChild)
+
+		internal void HandleNodeAdded(Node parentNode, Node newChild)
 		{
-			var parent = newChild;
-			var praParent = parent;
-			while (praParent.ParentNode != null)
-				praParent = praParent.ParentNode;
-
-			if (praParent != this)
+			if (!newChild.IsInDocument ())
 				return;
 
-			foreach (var script in newChild.Flatten().OfType<Script>())
-			{
-				var remote = script.HasDelayedContent;
-				var async = script.Async && remote || script.Source == NodeSources.Script;
-				var defer = script.Defer && remote;
-
-				if (!async && defer && ReadyState != DocumentReadyStates.Complete)
-				{
-					_unresolvedDelayedResources.AddRange(newChild.Flatten()
-						.OfType<IDelayedResource>()
-						.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded));
-				}
-				else
-				{
-					Task task = null;
-					if (remote)
-					{
-						task = script
-							.LoadAsync(_resourceProvider)
-							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
-
-						if (!async)
-							task.Wait();
-					}
-					else if (!string.IsNullOrEmpty(script.Text))
-					{
-						ExecuteScript(script);
-					}
-				}
-			}
+			if (NodeInserted != null)
+				NodeInserted (newChild);
 
 			if(newChild.Source != NodeSources.DocumentBuilder)
 				RaiseDomNodeInserted(newChild);
@@ -252,57 +206,6 @@ namespace WebBrowser.Dom
 			DispatchEvent(evt);
 		}
 
-		private void ExecuteScript(Script script)
-		{
-			Context.Send(x => RaiseBeforeScriptExecute(script), null);
-
-			try
-			{
-				script.Execute(_scriptExecutor);
-			}
-			catch (Exception ex)
-			{
-				Context.Send(x => RaiseScriptExecutionError(script, ex), null);
-			}
-
-			Context.Send(x => RaiseAfterScriptExecute(script), null);
-		}
-
-		public event Action<Script> AfterScriptExecute;
-		public event Action<Script, Exception> ScriptExecutionError;
-		
-		private void RaiseScriptExecutionError(Script script, Exception ex)
-		{
-			if (ScriptExecutionError != null)
-				ScriptExecutionError(script, ex);
-
-			var evt = (ErrorEvent)CreateEvent("ErrorEvent");
-			evt.ErrorEventInit(ex.Message, script.Src ?? "...", 0, 0, ex);
-			evt.Target = script;
-			DispatchEvent(evt);
-		}
-
-		private void RaiseAfterScriptExecute(Script script)
-		{
-			if (AfterScriptExecute != null)
-				AfterScriptExecute(script);
-
-			var evt = CreateEvent("Event");
-			evt.InitEvent("AfterScriptExecute",false, false);
-			evt.Target = script;
-			DispatchEvent(evt);
-		}
-
-		private void RaiseBeforeScriptExecute(Script script)
-		{
-			if (AfterScriptExecute != null)
-				AfterScriptExecute(script);
-
-			var evt = CreateEvent("Event");
-			evt.InitEvent("BeforeScriptExecute", false, false);
-			evt.Target = script;
-			DispatchEvent(evt);
-		}
 
 		internal void HandleNodeEventException(Node node, Exception exception)
 		{
@@ -314,7 +217,7 @@ namespace WebBrowser.Dom
 	}
 
 	[DomItem]
-	public interface IDocument
+	public interface IDocument : INode
 	{
 		Element CreateElement(string tagName);
 		Element DocumentElement { get; }
@@ -327,5 +230,8 @@ namespace WebBrowser.Dom
 		DocumentFragment CreateDocumentFragment();
 		Element GetElementById(string id);
 		Attr CreateAttribute(string name);
+		//not a part of public API
+		event Action<Node> NodeInserted;
+		event Action<IDocument> DomContentLoaded;
 	}
 }

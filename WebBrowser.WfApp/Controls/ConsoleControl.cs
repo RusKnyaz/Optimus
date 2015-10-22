@@ -60,10 +60,12 @@ namespace WebBrowser.WfApp.Controls
 			{
 				_document.RemoveEventListener("AfterScriptExecute", OnScriptExecuted, false);
 				_document.RemoveEventListener("BeforeScriptExecute", OnScriptExecuting, false);
-				_document.ScriptExecutionError += DocumentOnScriptExecutionError;
 			}
 			if(_engine == null)
 				return;
+
+			//todo: unsubscribe somewhere
+			_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
 			
 			_document = _engine.Document;
 			if (_document != null)

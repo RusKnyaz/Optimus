@@ -276,6 +276,7 @@ namespace WebBrowser.Dom.Elements
 		int NodeType { get; }
 		string NodeName { get; }
 		int CompareDocumentPosition(Node node);
+		IList<Node> ChildNodes { get;}
 	}
 
 	public static class NodeExtension
@@ -285,6 +286,20 @@ namespace WebBrowser.Dom.Elements
 			var e = node.OwnerDocument.CreateEvent("Event");
 			e.InitEvent(eventType, bubblable, cancellable);
 			return node.DispatchEvent(e);
+		}
+
+		/// <summary>
+		/// Determines if the node lies to document hierarhcy.
+		/// </summary>
+		/// <returns><c>true</c> if is in document the specified node; otherwise, <c>false</c>.</returns>
+		/// <param name="node">Node.</param>
+		public static bool IsInDocument(this Node node)
+		{
+			var praParent = node;
+			while (praParent.ParentNode != null)
+				praParent = praParent.ParentNode;
+
+			return praParent == node.OwnerDocument;
 		}
 	}
 }
