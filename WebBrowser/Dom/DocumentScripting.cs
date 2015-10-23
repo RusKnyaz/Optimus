@@ -14,7 +14,7 @@ namespace WebBrowser
 	/// </summary>
 	public class DocumentScripting : IDisposable
 	{
-		List<IDelayedResource> _unresolvedDelayedResources;
+		List<Task> _unresolvedDelayedResources;
 		private readonly IResourceProvider _resourceProvider;
 
 		IDocument _document;
@@ -31,15 +31,13 @@ namespace WebBrowser
 			_resourceProvider = resourceProvider;
 			document.NodeInserted += OnDocumentNodeInserted;
 			document.DomContentLoaded += OnDocumentDomContentLoaded;
-			_unresolvedDelayedResources = new List<IDelayedResource>();
+			_unresolvedDelayedResources = new List<Task>();
 		}
 
-		void OnDocumentNodeInserted (WebBrowser.Dom.Elements.Node node)
+		void OnDocumentNodeInserted (Node node)
 		{
 			if (!node.IsInDocument ())
 				return;
-
-			var document = node.OwnerDocument;
 
 			foreach (var script in node.Flatten().OfType<Script>())
 			{
@@ -51,7 +49,8 @@ namespace WebBrowser
 				{
 					_unresolvedDelayedResources.AddRange(script.Flatten()
 						.OfType<IDelayedResource>()
-						.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded));
+						.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded)
+						.Select(x => x.LoadAsync(_resourceProvider)));
 				}
 				else
 				{
@@ -75,7 +74,7 @@ namespace WebBrowser
 
 		void OnDocumentDomContentLoaded (IDocument document)
 		{
-			Task.WaitAll(_unresolvedDelayedResources.Where(x => !x.Loaded).Select(x => x.LoadAsync(_resourceProvider)).ToArray());
+			Task.WaitAll(_unresolvedDelayedResources.ToArray());
 			_unresolvedDelayedResources.Clear();
 			RunScripts(document.ChildNodes.SelectMany(x => x.Flatten()).OfType<Script>());
 		}

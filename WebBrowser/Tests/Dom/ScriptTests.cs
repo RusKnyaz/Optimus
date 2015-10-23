@@ -2,8 +2,6 @@
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
-using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Tests.Dom
 {
@@ -14,7 +12,7 @@ namespace WebBrowser.Tests.Dom
 		[TestCase("<html><head><script id='s' type='text/javascript'>alert('a');</script></head></html>", "alert('a');")]
 		public void EmbeddedScriptInnerHtml(string html, string expectedInnerHtml)
 		{
-			var document = new Document(null, null, Mock.Of<IScriptExecutor>(), null);
+			var document = new Document(null, null);
 			document.Write(html);
 			var s = document.GetElementById("s");
 			Assert.AreEqual(expectedInnerHtml, s.InnerHTML);

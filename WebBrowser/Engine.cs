@@ -24,9 +24,6 @@ namespace WebBrowser
 			{
 				_document = value;
 
-				if (DocumentChanged != null)
-					DocumentChanged();
-
 				if (Scripting != null)
 				{
 					Scripting.Dispose ();
@@ -37,6 +34,9 @@ namespace WebBrowser
 				{
 					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
 				}
+
+				if (DocumentChanged != null)
+					DocumentChanged();
 			}
 		}
 
@@ -84,7 +84,7 @@ namespace WebBrowser
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
-			Document = new Document(ResourceProvider, Context, ScriptExecutor, Window);
+			Document = new Document(Context, Window);
 			Document.OnNodeException += (node, exception) => Console.Log("Node event handler exception: " + exception.Message);
 			//todo: clear js runtime context
 			

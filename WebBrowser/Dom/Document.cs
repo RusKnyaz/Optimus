@@ -37,21 +37,16 @@ namespace WebBrowser.Dom
 	/// </summary>
 	public class Document : DocumentFragment, IDocument
 	{
-		private readonly IResourceProvider _resourceProvider;
 		public readonly SynchronizationContext Context;
-		private readonly IScriptExecutor _scriptExecutor;
 
-		internal Document() :this(null, null, null, null)
+		internal Document() :this(null, null)
 		{
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		internal Document(IResourceProvider resourceProvider, SynchronizationContext context, IScriptExecutor scriptExecutor, 
-			Window window):base(null)
+		internal Document(SynchronizationContext context, Window window):base(null)
 		{
-			_resourceProvider = resourceProvider;
 			Context = context ?? new StubSynchronizationContext();
-			_scriptExecutor = scriptExecutor;
 			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
 

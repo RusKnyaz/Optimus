@@ -65,8 +65,11 @@ namespace WebBrowser.WfApp.Controls
 				return;
 
 			//todo: unsubscribe somewhere
-			_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
-			
+			if (_engine.Scripting != null)
+			{
+				_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
+			}
+
 			_document = _engine.Document;
 			if (_document != null)
 			{
