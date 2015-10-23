@@ -12,7 +12,7 @@ namespace WebBrowser.Environment
 	{
 		private EventTarget _eventTarget;
 
-		public Window(SynchronizationContext context, Engine engine)
+		public Window(Func<object> getSyncObj, Engine engine)
 		{
 			Screen = new Screen
 				{
@@ -29,7 +29,7 @@ namespace WebBrowser.Environment
 			Location = new Location(engine);//todo: remove the stub href value
 			Navigator = new Navigator();
 
-			_timers = new WindowTimers(context);
+			_timers = new WindowTimers(getSyncObj);
 			_timers.OnException += exception =>
 				{
 					var jsEx = exception as JavaScriptException;

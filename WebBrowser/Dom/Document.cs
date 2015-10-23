@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Dom.Events;
 using WebBrowser.Environment;
@@ -12,19 +10,6 @@ using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom
 {
-	class StubSynchronizationContext : SynchronizationContext
-	{
-		public override void Post(SendOrPostCallback d, object state)
-		{
-			d(state);
-		}
-
-		public override void Send(SendOrPostCallback d, object state)
-		{
-			d(state);
-		}
-	}
-
 	public enum DocumentReadyStates
 	{
 		Loading, Interactive, Complete
@@ -37,16 +22,13 @@ namespace WebBrowser.Dom
 	/// </summary>
 	public class Document : DocumentFragment, IDocument
 	{
-		public readonly SynchronizationContext Context;
-
-		internal Document() :this(null, null)
+		internal Document() :this(null)
 		{
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		internal Document(SynchronizationContext context, Window window):base(null)
+		internal Document(Window window):base(null)
 		{
-			Context = context ?? new StubSynchronizationContext();
 			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
 
@@ -88,7 +70,11 @@ namespace WebBrowser.Dom
 		{
 			var evt = CreateEvent("Event");
 			evt.InitEvent(type, false, false);
-			Context.Send(state => DispatchEvent(evt), null);
+			lock (this)
+			{
+				//todo: deadlock possible if event raised from js
+				DispatchEvent(evt);	
+			}
 		}
 
 		public Element CreateElement(string tagName)

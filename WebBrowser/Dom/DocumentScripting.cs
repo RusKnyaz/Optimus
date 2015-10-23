@@ -14,7 +14,7 @@ namespace WebBrowser
 	/// </summary>
 	public class DocumentScripting : IDisposable
 	{
-		List<Task> _unresolvedDelayedResources;
+		Queue<Tuple<Task, Script>> _unresolvedDelayedResources;
 		private readonly IResourceProvider _resourceProvider;
 
 		IDocument _document;
@@ -31,7 +31,7 @@ namespace WebBrowser
 			_resourceProvider = resourceProvider;
 			document.NodeInserted += OnDocumentNodeInserted;
 			document.DomContentLoaded += OnDocumentDomContentLoaded;
-			_unresolvedDelayedResources = new List<Task>();
+			_unresolvedDelayedResources = new Queue<Tuple<Task, Script>>();
 		}
 
 		void OnDocumentNodeInserted (Node node)
@@ -47,17 +47,13 @@ namespace WebBrowser
 
 				if (!async && defer && node.OwnerDocument.ReadyState != DocumentReadyStates.Complete)
 				{
-					_unresolvedDelayedResources.AddRange(script.Flatten()
-						.OfType<IDelayedResource>()
-						.Where(delayed => delayed != null && delayed.HasDelayedContent && !delayed.Loaded)
-						.Select(x => x.LoadAsync(_resourceProvider)));
+					_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(script.LoadAsync(_resourceProvider), script));
 				}
 				else
 				{
-					Task task = null;
 					if (remote)
 					{
-						task = script
+						var task = script
 							.LoadAsync(_resourceProvider)
 							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
 
@@ -74,9 +70,12 @@ namespace WebBrowser
 
 		void OnDocumentDomContentLoaded (IDocument document)
 		{
-			Task.WaitAll(_unresolvedDelayedResources.ToArray());
-			_unresolvedDelayedResources.Clear();
-			RunScripts(document.ChildNodes.SelectMany(x => x.Flatten()).OfType<Script>());
+			while (_unresolvedDelayedResources.Count > 0)
+			{
+				var scriptTask = _unresolvedDelayedResources.Dequeue();
+				scriptTask.Item1.Wait();
+				ExecuteScript(scriptTask.Item2);
+			}
 		}
 
 		internal void RunScripts(IEnumerable<Script> scripts)
@@ -92,18 +91,21 @@ namespace WebBrowser
 
 		private void ExecuteScript(Script script)
 		{
-			script.OwnerDocument.Context.Send(x => RaiseBeforeScriptExecute(script), null);
-
-			try
+			lock (script.OwnerDocument)
 			{
-				script.Execute(_scriptExecutor);
-			}
-			catch (Exception ex)
-			{
-				script.OwnerDocument.Context.Send(x => RaiseScriptExecutionError(script, ex), null);
-			}
+				RaiseBeforeScriptExecute(script);
 
-			script.OwnerDocument.Context.Send(x => RaiseAfterScriptExecute(script), null);
+				try
+				{
+					script.Execute(_scriptExecutor);
+				}
+				catch (Exception ex)
+				{
+					RaiseScriptExecutionError(script, ex);
+				}
+
+				RaiseAfterScriptExecute(script);
+			}
 		}
 
 		private void RaiseScriptExecutionError(Script script, Exception ex)

@@ -73,23 +73,20 @@ namespace WebBrowser.Dom.Elements
 		{
 			if (HasDelayedContent)
 			{
-				OwnerDocument.Context.Send(() =>
-				{
-					if(OnLoad!= null)
-						OnLoad();
-					this.RaiseEvent("load", false, false);
-				});
+				if (OnLoad != null)
+					OnLoad();
+				this.RaiseEvent("load", false, false);
 			}
 		}
 
 		private void RaiseError()
 		{
-			OwnerDocument.Context.Send(() =>
+			lock(OwnerDocument)
 			{
 				if (OnError != null)
 					OnError();
 				this.RaiseEvent("error", false, false);
-			});
+			}
 		}
 
 		public void Execute(IScriptExecutor scriptExecutor)

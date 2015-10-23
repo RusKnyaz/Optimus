@@ -14,7 +14,6 @@ namespace WebBrowser.ScriptExecuting
 	internal class ScriptExecutor : IScriptExecutor
 	{
 		private readonly Engine _engine;
-		private SynchronizationContext _context;
 
 		private string _scopeEmbeddingObjectName = "A89A3DC7FB5944849D4DE0781117A595";
 		
@@ -31,13 +30,12 @@ namespace WebBrowser.ScriptExecuting
 
 			public Document Document { get { return _engine.Document; } }
 			public Window Window { get { return _engine.Window; } }
-			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider, _engine.Context);}
+			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider, _engine.Document);}
 		}
 
 		public ScriptExecutor(Engine engine)
 		{
 			_engine = engine;
-			_context = engine.Context;
 			CreateEngine(engine);
 		}
 
@@ -66,27 +64,24 @@ namespace WebBrowser.ScriptExecuting
 
 		public void Execute(string type, string code)
 		{
-			_context.Send(_ =>
+			if (string.IsNullOrEmpty(type) || type.ToLowerInvariant() == "text/javascript")
 			{
-				if (string.IsNullOrEmpty(type) || type.ToLowerInvariant() == "text/javascript")
+				try
 				{
-					try
-					{
-						_jsEngine.Execute(code);
-					}
-					catch (JavaScriptException e)
-					{
-						var ex = new ScriptExecutingException(e.Error.ToString(), e, code);
-						if (OnException != null)
-							OnException(ex);
-					}
-					catch (Exception e)
-					{
-						if (OnException != null)
-							OnException(e);
-					}
+					_jsEngine.Execute(code);
 				}
-			}, null);
+				catch (JavaScriptException e)
+				{
+					var ex = new ScriptExecutingException(e.Error.ToString(), e, code);
+					if (OnException != null)
+						OnException(ex);
+				}
+				catch (Exception e)
+				{
+					if (OnException != null)
+						OnException(e);
+				}
+			}
 		}
 
 		public event Action<Exception> OnException;

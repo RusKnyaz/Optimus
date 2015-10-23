@@ -32,7 +32,7 @@ namespace WebBrowser.Dom
 	public class XmlHttpRequest : IXmlHttpRequest
 	{
 		private readonly IResourceProvider _resourceProvider;
-		private readonly SynchronizationContext _context;
+		private readonly object _syncObj;
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
@@ -41,10 +41,10 @@ namespace WebBrowser.Dom
 
 		public event Action OnTimeout;
 
-		public XmlHttpRequest(IResourceProvider resourceProvider, SynchronizationContext context)
+		public XmlHttpRequest(IResourceProvider resourceProvider, object syncObj)
 		{
 			_resourceProvider = resourceProvider;
-			_context = context;
+			_syncObj = syncObj;
 			ReadyState = UNSENT;
 		}
 
@@ -194,7 +194,10 @@ namespace WebBrowser.Dom
 
 		private void CallInContext(Action action)
 		{
-			_context.Send(x => ((Action)x).Fire(), action);
+			lock (_syncObj)
+			{
+				(action).Fire();
+			}
 		}
 
 		public int Timeout

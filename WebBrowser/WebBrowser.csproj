@@ -104,7 +104,6 @@
     <Compile Include="ScriptExecuting\ListAdapter.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
-    <Compile Include="TestingTools\SynchronizationContextExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
@@ -118,7 +117,6 @@
     <Compile Include="Tests\EngineTests\OpenSites.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tools\ListExtension.cs" />
-    <Compile Include="Tools\SignleThreadSynchronizationContext.cs" />
     <Compile Include="Tests\EngineTests\EngineUnitTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryFormTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryTests.cs" />

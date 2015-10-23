@@ -12,24 +12,30 @@ namespace WebBrowser.Dom.Elements
 
 		public event Action<Exception> OnException;
 
-		public WindowTimers(SynchronizationContext context)
+		private readonly Func<object> _getSyncObj;
+
+		public WindowTimers(Func<Object> getGetSyncObj)
 		{
-			_context = context;
+			_getSyncObj = getGetSyncObj;
 		}
 
 		public int SetTimeout(Action handler, int timeout)
 		{
-			var timer = new Timer(state => _context.Send(o => { 
-				                                                  try
-				                                                  {
-					                                                  handler();
-				                                                  }
-				                                                  catch(Exception e)
-				                                                  {
-					                                                  if (OnException != null)
-						                                                  OnException(e);
-				                                                  }
-			}, null), null, timeout, Timeout.Infinite);
+			var timer = new Timer(state =>
+			{
+				lock (state)
+				{
+					try
+					{
+						handler();
+					}
+					catch (Exception e)
+					{
+						if (OnException != null)
+							OnException(e);
+					}
+				}
+			}, _getSyncObj(), timeout, Timeout.Infinite);
 
 			return timer.GetHashCode();
 		}

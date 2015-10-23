@@ -43,15 +43,11 @@ namespace WebBrowser
 		public Console Console { get; private set; }
 		public Window Window { get; private set; }
 
-		public SynchronizationContext Context { get; private set; }
-
 		internal Engine(IResourceProvider resourceProvider)
 		{
-			Context = new SignleThreadSynchronizationContext();
-
 			ResourceProvider = resourceProvider;
 			Console = new Console();
-			Window = new Window(Context, this);
+			Window = new Window(() => Document, this);
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
 		}
@@ -84,7 +80,7 @@ namespace WebBrowser
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
-			Document = new Document(Context, Window);
+			Document = new Document(Window);
 			Document.OnNodeException += (node, exception) => Console.Log("Node event handler exception: " + exception.Message);
 			//todo: clear js runtime context
 			
@@ -95,9 +91,6 @@ namespace WebBrowser
 		public event Action DocumentChanged;
 		public void Dispose()
 		{
-			var disposableContext = Context as IDisposable;
-			if (disposableContext != null)
-				disposableContext.Dispose();
 		}
     }
 }
