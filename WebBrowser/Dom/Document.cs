@@ -29,12 +29,10 @@ namespace WebBrowser.Dom
 
 		internal Document(Window window):base(null)
 		{
-			_unresolvedDelayedResources = new List<IDelayedResource>();
 			NodeType = DOCUMENT_NODE;
 
 			DocumentElement = new Element(this, "html"){ParentNode = this};
 			ChildNodes = new List<Node> { DocumentElement };
-
 			EventTarget = new EventTarget(this, () => window);
 		}
 
@@ -42,8 +40,6 @@ namespace WebBrowser.Dom
 		public DocumentReadyStates ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
 
-		private readonly List<IDelayedResource> _unresolvedDelayedResources;
-		
 		public void Write(string text)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(text)))
@@ -169,11 +165,11 @@ namespace WebBrowser.Dom
 			if (!newChild.IsInDocument ())
 				return;
 
+			if (newChild.Source != NodeSources.DocumentBuilder)
+				RaiseDomNodeInserted(newChild);
+
 			if (NodeInserted != null)
 				NodeInserted (newChild);
-
-			if(newChild.Source != NodeSources.DocumentBuilder)
-				RaiseDomNodeInserted(newChild);
 		}
 
 		private void RaiseDomNodeInserted(Node newChild)

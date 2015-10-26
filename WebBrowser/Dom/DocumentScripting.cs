@@ -132,8 +132,8 @@ namespace WebBrowser
 
 		private void RaiseBeforeScriptExecute(Script script)
 		{
-			if (AfterScriptExecute != null)
-				AfterScriptExecute(script);
+			if (BeforeScriptExecute != null)
+				BeforeScriptExecute(script);
 
 			var evt = script.OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("BeforeScriptExecute", false, false);
@@ -141,6 +141,7 @@ namespace WebBrowser
 			script.OwnerDocument.DispatchEvent(evt);
 		}
 
+		public event Action<Script> BeforeScriptExecute;
 		public event Action<Script> AfterScriptExecute;
 		public event Action<Script, Exception> ScriptExecutionError;
 

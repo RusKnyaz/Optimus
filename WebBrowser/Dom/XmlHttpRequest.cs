@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
 
@@ -32,7 +31,7 @@ namespace WebBrowser.Dom
 	public class XmlHttpRequest : IXmlHttpRequest
 	{
 		private readonly IResourceProvider _resourceProvider;
-		private readonly object _syncObj;
+		private readonly Func<object> _syncObj;
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
@@ -41,7 +40,7 @@ namespace WebBrowser.Dom
 
 		public event Action OnTimeout;
 
-		public XmlHttpRequest(IResourceProvider resourceProvider, object syncObj)
+		public XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj)
 		{
 			_resourceProvider = resourceProvider;
 			_syncObj = syncObj;
@@ -194,9 +193,9 @@ namespace WebBrowser.Dom
 
 		private void CallInContext(Action action)
 		{
-			lock (_syncObj)
+			lock (_syncObj())
 			{
-				(action).Fire();
+				action.Fire();
 			}
 		}
 

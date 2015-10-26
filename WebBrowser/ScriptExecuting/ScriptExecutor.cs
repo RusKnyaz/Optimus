@@ -30,7 +30,7 @@ namespace WebBrowser.ScriptExecuting
 
 			public Document Document { get { return _engine.Document; } }
 			public Window Window { get { return _engine.Window; } }
-			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider, _engine.Document);}
+			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider, () => Document);}
 		}
 
 		public ScriptExecutor(Engine engine)

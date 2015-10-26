@@ -7,8 +7,7 @@ namespace WebBrowser.Dom.Elements
 {
 	internal class WindowTimers
 	{
-		private readonly SynchronizationContext _context;
-		readonly List<Timer> _activeTimers = new List<Timer>();
+		readonly List<TimeoutTimer> _activeTimers = new List<TimeoutTimer>();
 
 		public event Action<Exception> OnException;
 
@@ -21,31 +20,86 @@ namespace WebBrowser.Dom.Elements
 
 		public int SetTimeout(Action handler, int timeout)
 		{
-			var timer = new Timer(state =>
+			var timer = new TimeoutTimer(t =>
+				{
+					handler();
+					lock (_activeTimers)
+					{
+						_activeTimers.Remove(t);
+					}
+				}, exception =>
+					{
+						if (OnException != null)
+							OnException(exception);
+					}, timeout, _getSyncObj);
+
+			lock (_activeTimers)
 			{
-				lock (state)
+				_activeTimers.Add(timer);	
+			}
+
+			timer.Start();
+			
+			return timer.GetHashCode();
+		}
+
+		class TimeoutTimer : IDisposable
+		{
+			private readonly Action<TimeoutTimer> _handler;
+			private readonly Action<Exception> _errorHandler;
+			private readonly int _timeout;
+			private readonly Func<object> _getSync;
+			private Timer _timer;
+
+			public TimeoutTimer(Action<TimeoutTimer> handler, Action<Exception> errorHandler, int timeout, Func<Object> getSync)
+			{
+				_handler = handler;
+				_errorHandler = errorHandler;
+				_timeout = timeout;
+				_getSync = getSync;
+			}
+
+			private void Callback(object state)
+			{
+				lock (_getSync())
 				{
 					try
 					{
-						handler();
+						_handler(this);
 					}
 					catch (Exception e)
 					{
-						if (OnException != null)
-							OnException(e);
+						if (_errorHandler != null)
+							_errorHandler(e);
 					}
 				}
-			}, _getSyncObj(), timeout, Timeout.Infinite);
+			}
+			
+			public void Dispose()
+			{
+				lock (this)
+				{
+					if(_timer != null)
+						_timer.Dispose();
+				}
+			}
 
-			return timer.GetHashCode();
+			public void Start()
+			{
+				_timer = new Timer(Callback, null, _timeout, Timeout.Infinite);
+			}
 		}
 
 		public void ClearTimeout(int handle)
 		{
-			var timer = _activeTimers.FirstOrDefault(x => x.GetHashCode() == handle);
-			if (timer != null)
+			lock (_activeTimers)
 			{
-				timer.Dispose();
+				var timer = _activeTimers.FirstOrDefault(x => x.GetHashCode() == handle);
+				if (timer != null)
+				{
+					timer.Dispose();
+					_activeTimers.Remove(timer);
+				}
 			}
 		}
 	}

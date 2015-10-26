@@ -16,8 +16,14 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine(_resourceProvider);
 			engine.DocumentChanged+= () =>
 			{
+				engine.Scripting.BeforeScriptExecute += script => System.Console.WriteLine(
+					"Executing:" + (script.Src ?? script.Id ?? "<script>"));
+
 				engine.Scripting.AfterScriptExecute += script => System.Console.WriteLine(
 					"Executed:" + (script.Src ?? script.Id ?? "<script>"));
+
+				engine.Scripting.ScriptExecutionError += (script, exception) => System.Console.WriteLine(
+					"Error script execution:" + (script.Src ?? script.Id ?? "<script>") + " " + exception.Message);
 			};
 			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
 			return engine;
