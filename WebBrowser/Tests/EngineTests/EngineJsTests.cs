@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -236,6 +235,16 @@ console.log(d.childNodes[0].tagName);");
 			CollectionAssert.AreEqual(new object[] { "p" }, _log);
 		}
 
+		//The test comes from bootstrap library
+		[Test]
+		public void StyleOfCustom()
+		{
+			var engine = CreateEngine("<span id='content1' style='width:100pt; heigth:100pt'></span>",
+@"var style = document.createElement('bootstrap').style;
+console.log(style ? 'ok' : 'null');");
+			CollectionAssert.AreEqual(new[] { "ok"}, _log);
+		}
+
 		[Test]
 		public void StyleRead()
 		{
@@ -267,6 +276,7 @@ console.log(style['width']);");
 			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog+= x => _log.Add(x.ToString());
 			engine.OpenUrl("http://todosoft.org");
+			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "http://todosoft.org", "http:" }, _log);
 		}
 
@@ -279,6 +289,7 @@ console.log(style['width']);");
 			var engine = new Engine(resourceProvider);
 			engine.OpenUrl("http://todosoft.org");
 
+			Thread.Sleep(1000);
 //todo:			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.org"), Times.Once());
 //todo:			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.org/sub"), Times.Once());
 

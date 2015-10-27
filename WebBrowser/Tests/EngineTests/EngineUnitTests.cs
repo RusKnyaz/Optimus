@@ -1,6 +1,5 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
-using System.Net;
 using System.Threading;
 using Moq;
 using NUnit.Framework;

@@ -93,7 +93,7 @@ namespace WebBrowser.Dom
 				case"body":return new Body(this);
 			}
 
-			return new Element(this, tagName) { OwnerDocument = this};
+			return new HtmlElement(this, tagName) { OwnerDocument = this };
 		}
 
 		public Attr CreateAttribute(string name)
@@ -165,11 +165,11 @@ namespace WebBrowser.Dom
 			if (!newChild.IsInDocument ())
 				return;
 
-			if (newChild.Source != NodeSources.DocumentBuilder)
-				RaiseDomNodeInserted(newChild);
-
 			if (NodeInserted != null)
 				NodeInserted (newChild);
+
+			if (newChild.Source != NodeSources.DocumentBuilder)
+				RaiseDomNodeInserted(newChild);
 		}
 
 		private void RaiseDomNodeInserted(Node newChild)

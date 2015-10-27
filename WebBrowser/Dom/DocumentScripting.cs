@@ -43,27 +43,24 @@ namespace WebBrowser
 			{
 				var remote = script.HasDelayedContent;
 				var async = script.Async && remote || script.Source == NodeSources.Script;
-				var defer = script.Defer && remote;
+				var defer = script.Defer && remote && !async && script.Source == NodeSources.DocumentBuilder;
 
-				if (!async && defer && node.OwnerDocument.ReadyState != DocumentReadyStates.Complete)
+				if (defer)
 				{
 					_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(script.LoadAsync(_resourceProvider), script));
 				}
-				else
+				else if (remote)
 				{
-					if (remote)
-					{
-						var task = script
-							.LoadAsync(_resourceProvider)
-							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
+					var task = script
+						.LoadAsync(_resourceProvider)
+						.ContinueWith((t, s) => ExecuteScript((Script) s), script);
 
-						if (!async)
-							task.Wait();
-					}
-					else if (!string.IsNullOrEmpty(script.Text))
-					{
-						ExecuteScript(script);
-					}
+					if (!async)
+						task.Wait();
+				}
+				else if (!string.IsNullOrEmpty(script.Text))
+				{
+					ExecuteScript(script);
 				}
 			}
 		}

@@ -56,14 +56,14 @@ namespace WebBrowser
 
 		public Uri Uri { get; private set; }
 
-		public void OpenUrl(string path)
+		public async void OpenUrl(string path)
 		{
 			ScriptExecutor.Clear();
 			Uri = new Uri(path);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
-			var task = ResourceProvider.GetResourceAsync(path);
-			task.Wait();
-			var resource = task.Result;
+			var resource = await ResourceProvider.GetResourceAsync(path);
+			//task.Wait();
+			//var resource = task.Result;
 			if (resource.Type == ResourceTypes.Html)
 			{
 				var httpResponse = resource as HttpResponse;
