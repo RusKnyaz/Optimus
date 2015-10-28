@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using Jint.Runtime;
 using WebBrowser.Dom.Elements;
 
@@ -97,5 +96,16 @@ namespace WebBrowser.Environment
 		}
 
 		public event Action<string> OnAlert;
+
+		public CssStyleDeclaration GetComputedStyle(Element element)
+		{
+			return GetComputedStyle(element, null);
+		}
+		
+		public CssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
+		{
+			//return element.
+			throw new NotImplementedException();
+		}
 	}
 }

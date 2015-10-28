@@ -34,8 +34,10 @@ namespace WebBrowser.Dom
 			DocumentElement = new Element(this, "html"){ParentNode = this};
 			ChildNodes = new List<Node> { DocumentElement };
 			EventTarget = new EventTarget(this, () => window);
+			DefaultView = window;
 		}
 
+		public Window DefaultView { get; private set; }
 		public Element DocumentElement { get; private set; }
 		public DocumentReadyStates ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
