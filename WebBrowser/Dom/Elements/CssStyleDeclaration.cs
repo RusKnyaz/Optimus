@@ -38,8 +38,8 @@ namespace WebBrowser.Dom.Elements
 				int number;
 				if (int.TryParse(name, out number))
 					return;
-			
-				Properties[name] = value.ToString();
+
+				Properties[name] = value == null ? null : value.ToString();
 			}
 		}
 

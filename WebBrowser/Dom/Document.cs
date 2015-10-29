@@ -95,7 +95,7 @@ namespace WebBrowser.Dom
 				case"body":return new Body(this);
 			}
 
-			return new HtmlElement(this, tagName) { OwnerDocument = this };
+			return new HtmlUnknownElement(this, tagName);
 		}
 
 		public Attr CreateAttribute(string name)

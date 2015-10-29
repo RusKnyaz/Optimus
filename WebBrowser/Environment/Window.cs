@@ -54,9 +54,9 @@ namespace WebBrowser.Environment
 
 		private WindowTimers _timers;
 
-		public int SetTimeout(Action handler, int delay)
+		public int SetTimeout(Action handler, double? delay)
 		{
-			return _timers.SetTimeout(handler, delay);
+			return _timers.SetTimeout(handler, (int)(delay ?? 1));
 		}
 
 		public void ClearTimeout(int handle)
@@ -104,8 +104,10 @@ namespace WebBrowser.Environment
 		
 		public CssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
 		{
-			//return element.
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
+			//todo: implement style computing
+			
+			return new CssStyleDeclaration();
 		}
 	}
 }

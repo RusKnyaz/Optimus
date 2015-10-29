@@ -63,6 +63,7 @@
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
     <Compile Include="Dom\Events\CustomEvent.cs" />
     <Compile Include="Dom\Elements\DocumentFragment.cs" />
     <Compile Include="Dom\Elements\Element.cs" />
