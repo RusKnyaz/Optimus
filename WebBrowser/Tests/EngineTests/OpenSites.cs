@@ -23,11 +23,10 @@ namespace WebBrowser.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.OpenUrl("https://html5test.com");
+			Thread.Sleep(10000);//wait calculation
 
 			var score = engine.Document.GetElementById("score");
 			Assert.IsNotNull(score, "score");
-
-			Thread.Sleep(10000);//wait calculation
 			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
 			System.Console.WriteLine(tagWithValue.InnerHTML);
@@ -50,7 +49,7 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
 			engine.OpenUrl("http://192.168.1.36:8891");
-			Thread.Sleep(15000);
+			Thread.Sleep(10000);
 			var userName = engine.Document.GetElementById("UserName");
 
 			Assert.IsNotNull(userName);
