@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 
@@ -29,7 +30,23 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.IsNotNull(score, "score");
 			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
-			System.Console.WriteLine(tagWithValue.InnerHTML);
+			System.Console.WriteLine("Score: " + tagWithValue.InnerHTML);
+
+			foreach (var category in ("parsing elements form location output input communication webrtc interaction " +
+			                         "performance security history offline storage files streams video audio responsive " +
+			                         "canvas webgl animation").Split(' '))
+			{
+				try
+				{
+					System.Console.WriteLine(category + ": " +
+					                         engine.Document.GetElementById("head-" + category).GetElementsByTagName("span")[0]
+						                         .InnerHTML);
+				}
+				catch (Exception)
+				{
+					System.Console.WriteLine(category + " not found");
+				}
+			}
 		}
 
 		[Test]
