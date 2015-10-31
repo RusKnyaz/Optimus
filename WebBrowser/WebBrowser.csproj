@@ -118,6 +118,7 @@
     <Compile Include="Tests\EngineTests\OpenSites.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\TestPages.cs" />
+    <Compile Include="Tools\EngineQueryExtension.cs" />
     <Compile Include="Tools\ListExtension.cs" />
     <Compile Include="Tests\EngineTests\EngineUnitTests.cs" />
     <Compile Include="Tests\EngineTests\JQueryFormTests.cs" />
