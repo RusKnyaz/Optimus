@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -79,19 +80,28 @@ namespace WebBrowser.Dom
 			}
 		}
 
+		/// <summary>
+		/// Map attribute to event (onclick->click, etc...)
+		/// </summary>
+		private static IDictionary<string, string> _eventAttr = new Dictionary<string, string>
+		{
+			{"onclick", "click"}
+		};
+
 		private void RegisterAttr(Attr attr)
 		{
-			if (attr.Name.ToLowerInvariant() == "onclick")
+			string eventName;
+			if (_eventAttr.TryGetValue(attr.Name.ToLowerInvariant(), out eventName))
 			{
 				var parentElement = attr.OwnerElement;
 
-				var fname = "_clickHandler_" + DateTime.Now.Ticks;
+				var fname = eventName + "Handler_" + DateTime.Now.Ticks;
 				var funcInit = "function " + fname + "(){" + attr.Value.Trim() + ";}";
 				_scriptExecutor.Execute("text/javascript", funcInit);
 
 				var funcCall = fname + "();";
 
-				parentElement.AddEventListener("click", e => { _scriptExecutor.Execute("text/javascript", funcCall); }, false);
+				parentElement.AddEventListener(eventName, e => { _scriptExecutor.Execute("text/javascript", funcCall); }, false);
 
 				//todo: unsubscribe if attribute value changed
 			}

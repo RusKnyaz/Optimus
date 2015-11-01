@@ -39,6 +39,7 @@ namespace WebBrowser.Tests
 		public void ClickTest(string buttonId, string divId)
 		{
 			var engine = Open("click");
+			Thread.Sleep(1000);
 
 			engine.FirstElement("#" + buttonId).Click();
 			Assert.AreEqual("HI", engine.FirstElement("#" + divId).InnerHTML);

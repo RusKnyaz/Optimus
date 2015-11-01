@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -295,6 +296,22 @@ namespace WebBrowser.Dom.Elements
 		public Attr GetAttributeNode(string name)
 		{
 			return Attributes.ContainsKey(name) ? Attributes[name] : null;
+		}
+
+		protected T GetAttribute<T>(string name, T def)
+		{
+			var val = GetAttribute(name);
+			if (val == null)
+				return def;
+
+			try
+			{
+				return (T)Convert.ChangeType(val, typeof(T));
+			}
+			catch
+			{
+				return def;
+			}
 		}
 	}
 

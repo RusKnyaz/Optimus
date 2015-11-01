@@ -9,14 +9,23 @@ namespace WebBrowser.Dom.Elements
 	/// </summary>
 	public class HtmlElement : Element, IHtmlElement
 	{
+		static class Defaults
+		{
+			public static bool Hidden = false;
+		}
+
 		public HtmlElement(Document ownerDocument, string tagName)
 			: base(ownerDocument, tagName)
 		{
 			Style = new CssStyleDeclaration();
 		}
 
-		public bool Hidden { get; set; }
-		
+		public bool Hidden
+		{
+			get { return GetAttribute("hidden", Defaults.Hidden); }
+			set { SetAttribute("hidden", value.ToString());}
+		}
+
 		public void Click()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
@@ -41,6 +50,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			base.UpdatePropertyFromAttribute(value, invariantName);
 
+			//todo: remove it to property
 			if (invariantName == "style")
 			{
 				if (!string.IsNullOrEmpty(value))
@@ -57,10 +67,6 @@ namespace WebBrowser.Dom.Elements
 					}
 				}
 			} 
-			else if (invariantName == "hidden")
-			{
-				Hidden = value == "true";
-			}
 		}
 	}
 

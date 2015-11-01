@@ -63,6 +63,7 @@
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
     <Compile Include="Dom\Events\CustomEvent.cs" />
     <Compile Include="Dom\Elements\DocumentFragment.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
+    <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\EngineTests\ComplexTests.cs" />
     <Compile Include="Tests\EngineTests\EngineJsTests.cs" />
     <Compile Include="Tests\EngineTests\OpenSites.cs" />

@@ -93,6 +93,7 @@ namespace WebBrowser.Dom
 				case "script": return new Script(this);
 				case "head":return new Head(this);
 				case"body":return new Body(this);
+				case "textarea": return new HtmlTextAreaElement(this);
 			}
 
 			return new HtmlUnknownElement(this, tagName);
