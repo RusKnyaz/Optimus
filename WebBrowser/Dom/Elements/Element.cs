@@ -175,9 +175,18 @@ namespace WebBrowser.Dom.Elements
 		{
 			var invariantName = name.ToLowerInvariant();
 			if (Attributes.ContainsKey(invariantName))
+			{
+				//todo: we should notify someone about value changed. For example to handle event subscriptions.
 				Attributes[invariantName].Value = value;
+			}
 			else
-				Attributes.Add(invariantName, new Attr(this, name, value) { OwnerDocument = OwnerDocument });
+			{
+				var attr = new Attr(this, name, value) {OwnerDocument = OwnerDocument};
+				Attributes.Add(invariantName, attr);
+				OwnerDocument.HandleNodeAdded(attr);
+			}
+
+
 
 			UpdatePropertyFromAttribute(value, invariantName);
 		}
@@ -187,6 +196,14 @@ namespace WebBrowser.Dom.Elements
 			if (invariantName == "id")
 			{
 				Id = value;
+			}
+
+			if (invariantName == "onclick")
+			{
+				//todo: check should we unsubscribe old value
+				//todo: check if listener should capture
+				//todo: check execution order
+				AddEventListener("click", e => { }, false);
 			}
 		}
 

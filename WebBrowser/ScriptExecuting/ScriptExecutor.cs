@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Threading;
 using Jint.Native;
 using Jint.Runtime;
-using Jint.Runtime.Descriptors;
-using Jint.Runtime.Interop;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Environment;

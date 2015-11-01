@@ -1,25 +1,22 @@
 ﻿using System;
-using WebBrowser.Dom;
-using WebBrowser.ScriptExecuting;
-using WebBrowser.Dom.Elements;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using WebBrowser.Dom.Elements;
 using WebBrowser.Dom.Events;
+using WebBrowser.ScriptExecuting;
 
-namespace WebBrowser
+namespace WebBrowser.Dom
 {
 	/// <summary>
 	/// Executes scripts for the Document in proper order.
 	/// </summary>
 	public class DocumentScripting : IDisposable
 	{
-		Queue<Tuple<Task, Script>> _unresolvedDelayedResources;
+		private readonly Queue<Tuple<Task, Script>> _unresolvedDelayedResources;
 		private readonly IResourceProvider _resourceProvider;
-
-		IDocument _document;
-
-		IScriptExecutor _scriptExecutor;
+		private readonly IDocument _document;
+		private readonly IScriptExecutor _scriptExecutor;
 
 		public DocumentScripting (
 			IDocument document, 
@@ -39,29 +36,64 @@ namespace WebBrowser
 			if (!node.IsInDocument ())
 				return;
 
-			foreach (var script in node.Flatten().OfType<Script>())
+			var attr = node as Attr;
+			if (attr != null)
 			{
-				var remote = script.HasDelayedContent;
-				var async = script.Async && remote || script.Source == NodeSources.Script;
-				var defer = script.Defer && remote && !async && script.Source == NodeSources.DocumentBuilder;
+				RegisterAttr(attr);
 
-				if (defer)
-				{
-					_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(script.LoadAsync(_resourceProvider), script));
-				}
-				else if (remote)
-				{
-					var task = script
-						.LoadAsync(_resourceProvider)
-						.ContinueWith((t, s) => ExecuteScript((Script) s), script);
+				return;
+			}
 
-					if (!async)
-						task.Wait();
-				}
-				else if (!string.IsNullOrEmpty(script.Text))
+			foreach (var elt in node.Flatten().OfType<HtmlElement>())
+			{
+				foreach (var attribute in elt.Attributes)
 				{
-					ExecuteScript(script);
+					RegisterAttr(attribute);
 				}
+
+				var script = elt as Script;
+				if (script != null)
+				{
+					var remote = script.HasDelayedContent;
+					var async = script.Async && remote || script.Source == NodeSources.Script;
+					var defer = script.Defer && remote && !async && script.Source == NodeSources.DocumentBuilder;
+
+					if (defer)
+					{
+						_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(script.LoadAsync(_resourceProvider), script));
+					}
+					else if (remote)
+					{
+						var task = script
+							.LoadAsync(_resourceProvider)
+							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
+
+						if (!async)
+							task.Wait();
+					}
+					else if (!string.IsNullOrEmpty(script.Text))
+					{
+						ExecuteScript(script);
+					}
+				}
+			}
+		}
+
+		private void RegisterAttr(Attr attr)
+		{
+			if (attr.Name.ToLowerInvariant() == "onclick")
+			{
+				var parentElement = attr.OwnerElement;
+
+				var fname = "_clickHandler_" + DateTime.Now.Ticks;
+				var funcInit = "function " + fname + "(){" + attr.Value.Trim() + ";}";
+				_scriptExecutor.Execute("text/javascript", funcInit);
+
+				var funcCall = fname + "();";
+
+				parentElement.AddEventListener("click", e => { _scriptExecutor.Execute("text/javascript", funcCall); }, false);
+
+				//todo: unsubscribe if attribute value changed
 			}
 		}
 

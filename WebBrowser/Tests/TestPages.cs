@@ -1,7 +1,6 @@
 ﻿#if NUNIT
 using System.Threading;
 using NUnit.Framework;
-using WebBrowser.Dom.Elements;
 using WebBrowser.Tools;
 
 namespace WebBrowser.Tests
@@ -18,6 +17,7 @@ namespace WebBrowser.Tests
 		{
 			var engine = new Engine().AttachConsole();
 			engine.OpenUrl(GetTestUrl(testUrl));
+			engine.WaitDocumentLoad();
 			return engine;
 		}
 
@@ -26,7 +26,7 @@ namespace WebBrowser.Tests
 		public void OpenHelloPageTest(string subUrl)
 		{
 			var engine = Open(subUrl);
-			Thread.Sleep(2000);
+			Thread.Sleep(1000);
 
 			var greeting = engine.Document.GetElementById("greeting");
 			Assert.IsNotNull(greeting);
@@ -39,7 +39,6 @@ namespace WebBrowser.Tests
 		public void ClickTest(string buttonId, string divId)
 		{
 			var engine = Open("click");
-			Thread.Sleep(2000);
 
 			engine.FirstElement("#" + buttonId).Click();
 			Assert.AreEqual("HI", engine.FirstElement("#" + divId).InnerHTML);

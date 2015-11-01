@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using WebBrowser.Tools;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -24,7 +25,8 @@ namespace WebBrowser.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.OpenUrl("https://html5test.com");
-			Thread.Sleep(10000);//wait calculation
+			engine.WaitDocumentLoad();
+			Thread.Sleep(5000);//wait calculation
 
 			var score = engine.Document.GetElementById("score");
 			Assert.IsNotNull(score, "score");

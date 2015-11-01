@@ -1197,7 +1197,9 @@ var requirejs, require, define;
 					node.detachEvent(ieName, func);
 				}
 			} else {
-				node.removeEventListener(name, func, false);
+			    console.log("asdasdasdadasdasd");
+			    //node.removeEventListener(name, func, false);
+			    node.removeEventListener(name, null, false);
 			}
 		}
 
@@ -1210,12 +1212,12 @@ var requirejs, require, define;
 		function getScriptData(evt) {
 			//Using currentTarget instead of target for Firefox 2.0's sake. Not
 			//all old browsers will be supported, but this one was easy enough
-			//to support and still makes sense.
-			var node = evt.currentTarget || evt.srcElement;
+		    //to support and still makes sense.
+		    var node = evt.currentTarget || evt.srcElement;
 
 			//Remove the listeners once here.
-			removeListener(node, context.onScriptLoad, 'load', 'onreadystatechange');
-			removeListener(node, context.onScriptError, 'error');
+		    removeListener(node, context.onScriptLoad, 'load', 'onreadystatechange');
+		    removeListener(node, context.onScriptError, 'error');
 
 			return {
 				node: node,
@@ -1681,8 +1683,9 @@ var requirejs, require, define;
 					//to long.
 					interactiveScript = null;
 
-					//Pull out the name of the module and the context.
-					var data = getScriptData(evt);
+				    //Pull out the name of the module and the context.
+				    var data = getScriptData(evt);
+				    console.log("2222222222: " +data.id);
 					context.completeLoad(data.id);
 				}
 			},

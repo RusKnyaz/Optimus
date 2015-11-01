@@ -162,7 +162,7 @@ namespace WebBrowser.Dom
 		public event Action<Node> NodeInserted;
 
 
-		internal void HandleNodeAdded(Node parentNode, Node newChild)
+		internal void HandleNodeAdded(Node newChild)
 		{
 			if (!newChild.IsInDocument ())
 				return;

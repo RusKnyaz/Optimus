@@ -50,6 +50,8 @@ namespace WebBrowser
 			Window = new Window(() => Document, this);
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+			Document = new Document(Window);
+			Document.OnNodeException += (node, exception) => Console.Log("Node event handler exception: " + exception.Message);
 		}
 
 		public Engine() : this(new ResourceProvider()) { }
@@ -80,8 +82,6 @@ namespace WebBrowser
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
-			Document = new Document(Window);
-			Document.OnNodeException += (node, exception) => Console.Log("Node event handler exception: " + exception.Message);
 			//todo: clear js runtime context
 			
 			DocumentBuilder.Build(Document, stream);

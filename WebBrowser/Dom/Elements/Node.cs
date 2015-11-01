@@ -67,7 +67,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			node.ParentNode = this;
 			node.OwnerDocument = OwnerDocument;
-			OwnerDocument.HandleNodeAdded(this, node);
+			OwnerDocument.HandleNodeAdded(node);
 		}
 
 		private void UnattachFromParent(Node node)

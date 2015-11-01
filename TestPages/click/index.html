@@ -10,7 +10,7 @@
 </head>
 <body>
 <button id ="but1" onclick="hi1()">Clickme1</button><div id="hi1"></div>
-<button id="but2" onclick=" document.getElementById('hi2').innerHTML = 'HI' ">Clickme2</button>
+<button id="but2" onclick="document.getElementById('hi2').innerHTML = 'HI' ">Clickme2</button>
 <div id="hi2"></div>
 <button id="but3">Clickme3</button>
 <div id="hi3"></div>
@@ -18,7 +18,7 @@
     var but = document.getElementById("but3");
     but.addEventListener("click", function () {
         document.getElementById("hi3").innerHTML = "HI";
-    }, false, false);
+    }, false);
 </script>
 </body>
 </html>
