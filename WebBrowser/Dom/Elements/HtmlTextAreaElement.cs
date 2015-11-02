@@ -8,6 +8,7 @@
 	{
 		static class Defaults
 		{
+			public static string Autocomplete = "on";
 			public static bool Autofocus = false;
 			public static bool Disabled = false;
 			public static ulong Cols = 20ul;
@@ -15,6 +16,12 @@
 			public static bool Required = false;
 			public static bool Readonly = false;
 			public static ulong Rows = 2ul;
+			public static string DirName = string.Empty;
+			public static long MaxLength = -1;
+			public static long MinLength = -1;
+			public static string Name = string.Empty;
+			public static string Wrap = string.Empty;
+			public static string DefaultValue = string.Empty;
 		}
 
 		public HtmlTextAreaElement(Document ownerDocument) : base(ownerDocument, "textarea")
@@ -69,18 +76,48 @@
 			set { InnerHTML = value ?? string.Empty; }
 		}
 
+		public string DirName
+		{
+			get { return GetAttribute("dirName", Defaults.DirName); }
+			set { SetAttribute("dirName", value); }
+		}
 
-		//		 attribute DOMString autocomplete;
-//           attribute DOMString dirName;
+		public long MaxLength
+		{
+			get { return GetAttribute("maxLength", Defaults.MaxLength); }
+			set { SetAttribute("maxLength", value.ToString()); }
+		}
+
+		public long MinLength
+		{
+			get { return GetAttribute("minLength", Defaults.MinLength); }
+			set { SetAttribute("minLength", value.ToString()); }
+		}
+
+		public string Name
+		{
+			get { return GetAttribute("name", Defaults.Name); }
+			set { SetAttribute("name", value); }
+		}
+
+		public string Wrap
+		{
+			get { return GetAttribute("wrap", Defaults.Wrap); }
+			set { SetAttribute("wrap", value); }
+		}
+
+		public string DefaultValue
+		{
+			get { return GetAttribute("defaultValue", Defaults.DefaultValue); }
+			set { SetAttribute("defaultValue", value); }
+		}
+
+		public ulong TextLength
+		{
+			get { return (ulong) (Value ?? string.Empty).Length; }
+		}
+
 //  readonly attribute HTMLFormElement? form;
-//           attribute long maxLength;
-//           attribute long minLength;
-//           attribute DOMString name;
-//           attribute DOMString wrap;
-//
-//  readonly attribute DOMString type;
-//           attribute DOMString defaultValue;
-//  readonly attribute unsigned long textLength;
 //
 //  readonly attribute boolean willValidate;
 //  readonly attribute ValidityState validity;

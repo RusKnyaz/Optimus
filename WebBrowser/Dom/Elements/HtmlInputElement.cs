@@ -15,11 +15,21 @@ namespace WebBrowser.Dom.Elements
 			public static bool Required = false;
 			public static string Value = string.Empty;
 			public static string Type = "text";
+			public static string Autocomplete = "on";
 		}
 
 		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, "input")
 		{
 			Type = "text";
+		}
+
+		/// <summary>
+		/// Specifies whether or not an input field should have autocomplete enabled. Available values: "on"|"off".
+		/// </summary>
+		public string Autocomplete
+		{
+			get { return GetAttribute("autocomplete", Defaults.Autocomplete); }
+			set { SetAttribute("autocomplete", value); }
 		}
 
 		public string Value
