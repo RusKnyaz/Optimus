@@ -85,8 +85,7 @@ namespace WebBrowser.Dom.Elements
 
 		public IList<Node> ChildNodes { get; protected set; }
 		public string InternalId { get; private set; }
-		public string Id { get; set; }
-
+		
 		public Node RemoveChild(Node node)
 		{
 			ChildNodes.Remove(node);
@@ -262,7 +261,6 @@ namespace WebBrowser.Dom.Elements
 	{
 		Document OwnerDocument { get; }
 		Node AppendChild(Node node);
-		string Id { get; }
 		Node RemoveChild(Node node);
 		Node InsertBefore(Node newChild, Node refNode);
 		bool HasChildNodes { get; }

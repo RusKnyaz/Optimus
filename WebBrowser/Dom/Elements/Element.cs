@@ -1,93 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {
-	[DomItem]
-	public interface IAttributesCollection:  IEnumerable<Attr>
-	{
-		Attr this[string name]{get; set; }
-		Attr this[int idx] { get; }
-		bool ContainsKey(string name);
-		void Remove(string name);
-		void Add(string invariantName, Attr attr);
-		int Count { get; }
-	}
-
-	public class AttributesCollection : IAttributesCollection
-	{
-		public AttributesCollection()
-		{
-			Properties = new OrderedDictionary();
-		}
-
-		public OrderedDictionary Properties { get; private set; }
-
-		public Attr this[string name]
-		{
-			get
-			{
-				int number;
-				if (int.TryParse(name, out number))
-					return this[number];
-				
-				return (Attr)Properties[name]; //return value
-			}
-			set
-			{
-				int number;
-				if (int.TryParse(name, out number))
-					return;
-			
-				Properties[name] = value;
-			}
-		}
-
-		public Attr this[int idx]
-		{
-			get
-			{
-				return idx < 0 || idx >= Properties.Count ? null : (Attr)Properties[idx];
-			}
-		}
-
-		public bool ContainsKey(string name)
-		{
-			int number;
-			if (int.TryParse(name, out number))
-				return number >= 0  && number < Count;
-
-			return Properties.Contains(name);
-		}
-
-		public IEnumerator<Attr> GetEnumerator()
-		{
-			return Properties.Values.Cast<Attr>().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return Properties.GetEnumerator();
-		}
-
-		public void Remove(string name)
-		{
-			Properties.Remove(name);
-		}
-
-		public void Add(string invariantName, Attr attr)
-		{
-			Properties.Add(invariantName, attr);
-		}
-
-		public int Count { get { return Properties.Count; } }
-	}
-
 	public class Element : Node, IElement
 	{
 		private readonly IAttributesCollection _attributes;
@@ -109,6 +26,12 @@ namespace WebBrowser.Dom.Elements
 		}
 
 		public string TagName { get; private set; }
+
+		public string Id
+		{
+			get { return GetAttribute("id", string.Empty); }
+			set { SetAttribute("id", value); }
+		}
 
 		public virtual string InnerHTML
 		{
@@ -187,25 +110,12 @@ namespace WebBrowser.Dom.Elements
 				OwnerDocument.HandleNodeAdded(attr);
 			}
 
-
-
 			UpdatePropertyFromAttribute(value, invariantName);
 		}
 
 		protected virtual void UpdatePropertyFromAttribute(string value, string invariantName)
 		{
-			if (invariantName == "id")
-			{
-				Id = value;
-			}
-
-			if (invariantName == "onclick")
-			{
-				//todo: check should we unsubscribe old value
-				//todo: check if listener should capture
-				//todo: check execution order
-				AddEventListener("click", e => { }, false);
-			}
+			//todo: remove the stuff
 		}
 
 		public Attr SetAttributeNode(Attr attr)
