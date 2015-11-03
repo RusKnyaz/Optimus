@@ -5,7 +5,7 @@ namespace WebBrowser.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
-	public class HtmlInputElement : HtmlElement, IHtmlInputElement
+	public class HtmlInputElement : HtmlElement, IHtmlInputElement, IResettableElement
 	{
 		static class Defaults
 		{
@@ -66,6 +66,18 @@ namespace WebBrowser.Dom.Elements
 		{
 			get { return GetAttribute("checked", Defaults.Checked); }
 			set { SetAttribute("checked", value.ToString());}
+		}
+
+		void IResettableElement.Reset()
+		{
+			//todo: implement
+			//The reset algorithm for input elements is to set the dirty value flag and dirty checkedness flag back to false, 
+			//set the value of the element to the value of the value content attribute, if there is one, or the empty string otherwise, 
+			//set the checkedness of the element to true if the element has a checked content attribute and false if it does not, 
+			//empty the list of selected files, and then invoke the value sanitization algorithm, if the type attribute's current 
+			//state defines one.
+
+			throw new System.NotImplementedException();
 		}
 	}
 

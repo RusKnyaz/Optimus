@@ -1,4 +1,5 @@
 ﻿#if NUNIT
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
@@ -52,6 +53,25 @@ namespace WebBrowser.Tests.Dom
 			_textArea.SetAttribute("rows", null);
 			Assert.AreEqual(null, _textArea.GetAttribute("rows"));
 			Assert.AreEqual(2, _textArea.Rows);
+		}
+
+		[Test]
+		public void AncestorOwnerForm()
+		{
+			var form = _document.CreateElement("form");
+			form.AppendChild(_textArea);
+			Assert.AreEqual(form, _textArea.Form);
+		}
+
+		[Test]
+		public void NeightbourOwnerForm()
+		{
+			var form = _document.CreateElement("form");
+			form.Id = "myForm";
+			_textArea.SetAttribute("form", "myForm");
+			_document.DocumentElement.AppendChild(_textArea);
+			_document.DocumentElement.AppendChild(form);
+			Assert.AreEqual(form, _textArea.Form);
 		}
 	}
 }

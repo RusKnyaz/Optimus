@@ -35,6 +35,12 @@ namespace WebBrowser.Dom.Elements
 
 		public event Action OnClick;
 
+		/// <summary>
+		/// This method allows the dispatch of events into the implementations event model. 
+		/// Events dispatched in this manner will have the same capturing and bubbling behavior as events dispatched directly by the implementation. The target of the event is the EventTarget on which dispatchEvent is called.
+		/// </summary>
+		/// <returns>The return value of dispatchEvent indicates whether any of the listeners which handled the event called preventDefault. 4
+		/// If preventDefault was called the value is false, else the value is true.</returns>
 		public override bool DispatchEvent(Event evt)
 		{
 			if (evt.Type == "click" && OnClick != null)

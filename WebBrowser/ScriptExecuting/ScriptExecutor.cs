@@ -52,6 +52,7 @@ namespace WebBrowser.ScriptExecuting
 			_jsEngine.Global.FastAddProperty("HTMLElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlElement))), false, false, false);
 			_jsEngine.Global.FastAddProperty("HTMLInputElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlInputElement))), false, false, false);
 			_jsEngine.Global.FastAddProperty("HTMLTextAreaElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlTextAreaElement))), false, false, false);
+			_jsEngine.Global.FastAddProperty("HTMLFormElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlFormElement))), false, false, false);
 			_jsEngine.Global.FastAddProperty("HTMLUnknownElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlUnknownElement))), false, false, false);
 			_jsEngine.Global.FastAddProperty("Script", new JsValue(new ClrPrototype(_jsEngine, typeof(Script))), false, false, false);
 			_jsEngine.Global.FastAddProperty("Body", new JsValue(new ClrPrototype(_jsEngine, typeof(Body))), false, false, false);

@@ -1,10 +1,12 @@
-﻿namespace WebBrowser.Dom.Elements
+﻿using System.Linq;
+
+namespace WebBrowser.Dom.Elements
 {
 	/// <summary>
 	/// Represents textarea html element (see http://www.w3.org/TR/html5/forms.html#the-textarea-element).
 	/// Todo: complete implementation
 	/// </summary>
-	public class HtmlTextAreaElement : HtmlElement
+	public class HtmlTextAreaElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults
 		{
@@ -117,6 +119,9 @@
 			get { return (ulong) (Value ?? string.Empty).Length; }
 		}
 
+		//todo: Check implementation
+		public string TextContent { get {return DefaultValue;} set { DefaultValue = value; } }
+
 //  readonly attribute HTMLFormElement? form;
 //
 //  readonly attribute boolean willValidate;
@@ -134,5 +139,24 @@
 //  void setRangeText(DOMString replacement);
 //  void setRangeText(DOMString replacement, unsigned long start, unsigned long end, optional SelectionMode selectionMode = "preserve");
 //  void setSelectionRange(unsigned long start, unsigned long end, optional DOMString direction);
+		public void Reset()
+		{
+			Value = TextContent;
+		}
+
+		public HtmlFormElement Form
+		{
+			get
+			{
+				var formId = GetAttribute("form");
+				if (!string.IsNullOrEmpty(formId))
+				{
+					var form = OwnerDocument.GetElementById(formId) as HtmlFormElement;
+					if (form != null)
+						return form;
+				}
+				return this.Ancestors().OfType<HtmlFormElement>().FirstOrDefault();
+			}
+		}
 	}
 }

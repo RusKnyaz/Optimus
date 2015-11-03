@@ -299,5 +299,15 @@ namespace WebBrowser.Dom.Elements
 
 			return praParent == node.OwnerDocument;
 		}
+
+		public static IEnumerable<Node> Ancestors(this Node node)
+		{
+			var parent = node.ParentNode;
+			while (parent != null)
+			{
+				yield return parent;
+				parent = parent.ParentNode;
+			}
+		}
 	}
 }

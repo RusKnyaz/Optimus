@@ -67,8 +67,11 @@
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
+    <Compile Include="Dom\Elements\IFormElement.cs" />
+    <Compile Include="Dom\Elements\IResettableElement.cs" />
     <Compile Include="Dom\Events\CustomEvent.cs" />
     <Compile Include="Dom\Elements\DocumentFragment.cs" />
     <Compile Include="Dom\Elements\Element.cs" />
