@@ -1,6 +1,7 @@
 ﻿#if NUNIT
 using System.Threading;
 using NUnit.Framework;
+using WebBrowser.Dom.Elements;
 using WebBrowser.Tools;
 
 namespace WebBrowser.Tests
@@ -44,6 +45,20 @@ namespace WebBrowser.Tests
 			engine.FirstElement("#" + buttonId).Click();
 			Assert.AreEqual("HI", engine.FirstElement("#" + divId).InnerHTML);
 		}
+
+		[Test]
+		public void FormSubmitTest()
+		{
+			var engine = Open("form");
+
+			var submitButton = engine.WaitId("submitButton") as HtmlButtonElement;
+			Assert.IsNotNull(submitButton, "submitButton");
+
+			submitButton.Click();
+
+			var hi = engine.WaitId("hi");
+			Assert.IsNull(hi);
+		}
 	}
 
 	internal static class EngineExtension
@@ -65,6 +80,7 @@ namespace WebBrowser.Tests
 				engine.Scripting.ScriptExecutionError += (script, exception) => System.Console.WriteLine(
 					"Error script execution:" + (script.Src ?? script.Id ?? "<script>") + " " + exception.Message);
 			};
+
 			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
 			return engine;
 		}

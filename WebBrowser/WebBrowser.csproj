@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="Dom\DOMException.cs" />
+    <Compile Include="Dom\ElementExtension.cs" />
     <Compile Include="Dom\Elements\Attr.cs" />
     <Compile Include="Dom\AttributeMappedValue.cs" />
     <Compile Include="Dom\Elements\AttributesCollection.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
@@ -118,6 +120,7 @@
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
     <Compile Include="Tests\Dom\EventsTests.cs" />
+    <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />

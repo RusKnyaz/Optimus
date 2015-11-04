@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Jint.Native;
 using Jint.Runtime;
 using WebBrowser.Dom;
@@ -47,19 +48,23 @@ namespace WebBrowser.ScriptExecuting
 
 			_jsEngine.Execute(Resources.clrBridge);
 
-			_jsEngine.Global.FastAddProperty("Node", new JsValue(new ClrPrototype(_jsEngine, typeof(Node))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Element", new JsValue(new ClrPrototype(_jsEngine, typeof(Element))), false, false, false);
-			_jsEngine.Global.FastAddProperty("HTMLElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlElement))), false, false, false);
-			_jsEngine.Global.FastAddProperty("HTMLInputElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlInputElement))), false, false, false);
-			_jsEngine.Global.FastAddProperty("HTMLTextAreaElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlTextAreaElement))), false, false, false);
-			_jsEngine.Global.FastAddProperty("HTMLFormElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlFormElement))), false, false, false);
-			_jsEngine.Global.FastAddProperty("HTMLUnknownElement", new JsValue(new ClrPrototype(_jsEngine, typeof(HtmlUnknownElement))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Script", new JsValue(new ClrPrototype(_jsEngine, typeof(Script))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Body", new JsValue(new ClrPrototype(_jsEngine, typeof(Body))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Comment", new JsValue(new ClrPrototype(_jsEngine, typeof(Comment))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Document", new JsValue(new ClrPrototype(_jsEngine, typeof(Document))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Text", new JsValue(new ClrPrototype(_jsEngine, typeof(Text))), false, false, false);
-			_jsEngine.Global.FastAddProperty("Attr", new JsValue(new ClrPrototype(_jsEngine, typeof(Attr))), false, false, false);
+			AddDomType("Node", typeof(Node));
+			AddDomType("Element", typeof(Element));
+			AddDomType("HTMLButtonElement", typeof(HtmlButtonElement));
+			AddDomType("HTMLElement", typeof(HtmlElement));
+			AddDomType("HTMLInputElement", typeof(HtmlInputElement));
+			AddDomType("HTMLTextAreaElement", typeof(HtmlTextAreaElement));
+			AddDomType("HTMLFormElement", typeof(HtmlFormElement));
+			AddDomType("Script", typeof(Script));
+			AddDomType("Comment", typeof(Comment));
+			AddDomType("Document", typeof(Document));
+			AddDomType("Text", typeof(Text));
+			AddDomType("Attr", typeof(Attr));
+		}
+
+		private void AddDomType(string jsName, Type type)
+		{
+			_jsEngine.Global.FastAddProperty(jsName, new JsValue(new ClrPrototype(_jsEngine, type)), false, false, false);
 		}
 
 		public void Execute(string type, string code)

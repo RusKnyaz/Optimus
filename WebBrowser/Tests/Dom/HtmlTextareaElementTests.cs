@@ -1,5 +1,4 @@
 ﻿#if NUNIT
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;

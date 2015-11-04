@@ -26,7 +26,7 @@ namespace WebBrowser.Dom.Elements
 			set { SetAttribute("hidden", value.ToString());}
 		}
 
-		public void Click()
+		public virtual void Click()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("click", true, true);
@@ -39,13 +39,11 @@ namespace WebBrowser.Dom.Elements
 		/// This method allows the dispatch of events into the implementations event model. 
 		/// Events dispatched in this manner will have the same capturing and bubbling behavior as events dispatched directly by the implementation. The target of the event is the EventTarget on which dispatchEvent is called.
 		/// </summary>
-		/// <returns>The return value of dispatchEvent indicates whether any of the listeners which handled the event called preventDefault. 4
-		/// If preventDefault was called the value is false, else the value is true.</returns>
+		/// <returns> If preventDefault was called the value is false, else the value is true.</returns>
 		public override bool DispatchEvent(Event evt)
 		{
 			if (evt.Type == "click" && OnClick != null)
 				OnClick();
-
 			
 			return base.DispatchEvent(evt);
 		}

@@ -1,5 +1,4 @@
-﻿using System;
-using WebBrowser.ScriptExecuting;
+﻿using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
 {

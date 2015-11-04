@@ -117,6 +117,11 @@ namespace WebBrowser.Dom.Elements
 			}
 		}
 
+		public void Submit()
+		{
+			throw new NotImplementedException();
+		}
+
 		/*
            attribute boolean noValidate;
 

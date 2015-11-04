@@ -208,6 +208,12 @@ namespace WebBrowser.Dom.Elements
 			return Attributes.ContainsKey(name) ? Attributes[name] : null;
 		}
 
+		protected T GetAttribute<T>(string name, T[] availableValues, T def)
+		{
+			var val = GetAttribute(name, def);
+			return availableValues.Contains(val) ? val : def;
+		}
+
 		protected T GetAttribute<T>(string name, T def)
 		{
 			var val = GetAttribute(name);

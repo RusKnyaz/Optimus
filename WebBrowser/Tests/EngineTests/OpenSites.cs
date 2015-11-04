@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using WebBrowser.Dom.Elements;
 using WebBrowser.Tools;
 
 namespace WebBrowser.Tests.EngineTests
@@ -72,6 +73,21 @@ namespace WebBrowser.Tests.EngineTests
 			var userName = engine.Document.GetElementById("UserName");
 
 			Assert.IsNotNull(userName);
+		}
+
+		[Test]
+		public void LogonToOkkam()
+		{
+			var engine = new Engine();
+			engine.AttachConsole();
+			engine.OpenUrl("http://okkamtech.com");
+			
+			var logonButton = engine.WaitId("logon") as HtmlElement;
+			Assert.IsNotNull(logonButton);
+			logonButton.Click();
+
+			var logoutButton = engine.WaitId("logout");
+			Assert.IsNotNull(logoutButton);
 		}
 	}
 }

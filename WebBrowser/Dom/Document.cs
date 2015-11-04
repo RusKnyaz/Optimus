@@ -89,6 +89,7 @@ namespace WebBrowser.Dom
 				case "div":
 				case "span":
 				case "b": return new HtmlElement(this, tagName);
+				case "button": return new HtmlButtonElement(this);
 				case "input": return new HtmlInputElement(this);
 				case "script": return new Script(this);
 				case "head":return new Head(this);

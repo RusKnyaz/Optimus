@@ -146,17 +146,7 @@ namespace WebBrowser.Dom.Elements
 
 		public HtmlFormElement Form
 		{
-			get
-			{
-				var formId = GetAttribute("form");
-				if (!string.IsNullOrEmpty(formId))
-				{
-					var form = OwnerDocument.GetElementById(formId) as HtmlFormElement;
-					if (form != null)
-						return form;
-				}
-				return this.Ancestors().OfType<HtmlFormElement>().FirstOrDefault();
-			}
+			get { return this.FindOwnerForm(); }
 		}
 	}
 }

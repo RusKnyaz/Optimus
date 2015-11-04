@@ -63,6 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="click\index.html" />
+    <Content Include="form\index.html" />
+    <Content Include="form\postresult.html" />
     <Content Include="Index.html" />
     <Content Include="jq_rq\index.html" />
     <Content Include="jq_rq\jquery-2.1.1.min.js" />
