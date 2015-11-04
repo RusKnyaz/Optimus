@@ -64,7 +64,7 @@ namespace WebBrowser.Dom.Elements
 
 		public bool Checked
 		{
-			get { return GetAttribute("checked", Defaults.Checked); }
+			get { return GetAttributeNode("checked") != null; }
 			set { SetAttribute("checked", value.ToString());}
 		}
 

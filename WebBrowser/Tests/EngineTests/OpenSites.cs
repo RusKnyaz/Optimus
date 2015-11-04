@@ -83,11 +83,18 @@ namespace WebBrowser.Tests.EngineTests
 			engine.OpenUrl("http://okkamtech.com");
 			
 			var logonButton = engine.WaitId("logon") as HtmlElement;
-			Assert.IsNotNull(logonButton);
+			var userName = engine.Document.GetElementById("UserName") as HtmlInputElement;
+			var password = engine.Document.GetElementById("Password") as HtmlInputElement;
+			Assert.IsNotNull(logonButton, "LogonButton");
+			Assert.IsNotNull(userName, "UserName");
+			Assert.IsNotNull(password, "Password");
+
+			userName.Value = "";
+			password.Value = "";
 			logonButton.Click();
 
 			var logoutButton = engine.WaitId("logout");
-			Assert.IsNotNull(logoutButton);
+			Assert.IsNotNull(logoutButton, "Logout button");
 		}
 	}
 }

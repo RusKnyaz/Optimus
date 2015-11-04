@@ -196,6 +196,14 @@ namespace WebBrowser.Dom
 		}
 
 		public event Action<Node, Exception> OnNodeException;
+
+		internal void HandleFormSubmit(HtmlFormElement htmlFormElement)
+		{
+			if (OnFormSubmit != null)
+				OnFormSubmit(htmlFormElement);
+		}
+
+		internal event Action<HtmlFormElement> OnFormSubmit;
 	}
 
 	[DomItem]

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WebBrowser.Dom.Elements
 {
@@ -22,6 +19,9 @@ namespace WebBrowser.Dom.Elements
 			public static string Encoding = "application/x-www-form-urlencoded";
 		}
 
+		static string[] AllowedEnctypes = new []{"application/x-www-form-urlencoded", "multipart/form-data", "text/plain" };
+		private static string[] AllowedMethods = new[] {"get", "post"};
+
 		public HtmlFormElement(Document ownerDocument) : base(ownerDocument, "form"){}
 
 		public string Name
@@ -32,7 +32,7 @@ namespace WebBrowser.Dom.Elements
 
 		public string Method
 		{
-			get { return GetAttribute("method", Defaults.Method); }
+			get { return GetAttribute("method", AllowedMethods, Defaults.Method).ToLowerInvariant(); }
 			set { SetAttribute("method", value); }
 		}
 
@@ -64,11 +64,15 @@ namespace WebBrowser.Dom.Elements
 		}
 
 		/// <summary>
-		/// Form data set encoding type to use for form submission
+		/// Form data set encoding type to use for form submission. One of three below: 
+		/// <c>application/x-www-form-urlencoded</c>Default. All characters are encoded before sent (spaces are converted to "+" symbols, and special characters are converted to ASCII HEX values)
+		///	<c>multipart/form-data</c>	No characters are encoded. This value is required when you are using forms that have a file upload control
+		/// <c>text/plain</c>	Spaces are converted to "+" symbols, but no special characters are encoded
+		/// Note: The enctype attribute can be used only if method=<c>post</c>.
 		/// </summary>
 		public string Enctype
 		{
-			get { return GetAttribute("enctype", Defaults.Enctype); }
+			get { return GetAttribute("enctype", AllowedEnctypes, Defaults.Enctype).ToLowerInvariant(); }
 			set { SetAttribute("enctype", value); }
 		}
 
@@ -119,7 +123,12 @@ namespace WebBrowser.Dom.Elements
 
 		public void Submit()
 		{
-			throw new NotImplementedException();
+			var evt = OwnerDocument.CreateEvent("Event");
+			evt.InitEvent("submit", true, true);
+			if (!DispatchEvent(evt))
+				return;
+
+			OwnerDocument.HandleFormSubmit(this);
 		}
 
 		/*
