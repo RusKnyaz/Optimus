@@ -55,12 +55,22 @@
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("click", true, true);
-			if (DispatchEvent(evt))
+			DispatchEvent(evt);
+		}
+
+		public override bool DispatchEvent(Event evt)
+		{
+			if (!base.DispatchEvent(evt))
+				return false;
+			
+			//default actions;
+			if (evt.Type == "click")
 			{
 				var form = Form;
 				if (form != null)
 					form.Submit();
 			}
+			return true;
 		}
 
 		public HtmlFormElement Form

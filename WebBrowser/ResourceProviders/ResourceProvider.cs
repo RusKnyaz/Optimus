@@ -74,8 +74,12 @@ namespace WebBrowser.ResourceProviders
 
 			return provider.SendRequestAsync(req).ContinueWith(t =>
 					{
-						if (Received != null)
-							Received(req.Url);
+						try
+						{
+							if (Received != null)
+								Received(req.Url);
+						}
+						catch { }
 						return t.Result;
 					});
 		}

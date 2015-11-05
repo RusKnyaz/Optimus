@@ -2,12 +2,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
+    <script>
+        function submitByClick() {
+            var e = document.createEvent("Event");
+            e.initEvent("click", true, true);
+            document.getElementById('submitButton').dispatchEvent(e);
+        }
+    </script>
 </head>
 <body>
 <form action="postresult.html" method="get">
     <input type="text" name="h"/>
     <button type="submit" id="submitButton">Submit</button>
 </form>
-    <span id="jsSubmit" onclick="document.getElementById('submitButton').click()">Js Submit</span>
+<span id="jsSubmit" onclick=" document.getElementById('submitButton').click() ">Js Submit</span>
+    <span id="jsSubmit2" onclick="submitByClick()">Js Submit2</span>
 </body>
 </html>

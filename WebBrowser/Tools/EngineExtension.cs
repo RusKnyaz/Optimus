@@ -11,10 +11,10 @@ namespace WebBrowser.Tools
 
 		public static void WaitDocumentLoad(this Engine engine)
 		{
-			if(engine.Document.ReadyState == DocumentReadyStates.Complete)
+			if(engine.Document.ReadyState != DocumentReadyStates.Loading)
 				return;
 			
-			var signal = new ManualResetEvent(false);
+			var signal = new ManualResetEventSlim(false);
 
 			var handler = (Action<IDocument>)(document =>
 			{
@@ -23,9 +23,9 @@ namespace WebBrowser.Tools
 
 			engine.Document.DomContentLoaded += handler;
 
-			if (engine.Document.ReadyState != DocumentReadyStates.Complete)
+			if (engine.Document.ReadyState == DocumentReadyStates.Loading)
 			{
-				signal.WaitOne();
+				signal.Wait(DefaultTimeout);
 			}
 
 			engine.Document.DomContentLoaded -= handler;

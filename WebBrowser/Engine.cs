@@ -76,12 +76,18 @@ namespace WebBrowser
 			{
 				//todo: escape specialchars
 				var url = form.Action + "?" + data;
-				OpenUrl(url);
+
+				Document = new Document(Window);
+				var request = ResourceProvider.CreateRequest(url);
+				var response = await ResourceProvider.GetResourceAsync(request);
+				LoadFromResponse(response);
 			}
 			else
 			{
 				if (form.Action != "about:blank")
 				{
+					Document = new Document(Window);
+
 					var request = ResourceProvider.CreateRequest(form.Action);
 					var httpRequest = request as HttpRequest;
 					if (httpRequest != null)

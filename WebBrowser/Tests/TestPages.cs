@@ -57,7 +57,8 @@ namespace WebBrowser.Tests
 			submitButton.Click();
 
 			var hi = engine.WaitId("hi");
-			Assert.IsNull(hi);
+			Assert.IsNotNull(hi);
+			Assert.AreEqual("HI", hi.InnerHTML);
 		}
 	}
 

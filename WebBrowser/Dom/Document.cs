@@ -54,6 +54,8 @@ namespace WebBrowser.Dom
 
 		internal void Complete()
 		{
+			ReadyState = DocumentReadyStates.Interactive;
+
 			if (DomContentLoaded != null)
 				DomContentLoaded (this);
 

@@ -125,10 +125,19 @@ namespace WebBrowser.Dom.Elements
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("submit", true, true);
-			if (!DispatchEvent(evt))
-				return;
+			DispatchEvent(evt);
+		}
 
-			OwnerDocument.HandleFormSubmit(this);
+		public override bool DispatchEvent(Event evt)
+		{
+			if (!base.DispatchEvent(evt))
+				return false;
+
+			//default actions;
+			if(evt.Type == "submit")
+				OwnerDocument.HandleFormSubmit(this);
+
+			return true;
 		}
 
 		/*

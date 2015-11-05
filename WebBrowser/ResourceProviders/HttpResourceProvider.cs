@@ -30,12 +30,11 @@ namespace WebBrowser.ResourceProviders
 			return MakeResponse(response);
 		}
 
-		public async Task<IResource> SendRequestAsync(IRequest request)
+		public Task<IResource> SendRequestAsync(IRequest request)
 		{
 			var httpRequest = (HttpRequest)request;
 			var webRequest = MakeWebRequest(httpRequest);
-			var response = await webRequest.GetResponseAsync();
-			return MakeResponse((HttpWebResponse)response);
+			return webRequest.GetResponseAsync().ContinueWith(task => (IResource)MakeResponse((HttpWebResponse) task.Result));
 		}
 
 		private HttpResponse MakeResponse(HttpWebResponse response)
