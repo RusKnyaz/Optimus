@@ -11,7 +11,7 @@ namespace WebBrowser.Tests
 	{
 		private string GetTestUrl(string testUrl)
 		{
-			return "http://localhost:21449/"+testUrl+"/index.html";
+			return "http://localhost:21449/" + testUrl + "/index.html";
 		}
 
 		private Engine Open(string testUrl)
@@ -60,7 +60,19 @@ namespace WebBrowser.Tests
 			Assert.IsNotNull(hi);
 			Assert.AreEqual("HI", hi.InnerHTML);
 		}
-	}
+
+		[Test]
+		public void JQuery()
+		{
+			var engine = Open("jquery") ;
+			var b = engine.WaitId("b") as HtmlButtonElement;
+			Assert.IsNotNull(b);
+			b.Click();
+			var g = engine.Document.GetElementById("greeting");
+			Assert.IsNotNull(g);
+			Assert.AreEqual("HI", g.InnerHTML);
+		}
+}
 
 	internal static class EngineExtension
 	{

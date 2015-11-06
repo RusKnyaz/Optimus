@@ -66,6 +66,8 @@
     <Content Include="form\index.html" />
     <Content Include="form\postresult.html" />
     <Content Include="Index.html" />
+    <Content Include="jquery\index.html" />
+    <Content Include="jquery\jquery-2.1.4.js" />
     <Content Include="jq_rq\index.html" />
     <Content Include="jq_rq\jquery-2.1.1.min.js" />
     <Content Include="jq_rq\require.js" />

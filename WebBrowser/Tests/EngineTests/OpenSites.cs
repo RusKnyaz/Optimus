@@ -89,8 +89,8 @@ namespace WebBrowser.Tests.EngineTests
 			Assert.IsNotNull(userName, "UserName");
 			Assert.IsNotNull(password, "Password");
 
-			userName.Value = "";
-			password.Value = "";
+			userName.Value = "a";
+			password.Value = "b";
 			logonButton.Click();
 
 			var logoutButton = engine.WaitId("logout");

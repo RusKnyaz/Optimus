@@ -148,7 +148,6 @@ namespace WebBrowser.Dom.Elements
   getter Element (unsigned long index);
   getter (RadioNodeList or Element) (DOMString name);
 
-  void submit();
   boolean checkValidity();
 		 */
 	}

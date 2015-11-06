@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Properties;
 using WebBrowser.ResourceProviders;
+using WebBrowser.Tools;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -95,6 +97,33 @@ namespace WebBrowser.Tests.EngineTests
 			};
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			Assert.AreEqual("1", result);
+		}
+
+		[Test]
+		public void EventsSubscription()
+		{
+			var script = @"$('#b').on('click', function() {console.log('hi'); });
+var e = document.createElement('div');
+e.id = 'loaded';
+document.body.appendChild(e);";
+
+			var engine = new Engine();
+			string result = null;
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine(o.ToString());
+				result = o.ToString();
+			};
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
+			var loaded = engine.WaitId("loaded");
+			Assert.IsNotNull(loaded);
+			
+			var e = engine.Document.CreateEvent("Event");
+			e.InitEvent("click", true, true);
+			engine.Document.GetElementById("b").DispatchEvent(e);
+
+			
+			Assert.AreEqual("hi", result);
 		}
 	}
 

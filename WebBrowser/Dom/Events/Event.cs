@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Policy;
 using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom.Elements
@@ -35,6 +36,11 @@ namespace WebBrowser.Dom.Elements
 		{
 			if (Cancellable)
 				Cancelled = true;
+		}
+
+		public bool IsDefaultPrevented()
+		{
+			return Cancelled;
 		}
 
 		public void InitEvent(string type, bool canBubble, bool canCancel)
