@@ -2,13 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Environment;
 using WebBrowser.ResourceProviders;
 using WebBrowser.ScriptExecuting;
-using WebBrowser.Tools;
 
 namespace WebBrowser
 {

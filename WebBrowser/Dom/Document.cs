@@ -35,7 +35,7 @@ namespace WebBrowser.Dom
 
 			DocumentElement = new Element(this, "html"){ParentNode = this};
 			ChildNodes = new List<Node> { DocumentElement };
-			EventTarget = new EventTarget(this, () => window);
+			EventTarget = new EventTarget(this, () => window, () => this);
 			DefaultView = window;
 
 			ReadyState = DocumentReadyStates.Loading;

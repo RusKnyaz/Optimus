@@ -42,7 +42,7 @@ namespace WebBrowser.Environment
 					}
 				};
 
-			_eventTarget = new EventTarget(this, () => null);
+			_eventTarget = new EventTarget(this, () => null, () => engine.Document);
 		}
 
 		public int InnerWidth { get; set; }

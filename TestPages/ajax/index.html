@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+        
+</head>
+<body>
+    <div id="t"></div>
+    <script>
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            document.getElementById("t").innerHTML = xmlhttp.getAllResponseHeaders();
+        }
+        else if (xmlhttp.readyState == 4) {
+            alert(xmlhttp.status);
+        }
+        
+    }
+    xmlhttp.open("GET", "data.html", true);
+    xmlhttp.send();
+    </script>
+
+</body>
+</html>

@@ -24,7 +24,7 @@ namespace WebBrowser.Dom.Elements
 		{
 			_ownerDocument = ownerDocument;
 			ChildNodes = new List<Node>();
-			EventTarget = new EventTarget(this, () => ParentNode);
+			EventTarget = new EventTarget(this, () => ParentNode, () => OwnerDocument);
 		}
 	
 		private Document _ownerDocument;

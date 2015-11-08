@@ -10,10 +10,19 @@ namespace WebBrowser.Dom.Elements
 		readonly Dictionary<string, List<Action<Event>>> _listeners = new Dictionary<string, List<Action<Event>>>();
 		readonly Dictionary<string, List<Action<Event>>> _capturingListeners = new Dictionary<string, List<Action<Event>>>();
 
+		public Func<object> _getLockObject;
+
 		public EventTarget(IEventTarget originalTarget, Func<IEventTarget> getParent)
+			: this(originalTarget, getParent, () => new object())
+		{
+			
+		}
+
+		public EventTarget(IEventTarget originalTarget, Func<IEventTarget> getParent, Func<object> getLockObject)
 		{
 			_originalTarget = originalTarget;
 			_getParent = getParent;
+			_getLockObject = getLockObject;
 		}
 
 		List<Action<Event>> GetListeners(string type)
@@ -85,16 +94,19 @@ namespace WebBrowser.Dom.Elements
 
 		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listeners)
 		{
-			foreach (var listener in listeners(evt.Type))
+			lock (_getLockObject())
 			{
-				try
+				foreach (var listener in listeners(evt.Type))
 				{
-					listener(evt);
-				}
-				catch (Exception e)
-				{
-					if (HandlerException != null)
-						HandlerException(e);
+					try
+					{
+						listener(evt);
+					}
+					catch (Exception e)
+					{
+						if (HandlerException != null)
+							HandlerException(e);
+					}
 				}
 			}
 		}
