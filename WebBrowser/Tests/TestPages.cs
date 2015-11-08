@@ -93,6 +93,7 @@ namespace WebBrowser.Tests
 		public void JQueryForm()
 		{
 			var engine = Open("jquery/jqueryForm");
+			Assert.IsNotNull(engine.WaitId("ready"), "ready");
 			var button = engine.WaitId("b") as HtmlButtonElement;
 			Assert.IsNotNull(button);
 			button.Click();
@@ -101,6 +102,17 @@ namespace WebBrowser.Tests
 			var g = engine.FirstElement("#g");
 			Assert.IsNotNull(g);
 			Assert.AreEqual("HI", g.InnerHTML);
+		}
+
+		[Test, Ignore]
+		public void Ajax()
+		{
+			var engine = Open("ajax");
+			var button = engine.WaitId("t");
+			Assert.IsNotNull(button);
+
+			Thread.Sleep(1000);
+			Assert.AreEqual("HI", button.InnerHTML);
 		}
 	}
 }

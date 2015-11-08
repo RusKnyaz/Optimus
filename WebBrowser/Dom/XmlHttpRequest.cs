@@ -107,8 +107,7 @@ namespace WebBrowser.Dom
 		{
 			if (_response.Headers == null)
 				return "";
-			//todo: check
-			Debug.Fail("Call to untestet method");
+			
 			return _response.Headers.ToString();
 		}
 

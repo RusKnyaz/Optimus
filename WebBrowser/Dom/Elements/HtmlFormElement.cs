@@ -142,16 +142,15 @@ namespace WebBrowser.Dom.Elements
 				try
 				{
 					if (OnSubmit != null)
-					{
 						OnSubmit(evt);
-						if (evt.IsDefaultPrevented())
-							return false;
-					}
 				}
 				catch
 				{
 					//todo: log
 				}
+
+				if (evt.IsDefaultPrevented())
+					return false;
 
 				OwnerDocument.HandleFormSubmit(this);
 			}

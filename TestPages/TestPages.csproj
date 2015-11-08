@@ -62,6 +62,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ajax\index.html" />
     <Content Include="click\index.html" />
     <Content Include="form\index.html" />
     <Content Include="form\postresult.html" />
@@ -93,6 +94,7 @@
   <ItemGroup>
     <Content Include="jquery\jquery.form.js" />
     <Content Include="jquery\data.json" />
+    <Content Include="ajax\data.html" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
