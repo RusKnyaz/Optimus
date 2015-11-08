@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
+using WebBrowser.Dom.Elements;
 using WebBrowser.Properties;
 using WebBrowser.ResourceProviders;
 using WebBrowser.Tools;
@@ -100,7 +101,7 @@ namespace WebBrowser.Tests.EngineTests
 		}
 
 		[Test]
-		public void EventsSubscription()
+		public void On()
 		{
 			var script = @"$('#b').on('click', function() {console.log('hi'); });
 var e = document.createElement('div');
@@ -121,9 +122,46 @@ document.body.appendChild(e);";
 			var e = engine.Document.CreateEvent("Event");
 			e.InitEvent("click", true, true);
 			engine.Document.GetElementById("b").DispatchEvent(e);
-
 			
 			Assert.AreEqual("hi", result);
+		}
+
+		[Test]
+		public void Bind()
+		{
+			var script = @"$('#b').bind('click', function() {console.log('hi'); });
+var e = document.createElement('div');
+e.id = 'loaded';
+document.body.appendChild(e);";
+
+			var engine = new Engine();
+			string result = null;
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine(o.ToString());
+				result = o.ToString();
+			};
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
+			var loaded = engine.WaitId("loaded");
+			Assert.IsNotNull(loaded);
+
+			((HtmlElement)engine.Document.GetElementById("b")).Click();
+
+			Assert.AreEqual("hi", result);
+		}
+
+		[Test]
+		public void DocumentBody()
+		{
+			var script = @"$(function(){console.log(document.body);});";
+
+			var engine = new Engine();
+			object result = null;
+			engine.Console.OnLog += o =>{result = o;};
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='b'></div></body></html>");
+			Thread.Sleep(1000);
+
+			Assert.IsNotNull(result);
 		}
 	}
 

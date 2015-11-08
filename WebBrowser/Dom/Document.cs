@@ -10,9 +10,11 @@ using WebBrowser.ScriptExecuting;
 
 namespace WebBrowser.Dom
 {
-	public enum DocumentReadyStates
+	public static class DocumentReadyStates
 	{
-		Loading, Interactive, Complete
+		public const string Loading = "loading";
+		public const string Interactive = "interactive";
+		public const string Complete = "complete";
 	}
 
 	/// <summary>
@@ -35,11 +37,13 @@ namespace WebBrowser.Dom
 			ChildNodes = new List<Node> { DocumentElement };
 			EventTarget = new EventTarget(this, () => window);
 			DefaultView = window;
+
+			ReadyState = DocumentReadyStates.Loading;
 		}
 
 		public Window DefaultView { get; private set; }
 		public Element DocumentElement { get; private set; }
-		public DocumentReadyStates ReadyState { get; private set; }
+		public string ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
 
 		public void Write(string text)
@@ -63,6 +67,7 @@ namespace WebBrowser.Dom
 			//todo: check is it right
 			ReadyState = DocumentReadyStates.Complete;
 
+			//todo: we should fire this event properly
 			Trigger("load");
 		}
 
@@ -95,7 +100,7 @@ namespace WebBrowser.Dom
 				case "input": return new HtmlInputElement(this);
 				case "script": return new Script(this);
 				case "head":return new Head(this);
-				case "body":return new Body(this);
+				case "body":return new HtmlBodyElement(this);
 				case "textarea": return new HtmlTextAreaElement(this);
 				case "form":return new HtmlFormElement(this);
 			}

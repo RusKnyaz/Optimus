@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace WebBrowser.Dom.Elements
@@ -128,14 +129,32 @@ namespace WebBrowser.Dom.Elements
 			DispatchEvent(evt);
 		}
 
+		public event Action<Event> OnSubmit;
+
 		public override bool DispatchEvent(Event evt)
 		{
 			if (!base.DispatchEvent(evt))
 				return false;
 
 			//default actions;
-			if(evt.Type == "submit")
+			if (evt.Type == "submit")
+			{
+				try
+				{
+					if (OnSubmit != null)
+					{
+						OnSubmit(evt);
+						if (evt.IsDefaultPrevented())
+							return false;
+					}
+				}
+				catch
+				{
+					//todo: log
+				}
+
 				OwnerDocument.HandleFormSubmit(this);
+			}
 
 			return true;
 		}

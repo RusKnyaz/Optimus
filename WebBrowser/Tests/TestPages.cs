@@ -11,7 +11,7 @@ namespace WebBrowser.Tests
 	{
 		private string GetTestUrl(string testUrl)
 		{
-			return "http://localhost:21449/" + testUrl + "/index.html";
+			return "http://localhost:21449/" + (testUrl.Contains("/") ? (testUrl+".html") : (testUrl + "/index.html"));
 		}
 
 		private Engine Open(string testUrl)
@@ -62,40 +62,45 @@ namespace WebBrowser.Tests
 		}
 
 		[Test]
-		public void JQuery()
+		public void JQueryOn()
 		{
 			var engine = Open("jquery") ;
+			Assert.IsNotNull(engine.WaitId("ready"), "ready");
 			var b = engine.WaitId("b") as HtmlButtonElement;
 			Assert.IsNotNull(b);
 			b.Click();
+			Thread.Sleep(100);
 			var g = engine.Document.GetElementById("greeting");
 			Assert.IsNotNull(g);
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
-}
 
-	internal static class EngineExtension
-	{
-		/// <summary>
-		/// Attach System.Console to log engine events;
-		/// </summary>
-		/// <param name="engine"></param>
-		public static Engine AttachConsole(this Engine engine)
+		[Test]
+		public void JQueryBind()
 		{
-			engine.DocumentChanged += () =>
-			{
-				engine.Scripting.BeforeScriptExecute += script => System.Console.WriteLine(
-					"Executing:" + (script.Src ?? script.Id ?? "<script>"));
+			var engine = Open("jquery");
+			Assert.IsNotNull(engine.WaitId("ready"), "ready");
+			var b = engine.WaitId("b2") as HtmlButtonElement;
+			Assert.IsNotNull(b);
+			b.Click();
+			Thread.Sleep(100);
+			var g = engine.Document.GetElementById("greeting2");
+			Assert.IsNotNull(g);
+			Assert.AreEqual("HI", g.InnerHTML);
+		}
 
-				engine.Scripting.AfterScriptExecute += script => System.Console.WriteLine(
-					"Executed:" + (script.Src ?? script.Id ?? "<script>"));
+		[Test]
+		public void JQueryForm()
+		{
+			var engine = Open("jquery/jqueryForm");
+			var button = engine.WaitId("b") as HtmlButtonElement;
+			Assert.IsNotNull(button);
+			button.Click();
 
-				engine.Scripting.ScriptExecutionError += (script, exception) => System.Console.WriteLine(
-					"Error script execution:" + (script.Src ?? script.Id ?? "<script>") + " " + exception.Message);
-			};
-
-			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
-			return engine;
+			Thread.Sleep(1000);
+			var g = engine.FirstElement("#g");
+			Assert.IsNotNull(g);
+			Assert.AreEqual("HI", g.InnerHTML);
 		}
 	}
 }

@@ -68,6 +68,7 @@
     <Content Include="Index.html" />
     <Content Include="jquery\index.html" />
     <Content Include="jquery\jquery-2.1.4.js" />
+    <Content Include="jquery\jqueryForm.html" />
     <Content Include="jq_rq\index.html" />
     <Content Include="jq_rq\jquery-2.1.1.min.js" />
     <Content Include="jq_rq\require.js" />
@@ -90,6 +91,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="jquery\jquery.form.js" />
+    <Content Include="jquery\data.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

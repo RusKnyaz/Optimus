@@ -84,7 +84,8 @@ namespace WebBrowser.Dom
 		/// </summary>
 		private static IDictionary<string, string> _eventAttr = new Dictionary<string, string>
 		{
-			{"onclick", "click"}
+			{"onclick", "click"},
+			{"onload", "load"}
 		};
 
 		private void RegisterAttr(Attr attr)
@@ -100,6 +101,7 @@ namespace WebBrowser.Dom
 
 				var funcCall = fname + "();";
 
+				//todo: what we should to do with e.Onclick public properties?
 				parentElement.AddEventListener(eventName, e => { _scriptExecutor.Execute("text/javascript", funcCall); }, false);
 
 				//todo: unsubscribe if attribute value changed

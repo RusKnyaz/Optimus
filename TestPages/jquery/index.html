@@ -1,15 +1,26 @@
 <!DOCTYPE html>
 <html>
-	<script src='jquery-2.1.4.js'></script>
-	<script>
-		$(function() {
-		    $("#b").on("click", function() {
-		        $("#greeting").html("HI");
-		    });
-		});
-	</script>
+<script src='jquery-2.1.4.js'></script>
+<script>
+    $(function() {
+        $("#b").on("click", function() {
+            $("#greeting").html("HI");
+        });
+
+        $("#b2").bind("click", function () {
+            $("#greeting2").html("HI");
+        });
+
+        var r = document.createElement("div");
+        r.id = "ready";
+        document.body.appendChild(r);
+    });
+</script>
 <body>
 <button id="b">B</button>
 <p id='greeting'></p>
+
+<button id="b2">B</button>
+<p id='greeting2'></p>
 </body>
 </html>

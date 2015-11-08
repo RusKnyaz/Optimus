@@ -492,5 +492,13 @@ match.shift();
 console.log(match[0]);");
 			CollectionAssert.AreEqual(new object[] { "Brown" }, _log);
 		}
+
+		[Test]
+		public void DocumentBody()
+		{
+			_resourceProvider.Resource("test.js", "document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
+			_engine.Load("<html><head><script src='test.js'/></head><body>HI</body></html>");
+			CollectionAssert.AreEqual(new[]{"hi"}, _log);
+		}
 	}
 }

@@ -6,6 +6,7 @@ using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Environment;
 using WebBrowser.Properties;
+using WebBrowser.Tests.Dom;
 
 namespace WebBrowser.ScriptExecuting
 {
@@ -50,6 +51,7 @@ namespace WebBrowser.ScriptExecuting
 
 			AddDomType("Node", typeof(Node));
 			AddDomType("Element", typeof(Element));
+			AddDomType("HTMLBodyElement", typeof(HtmlBodyElement));
 			AddDomType("HTMLButtonElement", typeof(HtmlButtonElement));
 			AddDomType("HTMLElement", typeof(HtmlElement));
 			AddDomType("HTMLInputElement", typeof(HtmlInputElement));

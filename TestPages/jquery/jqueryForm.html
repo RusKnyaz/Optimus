@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<script src='jquery-2.1.4.js'></script>
+<script src='jquery.form.js'></script>
+<script>
+		$(function() {
+		    $("#f").ajaxForm(function () {
+		        $("#g").html("HI");
+		    });
+		});
+</script>
+<body>
+<form id="f" >
+    <input name="a"/>
+    <button id="b" type="submit">B</button>
+</form>
+<p id='g'></p>
+</body>
+</html>

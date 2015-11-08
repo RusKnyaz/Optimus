@@ -63,7 +63,8 @@
     <Compile Include="Dom\Elements\Attr.cs" />
     <Compile Include="Dom\AttributeMappedValue.cs" />
     <Compile Include="Dom\Elements\AttributesCollection.cs" />
-    <Compile Include="Dom\Elements\Body.cs" />
+    <Compile Include="Dom\Elements\EventTarget.cs" />
+    <Compile Include="Dom\Elements\HtmlBodyElement.cs" />
     <Compile Include="Dom\Elements\CharacterData.cs" />
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
@@ -120,12 +121,14 @@
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="EngineExtension.cs" />
     <Compile Include="Tests\Dom\EventsTests.cs" />
+    <Compile Include="Tests\Dom\EventTargetTests.cs" />
     <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
+    <Compile Include="Tests\EngineExtension.cs" />
     <Compile Include="Tests\EngineTests\ComplexTests.cs" />
     <Compile Include="Tests\EngineTests\EngineJsTests.cs" />
     <Compile Include="Tests\EngineTests\OpenSites.cs" />
