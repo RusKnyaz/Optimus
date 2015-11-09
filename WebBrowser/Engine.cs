@@ -56,6 +56,10 @@ namespace WebBrowser
 			Document.OnFormSubmit+=OnFormSubmit;
 		}
 
+		/// <summary>
+		/// todo: rewrite and complete the stuff
+		/// </summary>
+		/// <param name="form"></param>
 		private async void OnFormSubmit(HtmlFormElement form)
 		{
 			if (string.IsNullOrEmpty(form.Action))
@@ -82,7 +86,34 @@ namespace WebBrowser
 			}
 			else
 			{
-				if (form.Action != "about:blank")
+				if (!string.IsNullOrEmpty(form.Target))
+				{
+					var targetFrame = Document.GetElementById(form.Target) as HtmlIFrameElement;
+					if (targetFrame != null)
+					{
+						var document = new Document(Window);
+						targetFrame.ContentDocument = document;
+
+						var request = ResourceProvider.CreateRequest(form.Action);
+						var httpRequest = request as HttpRequest;
+						if (httpRequest != null)
+						{
+							//todo: use right encoding and enctype
+							httpRequest.Data = Encoding.UTF8.GetBytes(data);
+						}
+
+						var response = await ResourceProvider.GetResourceAsync(request);
+
+						//what should we do if the frame is not found?
+						if (response.Type == ResourceTypes.Html)
+						{
+							//todo: clear js runtime context
+							DocumentBuilder.Build(document, response.Stream);
+							document.Complete();
+						}
+					}
+				}
+				else if (form.Action != "about:blank")
 				{
 					Document = new Document(Window);
 
@@ -98,6 +129,7 @@ namespace WebBrowser
 
 					LoadFromResponse(response);
 				}
+				//todo: handle 'about:blank'
 			}
 		}
 

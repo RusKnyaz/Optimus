@@ -103,6 +103,7 @@ namespace WebBrowser.Dom
 				case "body":return new HtmlBodyElement(this);
 				case "textarea": return new HtmlTextAreaElement(this);
 				case "form":return new HtmlFormElement(this);
+				case "iframe":return new HtmlIFrameElement(this);
 			}
 
 			return new HtmlUnknownElement(this, tagName);
