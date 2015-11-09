@@ -83,6 +83,8 @@ namespace WebBrowser.Tests.EngineTests
 			engine.OpenUrl("http://okkamtech.com");
 			
 			var logonButton = engine.WaitId("logon") as HtmlElement;
+			Thread.Sleep(5000);
+
 			var userName = engine.Document.GetElementById("UserName") as HtmlInputElement;
 			var password = engine.Document.GetElementById("Password") as HtmlInputElement;
 			Assert.IsNotNull(logonButton, "LogonButton");
@@ -93,8 +95,8 @@ namespace WebBrowser.Tests.EngineTests
 			password.Value = "b";
 			logonButton.Click();
 
-			var logoutButton = engine.WaitId("logout");
-			Assert.IsNotNull(logoutButton, "Logout button");
+			var error = engine.WaitId("validationError");
+			Assert.IsNotNull(error, "error");
 		}
 	}
 }

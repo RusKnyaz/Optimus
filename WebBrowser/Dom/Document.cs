@@ -120,6 +120,11 @@ namespace WebBrowser.Dom
 			return DocumentElement.Flatten().OfType<Element>().FirstOrDefault(x => x.Id == id);
 		}
 
+		public IReadOnlyCollection<Element> GetElementsByName(string name)
+		{
+			return DocumentElement.Flatten().OfType<Element>().Where(x => x.GetAttribute("name") == name).ToList().AsReadOnly();
+		}
+
 		public DocumentFragment CreateDocumentFragment()
 		{
 			return new DocumentFragment(this);

@@ -39,16 +39,24 @@ namespace WebBrowser.Tools
 		public static Element WaitId(this Engine engine, string id, int timeout = DefaultTimeout)
 		{
 			engine.WaitDocumentLoad();
+			return engine.Document.WaitId(id, timeout);
+		}
+
+		/// <summary>
+		/// Wait while element with specified id appears in document.
+		/// </summary>
+		public static Element WaitId(this Document document, string id, int timeout = DefaultTimeout)
+		{
 			var timespan = 100;
-			for (int i = 0; i < timeout/timespan; i++)
+			for (int i = 0; i < timeout / timespan; i++)
 			{
-				var elt = engine.Document.GetElementById(id);
+				var elt = document.GetElementById(id);
 				if (elt != null)
 					return elt;
 
 				Thread.Sleep(timespan);
 			}
-			return engine.Document.GetElementById(id);
+			return document.GetElementById(id);
 		}
 	}
 }

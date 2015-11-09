@@ -1,4 +1,5 @@
 ﻿#if NUNIT
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using WebBrowser.Dom.Elements;
@@ -44,6 +45,29 @@ namespace WebBrowser.Tests
 
 			engine.FirstElement("#" + buttonId).Click();
 			Assert.AreEqual("HI", engine.FirstElement("#" + divId).InnerHTML);
+		}
+
+		[Test]
+		public void FormToFrameTest()
+		{
+			var engine = Open("form/frametarget");
+
+			var submitButton = engine.WaitId("submitButton") as HtmlButtonElement;
+			Assert.IsNotNull(submitButton, "submitButton");
+
+			submitButton.Click();
+			Thread.Sleep(1000);
+
+
+			var frame = engine.Document.GetElementsByName("t").FirstOrDefault() as HtmlIFrameElement;
+			Assert.IsNotNull(frame, "iframe");
+
+			
+			Assert.IsNotNull(frame);
+			Assert.IsNotNull(frame.ContentDocument);
+			var hi = frame.ContentDocument.WaitId("hi");
+			Assert.IsNotNull(hi, "hi");
+			Assert.AreEqual("HI", hi.InnerHTML);
 		}
 
 		[Test]
@@ -104,6 +128,8 @@ namespace WebBrowser.Tests
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
 
+		
+
 		[Test, Ignore]
 		public void Ajax()
 		{
@@ -114,6 +140,8 @@ namespace WebBrowser.Tests
 			Thread.Sleep(1000);
 			Assert.AreEqual("HI", button.InnerHTML);
 		}
+
+		
 	}
 }
 #endif

@@ -74,63 +74,50 @@ namespace WebBrowser
 				x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
 				));
 
-			if (form.Method.ToLowerInvariant() == "get")
-			{
-				//todo: escape specialchars
-				var url = form.Action + "?" + data;
+			var isGet = form.Method.ToLowerInvariant() == "get";
 
-				Document = new Document(Window);
-				var request = ResourceProvider.CreateRequest(url);
-				var response = await ResourceProvider.GetResourceAsync(request);
-				LoadFromResponse(response);
-			}
-			else
+			var url = form.Action;
+
+			if (isGet)
+				url += "?" + data;
+
+			if (form.Action != "about:blank")
 			{
-				if (!string.IsNullOrEmpty(form.Target))
+				var document = new Document(Window);
+
+				HtmlIFrameElement targetFrame = null;
+				if (!string.IsNullOrEmpty(form.Target) &&
+					(targetFrame = Document.GetElementsByName(form.Target).FirstOrDefault() as HtmlIFrameElement) != null)
 				{
-					var targetFrame = Document.GetElementById(form.Target) as HtmlIFrameElement;
-					if (targetFrame != null)
-					{
-						var document = new Document(Window);
-						targetFrame.ContentDocument = document;
-
-						var request = ResourceProvider.CreateRequest(form.Action);
-						var httpRequest = request as HttpRequest;
-						if (httpRequest != null)
-						{
-							//todo: use right encoding and enctype
-							httpRequest.Data = Encoding.UTF8.GetBytes(data);
-						}
-
-						var response = await ResourceProvider.GetResourceAsync(request);
-
-						//what should we do if the frame is not found?
-						if (response.Type == ResourceTypes.Html)
-						{
-							//todo: clear js runtime context
-							DocumentBuilder.Build(document, response.Stream);
-							document.Complete();
-						}
-					}
+					targetFrame.ContentDocument = document;
 				}
-				else if (form.Action != "about:blank")
+				else
 				{
-					Document = new Document(Window);
+					Document = document;
+				}
 
-					var request = ResourceProvider.CreateRequest(form.Action);
+				var request = ResourceProvider.CreateRequest(url);
+				if (!isGet)
+				{
 					var httpRequest = request as HttpRequest;
 					if (httpRequest != null)
 					{
 						//todo: use right encoding and enctype
 						httpRequest.Data = Encoding.UTF8.GetBytes(data);
 					}
-
-					var response = await ResourceProvider.GetResourceAsync(request);
-
-					LoadFromResponse(response);
 				}
-				//todo: handle 'about:blank'
+
+				var response = await ResourceProvider.GetResourceAsync(request);
+
+				//what should we do if the frame is not found?
+				if (response.Type == ResourceTypes.Html)
+				{
+					//todo: clear js runtime context
+					DocumentBuilder.Build(document, response.Stream);
+					document.Complete();
+				}
 			}
+			//todo: handle 'about:blank'
 		}
 
 		public Engine() : this(new ResourceProvider()) { }

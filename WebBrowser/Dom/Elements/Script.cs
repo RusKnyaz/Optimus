@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using WebBrowser.ScriptExecuting;
-using WebBrowser.TestingTools;
 
 namespace WebBrowser.Dom.Elements
 {

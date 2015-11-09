@@ -64,6 +64,7 @@
   <ItemGroup>
     <Content Include="ajax\index.html" />
     <Content Include="click\index.html" />
+    <Content Include="form\frametarget.html" />
     <Content Include="form\index.html" />
     <Content Include="form\postresult.html" />
     <Content Include="Index.html" />
