@@ -18,7 +18,7 @@ namespace WebBrowser.Dom.Elements
 			public static string Autocomplete = "on";
 		}
 
-		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, "input")
+		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input)
 		{
 			Type = "text";
 		}

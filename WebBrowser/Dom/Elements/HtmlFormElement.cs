@@ -23,7 +23,7 @@ namespace WebBrowser.Dom.Elements
 		static string[] AllowedEnctypes = new []{"application/x-www-form-urlencoded", "multipart/form-data", "text/plain" };
 		private static string[] AllowedMethods = new[] {"get", "post"};
 
-		public HtmlFormElement(Document ownerDocument) : base(ownerDocument, "form"){}
+		public HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form){}
 
 		public string Name
 		{

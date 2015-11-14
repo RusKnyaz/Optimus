@@ -7,12 +7,10 @@ namespace WebBrowser.Dom.Elements
 	/// </summary>
 	public class HtmlBodyElement : HtmlElement
 	{
-		public HtmlBodyElement(Document ownerDocument) : base(ownerDocument, "body")
+		public HtmlBodyElement(Document ownerDocument) : base(ownerDocument, TagsNames.Body)
 		{
 		}
 
 		public Action<Event> OnLoad;
-
-
 	}
 }

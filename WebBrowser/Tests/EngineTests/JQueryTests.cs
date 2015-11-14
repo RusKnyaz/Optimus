@@ -1,15 +1,12 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Properties;
-using WebBrowser.ResourceProviders;
 using WebBrowser.Tools;
 
 namespace WebBrowser.Tests.EngineTests
@@ -162,6 +159,20 @@ document.body.appendChild(e);";
 			Thread.Sleep(1000);
 
 			Assert.IsNotNull(result);
+		}
+
+		[TestCase(".u", 1)]
+		[TestCase("div", 1)]
+		[TestCase("#a", 1)]
+		public void Selector(string selector, int exptectedCount)
+		{
+			var script = @"console.log($('"+selector+"').length);";
+			var engine = new Engine();
+			object result = null;
+			engine.Console.OnLog += o => {System.Console.WriteLine((o ??"null").ToString()); result = o; };
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body><div class = 'u' id='a'></div><script>" + script + "</script></body></html>");
+			
+			Assert.AreEqual(exptectedCount, result);
 		}
 	}
 

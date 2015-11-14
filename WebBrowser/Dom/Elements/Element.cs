@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using WebBrowser.ScriptExecuting;
@@ -60,7 +61,12 @@ namespace WebBrowser.Dom.Elements
 
 		public Element[] GetElementsByTagName(string tagName)
 		{
-			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.TagName == tagName).ToArray();
+			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.TagName == tagName.ToUpperInvariant()).ToArray();
+		}
+
+		public HtmlElement[] GetElementsByClassName(string name)
+		{
+			return ChildNodes.SelectMany(x => x.Flatten()).OfType<HtmlElement>().Where(x => x.ClassName.Split(' ').Contains(name)).ToArray();
 		}
 
 		public string GetAttribute(string name)

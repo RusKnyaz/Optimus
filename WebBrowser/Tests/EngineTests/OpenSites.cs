@@ -81,6 +81,7 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			engine.AttachConsole();
 			engine.OpenUrl("http://okkamtech.com");
+			//engine.OpenUrl("http://localhost:2930");
 			
 			var logonButton = engine.WaitId("logon") as HtmlElement;
 			Thread.Sleep(5000);

@@ -13,7 +13,7 @@
 
 		private static readonly string[] AvailableTypes = {"submit", "button", "reset"};
 
-		public HtmlButtonElement(Document ownerDocument) : base(ownerDocument, "button") { }
+		public HtmlButtonElement(Document ownerDocument) : base(ownerDocument, TagsNames.Button) { }
 
 		public string Type
 		{

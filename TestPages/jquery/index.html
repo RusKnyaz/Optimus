@@ -2,8 +2,10 @@
 <html>
 <script src='jquery-2.1.4.js'></script>
 <script>
-    $(function() {
-        $("#b").on("click", function() {
+    $(function () {
+        $(".a").click();
+
+        /* $("#b").on("click", function() {
             $("#greeting").html("HI");
         });
 
@@ -11,9 +13,13 @@
             $("#greeting2").html("HI");
         });
 
+        $("#d").on("click.shmik", ".a", function () {
+            $("#greeting3").html("HI");
+        });
+
         var r = document.createElement("div");
         r.id = "ready";
-        document.body.appendChild(r);
+        document.body.appendChild(r);*/
     });
 </script>
 <body>
@@ -22,5 +28,10 @@
 
 <button id="b2">B</button>
 <p id='greeting2'></p>
+
+    <div id="d">
+        <button id="b3" class="a">B</button>
+        <p id='greeting3'></p>
+    </div>
 </body>
 </html>

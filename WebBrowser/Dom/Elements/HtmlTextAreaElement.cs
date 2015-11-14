@@ -26,7 +26,7 @@ namespace WebBrowser.Dom.Elements
 			public static string DefaultValue = string.Empty;
 		}
 
-		public HtmlTextAreaElement(Document ownerDocument) : base(ownerDocument, "textarea")
+		public HtmlTextAreaElement(Document ownerDocument) : base(ownerDocument, TagsNames.Textarea)
 		{
 		}
 

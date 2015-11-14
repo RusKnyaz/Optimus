@@ -26,6 +26,12 @@ namespace WebBrowser.Dom.Elements
 			set { SetAttribute("hidden", value.ToString());}
 		}
 
+		public string ClassName
+		{
+			get { return GetAttribute("class", "");}
+			set { SetAttribute("class", value);}
+		}
+
 		public virtual void Click()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
@@ -80,5 +86,6 @@ namespace WebBrowser.Dom.Elements
 		bool Hidden { get; set; }
 		void Click();
 		event Action OnClick;
+		string ClassName { get; set; }
 	}
 }

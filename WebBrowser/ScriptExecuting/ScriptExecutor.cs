@@ -1,12 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
 using Jint.Native;
 using Jint.Runtime;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Environment;
 using WebBrowser.Properties;
-using WebBrowser.Tests.Dom;
 
 namespace WebBrowser.ScriptExecuting
 {
@@ -58,6 +56,7 @@ namespace WebBrowser.ScriptExecuting
 			AddDomType("HTMLInputElement", typeof(HtmlInputElement));
 			AddDomType("HTMLTextAreaElement", typeof(HtmlTextAreaElement));
 			AddDomType("HTMLFormElement", typeof(HtmlFormElement));
+			AddDomType("HTMLHtmlElement", typeof(HtmlHtmlElement));
 			AddDomType("Script", typeof(Script));
 			AddDomType("Comment", typeof(Comment));
 			AddDomType("Document", typeof(Document));

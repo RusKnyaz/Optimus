@@ -85,30 +85,18 @@ namespace WebBrowser.Tests
 			Assert.AreEqual("HI", hi.InnerHTML);
 		}
 
-		[Test]
-		public void JQueryOn()
+		[TestCase("b", "greeting", Description = "Test .on(evt, selector)")]
+		[TestCase("b2", "greeting2", Description = "Test .bind")]
+		[TestCase("b3", "greeting3", Description = "Test .on(evt, selector, handler)")]
+		public void JQueryOn(string buttonId, string greetingId)
 		{
 			var engine = Open("jquery") ;
 			Assert.IsNotNull(engine.WaitId("ready"), "ready");
-			var b = engine.WaitId("b") as HtmlButtonElement;
+			var b = engine.WaitId(buttonId) as HtmlButtonElement;
 			Assert.IsNotNull(b);
 			b.Click();
 			Thread.Sleep(100);
-			var g = engine.Document.GetElementById("greeting");
-			Assert.IsNotNull(g);
-			Assert.AreEqual("HI", g.InnerHTML);
-		}
-
-		[Test]
-		public void JQueryBind()
-		{
-			var engine = Open("jquery");
-			Assert.IsNotNull(engine.WaitId("ready"), "ready");
-			var b = engine.WaitId("b2") as HtmlButtonElement;
-			Assert.IsNotNull(b);
-			b.Click();
-			Thread.Sleep(100);
-			var g = engine.Document.GetElementById("greeting2");
+			var g = engine.Document.GetElementById(greetingId);
 			Assert.IsNotNull(g);
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
@@ -127,8 +115,6 @@ namespace WebBrowser.Tests
 			Assert.IsNotNull(g);
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
-
-		
 
 		[Test, Ignore]
 		public void Ajax()

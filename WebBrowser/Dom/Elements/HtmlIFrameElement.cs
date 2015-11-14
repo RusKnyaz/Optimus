@@ -17,7 +17,7 @@ namespace WebBrowser.Dom.Elements
 			public const string Scrolling = "";
 		}
 
-		public HtmlIFrameElement(Document ownerDocument) : base(ownerDocument, "iframe")
+		public HtmlIFrameElement(Document ownerDocument) : base(ownerDocument, TagsNames.IFrame)
 		{
 		}
 

@@ -1,4 +1,5 @@
 ﻿#if NUNIT
+using System.Linq.Expressions;
 using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
@@ -157,6 +158,33 @@ namespace WebBrowser.Tests
 			var document = new Document();
 			document.Write("<html><head><meta></head><body><div></div></body></html>");
 			document.Assert(doc => doc.Body.InnerHTML == "<div></div>" && doc.Head.InnerHTML == "<meta></meta>");
+		}
+
+		[Test]
+		public void GetElementsByClassName()
+		{
+			var document = new Document();
+			document.Write("<html><head><meta></head><body>" +
+			               "<div class='a' id='d1'></div>" +
+			               "<div class = 'b' id = 'd2'></div>" +
+			               "<div class='a b' id='d3'></div></body></html>");
+
+			var result = document.GetElementsByClassName("a");
+
+			Assert.AreEqual(2, result.Length);
+			CollectionAssert.AreEqual(new[] { document.GetElementById("d1"), document.GetElementById("d3") },  result);
+		}
+
+		[Test]
+		public void DocumentElementNodeName()
+		{
+			var document = new Document();
+			document.Write("<html><head><meta></head><body>" +
+						   "<div class='a' id='d1'></div>" +
+						   "<div class = 'b' id = 'd2'></div>" +
+						   "<div class='a b' id='d3'></div></body></html>");
+
+			Assert.AreEqual("HTML", document.DocumentElement.NodeName);
 		}
 	}
 }

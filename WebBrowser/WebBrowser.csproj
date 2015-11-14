@@ -71,6 +71,7 @@
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
     <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
+    <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlIFrameElement.cs" />
     <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />

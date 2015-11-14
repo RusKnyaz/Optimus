@@ -500,5 +500,33 @@ console.log(match[0]);");
 			_engine.Load("<html><head><script src='test.js'/></head><body>HI</body></html>");
 			CollectionAssert.AreEqual(new[]{"hi"}, _log);
 		}
+
+		[Test]
+		public void Splice()
+		{
+			_resourceProvider.Resource("test.js", "var x = [1,2,3]; x.splice(1,0,4);console.log(x);");
+			_engine.Load("<html><head><script src='test.js'/></head><body>HI</body></html>");
+			CollectionAssert.AreEqual(new[] { 1,4,2,3 }, _log[0] as object[]);
+		}
+
+		[Test]
+		public void GetElementsByClassName()
+		{
+
+			_engine.Load("<html><body>" +
+			               "<div class='a' id='d1'></div>" +
+			               "<div class = 'b' id = 'd2'></div>" +
+			               "<div class='a b' id='d3'></div><script>console.log(document.getElementsByClassName('a').length);</script></body></html>");
+
+			CollectionAssert.AreEqual(new[] { 2 },  _log);
+		}
+
+		[Test]
+		public void GetElementsByClassNameToString()
+		{
+			_engine.Load("<html><head><script>console.log(document.getElementsByClassName.toString());</script></head><body></body></html>");
+
+			CollectionAssert.AreEqual(new[] { "function getElementsByClassName() { [native code] }" }, _log);
+		}
 	}
 }

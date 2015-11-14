@@ -92,7 +92,11 @@ namespace WebBrowser.ScriptExecuting
 
 			if (methods.Any())
 			{
-				var descriptor = new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, methods), false, true, false);
+				var func = new MethodInfoFunctionInstance(Engine, methods);
+				func.FastAddProperty("toString",
+					new JsValue(new ClrFunctionInstance(Engine, (value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
+					false, false, false);
+				var descriptor = new PropertyDescriptor(func, false, true, false);
 				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
@@ -104,7 +108,12 @@ namespace WebBrowser.ScriptExecuting
 
 			if (pascalCasedMethods.Any())
 			{
-				var descriptor = new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, pascalCasedMethods), false, true, false);
+				var func = new MethodInfoFunctionInstance(Engine, pascalCasedMethods);
+				func.FastAddProperty("toString",
+					new JsValue(new ClrFunctionInstance(Engine, (value, values) => new JsValue("function " + propertyName + "() { [native code] }"))), 
+					false, false, false);
+
+				var descriptor = new PropertyDescriptor(func, false, true, false);
 				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}

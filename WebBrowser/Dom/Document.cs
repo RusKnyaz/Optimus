@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Dom.Events;
@@ -33,7 +34,7 @@ namespace WebBrowser.Dom
 		{
 			NodeType = DOCUMENT_NODE;
 
-			DocumentElement = new Element(this, "html"){ParentNode = this};
+			DocumentElement = new HtmlHtmlElement(this){ParentNode = this};
 			ChildNodes = new List<Node> { DocumentElement };
 			EventTarget = new EventTarget(this, () => window, () => this);
 			DefaultView = window;
@@ -45,6 +46,12 @@ namespace WebBrowser.Dom
 		public Element DocumentElement { get; private set; }
 		public string ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
+		[Obsolete("Use window.location")]
+		//todo: check is it true for frames
+		public Location Location { get { return DefaultView.Location; } }
+		public string DocumentURI {get { return DefaultView.Location.Href; }  set { DefaultView.Location.Href = value; }}
+		public IEnumerable<HtmlFormElement> Forms { get { return GetElementsByTagName("form").Cast<HtmlFormElement>(); } }
+		public IEnumerable<IHtmlScriptElement> Scripts { get { return GetElementsByTagName("script").Cast<IHtmlScriptElement>(); } }
 
 		public void Write(string text)
 		{
@@ -89,24 +96,25 @@ namespace WebBrowser.Dom
 			if(tagName == string.Empty)
 				throw new ArgumentOutOfRangeException("tagName");
 
-			var invariantTagName = tagName.ToLowerInvariant();
+			var invariantTagName = tagName.ToUpperInvariant();
 			switch (invariantTagName)
 			{
 				//todo: fill the list
-				case "div":
-				case "span":
-				case "b": return new HtmlElement(this, tagName);
-				case "button": return new HtmlButtonElement(this);
-				case "input": return new HtmlInputElement(this);
-				case "script": return new Script(this);
-				case "head":return new Head(this);
-				case "body":return new HtmlBodyElement(this);
-				case "textarea": return new HtmlTextAreaElement(this);
-				case "form":return new HtmlFormElement(this);
-				case "iframe":return new HtmlIFrameElement(this);
+				case "DIV":
+				case "SPAN":
+				case "B": return new HtmlElement(this, invariantTagName);
+				case TagsNames.Button: return new HtmlButtonElement(this);
+				case TagsNames.Input: return new HtmlInputElement(this);
+				case TagsNames.Script: return new Script(this);
+				case TagsNames.Head:return new Head(this);
+				case TagsNames.Body:return new HtmlBodyElement(this);
+				case TagsNames.Textarea: return new HtmlTextAreaElement(this);
+				case TagsNames.Form:return new HtmlFormElement(this);
+				case TagsNames.IFrame:return new HtmlIFrameElement(this);
+				case TagsNames.Html:return new HtmlHtmlElement(this);
 			}
 
-			return new HtmlUnknownElement(this, tagName);
+			return new HtmlUnknownElement(this, invariantTagName);
 		}
 
 		public Attr CreateAttribute(string name)
@@ -125,6 +133,7 @@ namespace WebBrowser.Dom
 			return DocumentElement.Flatten().OfType<Element>().Where(x => x.GetAttribute("name") == name).ToList().AsReadOnly();
 		}
 
+		
 		public DocumentFragment CreateDocumentFragment()
 		{
 			return new DocumentFragment(this);
