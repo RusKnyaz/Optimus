@@ -29,6 +29,12 @@ namespace WebBrowser.Tests.Dom
 			Assert.AreEqual(setType, _button.GetAttribute("type"));
 			Assert.AreEqual(getType, _button.Type);
 		}
+
+		[Test]
+		public void Defaults()
+		{
+			_button.Assert(b => b.Disabled == false);
+		}
 	}
 }
 #endif

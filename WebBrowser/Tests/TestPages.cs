@@ -93,11 +93,12 @@ namespace WebBrowser.Tests
 			var engine = Open("jquery") ;
 			Assert.IsNotNull(engine.WaitId("ready"), "ready");
 			var b = engine.WaitId(buttonId) as HtmlButtonElement;
-			Assert.IsNotNull(b);
+			Assert.IsNotNull(b, "button");
 			b.Click();
 			Thread.Sleep(100);
 			var g = engine.Document.GetElementById(greetingId);
-			Assert.IsNotNull(g);
+
+			Assert.IsNotNull(g, "greeting");
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
 

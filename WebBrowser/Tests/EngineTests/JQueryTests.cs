@@ -174,6 +174,20 @@ document.body.appendChild(e);";
 			
 			Assert.AreEqual(exptectedCount, result);
 		}
+
+		[Test]
+		public void OnWithSelector()
+		{
+			var script = @"$('#a').on('click.some', '.u', function(){console.log('hi');});";
+			var engine = new Engine();
+			object result = null;
+			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script + "</script></body></html>");
+
+			var u = engine.Document.GetElementById("u") as HtmlElement;
+			u.Click();
+			Assert.AreEqual("hi", result);
+		}
 	}
 
 	public static class StringExtension

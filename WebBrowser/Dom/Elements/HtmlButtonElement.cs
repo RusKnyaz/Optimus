@@ -29,7 +29,7 @@
 
 		public bool Disabled
 		{
-			get { return GetAttribute("disabled") == null; }
+			get { return GetAttribute("disabled") != null; }
 			set { SetAttribute("disabled", value ? "" : null);}
 		}
 
