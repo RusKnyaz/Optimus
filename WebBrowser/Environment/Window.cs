@@ -64,14 +64,14 @@ namespace WebBrowser.Environment
 			_timers.ClearTimeout(handle);
 		}
 
-		public int SetInterval(Action handler, int delay)
+		public int SetInterval(Action handler, double? delay)
 		{
-			throw new NotImplementedException();
+			return _timers.SetInterval(handler, (int)(delay ?? 1));
 		}
 
 		public void ClearInterval(int handle)
 		{
-			throw new NotImplementedException();
+			_timers.ClearTimeout(handle);
 		}
 
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)

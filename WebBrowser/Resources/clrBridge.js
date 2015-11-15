@@ -36,11 +36,11 @@
 	window.addEventListener = function(a, b, c) { engine.Window.AddEventListener(a, b, c); };
 	window.removeEventListener = function (a, b, c) { engine.Window.RemoveEventListener(a, b, c); };
 	window.dispatchEvent = function (x) { return engine.Window.DispatchEvent(x); };
-	window.clearTimeout = engine.Window.clearTimeout;
+    window.clearTimeout = function(x) { engine.Window.clearTimeout(x); };
 	window.location = engine.Window.Location;
 	window.navigator = engine.Window.Navigator;
 	window.screen = engine.Window.Screen;
-	window.alert = engine.Window.Alert;
+    window.alert = function(x) { engine.Window.Alert(x); };
     
 	bindProps(window, engine.Window, "innerWidth innerHeight");
 	window.setTimeout = function (handler, timeout) {
@@ -51,6 +51,14 @@
 			handler.apply({}, args);
 		}, timeout);
 	};
+
+    window.setInterval = function(handler, timeout) {
+        if (!handler)
+            return;
+        var args = Array.prototype.slice.call(arguments, 2);
+        return engine.Window.SetInterval(function () {handler.apply({}, args);}, timeout);
+    }
+    window.clearInterval = function(x) { engine.Window.clearInterval(x); };
 	
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {

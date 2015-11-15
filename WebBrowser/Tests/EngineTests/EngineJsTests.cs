@@ -528,5 +528,11 @@ console.log(match[0]);");
 
 			CollectionAssert.AreEqual(new[] { "function getElementsByClassName() { [native code] }" }, _log);
 		}
+
+		[Test]
+		public void ClearIntervalSmokeTest()
+		{
+			_engine.Load("<html><head><script>clearInterval(1);</script></head><body></body></html>");
+		}
 	}
 }

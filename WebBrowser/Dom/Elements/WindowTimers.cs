@@ -7,7 +7,7 @@ namespace WebBrowser.Dom.Elements
 {
 	internal class WindowTimers
 	{
-		readonly List<TimeoutTimer> _activeTimers = new List<TimeoutTimer>();
+		readonly List<IDisposable> _activeTimers = new List<IDisposable>();
 
 		public event Action<Exception> OnException;
 
@@ -40,6 +40,21 @@ namespace WebBrowser.Dom.Elements
 
 			timer.Start();
 			
+			return timer.GetHashCode();
+		}
+
+		public int SetInterval(Action handler, int timeout)
+		{
+			var timer = new Timer(state =>
+			{
+				lock(_getSyncObj()) handler();
+			}, null, 0, timeout);
+
+			lock (_activeTimers)
+			{
+				_activeTimers.Add(timer);
+			}
+
 			return timer.GetHashCode();
 		}
 
