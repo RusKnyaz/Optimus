@@ -23,18 +23,19 @@ namespace WebBrowser.WfApp.Controls
 			set
 			{
 				if (_engine != null)
-					_engine.DocumentChanged -= EngineOnDocumentChanged;
+				{
+					Document = null;
+				}
+					
 				_engine = value;
-				if(_engine != null)
-					_engine.DocumentChanged+=EngineOnDocumentChanged;
+				if (_engine != null)
+				{
+					Document = _engine.Document;
+					this.SafeBeginInvoke(() => treeView1.Nodes.Clear());
+				}
 			}
 		}
 
-		private void EngineOnDocumentChanged()
-		{
-			Document = _engine.Document;
-			this.SafeBeginInvoke(() => treeView1.Nodes.Clear());
-		}
 
 		private Document Document
 		{
@@ -43,14 +44,14 @@ namespace WebBrowser.WfApp.Controls
 			{
 				if (_document != null)
 				{
-					_document.DomNodeInserted -= DocumentOnDomNodeInserted;
+					_document.NodeInserted -= DocumentOnDomNodeInserted;
 					_document.RemoveEventListener("DOMContentLoaded",  OnDocumentLoaded, false);
 				}
 
 				_document = value;
 				if (_document != null)
 				{
-					_document.DomNodeInserted += DocumentOnDomNodeInserted;
+					_document.NodeInserted += DocumentOnDomNodeInserted;
 					_document.AddEventListener("DOMContentLoaded", OnDocumentLoaded, false);
 				}
 			}

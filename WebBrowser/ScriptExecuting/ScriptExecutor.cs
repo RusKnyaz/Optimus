@@ -55,6 +55,7 @@ namespace WebBrowser.ScriptExecuting
 			AddDomType("HTMLIFrameElement", typeof(HtmlIFrameElement));
 			AddDomType("HTMLInputElement", typeof(HtmlInputElement));
 			AddDomType("HTMLTextAreaElement", typeof(HtmlTextAreaElement));
+			AddDomType("HTMLUnknownElement", typeof(HtmlUnknownElement));
 			AddDomType("HTMLFormElement", typeof(HtmlFormElement));
 			AddDomType("HTMLHtmlElement", typeof(HtmlHtmlElement));
 			AddDomType("Script", typeof(Script));

@@ -27,8 +27,15 @@ namespace WebBrowser.WfApp.Controls
 					_engine.Console.OnLog -= ConsoleOnOnLog;
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnOnRequest;
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnReceived;
-					_engine.DocumentChanged-=EngineOnDocumentChanged;
 					_engine.Window.OnAlert -= OnAlert;
+
+					if (_document != null)
+					{
+						_document.RemoveEventListener("AfterScriptExecute", OnScriptExecuted, false);
+						_document.RemoveEventListener("BeforeScriptExecute", OnScriptExecuting, false);
+					}
+
+					_engine.Scripting.ScriptExecutionError -= DocumentOnScriptExecutionError;
 				}
 
 				_engine = value;
@@ -37,12 +44,12 @@ namespace WebBrowser.WfApp.Controls
 				{
 					_engine.Console.OnLog += ConsoleOnOnLog;
 					_engine.ResourceProvider.OnRequest += ResourceProviderOnReceived;
-					_engine.DocumentChanged += EngineOnDocumentChanged;
 					_engine.Window.OnAlert += OnAlert;
-				}
-				else
-				{
-					EngineOnDocumentChanged();
+
+					_document = _engine.Document;
+					_document.AddEventListener("AfterScriptExecute", OnScriptExecuted, false);
+					_document.AddEventListener("BeforeScriptExecute", OnScriptExecuting, false);
+					_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
 				}
 			}
 		}
@@ -53,30 +60,6 @@ namespace WebBrowser.WfApp.Controls
 		}
 
 		private Document _document = null;
-
-		private void EngineOnDocumentChanged()
-		{
-			if (_document != null)
-			{
-				_document.RemoveEventListener("AfterScriptExecute", OnScriptExecuted, false);
-				_document.RemoveEventListener("BeforeScriptExecute", OnScriptExecuting, false);
-			}
-			if(_engine == null)
-				return;
-
-			//todo: unsubscribe somewhere
-			if (_engine.Scripting != null)
-			{
-				_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
-			}
-
-			_document = _engine.Document;
-			if (_document != null)
-			{
-				_document.AddEventListener("AfterScriptExecute", OnScriptExecuted, false);
-				_document.AddEventListener("BeforeScriptExecute", OnScriptExecuting, false);
-			}
-		}
 
 		private void DocumentOnScriptExecutionError(Script script, Exception exception)
 		{
