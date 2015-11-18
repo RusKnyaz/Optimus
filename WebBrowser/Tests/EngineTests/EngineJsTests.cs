@@ -530,9 +530,9 @@ console.log(match[0]);");
 		}
 
 		[Test]
-		public void ClearIntervalSmokeTest()
+		public void ClearInterval()
 		{
-			_engine.Load("<html><head><script>clearInterval(1);</script></head><body></body></html>");
+			_engine.Load("<html><head><script>var x = setInterval(function(){}, 1000); clearInterval(x);</script></head><body></body></html>");
 		}
 	}
 }

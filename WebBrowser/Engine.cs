@@ -151,8 +151,10 @@ namespace WebBrowser
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
+			//todo: we should create new document
+			Document.ChildNodes.Clear();
+		
 			//todo: clear js runtime context
-			
 			DocumentBuilder.Build(Document, stream);
 			Document.Complete();
 		}

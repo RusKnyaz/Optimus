@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
+using HtmlElement = WebBrowser.Dom.Elements.HtmlElement;
 
 namespace WebBrowser.WfApp.Controls
 {
@@ -149,6 +150,22 @@ namespace WebBrowser.WfApp.Controls
 		{
 			if (NodeSelected != null)
 				NodeSelected(e.Node);
+		}
+
+		private void clickToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var node = treeView1.SelectedNode;
+			if (node != null)
+			{
+				var elt = node.Tag as HtmlElement;
+				if (elt != null)
+				{
+					elt.Click();
+					return;
+				}
+			}
+
+			MessageBox.Show("Nothing to click");
 		}
 	}
 }

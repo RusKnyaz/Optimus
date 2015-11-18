@@ -36,7 +36,7 @@
 	window.addEventListener = function(a, b, c) { engine.Window.AddEventListener(a, b, c); };
 	window.removeEventListener = function (a, b, c) { engine.Window.RemoveEventListener(a, b, c); };
 	window.dispatchEvent = function (x) { return engine.Window.DispatchEvent(x); };
-    window.clearTimeout = function(x) { engine.Window.clearTimeout(x); };
+    window.clearTimeout = function(x) { engine.Window.ClearTimeout(x); };
 	window.location = engine.Window.Location;
 	window.navigator = engine.Window.Navigator;
 	window.screen = engine.Window.Screen;
@@ -58,7 +58,7 @@
         var args = Array.prototype.slice.call(arguments, 2);
         return engine.Window.SetInterval(function () {handler.apply({}, args);}, timeout);
     }
-    window.clearInterval = function(x) { engine.Window.clearInterval(x); };
+    window.clearInterval = function(x) { engine.Window.ClearInterval(x||-1); };
 	
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {
