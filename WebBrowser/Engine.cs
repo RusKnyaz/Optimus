@@ -23,22 +23,35 @@ namespace WebBrowser
 			get { return _document; }
 			private set
 			{
-				_document = value;
+				if (_document != null)
+				{
+					Document.OnNodeException -= OnNodeException;
+					Document.OnFormSubmit -= OnFormSubmit;
+				}
 
 				if (Scripting != null)
 				{
-					Scripting.Dispose ();
+					Scripting.Dispose();
 					Scripting = null;
 				}
 
+				_document = value;
+				
 				if (_document != null)
 				{
 					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
+					Document.OnNodeException += OnNodeException;
+					Document.OnFormSubmit += OnFormSubmit;
 				}
 
 				if (DocumentChanged != null)
 					DocumentChanged();
 			}
+		}
+
+		private void OnNodeException(Node node, Exception exception)
+		{
+			Console.Log("Node event handler exception: " + exception.Message);
 		}
 
 		public Console Console { get; private set; }
@@ -51,9 +64,7 @@ namespace WebBrowser
 			Window = new Window(() => Document, this);
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
-			Document = new Document(Window);
-			Document.OnNodeException += (node, exception) => Console.Log("Node event handler exception: " + exception.Message);
-			Document.OnFormSubmit+=OnFormSubmit;
+			
 		}
 
 		/// <summary>
@@ -127,6 +138,7 @@ namespace WebBrowser
 		public async void OpenUrl(string path)
 		{
 			ScriptExecutor.Clear();
+			Document = new Document(Window);
 			Uri = new Uri(path);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
 			var resource = await ResourceProvider.GetResourceAsync(path);
@@ -141,19 +153,27 @@ namespace WebBrowser
 				if (httpResponse != null && httpResponse.Uri != null)
 					Uri = httpResponse.Uri;
 
-				Load(resource.Stream);
+				BuildDocument(resource.Stream);
 			}
 		}
 
+		/// <summary>
+		/// For tests
+		/// </summary>
+		/// <param name="stream"></param>
 		public void Load(Stream stream)
+		{
+			ScriptExecutor.Clear();
+			Document = new Document(Window);
+			BuildDocument(stream);
+		}
+
+		private void BuildDocument(Stream stream)
 		{
 			//todo: fix protocol
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
-			//todo: we should create new document
-			Document.ChildNodes.Clear();
-		
 			//todo: clear js runtime context
 			DocumentBuilder.Build(Document, stream);
 			Document.Complete();

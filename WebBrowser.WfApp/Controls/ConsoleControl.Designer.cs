@@ -35,18 +35,21 @@
 			// 
 			this.textBoxLog.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.textBoxLog.Location = new System.Drawing.Point(0, 0);
+			this.textBoxLog.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.textBoxLog.Multiline = true;
 			this.textBoxLog.Name = "textBoxLog";
-			this.textBoxLog.Size = new System.Drawing.Size(355, 156);
+			this.textBoxLog.Size = new System.Drawing.Size(473, 192);
 			this.textBoxLog.TabIndex = 0;
 			// 
 			// ConsoleControl
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScroll = true;
 			this.Controls.Add(this.textBoxLog);
+			this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
 			this.Name = "ConsoleControl";
-			this.Size = new System.Drawing.Size(355, 156);
+			this.Size = new System.Drawing.Size(473, 192);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

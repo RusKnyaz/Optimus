@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Dom.Events;
@@ -185,7 +184,6 @@ namespace WebBrowser.Dom
 
 		public event Action<Node> DomNodeInserted;
 		public event Action<Node> NodeInserted;
-
 
 		internal void HandleNodeAdded(Node newChild)
 		{

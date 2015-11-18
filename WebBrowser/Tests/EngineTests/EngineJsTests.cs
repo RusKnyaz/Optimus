@@ -87,7 +87,7 @@ console.log(e.parentNode.tagName);
 console.log(e.ownerDocument == document);
 console.log(e.getAttribute('id'));");
 
-			CollectionAssert.AreEqual(new object[] { true, true, "div", true, "h1", true, "h3", true, "body", true, "d" }, _log);
+			CollectionAssert.AreEqual(new object[] { true, true, "DIV", true, "H1", true, "H3", true, "BODY", true, "d" }, _log);
 		}
 
 		[Test]
@@ -134,7 +134,7 @@ console.log(div.tagName);
 console.log(div.parentNode == null);
 console.log(div.appendChild != null);");
 
-			CollectionAssert.AreEqual(new object[]{true, true, "div", true, true}, _log);
+			CollectionAssert.AreEqual(new object[]{true, true, "DIV", true, true}, _log);
 		}
 
 		[Test]
@@ -232,7 +232,7 @@ console.log(navigator.userAgent);");
 d.childNodes[0] = document.createElement('p');
 console.log(d.childNodes[0].tagName);");
 
-			CollectionAssert.AreEqual(new object[] { "p" }, _log);
+			CollectionAssert.AreEqual(new object[] { "P" }, _log);
 		}
 
 		//The test comes from bootstrap library

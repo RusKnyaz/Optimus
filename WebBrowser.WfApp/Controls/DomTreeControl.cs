@@ -26,15 +26,23 @@ namespace WebBrowser.WfApp.Controls
 				if (_engine != null)
 				{
 					Document = null;
+					_engine.DocumentChanged -= OnDocumentChanged;
 				}
 					
 				_engine = value;
 				if (_engine != null)
 				{
 					Document = _engine.Document;
+					_engine.DocumentChanged += OnDocumentChanged;
+
 					this.SafeBeginInvoke(() => treeView1.Nodes.Clear());
 				}
 			}
+		}
+
+		private void OnDocumentChanged()
+		{
+			Document = _engine.Document;
 		}
 
 
@@ -48,7 +56,7 @@ namespace WebBrowser.WfApp.Controls
 					_document.NodeInserted -= DocumentOnDomNodeInserted;
 					_document.RemoveEventListener("DOMContentLoaded",  OnDocumentLoaded, false);
 				}
-
+				treeView1.Nodes.Clear();
 				_document = value;
 				if (_document != null)
 				{

@@ -29,12 +29,6 @@ namespace WebBrowser.WfApp.Controls
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnReceived;
 					_engine.Window.OnAlert -= OnAlert;
 
-					if (_document != null)
-					{
-						_document.RemoveEventListener("AfterScriptExecute", OnScriptExecuted, false);
-						_document.RemoveEventListener("BeforeScriptExecute", OnScriptExecuting, false);
-					}
-
 					_engine.Scripting.ScriptExecutionError -= DocumentOnScriptExecutionError;
 				}
 
@@ -45,13 +39,15 @@ namespace WebBrowser.WfApp.Controls
 					_engine.Console.OnLog += ConsoleOnOnLog;
 					_engine.ResourceProvider.OnRequest += ResourceProviderOnReceived;
 					_engine.Window.OnAlert += OnAlert;
-
-					_document = _engine.Document;
-					_document.AddEventListener("AfterScriptExecute", OnScriptExecuted, false);
-					_document.AddEventListener("BeforeScriptExecute", OnScriptExecuting, false);
-					_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
+					Document = _engine.Document;
+					_engine.DocumentChanged += OnDocumentChanged;
 				}
 			}
+		}
+
+		private void OnDocumentChanged()
+		{
+			Document = _engine.Document;
 		}
 
 		private void OnAlert(string obj)
@@ -60,6 +56,27 @@ namespace WebBrowser.WfApp.Controls
 		}
 
 		private Document _document = null;
+
+		private Document Document
+		{
+			set
+			{
+				if (_document != null)
+				{
+					_document.RemoveEventListener("AfterScriptExecute", OnScriptExecuted, false);
+					_document.RemoveEventListener("BeforeScriptExecute", OnScriptExecuting, false);
+					_engine.Scripting.ScriptExecutionError -= DocumentOnScriptExecutionError;
+				}
+
+				_document = value;
+				if (_document != null)
+				{
+					_document.AddEventListener("AfterScriptExecute", OnScriptExecuted, false);
+					_document.AddEventListener("BeforeScriptExecute", OnScriptExecuting, false);
+					_engine.Scripting.ScriptExecutionError += DocumentOnScriptExecutionError;
+				}
+			}
+		}
 
 		private void DocumentOnScriptExecutionError(Script script, Exception exception)
 		{
