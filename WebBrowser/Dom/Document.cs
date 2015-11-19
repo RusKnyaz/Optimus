@@ -179,7 +179,7 @@ namespace WebBrowser.Dom
 			if(type == "KeyboardEvent")
 				return new KeyboardEvent();
 
-			if(type == "Error")
+			if(type == "ErrorEvent")
 				return new ErrorEvent();
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);

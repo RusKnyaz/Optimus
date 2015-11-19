@@ -16,5 +16,10 @@
 		{
 			get { return "html"; }
 		}
+
+		public override string ToString()
+		{
+			return "<!DOCTYPE html>";
+		}
 	}
 }

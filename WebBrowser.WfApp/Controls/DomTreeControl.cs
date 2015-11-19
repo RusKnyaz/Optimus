@@ -55,7 +55,6 @@ namespace WebBrowser.WfApp.Controls
 				{
 					_document.NodeInserted -= DocumentOnDomNodeInserted;
 					_document.NodeRemoved -= DocumentOnNodeRemoved;
-					_document.RemoveEventListener("DOMContentLoaded",  OnDocumentLoaded, false);
 				}
 				treeView1.Nodes.Clear();
 				_document = value;
@@ -63,7 +62,6 @@ namespace WebBrowser.WfApp.Controls
 				{
 					_document.NodeInserted += DocumentOnDomNodeInserted;
 					_document.NodeRemoved += DocumentOnNodeRemoved;
-					_document.AddEventListener("DOMContentLoaded", OnDocumentLoaded, false);
 
 					//show exist nodes;
 					foreach (var node in _document.ChildNodes)
@@ -82,14 +80,6 @@ namespace WebBrowser.WfApp.Controls
 				this.SafeInvoke(() => nodeToremove.Parent.Nodes.Remove(nodeToremove));
 		}
 
-		private void OnDocumentLoaded(Event @event)
-		{
-			foreach (var childNode in _document.DocumentElement.ChildNodes)
-			{
-				DocumentOnDomNodeInserted(childNode);
-			}
-		}
-
 		private Dictionary<Node, TreeNode> _nodes = new Dictionary<Node, TreeNode>();
 
 		//todo: the index on node inserted should be considered.
@@ -102,8 +92,12 @@ namespace WebBrowser.WfApp.Controls
 			this.SafeInvoke(() =>
 				{
 					var newTreeNode = CreateBranch(child);
+
 					if (newTreeNode != null)
-						targetTreeNodeCollection.Add(newTreeNode);		
+					{
+						var idx = child.ParentNode.ChildNodes.IndexOf(child);
+						targetTreeNodeCollection.Insert(idx, newTreeNode);
+					}
 				});
 		}
 
@@ -144,6 +138,9 @@ namespace WebBrowser.WfApp.Controls
 					}
 				}
 			}
+
+			if (name == null)
+				name = node.ToString();
 				
 			var treeNode = new TreeNode(name) {Tag = node};
 
