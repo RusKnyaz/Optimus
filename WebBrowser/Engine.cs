@@ -14,7 +14,7 @@ namespace WebBrowser
 	{
 		private Document _document;
 		public IResourceProvider ResourceProvider { get; private set; }
-		internal IScriptExecutor ScriptExecutor { get; private set; }
+		public IScriptExecutor ScriptExecutor { get; private set; }
 
 		public DocumentScripting Scripting	{get; private set;}
 
@@ -57,14 +57,13 @@ namespace WebBrowser
 		public Console Console { get; private set; }
 		public Window Window { get; private set; }
 
-		internal Engine(IResourceProvider resourceProvider)
+		public Engine(IResourceProvider resourceProvider)
 		{
 			ResourceProvider = resourceProvider;
 			Console = new Console();
 			Window = new Window(() => Document, this);
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
-			
 		}
 
 		/// <summary>

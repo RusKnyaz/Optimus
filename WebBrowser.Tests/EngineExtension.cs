@@ -1,3 +1,6 @@
+using System.IO;
+using System.Text;
+
 namespace WebBrowser.Tests
 {
 	internal static class EngineExtension
@@ -24,6 +27,14 @@ namespace WebBrowser.Tests
 
 			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
 			return engine;
+		}
+
+		public static void Load(this Engine engine, string html)
+		{
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
+			{
+				engine.Load(stream);
+			}
 		}
 	}
 }

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using WebBrowser.Properties;
+using WebBrowser.Tests.Properties;
 
 namespace WebBrowser.Tests.EngineTests
 {
@@ -12,7 +12,7 @@ namespace WebBrowser.Tests.EngineTests
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
 			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script>" +
-				"<script>"+Resources.jQuery_Form+"</script></head><body></body></html>");
+				"<script>" + Resources.jQuery_Form + "</script></head><body></body></html>");
 		}
 	}
 }
