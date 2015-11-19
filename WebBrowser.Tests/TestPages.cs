@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using WebBrowser.Dom.Elements;
@@ -128,7 +127,20 @@ namespace WebBrowser.Tests
 			Assert.AreEqual("HI", button.InnerHTML);
 		}
 
-		
+		[Test]
+		public void KnockoutClick()
+		{
+			var engine = Open("knockout");
+			engine.WaitDocumentLoad();
+			var button = engine.Document.GetElementById("b") as HtmlButtonElement;
+
+			button.Assert(b => b.InnerHTML == "Click me");
+			button.Click();
+
+			var text = engine.Document.GetElementById("p") as HtmlElement;
+			Assert.IsNotNull(text, "text");
+			Assert.AreEqual("HI", text.InnerHTML);
+			Assert.IsTrue(button.Disabled);
+		}
 	}
 }
-#endif

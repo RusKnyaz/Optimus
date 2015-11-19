@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script src="knockout-3.2.0.js"></script>
+    <title></title>
+</head>
+<body>
+    <iframe name="stubframe" src="about:blank" style="display: none"></iframe>
+    <form action="about:blank" method="post" id="logon_form" target="stubframe" class="form-signin">
+        <button id="b" data-bind="html:buttonText, click:click, enable: enabled"></button>
+    <p id="p" data-bind="text:text"></p>
+        </form>
+</body>
+<script>
+    var vm = {
+        text: ko.observable(),
+        buttonText: ko.observable("Click me"),
+        enabled:ko.observable(true)
+    };
+
+    vm.click = function() {
+        vm.text("HI");
+        vm.enabled(false);
+    };
+
+    ko.applyBindings(vm);
+</script>
+</html>
