@@ -63,6 +63,7 @@
     <Compile Include="Dom\Elements\Attr.cs" />
     <Compile Include="Dom\AttributeMappedValue.cs" />
     <Compile Include="Dom\Elements\AttributesCollection.cs" />
+    <Compile Include="Dom\Elements\DocType.cs" />
     <Compile Include="Dom\Elements\EventTarget.cs" />
     <Compile Include="Dom\Elements\HtmlBodyElement.cs" />
     <Compile Include="Dom\Elements\CharacterData.cs" />

@@ -59,10 +59,17 @@ namespace WebBrowser.Html
 					case HtmlChunkTypes.Comment:
 						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });
 						break;
+					case HtmlChunkTypes.DocType:
+						elem.Children.Add(new HtmlDocType());
+						break;
 				}
 			}
 			return false;
 		}
+	}
+
+	internal class HtmlDocType : IHtmlNode
+	{
 	}
 
 	internal class HtmlComment : IHtmlNode

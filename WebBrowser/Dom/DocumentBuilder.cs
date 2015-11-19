@@ -154,6 +154,13 @@ namespace WebBrowser.Dom
 
 		private static void BuildElem(Node node, IHtmlNode htmlNode, NodeSources source)
 		{
+			var docType = htmlNode as HtmlDocType;
+			if (docType != null)
+			{
+				//todo: may be it's wrong to assume the doctype element placed before html in source document
+				node.OwnerDocument.InsertBefore(new DocType(), node.OwnerDocument.DocumentElement);
+			}
+			
 			var comment = htmlNode as HtmlComment;
 			if (comment != null)
 			{

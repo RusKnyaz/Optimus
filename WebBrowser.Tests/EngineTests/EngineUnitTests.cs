@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -261,6 +260,19 @@ window.clearTimeout(timer);"));
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
 		}
+
+		[Test]
+		public void ZeroLevelNodes()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://localhost", "<!DOCTYPE html><html><head></head><body></body></html>"));
+			engine.OpenUrl("http://localhost");
+
+			engine.Document.Assert(doc =>
+				doc.ChildNodes.Count == 2 &&
+				doc.ChildNodes[0].NodeType == Node.DOCUMENT_TYPE_NODE &&
+				doc.ChildNodes[1].NodeType == Node.ELEMENT_NODE &&
+				((HtmlElement)doc.ChildNodes[1]).TagName == "HTML" &&
+				doc.DocumentElement.TagName == "HTML");
+		}
 	}
 }
-#endif

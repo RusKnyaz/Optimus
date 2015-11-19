@@ -63,7 +63,7 @@ namespace WebBrowser.Dom.Elements
 			return node;
 		}
 
-		private void RegisterNode(Node node)
+		protected virtual void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
 			node.OwnerDocument = OwnerDocument;
@@ -89,6 +89,7 @@ namespace WebBrowser.Dom.Elements
 		public Node RemoveChild(Node node)
 		{
 			ChildNodes.Remove(node);
+			OwnerDocument.HandleNodeRemoved(this, node);
 			return node;
 		}
 

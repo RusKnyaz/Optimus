@@ -54,6 +54,7 @@ namespace WebBrowser.WfApp.Controls
 				if (_document != null)
 				{
 					_document.NodeInserted -= DocumentOnDomNodeInserted;
+					_document.NodeRemoved -= DocumentOnNodeRemoved;
 					_document.RemoveEventListener("DOMContentLoaded",  OnDocumentLoaded, false);
 				}
 				treeView1.Nodes.Clear();
@@ -61,9 +62,24 @@ namespace WebBrowser.WfApp.Controls
 				if (_document != null)
 				{
 					_document.NodeInserted += DocumentOnDomNodeInserted;
+					_document.NodeRemoved += DocumentOnNodeRemoved;
 					_document.AddEventListener("DOMContentLoaded", OnDocumentLoaded, false);
+
+					//show exist nodes;
+					foreach (var node in _document.ChildNodes)
+					{
+						DocumentOnDomNodeInserted(node);
+					}
 				}
 			}
+		}
+
+		private void DocumentOnNodeRemoved(Node parent, Node node)
+		{
+			var nodeToremove = FindTreeNode(node);
+
+			if (nodeToremove != null)
+				this.SafeInvoke(() => nodeToremove.Parent.Nodes.Remove(nodeToremove));
 		}
 
 		private void OnDocumentLoaded(Event @event)
@@ -140,9 +156,15 @@ namespace WebBrowser.WfApp.Controls
 			return treeNode;
 		}
 
+		private TreeNode FindTreeNode(Node node)
+		{
+			TreeNode treeNode;
+			return _nodes.TryGetValue(node, out treeNode) ? treeNode : null;
+		}
+
 		private TreeNodeCollection FindTreeNodeCollection(Node parent)
 		{
-			if (parent == _engine.Document.DocumentElement)
+			if (parent == _engine.Document)
 				return treeView1.Nodes;
 
 			TreeNode treeNode;

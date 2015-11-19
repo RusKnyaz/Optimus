@@ -33,8 +33,11 @@ namespace WebBrowser.Dom
 		{
 			NodeType = DOCUMENT_NODE;
 
-			DocumentElement = new HtmlHtmlElement(this){ParentNode = this};
-			ChildNodes = new List<Node> { DocumentElement };
+			DocumentElement = CreateElement(TagsNames.Html);
+			ChildNodes.Add(DocumentElement);
+			DocumentElement.ParentNode = this;
+			DocumentElement.OwnerDocument = this;
+
 			EventTarget = new EventTarget(this, () => window, () => this);
 			DefaultView = window;
 
@@ -184,6 +187,13 @@ namespace WebBrowser.Dom
 
 		public event Action<Node> DomNodeInserted;
 		public event Action<Node> NodeInserted;
+		public event Action<Node, Node> NodeRemoved;
+
+		internal void HandleNodeRemoved(Node parent, Node node)
+		{
+			if (NodeRemoved!= null)
+				NodeRemoved(parent, node);
+		}
 
 		internal void HandleNodeAdded(Node newChild)
 		{
@@ -224,6 +234,13 @@ namespace WebBrowser.Dom
 		}
 
 		internal event Action<HtmlFormElement> OnFormSubmit;
+
+		protected override void RegisterNode(Node node)
+		{
+			node.ParentNode = this;
+			node.OwnerDocument = this;
+			HandleNodeAdded(node);
+		}
 	}
 
 	[DomItem]
