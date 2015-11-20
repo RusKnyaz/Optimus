@@ -59,6 +59,31 @@ namespace WebBrowser.ResourceProviders
 			result.Timeout = request.Timeout == 0 ? Timeout.Infinite : request.Timeout;
 			result.Method = request.Method;
 			result.CookieContainer = _cookies;
+
+			if(request.Headers != null)
+			foreach (var keyValue in request.Headers)
+			{
+				switch (keyValue.Key)
+				{
+					case "Content-Type":
+						result.ContentType = keyValue.Value;
+						break;
+					case "Accept":
+						result.Accept = keyValue.Value;
+						break;
+					default:
+						result.Headers[keyValue.Key] = keyValue.Value;
+						break;
+				}
+			}
+
+			if (request.Data != null && request.Method.ToUpperInvariant() != "GET")
+			{
+				using (var writer = new StreamWriter(result.GetRequestStream()))
+				{
+					writer.Write(request.Data);
+				}
+			}
 			return result;
 		}
 	}

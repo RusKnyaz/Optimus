@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -60,6 +59,7 @@ namespace WebBrowser.Dom
 		public void Open(string method, string url, bool? async, string username, string password)
 		{
 			_request = (HttpRequest)_resourceProvider.CreateRequest(url);
+			_request.Method = method;
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;
@@ -92,8 +92,6 @@ namespace WebBrowser.Dom
 		}}
 
 		public string ResponseText { get { return _data; } }
-
-		
 
 		public void SetRequestHeader(string name, string value)
 		{
@@ -140,7 +138,13 @@ namespace WebBrowser.Dom
 
 		public async void Send(object data)
 		{
-			//todo: use data
+			//todo: use specified encoding
+			//todo: fix data using
+			if (data != null)
+			{
+				_request.Data = Encoding.UTF8.GetBytes(data.ToString());
+			}
+
 			if (_async)
 			{
 				ReadyState = LOADING;
