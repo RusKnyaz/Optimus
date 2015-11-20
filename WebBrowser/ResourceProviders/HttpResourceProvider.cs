@@ -79,9 +79,9 @@ namespace WebBrowser.ResourceProviders
 
 			if (request.Data != null && request.Method.ToUpperInvariant() != "GET")
 			{
-				using (var writer = new StreamWriter(result.GetRequestStream()))
+				using (var writer = result.GetRequestStream())
 				{
-					writer.Write(request.Data);
+					writer.Write(request.Data, 0, request.Data.Length);
 				}
 			}
 			return result;

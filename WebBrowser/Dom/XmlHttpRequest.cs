@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using WebBrowser.ResourceProviders;
@@ -153,13 +154,20 @@ namespace WebBrowser.Dom
 					_response = (HttpResponse) await _resourceProvider.GetResourceAsync(_request);
 					_data = _response.Stream.ReadToEnd();
 				}
+				catch (AggregateException a)
+				{
+					var web = a.Flatten().InnerExceptions.OfType<WebException>().FirstOrDefault();
+					if (web != null)
+					{
+						_data = web.Response.GetResponseStream().ReadToEnd();
+					}
+				}
 				catch (WebException w)
 				{
 					if (w.Status == WebExceptionStatus.Timeout)
 					{
 						CallInContext(OnTimeout);
 					}
-					ReadyState = DONE;
 				}
 				catch (Exception e)
 				{
