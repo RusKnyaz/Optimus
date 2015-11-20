@@ -194,5 +194,19 @@ namespace WebBrowser.WfApp.Controls
 
 			MessageBox.Show("Nothing to click");
 		}
+
+		private void setAttributeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var node = treeView1.SelectedNode;
+			if (node == null)
+				return;
+
+			var elt = node.Tag as HtmlElement;
+			if(elt == null)
+				return;
+
+			var dlg = new SetAttributeForm {Element = elt};
+			dlg.Show();
+		}
 	}
 }
