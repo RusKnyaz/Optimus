@@ -138,9 +138,9 @@ namespace WebBrowser
 		{
 			ScriptExecutor.Clear();
 			Document = new Document(Window);
-			Uri = new Uri(path);
+			Uri = Uri.IsWellFormedUriString(path, UriKind.Absolute) ? new Uri(path) : new Uri(Uri, path);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
-			var resource = await ResourceProvider.GetResourceAsync(path);
+			var resource = await ResourceProvider.GetResourceAsync(Uri.ToString());
 			LoadFromResponse(resource);
 		}
 
