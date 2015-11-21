@@ -106,8 +106,13 @@ namespace WebBrowser.Dom
 		{
 			if (_response.Headers == null)
 				return "";
-			
-			return _response.Headers.ToString();
+
+			var headersString = _response.Headers.ToString();
+
+			//to fix jquery we should remove \r due to jquery uses .net regex where \r\n is not threated as end line
+			headersString = headersString.Replace("\r", "");
+
+			return headersString;
 		}
 
 		public string StatusText

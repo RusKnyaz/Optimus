@@ -10,7 +10,13 @@
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            document.getElementById("t").innerHTML = xmlhttp.getAllResponseHeaders();
+            var headers = xmlhttp.getAllResponseHeaders();
+            document.getElementById("t").innerHTML = headers;
+            var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
+            while (match = rheaders.exec()) {
+                console.log(match[1].toLowerCase());
+                console.log(match[2]);
+            }
         }
         else if (xmlhttp.readyState == 4) {
             alert(xmlhttp.status);

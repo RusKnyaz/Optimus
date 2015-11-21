@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using WebBrowser.Dom.Elements;
@@ -116,15 +117,20 @@ namespace WebBrowser.Tests
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void Ajax()
 		{
 			var engine = Open("ajax");
 			var button = engine.WaitId("t");
+
+			var log = new List<object>();
+			engine.Console.OnLog+= o =>{log.Add(o);};
 			Assert.IsNotNull(button);
 
-			Thread.Sleep(1000);
-			Assert.AreEqual("HI", button.InnerHTML);
+			Thread.Sleep(1000000);
+			Assert.AreNotEqual(0, log.Count);
+			Assert.AreEqual("X-SourceFiles: =?UTF-8?B?QzpccHJvamVjdHNcV2ViQnJvd3NlclxUZXN0UGFnZXNcYWpheFxkYXRhLmh0bWw=",
+				button.InnerHTML);
 		}
 
 		[Test]
