@@ -6,12 +6,37 @@ namespace WebBrowser.WfApp.Controls
 {
 	public partial class AddressBar : UserControl
 	{
+		private Engine _engine;
+
 		public AddressBar()
 		{
 			InitializeComponent();
 		}
 
-		public Engine Engine { get; set; }
+		public Engine Engine
+		{
+			get { return _engine; }
+			set
+			{
+				if (_engine != null)
+				{
+					_engine.OnUriChanged -= OnUriChanged;
+				}
+				_engine = value;
+				if (_engine != null)
+				{
+					_engine.OnUriChanged += OnUriChanged;
+				}
+			}
+		}
+
+		private void OnUriChanged()
+		{
+			this.SafeInvoke(() =>
+			{
+				textBoxUrl.Text = _engine.Uri.ToString();
+			});
+		}
 
 		private void textBoxUrl_KeyDown(object sender, KeyEventArgs e)
 		{
@@ -27,8 +52,9 @@ namespace WebBrowser.WfApp.Controls
 						{
 							MessageBox.Show(ex.ToString());
 						}
-					}).Start();
-				
+					}
+				 ).Start();
+
 			}
 		}
 	}

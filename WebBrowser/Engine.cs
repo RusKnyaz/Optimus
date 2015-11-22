@@ -13,6 +13,7 @@ namespace WebBrowser
 	public class Engine: IDisposable
 	{
 		private Document _document;
+		private Uri _uri;
 		public IResourceProvider ResourceProvider { get; private set; }
 		public IScriptExecutor ScriptExecutor { get; private set; }
 
@@ -132,7 +133,20 @@ namespace WebBrowser
 
 		public Engine() : this(new ResourceProvider()) { }
 
-		public Uri Uri { get; private set; }
+		public Uri Uri
+		{
+			get { return _uri; }
+			private set
+			{
+				_uri = value;
+				if (OnUriChanged != null)
+				{
+					OnUriChanged();
+				}
+			}
+		}
+
+		public event Action OnUriChanged;
 
 		public async void OpenUrl(string path)
 		{

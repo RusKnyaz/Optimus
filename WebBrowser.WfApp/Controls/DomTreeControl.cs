@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
@@ -187,7 +188,7 @@ namespace WebBrowser.WfApp.Controls
 				var elt = node.Tag as HtmlElement;
 				if (elt != null)
 				{
-					elt.Click();
+					Task.Run(() => elt.Click());
 					return;
 				}
 			}

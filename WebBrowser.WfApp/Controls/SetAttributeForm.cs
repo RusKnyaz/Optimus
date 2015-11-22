@@ -15,7 +15,7 @@ namespace WebBrowser.WfApp.Controls
 		{
 			if (Element == null) return;
 			var attributeName = textBoxName.Text;
-			var attributeValue = textBoxName.Text;
+			var attributeValue = textBoxValue.Text;
 			Element.SetAttribute(attributeName, attributeValue);
 			Close();
 		}

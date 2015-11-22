@@ -144,6 +144,7 @@ namespace WebBrowser.Tests.EngineTests
 			userName.Value = "admin";
 			password.Value = "admin";
 			logonButton.Click();
+			Thread.Sleep(1000);//wait while document changed
 
 			var error = engine.WaitId("logout");
 			Assert.IsNotNull(error, "logout");
