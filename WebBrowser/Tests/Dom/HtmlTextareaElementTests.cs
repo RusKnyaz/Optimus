@@ -72,6 +72,12 @@ namespace WebBrowser.Tests.Dom
 			_document.DocumentElement.AppendChild(form);
 			Assert.AreEqual(form, _textArea.Form);
 		}
+
+		[Test]
+		public void ToStringTest()
+		{
+			Assert.AreEqual("[object HTMLTextAreaElement]", _textArea.ToString());
+		}
 	}
 }
 #endif

@@ -69,6 +69,7 @@
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
     <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
+    <Compile Include="Dom\Elements\HtmlDivElement.cs" />
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlIFrameElement.cs" />

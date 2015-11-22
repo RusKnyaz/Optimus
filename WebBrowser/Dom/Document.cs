@@ -102,8 +102,9 @@ namespace WebBrowser.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
-				case "DIV":
+				case "DIV": return new HtmlDivElement(this);
 				case "SPAN":
+				case TagsNames.Nav:
 				case "B": return new HtmlElement(this, invariantTagName);
 				case TagsNames.Button: return new HtmlButtonElement(this);
 				case TagsNames.Input: return new HtmlInputElement(this);

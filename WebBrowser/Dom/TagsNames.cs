@@ -11,5 +11,7 @@
 		public const string Head = "HEAD";
 		public const string Input = "INPUT";
 		public const string Button = "BUTTON";
+		public const string Nav = "NAV";
+		public const string Div = "DIV";
 	}
 }
