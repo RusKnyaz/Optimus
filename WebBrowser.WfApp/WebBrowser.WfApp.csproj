@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -66,6 +67,12 @@
     <Compile Include="Controls\DomTreeControl.Designer.cs">
       <DependentUpon>DomTreeControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SetAttributeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\SetAttributeForm.Designer.cs">
+      <DependentUpon>SetAttributeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,6 +89,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\DomTreeControl.resx">
       <DependentUpon>DomTreeControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SetAttributeForm.resx">
+      <DependentUpon>SetAttributeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

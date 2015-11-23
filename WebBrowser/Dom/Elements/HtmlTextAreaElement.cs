@@ -148,5 +148,10 @@ namespace WebBrowser.Dom.Elements
 		{
 			get { return this.FindOwnerForm(); }
 		}
+
+		public override string ToString()
+		{
+			return "[object HTMLTextAreaElement]";
+		}
 	}
 }

@@ -483,16 +483,6 @@ console.log(arr[0]);");
 		}
 
 
-		//Bug in jint RegExpPrototype.InitReturnValueArray
-		[Test]
-		public void ShiftMatchResult()
-		{
-			var engine = CreateEngine("<div></div>", @"var match = /quick\s(brown).+?(jumps)/ig.exec('The Quick Brown Fox Jumps Over The Lazy Dog');
-match.shift();
-console.log(match[0]);");
-			CollectionAssert.AreEqual(new object[] { "Brown" }, _log);
-		}
-
 		[Test]
 		public void DocumentBody()
 		{
@@ -533,6 +523,53 @@ console.log(match[0]);");
 		public void ClearInterval()
 		{
 			_engine.Load("<html><head><script>var x = setInterval(function(){}, 1000); clearInterval(x);</script></head><body></body></html>");
+		}
+
+		[Test]
+		public void ResponseHeadersRegEx()
+		{
+			_engine.Load(@"<html><head><script>
+var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
+var headersString = 'X-AspNetMvc-Version: 4.0\nX-Powered-By: ASP.NET\n\n';
+while ( match = rheaders.exec( headersString ) ) { 
+console.log(match[1].toLowerCase());
+console.log(match[ 2 ]);
+}
+</script></html>");
+
+
+			CollectionAssert.AreEqual(new[] { "x-aspnetmvc-version", "4.0", "x-powered-by", "ASP.NET" }, _log);
+		}
+
+		//There is a difference between js and .net regexp - end line detection.
+		//To fix the issue, i replaced $ with ($:\r|\n|\r\n) in RegExpConstructor;
+		[Test]
+		public void ResponseHeadersRegExBug()
+		{
+			_engine.Load(@"<html><head><script>
+var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
+var headersString = 'X-AspNetMvc-Version: 4.0\r\nX-Powered-By: ASP.NET\r\n\r\n';
+while ( match = rheaders.exec( headersString ) ) { 
+console.log(match[1].toLowerCase());
+console.log(match[ 2 ]);
+}
+</script></html>");
+
+
+			CollectionAssert.AreEqual(new[] { "x-aspnetmvc-version", "4.0", "x-powered-by", "ASP.NET" }, _log);
+		}
+
+		//Bug in jint RegExpPrototype.InitReturnValueArray
+		//to resolve the issue, i removed 
+		// array.DefineOwnProperty("length", new PropertyDescriptor(value: lengthValue, writable: false, enumerable: false, configurable: false), true);
+		// in RegExpPrototype.InitReturnValueArray
+		[Test]
+		public void ShiftMatchResult()
+		{
+			var engine = CreateEngine("<div></div>", @"var match = /quick\s(brown).+?(jumps)/ig.exec('The Quick Brown Fox Jumps Over The Lazy Dog');
+match.shift();
+console.log(match[0]);");
+			CollectionAssert.AreEqual(new object[] { "Brown" }, _log);
 		}
 	}
 }

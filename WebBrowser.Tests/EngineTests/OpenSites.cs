@@ -99,5 +99,55 @@ namespace WebBrowser.Tests.EngineTests
 			var error = engine.WaitId("validationError");
 			Assert.IsNotNull(error, "error");
 		}
+
+		[Test]
+		public void LogonToKwintoError()
+		{
+			var engine = new Engine();
+			engine.AttachConsole();
+			engine.OpenUrl("http://localhost:2930");
+
+			var logonButton = engine.WaitId("logon") as HtmlElement;
+			Thread.Sleep(5000);
+
+			var userName = engine.Document.GetElementById("UserName") as HtmlInputElement;
+			var password = engine.Document.GetElementById("Password") as HtmlInputElement;
+			Assert.IsNotNull(logonButton, "LogonButton");
+			Assert.IsNotNull(userName, "UserName");
+			Assert.IsNotNull(password, "Password");
+
+			userName.Value = "admin";
+			password.Value = "b";
+			logonButton.Click();
+
+			var error = engine.WaitId("validationError");
+			Assert.IsNotNull(error, "error");
+			System.Console.WriteLine(error.InnerHTML);
+		}
+
+		[Test]
+		public void LogonToKwinto()
+		{
+			var engine = new Engine();
+			engine.AttachConsole();
+			engine.OpenUrl("http://localhost:2930");
+
+			var logonButton = engine.WaitId("logon") as HtmlElement;
+			Thread.Sleep(5000);
+
+			var userName = engine.Document.GetElementById("UserName") as HtmlInputElement;
+			var password = engine.Document.GetElementById("Password") as HtmlInputElement;
+			Assert.IsNotNull(logonButton, "LogonButton");
+			Assert.IsNotNull(userName, "UserName");
+			Assert.IsNotNull(password, "Password");
+
+			userName.Value = "admin";
+			password.Value = "admin";
+			logonButton.Click();
+			Thread.Sleep(1000);//wait while document changed
+
+			var error = engine.WaitId("logout");
+			Assert.IsNotNull(error, "logout");
+		}
 	}
 }

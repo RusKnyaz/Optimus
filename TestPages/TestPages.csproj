@@ -84,6 +84,8 @@
     <Content Include="jq_rq_knock\stringTemplateEngine.js" />
     <Content Include="jq_rq_knock\template.js" />
     <Content Include="jq_rq_knock\text.js" />
+    <Content Include="knockout\index.html" />
+    <Content Include="knockout\knockout-3.2.0.js" />
     <Content Include="linkedscript\index.html" />
     <Content Include="linkedscript\script.js" />
     <Content Include="simple\index.html" />

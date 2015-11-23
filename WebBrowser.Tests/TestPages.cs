@@ -1,4 +1,4 @@
-﻿#if NUNIT
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -117,18 +117,36 @@ namespace WebBrowser.Tests
 			Assert.AreEqual("HI", g.InnerHTML);
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void Ajax()
 		{
 			var engine = Open("ajax");
 			var button = engine.WaitId("t");
+
+			var log = new List<object>();
+			engine.Console.OnLog+= o =>{log.Add(o);};
 			Assert.IsNotNull(button);
 
-			Thread.Sleep(1000);
-			Assert.AreEqual("HI", button.InnerHTML);
+			Thread.Sleep(1000000);
+			Assert.AreNotEqual(0, log.Count);
+			Assert.AreEqual("X-SourceFiles: =?UTF-8?B?QzpccHJvamVjdHNcV2ViQnJvd3NlclxUZXN0UGFnZXNcYWpheFxkYXRhLmh0bWw=",
+				button.InnerHTML);
 		}
 
-		
+		[Test]
+		public void KnockoutClick()
+		{
+			var engine = Open("knockout");
+			engine.WaitDocumentLoad();
+			var button = engine.Document.GetElementById("b") as HtmlButtonElement;
+
+			button.Assert(b => b.InnerHTML == "Click me");
+			button.Click();
+
+			var text = engine.Document.GetElementById("p") as HtmlElement;
+			Assert.IsNotNull(text, "text");
+			Assert.AreEqual("HI", text.InnerHTML);
+			Assert.IsTrue(button.Disabled);
+		}
 	}
 }
-#endif

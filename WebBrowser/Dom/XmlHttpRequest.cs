@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using WebBrowser.ResourceProviders;
@@ -60,6 +60,7 @@ namespace WebBrowser.Dom
 		public void Open(string method, string url, bool? async, string username, string password)
 		{
 			_request = (HttpRequest)_resourceProvider.CreateRequest(url);
+			_request.Method = method;
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;
@@ -93,8 +94,6 @@ namespace WebBrowser.Dom
 
 		public string ResponseText { get { return _data; } }
 
-		
-
 		public void SetRequestHeader(string name, string value)
 		{
 			if(ReadyState != OPENED)
@@ -107,8 +106,13 @@ namespace WebBrowser.Dom
 		{
 			if (_response.Headers == null)
 				return "";
-			
-			return _response.Headers.ToString();
+
+			var headersString = _response.Headers.ToString();
+
+			//to fix jquery we should remove \r due to jquery uses .net regex where \r\n is not threated as end line
+			headersString = headersString.Replace("\r", "");
+
+			return headersString;
 		}
 
 		public string StatusText
@@ -140,7 +144,13 @@ namespace WebBrowser.Dom
 
 		public async void Send(object data)
 		{
-			//todo: use data
+			//todo: use specified encoding
+			//todo: fix data using
+			if (data != null)
+			{
+				_request.Data = Encoding.UTF8.GetBytes(data.ToString());
+			}
+
 			if (_async)
 			{
 				ReadyState = LOADING;
@@ -149,13 +159,20 @@ namespace WebBrowser.Dom
 					_response = (HttpResponse) await _resourceProvider.GetResourceAsync(_request);
 					_data = _response.Stream.ReadToEnd();
 				}
+				catch (AggregateException a)
+				{
+					var web = a.Flatten().InnerExceptions.OfType<WebException>().FirstOrDefault();
+					if (web != null)
+					{
+						_data = web.Response.GetResponseStream().ReadToEnd();
+					}
+				}
 				catch (WebException w)
 				{
 					if (w.Status == WebExceptionStatus.Timeout)
 					{
 						CallInContext(OnTimeout);
 					}
-					ReadyState = DONE;
 				}
 				catch (Exception e)
 				{
