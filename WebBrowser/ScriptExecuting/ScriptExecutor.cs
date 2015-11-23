@@ -67,6 +67,7 @@ namespace WebBrowser.ScriptExecuting
 			AddDomType("Attr", typeof(Attr));
 
 			//Perf types
+			AddDomType("ArrayBuffer", typeof(ArrayBuffer));
 			AddDomType("Int8Array", typeof(Int8Array));
 			AddDomType("Uint8Array", typeof(UInt8Array));
 			AddDomType("Int16Array", typeof(Int16Array));

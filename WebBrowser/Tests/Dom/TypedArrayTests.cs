@@ -11,7 +11,7 @@ namespace WebBrowser.Tests.Dom
 		[Test]
 		public void InitAndGet()
 		{
-			var arr = new TypedArray<int> (new[]{ 4, 3, 2});
+			var arr = new Int8Array(new sbyte[]{ 4, 3, 2});
 			arr.Assert(array => array [0] == 4 && array [1] == 3 && array [2] == 2 && array.Length == 3);
 		}
 
