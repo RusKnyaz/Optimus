@@ -93,6 +93,7 @@
     <Compile Include="Dom\Elements\Node.cs" />
     <Compile Include="Dom\Events\UIEvent.cs" />
     <Compile Include="Dom\Elements\WindowTimers.cs" />
+    <Compile Include="Dom\Perf\TypedArray.cs" />
     <Compile Include="Dom\TagsNames.cs" />
     <Compile Include="Dom\XmlHttpRequest.cs" />
     <Compile Include="Environment\Location.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
@@ -153,6 +155,7 @@
   <ItemGroup>
     <Content Include="Resources\clrBridge.js" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

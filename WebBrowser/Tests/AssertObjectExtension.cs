@@ -9,7 +9,14 @@ namespace WebBrowser.Tests
 	{
 		public static void Assert<T>(this T obj, Expression<Func<T, bool>> predicate)
 		{
-			Assert(obj, predicate, predicate.Body);
+			try
+			{
+				Assert(obj, predicate, predicate.Body);
+			}
+			catch (Exception e)
+			{
+				throw e;
+			}
 		}
 
 		private static void Assert<T>(T obj, Expression<Func<T, bool>> parent, Expression expression)

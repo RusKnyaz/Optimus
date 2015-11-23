@@ -3,6 +3,7 @@ using Jint.Native;
 using Jint.Runtime;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
+using WebBrowser.Dom.Perf;
 using WebBrowser.Environment;
 using WebBrowser.Properties;
 
@@ -63,6 +64,12 @@ namespace WebBrowser.ScriptExecuting
 			AddDomType("Document", typeof(Document));
 			AddDomType("Text", typeof(Text));
 			AddDomType("Attr", typeof(Attr));
+
+			//Perf types
+			AddDomType("Int8Array", typeof(Int8Array));
+			AddDomType("Uint8Array", typeof(UInt8Array));
+			AddDomType("Int16Array", typeof(Int16Array));
+			AddDomType("Uint16Array", typeof(UInt16Array));
 		}
 
 		private void AddDomType(string jsName, Type type)

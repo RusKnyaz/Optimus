@@ -10,7 +10,6 @@ namespace WebBrowser.Dom.Elements
 		static class Defaults
 		{
 			public static bool Disabled = false;
-			public static bool Checked = false;
 			public static bool Readonly = false;
 			public static bool Required = false;
 			public static string Value = string.Empty;
@@ -20,7 +19,7 @@ namespace WebBrowser.Dom.Elements
 
 		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input)
 		{
-			Type = "text";
+			
 		}
 
 		/// <summary>
@@ -46,7 +45,7 @@ namespace WebBrowser.Dom.Elements
 
 		public string Type
 		{
-			get { return GetAttribute("type", Defaults.Value); }
+			get { return GetAttribute("type", Defaults.Type); }
 			set { SetAttribute("type", value); }
 		}
 
