@@ -6,9 +6,9 @@ namespace WebBrowser.Dom.Perf
 	//todo: write tests
 	public class TypedArray<T>
 	{
-		public TypedArray(ulong size)
+		public TypedArray(ArrayBuffer buffer)
 		{
-			_data = new T[size];
+			_data = buffer.Data;
 		}
 
 		protected TypedArray(T[] data)
@@ -16,16 +16,33 @@ namespace WebBrowser.Dom.Perf
 			_data = data;
 		} 
 
-		protected T[] _data;
+		protected byte[] _data;
 
-		public ulong BYTES_PER_ELEMENT {get { return (ulong) Marshal.SizeOf(typeof(T)); }}
+		private ulong BytesPerElement {get { return (ulong) Marshal.SizeOf(typeof(T)); }}
 
 		public ulong Length {get { return (ulong) _data.Length; }}
 
 		public T this[ulong index]
 		{
-			get { return _data[index]; }
-			set { _data[index] = value; }
+			get 
+			{ 
+				//todo: check the limits
+				fixed (byte* pBuffer = _data)
+				{
+					T* pSample = (T*)_data;
+					// now we can access samples via pSample e.g.:
+					return  pSample[index];
+				}
+			}
+			set { 
+				//todo: check the limits
+				fixed (byte* pBuffer = _data)
+				{
+					T* pSample = (T*)_data;
+					// now we can access samples via pSample e.g.:
+					pSample[index] = value;
+				}
+			}
 		}
 
 		public void Set(TypedArray<T> array, ulong offset)
@@ -49,6 +66,8 @@ namespace WebBrowser.Dom.Perf
 
 	public class Int8Array : TypedArray<sbyte>
 	{
+		public ulong const BYTES_PER_ELEMENT {get { return (ulong) Marshal.SizeOf(typeof(sbyte)); }}
+
 		public Int8Array(ulong size) : base(size){}
 
 		protected Int8Array(sbyte[] data) : base(data) { }
