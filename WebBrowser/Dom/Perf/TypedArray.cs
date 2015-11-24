@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace WebBrowser.Dom.Perf
 {
-	//todo: write tests
 	public class TypedArray<T>
 	{
 		public TypedArray(ArrayBuffer buffer)
@@ -23,14 +22,13 @@ namespace WebBrowser.Dom.Perf
 
 		public ulong Length {get { return (ulong) (_data.Length/BytesPerElement); }}
 
-		
-		public void Set(TypedArray<T> array, ulong offset)
+		public void Set(TypedArray<T> array, int offset)
 		{
-			array._data.CopyTo(_data, (long)offset);
+			Buffer.BlockCopy(array._data, 0, _data, offset * BytesPerElement, array._data.Length);
 		}
-		public void Set(T[] array, ulong offset)
+		public void Set(T[] array, int offset)
 		{
-			array.CopyTo(_data, (long)offset);
+			Buffer.BlockCopy(array, 0, _data, offset * BytesPerElement, array.Length * BytesPerElement);
 		}
 
 		protected T[] GetSub(long begin, long? end)
@@ -50,7 +48,7 @@ namespace WebBrowser.Dom.Perf
 		public Int8Array(ArrayBuffer buffer) : base(buffer) { }
 
 		public Int8Array(sbyte[] data) : base(data) { }
-		public Int8Array Subarray(long begin, long? end)
+		public Int8Array Subarray(long begin, long? end = null)
 		{
 			return new Int8Array(GetSub(begin, end));
 		}
@@ -130,6 +128,26 @@ namespace WebBrowser.Dom.Perf
 		public UInt16Array Subarray(long begin, long? end)
 		{
 			return new UInt16Array(GetSub(begin, end));
+		}
+
+		public unsafe ushort this[ulong index]
+		{
+			get
+			{
+				//todo: check the limits
+				fixed (byte* pBuffer = _data)
+				{
+					return ((ushort*)pBuffer)[index];
+				}
+			}
+			set
+			{
+				//todo: check the limits
+				fixed (byte* pBuffer = _data)
+				{
+					((ushort*)pBuffer)[index] = value;
+				}
+			}
 		}
 	}
 }
