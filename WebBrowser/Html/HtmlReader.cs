@@ -54,7 +54,6 @@ namespace WebBrowser.Html
 			for(var code = reader.Read(); code != -1; code = reader.Read())
 			{
 				var symbol = (char)code;
-
 				if (!escaped && symbol == '\\')
 				{
 					escaped = true;
@@ -68,6 +67,9 @@ namespace WebBrowser.Html
 				{
 					break;
 				}
+
+				if (qMark == ' ' && reader.Peek() == '>')
+					break;
 			}
 
 			return new string(buffer.ToArray());
@@ -281,11 +283,12 @@ namespace WebBrowser.Html
 									newState = States.ReadText;
 								break;
 							case States.WaitAttributeValue:
-								if (symbol == '\"' || symbol == '\'')
+								if (symbol != '>' && symbol != ' ')
 								{
-									var attrValue = ReadAttributeValue(symbol, reader);
+									var quoted = symbol == '\"' || symbol == '\'';
+									var attrValue = ReadAttributeValue(quoted ? symbol : ' ', reader);
 									state = newState = States.ReadAttributeName;
-									yield return new HtmlChunk() {Type = HtmlChunkTypes.AttributeValue, Value = attrValue};
+									yield return new HtmlChunk() {Type = HtmlChunkTypes.AttributeValue, Value = quoted ? attrValue : symbol + attrValue};
 									buffer.Clear();
 									continue;
 								}

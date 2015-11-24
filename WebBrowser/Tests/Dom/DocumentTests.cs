@@ -195,6 +195,22 @@ namespace WebBrowser.Tests
 			document.Write(html);
 			Assert.AreEqual(expectedMode, document.CompatMode);
 		}
+
+		[Test]
+		public void Parsing()
+		{
+			var document = new Document();
+			var e = document.CreateElement("div") as HtmlElement;	
+			e.InnerHTML = "<div<div>";
+			Assert.AreEqual("DIV<DIV", e.FirstChild.NodeName);
+
+			e.InnerHTML = "<div foo<bar=''>";
+			Assert.AreEqual("foo<bar", ((HtmlElement)e.FirstChild).Attributes[0].NodeName);
+			Assert.AreEqual("foo<bar", ((HtmlElement)e.FirstChild).Attributes[0].Name);
+
+			e.InnerHTML = "<div foo=`bar`>";
+			Assert.AreEqual("`bar`", ((HtmlElement)e.FirstChild).GetAttribute("foo"));
+		}
 	}
 }
 #endif

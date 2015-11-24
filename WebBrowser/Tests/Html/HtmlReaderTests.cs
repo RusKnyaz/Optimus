@@ -54,6 +54,7 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<script defer/>", "TagStart:script, AttributeName:defer, TagEnd:script")]
 		[TestCase("<meta><meta>", "TagStart:meta, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		[TestCase("<meta name='viewport'><meta>", "TagStart:meta, AttributeName:name, AttributeValue:viewport, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
+		[TestCase("<div at=val'></div>","TagStart:div, AttributeName:at, AttributeValue:val', TagEnd:div", Description = "Unquoted attributes values")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{
 			var result = Read(source).ToArray();
