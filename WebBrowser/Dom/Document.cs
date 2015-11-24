@@ -127,7 +127,6 @@ namespace WebBrowser.Dom
 
 		public Element GetElementById(string id)
 		{
-			//todo: create index;
 			return DocumentElement.Flatten().OfType<Element>().FirstOrDefault(x => x.Id == id);
 		}
 
@@ -241,6 +240,11 @@ namespace WebBrowser.Dom
 			node.ParentNode = this;
 			node.OwnerDocument = this;
 			HandleNodeAdded(node);
+		}
+
+		public string CompatMode
+		{
+			get { return ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat"; }
 		}
 	}
 

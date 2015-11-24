@@ -186,6 +186,15 @@ namespace WebBrowser.Tests
 
 			Assert.AreEqual("HTML", document.DocumentElement.NodeName);
 		}
+
+		[TestCase("<html></html>", "BackCompat")]
+		[TestCase("<!DOCTYPE html><html></html>", "CSS1Compat")]
+		public void CompatMode(string html, string expectedMode)
+		{
+			var document = new Document();
+			document.Write(html);
+			Assert.AreEqual(expectedMode, document.CompatMode);
+		}
 	}
 }
 #endif

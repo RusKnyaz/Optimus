@@ -37,7 +37,7 @@ namespace WebBrowser.Tests.EngineTests
 
 			foreach (var category in ("parsing elements form location output input communication webrtc interaction " +
 			                         "performance security history offline storage files streams video audio responsive " +
-			                         "canvas webgl animation").Split(' '))
+			                         "canvas webgl animation components other").Split(' '))
 			{
 				try
 				{
@@ -144,7 +144,6 @@ namespace WebBrowser.Tests.EngineTests
 			userName.Value = "admin";
 			password.Value = "admin";
 			logonButton.Click();
-			Thread.Sleep(1000);//wait while document changed
 
 			var error = engine.WaitId("logout");
 			Assert.IsNotNull(error, "logout");
