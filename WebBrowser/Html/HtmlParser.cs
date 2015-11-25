@@ -52,9 +52,7 @@ namespace WebBrowser.Html
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
 						return true;
 					case HtmlChunkTypes.Text:
-						if(htmlChunk.Value.Replace("\r","").Replace("\n","").Replace("\t", "") != string.Empty)
-							elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
-						//todo: what we should do with whitespaces?
+						elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
 						break;
 					case HtmlChunkTypes.Comment:
 						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });

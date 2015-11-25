@@ -12,7 +12,7 @@ namespace WebBrowser.Dom
 	//Build document parsed by HtmlAgilityPack
 	/*internal class DocumentBuilder
 	{
-		public static void Build(Node parentNode, string htmlString)
+		public static void Build(Node parentNode, string htmlString, NodeSources source = NodeSources.DocumentBuilder)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{

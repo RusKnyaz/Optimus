@@ -36,7 +36,7 @@ namespace WebBrowser.Html
 			ReadCloseTagName,
 			WaitAttributeValue,
 			ReadSpecTag,
-			ReadDocType,
+			ReadDocType
 		}
 
 		enum ReadScriptStates
@@ -49,11 +49,18 @@ namespace WebBrowser.Html
 		private static string ReadAttributeValue(char qMark, StreamReader reader)
 		{
 			var buffer = new List<char>();
+			var specialSymbol = false;
 
 			var escaped = false;
 			for(var code = reader.Read(); code != -1; code = reader.Read())
 			{
 				var symbol = (char)code;
+
+				if (symbol == '&' && !specialSymbol && !escaped)
+				{
+					buffer.AddRange(ReadSpecial(reader));
+				}
+
 				if (!escaped && symbol == '\\')
 				{
 					escaped = true;
@@ -75,7 +82,38 @@ namespace WebBrowser.Html
 			return new string(buffer.ToArray());
 		}
 
-		private static HtmlChunk ReadScript(StreamReader reader)
+		private static string ReadSpecial(StreamReader reader)
+		{
+			var buffer = new List<char>();
+			while (char.IsLetter((char)reader.Peek()))
+			{
+				buffer.Add((char)reader.Read());
+			}
+
+			var s = new string(buffer.ToArray());
+			var symbol = (char)reader.Peek();
+			if (symbol == ';')
+			{
+				reader.Read();
+				switch (s)
+				{
+					case "rang":
+						return "\u27E9";
+					case "lang":
+						return "\u27E8";
+					case "notinva":
+						return "\u2209";
+					case "apos":return "'";
+					case "Kopf":return "\uD835\uDD42"; 
+					case "ImaginaryI":
+						return "\u2148";
+				}
+			}
+
+			return "&" + s + ";";
+		}
+
+		private static HtmlChunk ReadScript(StreamReader reader, string endWord)
 		{
 			var code = 0;
 			var buffer = new List<char>();
@@ -100,10 +138,10 @@ namespace WebBrowser.Html
 						}
 						else if (symbol == '>')
 						{
-							var lastWord = new string(buffer.Last(8).ToArray()).ToLowerInvariant();
-							if (lastWord ==  "</script")
+							var lastWord = new string(buffer.Last(endWord.Length).ToArray()).ToLowerInvariant();
+							if (lastWord == endWord)
 							{
-								buffer.RemoveRange(buffer.Count-8, 8);
+								buffer.RemoveRange(buffer.Count - endWord.Length, endWord.Length);
 								return new HtmlChunk() { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()) };
 							}
 						}
@@ -175,20 +213,32 @@ namespace WebBrowser.Html
 			return new HtmlChunk() {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray())};
 		}
 
-		private static HtmlChunk ReadComment(StreamReader reader)
+		private static HtmlChunk ReadComment(StreamReader reader, bool minusable)
 		{
-			
 			var buffer = new List<char>();
-			var code = reader.Read();
+			var endsByMinus = false;
+			if (minusable && reader.Peek() == '-')
+			{
+				reader.Read();
+				if (reader.Peek() == '-')
+				{
+					reader.Read();
+					endsByMinus = true;
+				}
+				else
+				{
+					buffer.Add('-');
+				}
+			}
 
-			if(code != '-')
-				throw new HtmlInvalidFormatException("'-' expected at the start of comment");
-
-			for (code = reader.Read(); code != -1; code = reader.Read())
+			for (var code = reader.Read(); code != -1; code = reader.Read())
 			{
 				var symbol = (char) code;
 
-				if (symbol == '-')
+				if(symbol == '>' && !endsByMinus)
+					break;
+				
+				if (symbol == '-' && endsByMinus)
 				{
 					var next = reader.Read();
 					if (next == -1)
@@ -229,6 +279,14 @@ namespace WebBrowser.Html
 					if (code != -1)
 					{
 						var symbol = (char) code;
+						if (symbol == '\u000D')
+							symbol = '\u000A';
+
+						if (state == States.ReadText && symbol == '&')
+						{
+							buffer.AddRange(ReadSpecial(reader));
+							continue;
+						}
 
 						switch (state)
 						{
@@ -250,8 +308,24 @@ namespace WebBrowser.Html
 									case '>':
 										newState = States.ReadText;
 										break;
+									case '?':
+										var com = ReadComment(reader, false);
+										com.Value = "?" + com.Value;
+										yield return com;
+										state = newState = States.ReadText;
+										continue;
 									case '!':
-										newState = States.ReadSpecTag;
+										var ss = reader.Peek();
+										if (ss != 'D' && ss != 'd')
+										{
+											yield return ReadComment(reader, true);
+											state = newState = States.ReadText;
+											continue;
+										}
+										else
+										{
+											newState = States.ReadSpecTag;
+										}
 										break;
 								}
 								break;
@@ -300,12 +374,8 @@ namespace WebBrowser.Html
 									case 'd':
 										newState = States.ReadDocType;
 										break;
-									case '-':
-										yield return ReadComment(reader);
-										state = newState = States.ReadText;
-										continue;
-									//default:
-										//throw new HtmlInvalidFormatException("Unknown spec tag.");
+									default:
+										throw new HtmlInvalidFormatException("Unknown spec tag.");
 								}
 								break;
 
@@ -363,10 +433,10 @@ namespace WebBrowser.Html
 					{
 						var tagInvariantName = lastTag.ToLowerInvariant();
 
-						if (tagInvariantName == "script" || tagInvariantName == "style")
+						if (tagInvariantName == "script" || tagInvariantName == "style" || tagInvariantName == "textarea")
 						{
-							yield return ReadScript(reader);
-							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = "script"};
+							yield return ReadScript(reader, "</"+tagInvariantName);
+							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = tagInvariantName };
 							buffer.Clear();
 							newState = state = States.ReadText;
 							lastTag = string.Empty;

@@ -34,6 +34,7 @@ namespace WebBrowser.Tests.EngineTests
 			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
 			System.Console.WriteLine("Score: " + tagWithValue.InnerHTML);
+			Thread.Sleep(500);
 
 			foreach (var category in ("parsing elements form location output input communication webrtc interaction " +
 			                         "performance security history offline storage files streams video audio responsive " +

@@ -22,6 +22,9 @@ namespace WebBrowser.Tests.Html
 
 		[TestCase("Hello", "Text:Hello")]
 		[TestCase("<!--Hello-->", "Comment:Hello")]
+		[TestCase("<!-Hello-->", "Comment:-Hello--")]
+		[TestCase("<?import a>", "Comment:?import a")]
+		[TestCase("<?--import a-->", "Comment:?--import a--")]
 		[TestCase("<a></a>", "TagStart:a, TagEnd:a")]
 		[TestCase("<a>Hello</a>", "TagStart:a, Text:Hello, TagEnd:a")]
 		[TestCase("<a ></a>", "TagStart:a, TagEnd:a")]
@@ -55,6 +58,8 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<meta><meta>", "TagStart:meta, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		[TestCase("<meta name='viewport'><meta>", "TagStart:meta, AttributeName:name, AttributeValue:viewport, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		[TestCase("<div at=val'></div>","TagStart:div, AttributeName:at, AttributeValue:val', TagEnd:div", Description = "Unquoted attributes values")]
+		[TestCase("<textarea><!--</textarea>-->","TagStart:textarea, Text:<!--, TagEnd:textarea, Text:-->")]
+		[TestCase("\u000D", "Text:\u000A")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{
 			var result = Read(source).ToArray();

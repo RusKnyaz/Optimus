@@ -1,5 +1,5 @@
 ﻿#if NUNIT
-using System.Linq.Expressions;
+using System.Collections.Generic;
 using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
@@ -9,6 +9,14 @@ namespace WebBrowser.Tests
 	[TestFixture]
 	public class DocumentTests
 	{
+		private Document _document;
+
+		[SetUp]
+		public void SetUp()
+		{
+			_document = new Document();
+		}
+
 		[Test]
 		public void Document()
 		{
@@ -196,20 +204,53 @@ namespace WebBrowser.Tests
 			Assert.AreEqual(expectedMode, document.CompatMode);
 		}
 
+		private HtmlElement Div(string innerHtml)
+		{
+			var div = _document.CreateElement("div");
+			div.InnerHTML = innerHtml;
+			return (HtmlElement)div;
+		}
+
 		[Test]
+		//Parsing tests stoled from html5test project
 		public void Parsing()
 		{
-			var document = new Document();
-			var e = document.CreateElement("div") as HtmlElement;	
-			e.InnerHTML = "<div<div>";
-			Assert.AreEqual("DIV<DIV", e.FirstChild.NodeName);
+			Div("<div<div>").Assert(e => e.FirstChild.NodeName == "DIV<DIV");
+			Div("<div foo<bar=''>").Assert(
+				e => ((HtmlElement)e.FirstChild).Attributes[0].NodeName == "foo<bar" &&
+				((HtmlElement)e.FirstChild).Attributes[0].Name == "foo<bar");
 
-			e.InnerHTML = "<div foo<bar=''>";
-			Assert.AreEqual("foo<bar", ((HtmlElement)e.FirstChild).Attributes[0].NodeName);
-			Assert.AreEqual("foo<bar", ((HtmlElement)e.FirstChild).Attributes[0].Name);
+			Div("<div foo=`bar`>").Assert(e => ((HtmlElement)e.FirstChild).GetAttribute("foo") == "`bar`");
 
-			e.InnerHTML = "<div foo=`bar`>";
-			Assert.AreEqual("`bar`", ((HtmlElement)e.FirstChild).GetAttribute("foo"));
+			Div("<div \"foo=''>").Assert(e => ((HtmlElement)e.FirstChild).Attributes[0].NodeName == "\"foo" &&
+				((HtmlElement)e.FirstChild).Attributes[0].Name == "\"foo");
+
+			Div("<a href='\nbar'></a>").Assert(e => ((HtmlElement)e.FirstChild).GetAttribute("href") == "\nbar");
+			Div("<!DOCTYPE html>").Assert(e => e.FirstChild == null);
+
+			Div("<?import namespace=\"foo\" implementation=\"#bar\">").Assert(e => 
+				((CharacterData)e.FirstChild).NodeValue == "?import namespace=\"foo\" implementation=\"#bar\"" &&
+				e.FirstChild.NodeType == 8);
+			
+			Div("<!--foo--bar-->").Assert(e => e.FirstChild.NodeType == 8 && ((Comment)e.FirstChild).NodeValue == "foo--bar");
+
+			Div("<![CDATA[x]]>").Assert(e => e.FirstChild.NodeType == 8 && ((Comment)e.FirstChild).NodeValue == "[CDATA[x]]");
+
+			Div("<textarea><!--</textarea>--></textarea>").Assert(e => ((CharacterData)e.FirstChild.FirstChild).NodeValue == "<!--");
+			Div("<textarea><!--</textarea>-->").Assert(e => ((CharacterData)e.FirstChild.FirstChild).NodeValue == "<!--");
+			Div("<style><!--</style>--></style>").Assert(e => ((CharacterData)e.FirstChild.FirstChild).NodeValue == "<!--");
+			Div("<style><!--</style>-->").Assert(e => ((CharacterData)e.FirstChild.FirstChild).NodeValue == "<!--");
+		}
+
+		[TestCase("\u000D", "\u000A")]
+		[TestCase("&lang;&rang;", "\u27E8\u27E9")]
+		[TestCase("&apos;", "'")]
+		[TestCase("&ImaginaryI;", "\u2148")]
+		[TestCase("&Kopf;", "\uD835\uDD42")]
+		[TestCase("&notinva;", "\u2209")]
+		public void ParsingChars(string innerHtml, string expectedNodeValue)
+		{
+			Div(innerHtml).Assert(e => ((CharacterData)e.FirstChild).NodeValue == expectedNodeValue);
 		}
 	}
 }
