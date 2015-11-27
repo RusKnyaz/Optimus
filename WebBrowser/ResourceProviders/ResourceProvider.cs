@@ -35,9 +35,16 @@ namespace WebBrowser.ResourceProviders
 			}
 		}
 
+		private bool IsAbsoleteUri(string uri)
+		{
+			return !uri.StartsWith("/") && (
+				uri.StartsWith("http://") || uri.StartsWith("https://") || uri.StartsWith("file://") ||
+			       uri.StartsWith("data:"));
+		}
+
 		private Uri GetUri(string uri)
 		{
-			return Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
+			return IsAbsoleteUri(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 		}
 
 		private ISpecResourceProvider GetResourceProvider(Uri u)
