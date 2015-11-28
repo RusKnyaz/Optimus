@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Jint.Parser.Ast;
 
 namespace WebBrowser.Html
 {
@@ -9,6 +11,16 @@ namespace WebBrowser.Html
 	{
 		public HtmlChunkTypes Type;
 		public string Value;
+
+		public static HtmlChunk AttributeName(List<char> buffer)
+		{
+			return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray())};
+		}
+
+		public static HtmlChunk TagStart(List<char> buffer)
+		{
+			return new HtmlChunk { Type = HtmlChunkTypes.TagStart, Value = new string(buffer.ToArray()) };
+		}
 	}
 
 	public enum HtmlChunkTypes
@@ -203,7 +215,7 @@ namespace WebBrowser.Html
 					buffer.Add(symbol);
 			}
 
-			return new HtmlChunk() {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray())};
+			return new HtmlChunk {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray())};
 		}
 
 		private static HtmlChunk ReadComment(StreamReader reader, bool minusable)
@@ -224,32 +236,59 @@ namespace WebBrowser.Html
 				}
 			}
 
-			var end = endsByMinus ? "-->" : ">";
-			ReadToPhrase(reader, buffer, end);
+			if (endsByMinus)
+				ReadToPhrase(reader, buffer, "-->");
+			else 
+				ReadToChar(reader, buffer, '>');
 			
 			return new HtmlChunk {Value = new string(buffer.ToArray()), Type = HtmlChunkTypes.Comment};
 		}
 
-		private static string ReadToPhrase(StreamReader reader, List<char> buffer, params string[] ends)
+		private static int ReadToChars(StreamReader reader, List<char> buffer, params char[] end)
 		{
+			for (var code = reader.Read(); code != -1; code = reader.Read())
+			{
+				var symbol = (char)code;
+				if (end.Contains(symbol))
+					return symbol;
+
+				buffer.Add(symbol);
+			}
+			return -1;
+		}
+
+		private static bool ReadToChar(StreamReader reader, List<char> buffer, char end)
+		{
+			for (var code = reader.Read(); code != -1; code = reader.Read())
+			{
+				var symbol = (char)code;
+				if (symbol == end)
+					return true;
+
+				buffer.Add(symbol);
+			}
+			return false;
+		}
+
+		private static string ReadToPhrase(StreamReader reader, List<char> buffer, string end)
+		{
+			var lowerBuffer = new List<char>();
 			for (var code = reader.Read(); code != -1; code = reader.Read())
 			{
 				var symbol = (char)code;
 
 				buffer.Add(symbol);
+				lowerBuffer.Add(char.ToLowerInvariant(symbol));
 
-				var end = ends.FirstOrDefault(x => IsEndsWith(buffer, x));
-				if (end != null)
-				{
-					buffer.RemoveRange(buffer.Count-end.Length, end.Length);
-					return end;
-				}
-					
+				if(!IsEndsWith(lowerBuffer, end)) continue;
+				buffer.RemoveRange(buffer.Count-end.Length, end.Length);
+				return end;
 			}
 
 			return string.Empty;
 		}
 
+		
 		/// <summary>
 		/// Case insensitive comparison
 		/// </summary>
@@ -282,10 +321,27 @@ namespace WebBrowser.Html
 				var lastTag = string.Empty;
 
 				var state = States.ReadText;
-					var newState = States.ReadText;
+				var newState = States.ReadText;
 
 				do
 				{
+					if (state == States.ReadText)
+					{
+						//Read text node to tag start or stream end
+						var ex = ReadToChar(reader, buffer, '<');
+						if (buffer.Count > 0)
+						{
+							yield return
+								new HtmlChunk {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()).Replace("\u000D", "\u000A")};
+						}
+						if (!ex)
+							yield break;
+
+						buffer.Clear();
+
+						newState = state = States.ReadTagName;
+					}
+
 					code = reader.Read();
 
 					if (code != -1)
@@ -310,8 +366,42 @@ namespace WebBrowser.Html
 								switch (symbol)
 								{
 									case ' ':
-										newState = States.ReadAttributeName;
-										break;
+										if (buffer.Count > 0)
+										{
+											var tag = HtmlChunk.TagStart(buffer);
+											yield return tag;
+											lastTag = tag.Value;
+											buffer.Clear();
+										}
+
+										AAA:
+										var sym = ReadToChars(reader, buffer, '/', '>', '=', ' ');
+										if (buffer.Count > 0)
+										{
+											yield return HtmlChunk.AttributeName(buffer);
+											buffer.Clear();
+										}
+
+										if (sym == ' ')
+											sym = Skip(reader, ' ');
+									
+										switch (sym)
+										{
+											case '/':
+												state = newState= States.ReadSelfClosedTagEnd;
+												break;
+											case '>':
+												state = newState = States.ReadText;
+												break;
+											case '=':
+												state = newState = States.WaitAttributeValue;
+												break;
+											default:
+												buffer.Add((char)sym);
+												goto AAA;
+										}
+										
+										continue;
 									case '/':
 										newState = buffer.Count > 0
 											? States.ReadSelfClosedTagEnd
@@ -334,10 +424,7 @@ namespace WebBrowser.Html
 											state = newState = States.ReadText;
 											continue;
 										}
-										else
-										{
-											newState = States.ReadSpecTag;
-										}
+										newState = States.ReadSpecTag;
 										break;
 								}
 								break;
@@ -345,8 +432,6 @@ namespace WebBrowser.Html
 							case States.ReadSelfClosedTagEnd:
 								if (symbol == '>')
 									newState = States.ReadText;
-								//else
-									//throw new HtmlInvalidFormatException("'>' Expected at the end of tag after '/'");
 								break;
 
 							case States.ReadAttributeName:
@@ -473,6 +558,16 @@ namespace WebBrowser.Html
 					state = newState;
 				} while (code != -1);
 			}
+		}
+
+		private static int Skip(StreamReader reader, char c)
+		{
+			for (var s = reader.Read(); s != -1; s = reader.Read())
+			{
+				if (s != c)
+					return s;
+			}
+			return -1;
 		}
 	}
 
