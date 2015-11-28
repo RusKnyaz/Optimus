@@ -1,5 +1,4 @@
 ﻿#if NUNIT
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,6 +58,8 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<meta name='viewport'><meta>", "TagStart:meta, AttributeName:name, AttributeValue:viewport, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		[TestCase("<div at=val'></div>","TagStart:div, AttributeName:at, AttributeValue:val', TagEnd:div", Description = "Unquoted attributes values")]
 		[TestCase("<textarea><!--</textarea>-->","TagStart:textarea, Text:<!--, TagEnd:textarea, Text:-->")]
+		[TestCase("<textarea>/*</textarea>*/", "TagStart:textarea, Text:/*, TagEnd:textarea, Text:*/")]
+		[TestCase("<textarea>\"</textarea>\"", "TagStart:textarea, Text:\", TagEnd:textarea, Text:\"")]
 		[TestCase("\u000D", "Text:\u000A")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{

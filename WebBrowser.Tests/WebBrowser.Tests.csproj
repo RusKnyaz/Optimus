@@ -61,6 +61,7 @@
     <Compile Include="EngineTests\KnockoutTests.cs" />
     <Compile Include="EngineTests\OpenSites.cs" />
     <Compile Include="EngineTests\RequirejsTests.cs" />
+    <Compile Include="HtmlReader\HtmlReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -72,6 +73,7 @@
   <ItemGroup>
     <Content Include="Resources\jquery-2.1.3.js" />
     <Content Include="Resources\jQuery.Form.js" />
+    <None Include="Resources\Large_Html.txt" />
     <Content Include="Resources\requirejs.js" />
     <None Include="Resources\ya.js" />
     <None Include="Resources\requirejsl.js" />
@@ -90,6 +92,7 @@
       <Name>WebBrowser</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

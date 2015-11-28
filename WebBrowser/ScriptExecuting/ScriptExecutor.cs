@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Jint.Native;
 using Jint.Runtime;
 using WebBrowser.Dom;
@@ -48,33 +49,33 @@ namespace WebBrowser.ScriptExecuting
 
 			_jsEngine.Execute(Resources.clrBridge);
 
-			AddDomType("Node", typeof(Node));
-			AddDomType("Element", typeof(Element));
-			AddDomType("HTMLBodyElement", typeof(HtmlBodyElement));
-			AddDomType("HTMLButtonElement", typeof(HtmlButtonElement));
-			AddDomType("HTMLDivElement", typeof(HtmlDivElement));
-			AddDomType("HTMLElement", typeof(HtmlElement));
-			AddDomType("HTMLIFrameElement", typeof(HtmlIFrameElement));
-			AddDomType("HTMLInputElement", typeof(HtmlInputElement));
-			AddDomType("HTMLTextAreaElement", typeof(HtmlTextAreaElement));
-			AddDomType("HTMLUnknownElement", typeof(HtmlUnknownElement));
-			AddDomType("HTMLFormElement", typeof(HtmlFormElement));
-			AddDomType("HTMLHtmlElement", typeof(HtmlHtmlElement));
-			AddDomType("Script", typeof(Script));
-			AddDomType("Comment", typeof(Comment));
-			AddDomType("Document", typeof(Document));
-			AddDomType("Text", typeof(Text));
-			AddDomType("Attr", typeof(Attr));
+			AddClrType("Node", typeof(Node));
+			AddClrType("Element", typeof(Element));
+			AddClrType("HTMLBodyElement", typeof(HtmlBodyElement));
+			AddClrType("HTMLButtonElement", typeof(HtmlButtonElement));
+			AddClrType("HTMLDivElement", typeof(HtmlDivElement));
+			AddClrType("HTMLElement", typeof(HtmlElement));
+			AddClrType("HTMLIFrameElement", typeof(HtmlIFrameElement));
+			AddClrType("HTMLInputElement", typeof(HtmlInputElement));
+			AddClrType("HTMLTextAreaElement", typeof(HtmlTextAreaElement));
+			AddClrType("HTMLUnknownElement", typeof(HtmlUnknownElement));
+			AddClrType("HTMLFormElement", typeof(HtmlFormElement));
+			AddClrType("HTMLHtmlElement", typeof(HtmlHtmlElement));
+			AddClrType("Script", typeof(Script));
+			AddClrType("Comment", typeof(Comment));
+			AddClrType("Document", typeof(Document));
+			AddClrType("Text", typeof(Text));
+			AddClrType("Attr", typeof(Attr));
 
 			//Perf types
-			AddDomType("ArrayBuffer", typeof(ArrayBuffer));
-			AddDomType("Int8Array", typeof(Int8Array));
-			AddDomType("Uint8Array", typeof(UInt8Array));
-			AddDomType("Int16Array", typeof(Int16Array));
-			AddDomType("Uint16Array", typeof(UInt16Array));
+			AddClrType("ArrayBuffer", typeof(ArrayBuffer));
+			AddClrType("Int8Array", typeof(Int8Array));
+			AddClrType("Uint8Array", typeof(UInt8Array));
+			AddClrType("Int16Array", typeof(Int16Array));
+			AddClrType("Uint16Array", typeof(UInt16Array));
 		}
 
-		private void AddDomType(string jsName, Type type)
+		private void AddClrType(string jsName, Type type)
 		{
 			_jsEngine.Global.FastAddProperty(jsName, new JsValue(new ClrPrototype(_jsEngine, type)), false, false, false);
 		}
@@ -132,4 +133,5 @@ namespace WebBrowser.ScriptExecuting
 
 		public string Code { get; private set; }
 	}
+
 }

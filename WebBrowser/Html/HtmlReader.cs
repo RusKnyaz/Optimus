@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using WebBrowser.Tools;
 
 namespace WebBrowser.Html
 {
@@ -115,17 +114,13 @@ namespace WebBrowser.Html
 
 		private static HtmlChunk ReadScript(StreamReader reader, string endWord)
 		{
-			var code = 0;
 			var buffer = new List<char>();
 			var state = ReadScriptStates.Script;
 			var qMark = '\0';
 			var escape = false;
 
-			while (code != -1)
+			for (var code = reader.Read(); code != -1; code = reader.Read())
 			{
-				code = reader.Read();
-
-				if (code == -1) continue;
 				var symbol = (char) code;
 
 				switch (state)
@@ -138,11 +133,10 @@ namespace WebBrowser.Html
 						}
 						else if (symbol == '>')
 						{
-							var lastWord = new string(buffer.Last(endWord.Length).ToArray()).ToLowerInvariant();
-							if (lastWord == endWord)
+							if (IsEndsWith(buffer, endWord))
 							{
 								buffer.RemoveRange(buffer.Count - endWord.Length, endWord.Length);
-								return new HtmlChunk() { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()) };
+								return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()) };
 							}
 						}
 						else if (symbol == '/')
@@ -180,7 +174,6 @@ namespace WebBrowser.Html
 									continue;
 								}
 							}
-							
 
 							buffer.Add(symbol);
 							symbol = nextChar;
@@ -231,46 +224,65 @@ namespace WebBrowser.Html
 				}
 			}
 
-			for (var code = reader.Read(); code != -1; code = reader.Read())
-			{
-				var symbol = (char) code;
-
-				if(symbol == '>' && !endsByMinus)
-					break;
-				
-				if (symbol == '-' && endsByMinus)
-				{
-					var next = reader.Read();
-					if (next == -1)
-						throw new HtmlInvalidFormatException("Unexpected end of stream while read comment.");
-
-					var nextNext = reader.Read();
-					if (nextNext == -1)
-						throw new HtmlInvalidFormatException("Unexpected end of stream while read comment.");
-
-					if (next == '-' && nextNext == '>')
-						break;
-						
-					buffer.Add(symbol);
-					buffer.Add((char)next);
-					symbol = (char)nextNext;
-				}
-				buffer.Add(symbol);
-			}
-
-			return new HtmlChunk() {Value = new string(buffer.ToArray()), Type = HtmlChunkTypes.Comment};
+			var end = endsByMinus ? "-->" : ">";
+			ReadToPhrase(reader, buffer, end);
+			
+			return new HtmlChunk {Value = new string(buffer.ToArray()), Type = HtmlChunkTypes.Comment};
 		}
 
+		private static string ReadToPhrase(StreamReader reader, List<char> buffer, params string[] ends)
+		{
+			for (var code = reader.Read(); code != -1; code = reader.Read())
+			{
+				var symbol = (char)code;
+
+				buffer.Add(symbol);
+
+				var end = ends.FirstOrDefault(x => IsEndsWith(buffer, x));
+				if (end != null)
+				{
+					buffer.RemoveRange(buffer.Count-end.Length, end.Length);
+					return end;
+				}
+					
+			}
+
+			return string.Empty;
+		}
+
+		/// <summary>
+		/// Case insensitive comparison
+		/// </summary>
+		/// <param name="buffer"></param>
+		/// <param name="endPhrase"></param>
+		/// <returns></returns>
+		private static bool IsEndsWith(List<char> buffer, string endPhrase)
+		{
+			if (buffer.Count < endPhrase.Length)
+				return false;
+			
+			var end = endPhrase.ToLowerInvariant();
+
+			for (int i = 0, j = buffer.Count - end.Length; i < end.Length; i++, j++)
+			{
+				if(char.ToLowerInvariant(buffer[j]) != end[i])
+					return false;
+			}
+			return true;
+		}
+
+		
 		public static IEnumerable<HtmlChunk> Read(Stream stream)
 		{
 			var buffer = new List<char>();
 
 			using (var reader = new StreamReader(stream))
 			{
-				int code ;
-				var state = States.ReadText;
-				var newState = States.ReadText;
+				var code = -1;
 				var lastTag = string.Empty;
+
+				var state = States.ReadText;
+					var newState = States.ReadText;
 
 				do
 				{
@@ -420,11 +432,6 @@ namespace WebBrowser.Html
 								yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray()).Trim()};
 							break;
 						case States.ReadDocType:
-/*
-							if (data.Length < 7 || !data.ToUpperInvariant().StartsWith("OCTYPE "))
-								throw new HtmlInvalidFormatException("DOCTYPE tag exptected");
-*/
-
 							yield return new HtmlChunk {Type = HtmlChunkTypes.DocType, Value = data.Substring(7)};
 							break;
 					}
@@ -433,9 +440,20 @@ namespace WebBrowser.Html
 					{
 						var tagInvariantName = lastTag.ToLowerInvariant();
 
-						if (tagInvariantName == "script" || tagInvariantName == "style" || tagInvariantName == "textarea")
+						if (tagInvariantName == "script" || tagInvariantName == "style")
 						{
 							yield return ReadScript(reader, "</"+tagInvariantName);
+							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = tagInvariantName };
+							buffer.Clear();
+							newState = state = States.ReadText;
+							lastTag = string.Empty;
+							continue;
+						}
+						else if (tagInvariantName == "textarea")
+						{
+							var buffer1 = new List<char>();
+							ReadToPhrase(reader, buffer1, "</textarea>");
+							yield return new HtmlChunk { Value = new string(buffer1.ToArray()), Type = HtmlChunkTypes.Text };
 							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = tagInvariantName };
 							buffer.Clear();
 							newState = state = States.ReadText;
