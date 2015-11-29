@@ -34,8 +34,8 @@
 			this.splitContainer3 = new System.Windows.Forms.SplitContainer();
 			this.domTreeControl = new WebBrowser.WfApp.Controls.DomTreeControl();
 			this.consoleControl = new WebBrowser.WfApp.Controls.ConsoleControl();
-			this.addressBar = new WebBrowser.WfApp.Controls.AddressBar();
 			this.timeLineControl = new WebBrowser.WfApp.Controls.TimeLineControl();
+			this.addressBar = new WebBrowser.WfApp.Controls.AddressBar();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -138,6 +138,15 @@
 			this.consoleControl.Size = new System.Drawing.Size(630, 102);
 			this.consoleControl.TabIndex = 0;
 			// 
+			// timeLineControl
+			// 
+			this.timeLineControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.timeLineControl.Engine = null;
+			this.timeLineControl.Location = new System.Drawing.Point(0, 0);
+			this.timeLineControl.Name = "timeLineControl";
+			this.timeLineControl.Size = new System.Drawing.Size(1093, 231);
+			this.timeLineControl.TabIndex = 0;
+			// 
 			// addressBar
 			// 
 			this.addressBar.Dock = System.Windows.Forms.DockStyle.Top;
@@ -147,15 +156,6 @@
 			this.addressBar.Name = "addressBar";
 			this.addressBar.Size = new System.Drawing.Size(1093, 39);
 			this.addressBar.TabIndex = 0;
-			// 
-			// timeLineControl
-			// 
-			this.timeLineControl.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.timeLineControl.Engine = null;
-			this.timeLineControl.Location = new System.Drawing.Point(0, 0);
-			this.timeLineControl.Name = "timeLineControl";
-			this.timeLineControl.Size = new System.Drawing.Size(1093, 231);
-			this.timeLineControl.TabIndex = 0;
 			// 
 			// MainForm
 			// 
