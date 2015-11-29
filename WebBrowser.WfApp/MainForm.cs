@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 using WebBrowser.Dom.Elements;
 using WebBrowser.WfApp.Controls;
@@ -42,6 +41,7 @@ namespace WebBrowser.WfApp
 				consoleControl.Engine = value;
 				domTreeControl.Engine = value;
 				addressBar.Engine = value;
+				timeLineControl.Engine = value;
 			}
 		}
 	}
