@@ -11,6 +11,8 @@ namespace WebBrowser.Environment
 	{
 		private EventTarget _eventTarget;
 
+		public WindowTimers Timers { get { return _timers; } }
+
 		public Window(Func<object> getSyncObj, Engine engine)
 		{
 			Screen = new Screen

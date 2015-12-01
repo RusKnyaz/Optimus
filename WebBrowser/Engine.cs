@@ -150,6 +150,7 @@ namespace WebBrowser
 
 		public async void OpenUrl(string path)
 		{
+			//todo: clear timers!!!!
 			ScriptExecutor.Clear();
 			Document = new Document(Window);
 			Uri = Uri.IsWellFormedUriString(path, UriKind.Absolute) ? new Uri(path) : new Uri(Uri, path);

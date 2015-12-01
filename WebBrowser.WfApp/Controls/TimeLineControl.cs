@@ -46,13 +46,15 @@ namespace WebBrowser.WfApp.Controls
 
 		enum IntervalTypes
 		{
-			Loading, Executing
+			Undefined,
+			Loading, Executing, Gap,
+			ExecutionFail
 		}
 
-		struct Interval
+		class Interval
 		{
-			public double Start;
-			public double Duration;
+			public long Start;
+			public long Duration;
 			public IntervalTypes Type;
 		}
 
@@ -64,7 +66,7 @@ namespace WebBrowser.WfApp.Controls
 			var lines = _timeLine.Lines;
 			var size = ClientSize;
 
-			var intervals = new List<Interval>[lines.Count];
+			var intervalLines = new List<Interval>[lines.Count];
 
 			var defTime = new DateTime();
 
@@ -74,47 +76,121 @@ namespace WebBrowser.WfApp.Controls
 			var startTime = lines[0][0].DateTime;
 			//var endTime = DateTime.Now;
 			var endTime = startTime;
-			for (var i = 0; i < intervals.Length; i++)
+			for (var i = 0; i < intervalLines.Length; i++)
 			{
-				intervals[i] = new List<Interval>();
-				var line = lines[i];
-				var requestTime = line.First(x => x.EventType == TimeLineEvents.Request).DateTime;
-				var receivedTime = line.FirstOrDefault(x => x.EventType == TimeLineEvents.Received).DateTime;
-				if (receivedTime == defTime)
+				intervalLines[i] = new List<Interval>();
+				var intervalsLine = intervalLines[i];
+				var line = lines[i].ToArray();
+
+				foreach (var timePoint in line)
 				{
-					receivedTime = now;
-					hasOpenInterval = true;
+					if (timePoint.DateTime > endTime)
+						endTime = timePoint.DateTime;
+
+					switch (timePoint.EventType)
+					{
+						case TimeLineEvents.Request:
+							intervalsLine.Add(new Interval
+							{
+								Start = (long)(timePoint.DateTime - startTime).TotalMilliseconds,
+								Duration = (long) (now - timePoint.DateTime).TotalMilliseconds,
+								Type = IntervalTypes.Loading
+							});
+						break;
+						case TimeLineEvents.Received:
+						{
+							var last = intervalsLine.LastOrDefault(x => x.Type == IntervalTypes.Loading);
+							if(last != null)
+								last.Duration = (long) ((timePoint.DateTime - startTime).TotalMilliseconds - last.Start);
+						}
+						break;
+						case TimeLineEvents.Executing:
+						{
+							intervalsLine.Add(new Interval
+							{
+								Start = (long) (timePoint.DateTime - startTime).TotalMilliseconds,
+								Duration = (long) (now - timePoint.DateTime).TotalMilliseconds,
+								Type = IntervalTypes.Executing
+							});
+						}
+						break;
+							case TimeLineEvents.Executed:
+							case TimeLineEvents.ExecutionFailed:
+						{
+							var last = intervalsLine.LastOrDefault(x => x.Type == IntervalTypes.Executing);
+							if (last != null)
+							{
+								last.Duration = (long) ((timePoint.DateTime - startTime).TotalMilliseconds - last.Start);
+								last.Type = timePoint.EventType == TimeLineEvents.Executed
+									? IntervalTypes.Executing
+									: IntervalTypes.ExecutionFail;
+							}
+						}
+						break;
+					}
 				}
 
-				intervals[i].Add(new Interval
+
+				/*DateTime receivedTime = defTime;
+				var requestTime = line.FirstOrDefault(x => x.EventType == TimeLineEvents.Request).DateTime;
+				if (requestTime != defTime)
 				{
-					Start = (requestTime - startTime).TotalMilliseconds,
-					Duration = (receivedTime - requestTime).TotalMilliseconds,
-					Type = IntervalTypes.Loading
-				});
+					receivedTime = line.FirstOrDefault(x => x.EventType == TimeLineEvents.Received).DateTime;
+					if (receivedTime == defTime)
+					{
+						receivedTime = now;
+						hasOpenInterval = true;
+					}
 
-				if (endTime < receivedTime)
-					endTime = receivedTime;
-
+					intervalLines[i].Add(new Interval
+					{
+						Start = (long) (requestTime - startTime).TotalMilliseconds,
+						Duration = (long) (receivedTime - requestTime).TotalMilliseconds,
+						Type = IntervalTypes.Loading
+					});
+					if (endTime < receivedTime)
+						endTime = receivedTime;
+				}
+				
 				var startExec = line.FirstOrDefault(x => x.EventType == TimeLineEvents.Executing).DateTime;
 				if (startExec != defTime)
 				{
-					var endExec = line.FirstOrDefault(x => x.EventType == TimeLineEvents.Executed).DateTime;
+					if (receivedTime != defTime)
+					{
+						intervalLines[i].Add(new Interval()
+						{
+							Start = (long) (receivedTime - startTime).TotalMilliseconds,
+							Duration = (long) (startExec - receivedTime).TotalMilliseconds,
+							Type = IntervalTypes.Gap
+						});
+					}
+				}
+
+				if (startExec != defTime)
+				{
+					var endExecEvent = line.FirstOrDefault(x => x.EventType == TimeLineEvents.Executed
+						|| x.EventType == TimeLineEvents.ExecutionFailed);
+
+					var endExec = endExecEvent.DateTime;
 					if (endExec == defTime)
 					{
 						endExec = DateTime.Now;
 						hasOpenInterval = true;
 					}
-					intervals[i].Add(new Interval
+					intervalLines[i].Add(new Interval
 					{
-						Start = (startExec - startTime).TotalMilliseconds,
-						Duration = (endExec - startExec).TotalMilliseconds,
-						Type = IntervalTypes.Executing
+						Start = (long) (startExec - startTime).TotalMilliseconds,
+						Duration = (long) (endExec - startExec).TotalMilliseconds,
+						Type = endExecEvent.EventType == TimeLineEvents.ExecutionFailed ? 
+						IntervalTypes.ExecutionFail : 
+						IntervalTypes.Executing
 					});
 
 					if (endTime < endExec)
 						endTime = endExec;
-				}
+
+
+				}*/
 			}
 			
 			if (endTime == startTime)
@@ -124,16 +200,26 @@ namespace WebBrowser.WfApp.Controls
 			var scale = size.Width / (endTime - startTime).TotalMilliseconds;
 
 			using (var titleBrush = new SolidBrush(Color.Black))
+			using(var durBrush = new SolidBrush(Color.DimGray))
 			using(var titleFont = new Font(new FontFamily("Arial"), 8))
 			using(var receiveBrush = new SolidBrush(Color.CornflowerBlue))
 			using(var executeBrush = new SolidBrush(Color.CadetBlue))
+			using(var executionFail = new SolidBrush(Color.Brown))
 			{
-				for (var i = 0; i < intervals.Length; i++)
+				for (var i = 0; i < intervalLines.Length; i++)
 				{
-					foreach (var interval in intervals[i])
+					foreach (var interval in intervalLines[i])
 					{
-						DrawBar(g, (float)interval.Start, (float)interval.Duration, scale, i, 
-							interval.Type == IntervalTypes.Loading ? receiveBrush : executeBrush);
+						if (interval.Type != IntervalTypes.Gap)
+						{
+							DrawBar(g, (float) interval.Start, (float) interval.Duration, scale, i,
+								interval.Type == IntervalTypes.Loading ? receiveBrush 
+								: interval.Type == IntervalTypes.Executing ? executeBrush 
+								: executionFail);
+						}
+
+						g.DrawString(interval.Duration+"ms", titleFont, durBrush, 
+							(float) ((interval.Start + interval.Duration/2)*scale), i * LineHeight);
 					}
 
 					g.DrawString(lines[i][0].ResourceId, titleFont, titleBrush, 0, i * LineHeight);

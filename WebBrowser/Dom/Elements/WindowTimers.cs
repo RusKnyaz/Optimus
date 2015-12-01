@@ -5,11 +5,13 @@ using System.Threading;
 
 namespace WebBrowser.Dom.Elements
 {
-	internal class WindowTimers
+	public class WindowTimers
 	{
 		readonly List<IDisposable> _activeTimers = new List<IDisposable>();
 
 		public event Action<Exception> OnException;
+		public event Action OnExecuting;
+		public event Action OnExecuted;
 
 		private readonly Func<object> _getSyncObj;
 
@@ -22,11 +24,13 @@ namespace WebBrowser.Dom.Elements
 		{
 			var timer = new TimeoutTimer(t =>
 				{
+					RaiseOnExecuting();
 					handler();
 					lock (_activeTimers)
 					{
 						_activeTimers.Remove(t);
 					}
+					RaiseOnExecuted();
 				}, exception =>
 					{
 						if (OnException != null)
@@ -116,6 +120,18 @@ namespace WebBrowser.Dom.Elements
 					_activeTimers.Remove(timer);
 				}
 			}
+		}
+
+		protected virtual void RaiseOnExecuting()
+		{
+			var handler = OnExecuting;
+			if (handler != null) handler();
+		}
+
+		protected virtual void RaiseOnExecuted()
+		{
+			var handler = OnExecuted;
+			if (handler != null) handler();
 		}
 	}
 }

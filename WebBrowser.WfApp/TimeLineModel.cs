@@ -53,30 +53,80 @@ namespace WebBrowser.WfApp
 				});
 			});
 
-			DocumentScripting prevScripting = null;
+			var scriptError = (Action<Script, Exception>) ((s, r) =>
+			{
+				if(!string.IsNullOrEmpty(s.Src))
+				action(new TimePoint
+				{
+					DateTime = DateTime.Now,
+					EventType = TimeLineEvents.ExecutionFailed,
+					ResourceId = s.Src
+				});
+			});
+
+			DocumentScripting curScripting = null;
 
 			var documentChanged = (Action) (() =>
 			{
-				if (prevScripting != null)
+				if (curScripting != null)
 				{
-					prevScripting.BeforeScriptExecute += beforeScriptExecute;
-					prevScripting.AfterScriptExecute += afterScriptExecute;
+					curScripting.BeforeScriptExecute -= beforeScriptExecute;
+					curScripting.AfterScriptExecute -= afterScriptExecute;
+					curScripting.ScriptExecutionError -= scriptError;
 				}
-				prevScripting = engine.Scripting;//todo: bugs possible when document changed quickly
-				engine.Scripting.BeforeScriptExecute += beforeScriptExecute;
-				engine.Scripting.AfterScriptExecute += afterScriptExecute;
+				curScripting = engine.Scripting;//todo: bugs possible when document changed quickly
+				curScripting.BeforeScriptExecute += beforeScriptExecute;
+				curScripting.AfterScriptExecute += afterScriptExecute;
+				curScripting.ScriptExecutionError += scriptError;
+			});
+
+			var timerExecuting = (Action) (() =>
+			{
+				action(new TimePoint
+				{
+					DateTime = DateTime.Now,
+					EventType = TimeLineEvents.Executing,
+					ResourceId = "[Timer]"
+				});
+			});
+
+			var timerExecuted = (Action) (() =>
+			{
+				action(new TimePoint
+				{
+					DateTime = DateTime.Now,
+					EventType = TimeLineEvents.Executed,
+					ResourceId = "[Timer]"
+				});
+			});
+
+			var timerFailed = (Action<Exception>) (_ =>
+			{
+				action(new TimePoint
+				{
+					DateTime = DateTime.Now,
+					EventType = TimeLineEvents.ExecutionFailed,
+					ResourceId = "[Timer]"
+				});
 			});
 
 			engine.ResourceProvider.OnRequest += requestHandler;
 			engine.ResourceProvider.OnRequest += receivedHandler;
-			prevScripting = engine.Scripting;
+			curScripting = engine.Scripting;
 			engine.DocumentChanged += documentChanged;
+
+			engine.Window.Timers.OnExecuting += timerExecuting;
+			engine.Window.Timers.OnExecuted += timerExecuted;
+			engine.Window.Timers.OnException += timerFailed;
 
 			return () =>
 			{
 				engine.ResourceProvider.OnRequest -= requestHandler;
 				engine.ResourceProvider.OnRequest -= receivedHandler;
-				engine.DocumentChanged += documentChanged;
+				engine.DocumentChanged -= documentChanged;
+				engine.Window.Timers.OnExecuting -= timerExecuting;
+				engine.Window.Timers.OnExecuted -= timerExecuted;
+				engine.Window.Timers.OnException -= timerFailed;
 			};
 		}
 	}
@@ -132,10 +182,12 @@ namespace WebBrowser.WfApp
 
 	internal enum TimeLineEvents
 	{
+		Unknown,
 		Request,
 		Received,
 		Executing,
-		Executed
+		Executed,
+		ExecutionFailed
 	}
 
 	internal enum TimeLineResources
