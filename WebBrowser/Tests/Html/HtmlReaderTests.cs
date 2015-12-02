@@ -62,6 +62,8 @@ namespace WebBrowser.Tests.Html
 		[TestCase("<textAREA><!--</TEXTarea>-->", "TagStart:textAREA, Text:<!--, TagEnd:textarea, Text:-->")]
 		[TestCase("<textarea>/*</textarea>*/", "TagStart:textarea, Text:/*, TagEnd:textarea, Text:*/")]
 		[TestCase("<textarea>\"</textarea>\"", "TagStart:textarea, Text:\", TagEnd:textarea, Text:\"")]
+		[TestCase("<head>\r\n\t<script>somecode</script></head>", 
+			"TagStart:head, Text:\n\n\t, TagStart:script, Text:somecode, TagEnd:script, TagEnd:head")]
 		[TestCase("\u000D", "Text:\u000A")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{

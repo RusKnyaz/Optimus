@@ -46,6 +46,17 @@ namespace WebBrowser.Tests.Html
 		}
 
 		[Test]
+		public void TextIsNotParent()
+		{
+			var elem = Parse("<head>\r\n\t<script>somecode</script>\r\n</head>").Cast<IHtmlElement>().Single();
+
+			elem.Assert(e =>
+				e.Name == "head" && 
+				(e.Children.First() as HtmlText).Value == "\n\n\t" &&
+				(e.Children.Skip(1).First() as HtmlElement).Name == "script");
+		}
+
+		[Test]
 		public void Text()
 		{
 			var elems = Parse("Hello").ToArray();

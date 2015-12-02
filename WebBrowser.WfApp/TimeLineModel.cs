@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 
@@ -32,35 +31,42 @@ namespace WebBrowser.WfApp
 			}));
 
 			var beforeScriptExecute = (Action<Script>)(s =>
-			{
-				if (!string.IsNullOrEmpty(s.Src))
+				{
+					var scriptName = !string.IsNullOrEmpty(s.Src)
+						? s.Src
+						: "Script_" + s.GetHashCode();
+
 				action(new TimePoint
 				{
 					DateTime = DateTime.Now,
 					EventType = TimeLineEvents.Executing,
-					ResourceId = s.Src
+					ResourceId = scriptName
 				});
 			});
 
 			var afterScriptExecute = (Action<Script>)(s =>
 			{
-				if(!string.IsNullOrEmpty(s.Src))
+				var scriptName = !string.IsNullOrEmpty(s.Src)
+						? s.Src
+						: "Script_" + s.GetHashCode();
 				action(new TimePoint
 				{
 					DateTime = DateTime.Now,
 					EventType = TimeLineEvents.Executed,
-					ResourceId = s.Src
+					ResourceId = scriptName
 				});
 			});
 
 			var scriptError = (Action<Script, Exception>) ((s, r) =>
 			{
-				if(!string.IsNullOrEmpty(s.Src))
+				var scriptName = !string.IsNullOrEmpty(s.Src)
+						? s.Src
+						: "Script_" + s.GetHashCode();
 				action(new TimePoint
 				{
 					DateTime = DateTime.Now,
 					EventType = TimeLineEvents.ExecutionFailed,
-					ResourceId = s.Src
+					ResourceId = scriptName
 				});
 			});
 

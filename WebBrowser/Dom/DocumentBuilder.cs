@@ -171,6 +171,10 @@ namespace WebBrowser.Dom
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
 			{
+				//todo: the more intelligent logic should be implemented. text nodes (except whitespaces) of html should falls into body.
+				if (node.NodeName == "HTML")
+					return;
+
 				var c = node.OwnerDocument.CreateTextNode(txt.Value);
 				c.Source = source;
 				node.AppendChild(c);
@@ -199,5 +203,7 @@ namespace WebBrowser.Dom
 
 			Build(elem, htmlElement.Children, source);
 		}
+
+
 	}
 }

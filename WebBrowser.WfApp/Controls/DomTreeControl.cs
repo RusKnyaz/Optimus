@@ -90,7 +90,7 @@ namespace WebBrowser.WfApp.Controls
 			if (targetTreeNodeCollection == null)
 				return;
 
-			this.SafeInvoke(() =>
+			this.SafeBeginInvoke(() =>
 				{
 					var newTreeNode = CreateBranch(child);
 

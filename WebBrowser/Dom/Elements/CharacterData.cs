@@ -12,7 +12,7 @@ namespace WebBrowser.Dom
 
 	public class Text : CharacterData
 	{
-		public Text()
+		public Text() 
 		{
 			NodeType = TEXT_NODE;
 		}

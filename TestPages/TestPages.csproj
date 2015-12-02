@@ -89,6 +89,7 @@
     <Content Include="linkedscript\index.html" />
     <Content Include="linkedscript\script.js" />
     <Content Include="simple\index.html" />
+    <Content Include="simple\parsing.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

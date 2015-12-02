@@ -179,8 +179,9 @@ namespace WebBrowser.Dom
 			if(type == "KeyboardEvent")
 				return new KeyboardEvent();
 
-			if(type == "ErrorEvent")
-				return new ErrorEvent();
+			/*todo: the event have own logic of propogation. it have not type. i do not know what should i do
+			 * if(type == "ErrorEvent")
+				return new ErrorEvent();*/
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
