@@ -47,7 +47,6 @@ namespace WebBrowser.WfApp.Controls
 
 		enum IntervalTypes
 		{
-			Undefined,
 			Loading, Executing, Gap,
 			ExecutionFail
 		}
@@ -68,8 +67,6 @@ namespace WebBrowser.WfApp.Controls
 			var size = ClientSize;
 
 			var intervalLines = new List<Interval>[lines.Count];
-
-			var defTime = new DateTime();
 
 			var now = DateTime.Now;
 			bool hasOpenInterval = false;

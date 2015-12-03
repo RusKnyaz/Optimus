@@ -13,6 +13,7 @@ namespace WebBrowser.Tests.Dom
 			void OnParentBubble(Event evt);
 			void OnChildBubble(Event evt);
 			void OnRootBubble(Event evt);
+			void OnRootCapture(Event evt);
 		}
 
 
@@ -34,6 +35,7 @@ namespace WebBrowser.Tests.Dom
 			_rootOriginal = Mock.Of<IEventTarget>();
 			_root = new EventTarget(_rootOriginal, () => null);
 			_root.AddEventListener("click", _handlers.Object.OnRootBubble, false);
+			_root.AddEventListener("click", _handlers.Object.OnRootCapture, true);
 
 			_parentOriginal = Mock.Of<IEventTarget>();
 			_parent = new EventTarget(_parentOriginal, () => _root);
@@ -55,6 +57,16 @@ namespace WebBrowser.Tests.Dom
 			_handlers.Verify(x => x.OnChildBubble(evt), Times.Once());
 			_handlers.Verify(x => x.OnParentBubble(evt), Times.Never());
 			_handlers.Verify(x => x.OnRootBubble(evt), Times.Never());
+		}
+
+		[Test]
+		public void RootEvent()
+		{
+			var evt = new Event();
+			evt.InitEvent("click", true, true);
+			_root.DispatchEvent(evt);
+			_handlers.Verify(x => x.OnRootBubble(evt), Times.Once());
+			_handlers.Verify(x => x.OnRootCapture(evt), Times.Once());
 		}
 	}
 }

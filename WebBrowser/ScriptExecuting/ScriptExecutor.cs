@@ -83,14 +83,22 @@ namespace WebBrowser.ScriptExecuting
 			AddGlobalGetter("screen", () => engine.Window.Screen);
 			AddGlobalGetter("innerWidth", () => engine.Window.InnerWidth);
 			AddGlobalGetter("innerHeight", () => engine.Window.InnerHeight);
+			
+			AddGlobalAct("alert", (_,x) => engine.Window.Alert(x[0].AsString()));
+			AddGlobalAct("clearInterval", (_,x) => engine.Window.ClearInterval(x.Length > 0 ? (int)x[0].AsNumber() : -1));
+			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
+			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
+		}
 
-			var alert = new ClrFunctionInstance(_jsEngine, (jsValue, values) =>
-				{
-					engine.Window.Alert(values[0].AsString());
-					return JsValue.Undefined;
-				});
+		private void AddGlobalAct(string name, Action<JsValue, JsValue[]> action)
+		{
+			var jsFunc = new ClrFunctionInstance(_jsEngine, (jsValue, values) =>
+			{
+				action(jsValue, values);
+				return JsValue.Undefined;
+			});
 
-			_jsEngine.Global.DefineOwnProperty("alert", new ClrAccessDescriptor(_jsEngine, value => alert), true);
+			_jsEngine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_jsEngine, value => jsFunc), true);
 		}
 
 		private void AddGlobalGetter(string name, Func<object> getter)

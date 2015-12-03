@@ -73,6 +73,10 @@ namespace WebBrowser.Dom.Elements
 					evt.CurrentTarget = _originalTarget;
 					NotifyListeners(evt, GetCapturingListeners);
 				}
+				else if(isOriginalTarget)
+				{
+					NotifyListeners(evt, GetCapturingListeners);
+				}
 
 				if (evt.IsPropagationStopped() || !isOriginalTarget)
 					return !evt.Cancelled;

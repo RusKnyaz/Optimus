@@ -523,6 +523,32 @@ console.log(arr[0]);");
 		}
 
 		[Test]
+		public void SetTimeout()
+		{
+			_engine.Load(
+				"<html><head><script>var x = setTimeout(function(){ console.log('called');});</script></head><body></body></html>");
+			Thread.Sleep(100);
+			CollectionAssert.AreEqual(new[] { "called" }, _log);
+		}
+		[Test]
+		public void ClearTimeout()
+		{
+			_engine.Load(
+				"<html><head><script>var x = setTimeout(function(){ console.log('called');}, 100);clearTimeout(x);</script></head><body></body></html>");
+			Thread.Sleep(100);
+			Assert.AreEqual(0, _log.Count);
+		}
+
+		[Test]
+		public void SetInterval()
+		{
+			_engine.Load(
+				"<html><head><script>var x = setInterval(function(){ console.log('called'); clearInterval(x);});</script></head><body></body></html>");
+			Thread.Sleep(100);
+			CollectionAssert.AreEqual(new[]{"called"}, _log);
+		}
+
+		[Test]
 		public void ClearInterval()
 		{
 			_engine.Load(
@@ -612,6 +638,33 @@ console.log(window.setInterval != null);
 console.log(window.clearInterval != null);");
 
 			CollectionAssert.AreEqual(new object[] { true, true, true, true, true, true, true }, _log);
+		}
+
+		[Test]
+		public void WindowAddEventListener()
+		{
+			CreateEngine("<div id=d></div>", @"
+var listener = function(){console.log('ok');};
+addEventListener('click', listener, true);
+var evt = document.createEvent('Event');
+evt.initEvent('click', true,true);
+dispatchEvent(evt);");
+
+			CollectionAssert.AreEqual(new object[] { "ok" }, _log);
+		}
+
+		[Test]
+		public void WindowRemoveEventListener()
+		{
+			CreateEngine("<div id=d></div>", @"
+var listener = function(){console.log('ok');};
+addEventListener('click', listener, true);
+removeEventListener('click', listener, true);
+var evt = document.createEvent('Event');
+evt.initEvent('click', true,true);
+dispatchEvent(evt);");
+
+			Assert.AreEqual(0, _log.Count);
 		}
 	}
 }

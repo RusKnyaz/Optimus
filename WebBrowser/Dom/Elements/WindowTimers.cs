@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using WebBrowser.Tools;
 
 namespace WebBrowser.Dom.Elements
 {
@@ -20,6 +21,12 @@ namespace WebBrowser.Dom.Elements
 			_getSyncObj = getGetSyncObj;
 		}
 
+		/// <summary>
+		/// Call handler once
+		/// </summary>
+		/// <param name="handler"></param>
+		/// <param name="timeout"></param>
+		/// <returns></returns>
 		public int SetTimeout(Action handler, int timeout)
 		{
 			var timer = new TimeoutTimer(t =>
@@ -47,19 +54,42 @@ namespace WebBrowser.Dom.Elements
 			return timer.GetHashCode();
 		}
 
+		/// <summary>
+		/// Call handler periodically
+		/// </summary>
+		/// <param name="handler"></param>
+		/// <param name="timeout"></param>
+		/// <returns></returns>
 		public int SetInterval(Action handler, int timeout)
 		{
-			var timer = new Timer(state =>
-			{
-				lock(_getSyncObj()) handler();
-			}, null, 0, timeout);
-
+			bool stopped = false;
+			var container = new Timer[1];
+			Disposable disp;
 			lock (_activeTimers)
 			{
-				_activeTimers.Add(timer);
+				disp = new Disposable(() => stopped = true);
+				_activeTimers.Add(disp);
 			}
 
-			return timer.GetHashCode();
+			var timer = new Timer(state =>
+			{
+				lock (_getSyncObj())
+				{
+					if (!stopped)
+					{
+						handler();
+					}
+					else if(container[0] != null)
+					{
+						container[0].Dispose();
+						container[0] = null;
+					}
+				}
+			}, null, 0, timeout);
+
+			container[0] = timer;
+
+			return disp.GetHashCode();
 		}
 
 		class TimeoutTimer : IDisposable
@@ -134,4 +164,6 @@ namespace WebBrowser.Dom.Elements
 			if (handler != null) handler();
 		}
 	}
+
+
 }
