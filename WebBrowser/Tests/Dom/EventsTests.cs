@@ -10,15 +10,15 @@ namespace WebBrowser.Tests.Dom
 	class EventsTests
 	{
 		//capturing:the event propagation in direction from parent to child
-		[TestCase(true, false, true, "body table td tr")]
-		[TestCase(true, true, true, "body table")]
-		[TestCase(false, false, true, "body table td")]
-		[TestCase(false, true, true, "body table")]
+		[TestCase(true, false, true, "BODY TABLE TD TR")]
+		[TestCase(true, true, true, "BODY TABLE")]
+		[TestCase(false, false, true, "BODY TABLE TD")]
+		[TestCase(false, true, true, "BODY TABLE")]
 		//Bubbling:the event propagation in direction from child to parent
-		[TestCase(true, false, false, "td tr table body")]
-		[TestCase(true, true, false, "td tr table")]
-		[TestCase(false, false, false, "td")]
-		[TestCase(false, true, false, "td")]
+		[TestCase(true, false, false, "TD TR TABLE BODY")]
+		[TestCase(true, true, false, "TD TR TABLE")]
+		[TestCase(false, false, false, "TD")]
+		[TestCase(false, true, false, "TD")]
 		public void Propagation(bool bubblable, bool stop, bool capture, string expectedEventsOrder)
 		{
 			var doc = new Document();

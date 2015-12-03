@@ -7,7 +7,7 @@ using WebBrowser.Tools;
 
 namespace WebBrowser.Tests.EngineTests
 {
-	[TestFixture]
+	[TestFixture, Ignore]
 	public class OpenSites
 	{
 		[TestCase("http://okkamtech.com")]

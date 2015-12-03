@@ -7,7 +7,7 @@ using WebBrowser.Tools;
 
 namespace WebBrowser.Tests
 {
-	[TestFixture]
+	[TestFixture, Ignore]
 	public class TestPages
 	{
 		private string GetTestUrl(string testUrl)

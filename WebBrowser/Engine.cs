@@ -155,7 +155,7 @@ namespace WebBrowser
 			Document = new Document(Window);
 			Uri = Uri.IsWellFormedUriString(path, UriKind.Absolute) ? new Uri(path) : new Uri(Uri, path);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
-			var resource = await ResourceProvider.GetResourceAsync(Uri.ToString());
+			var resource = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
 			LoadFromResponse(resource);
 		}
 

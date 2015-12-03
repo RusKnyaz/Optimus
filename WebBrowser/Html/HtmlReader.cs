@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using Jint.Parser.Ast;
 
 namespace WebBrowser.Html
 {
@@ -257,7 +255,7 @@ namespace WebBrowser.Html
 			return -1;
 		}
 
-		private static bool ReadToChar(StreamReader reader, List<char> buffer, char end)
+		private static bool ReadToChar(StreamReader reader, List<char> buffer, char end, bool unescape = false)
 		{
 			for (var code = reader.Read(); code != -1; code = reader.Read())
 			{
@@ -265,7 +263,14 @@ namespace WebBrowser.Html
 				if (symbol == end)
 					return true;
 
-				buffer.Add(symbol);
+				if (symbol == '&')
+				{
+					buffer.AddRange(ReadSpecial(reader));
+				}
+				else
+				{
+					buffer.Add(symbol);	
+				}
 			}
 			return false;
 		}
@@ -309,7 +314,6 @@ namespace WebBrowser.Html
 			}
 			return true;
 		}
-
 		
 		public static IEnumerable<HtmlChunk> Read(Stream stream)
 		{
@@ -328,7 +332,7 @@ namespace WebBrowser.Html
 					if (state == States.ReadText)
 					{
 						//Read text node to tag start or stream end
-						var ex = ReadToChar(reader, buffer, '<');
+						var ex = ReadToChar(reader, buffer, '<', true);
 						if (buffer.Count > 0)
 						{
 							yield return
@@ -579,5 +583,17 @@ namespace WebBrowser.Html
 
 		}
 	}
+
+	public static class StreamReaderExtension
+	{
+		public static IEnumerable<char> ToEnumerable(this StreamReader reader)
+		{
+			for (var s = reader.Read(); s != -1; s = reader.Read())
+			{
+				yield return (char)s;
+			}
+		}
+	}
+	
 }
 

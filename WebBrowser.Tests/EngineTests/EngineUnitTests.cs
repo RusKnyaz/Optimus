@@ -5,6 +5,7 @@ using NUnit.Framework;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.ResourceProviders;
+using WebBrowser.Tools;
 using Text = WebBrowser.Dom.Text;
 
 namespace WebBrowser.Tests.EngineTests
@@ -83,8 +84,8 @@ namespace WebBrowser.Tests.EngineTests
 				"http://localhost", "<html><body><div id='c'></div></body></html>");
 
 			var engine = new Engine(resourceProvider);
-
 			engine.OpenUrl("http://localhost");
+			engine.WaitId("c");
 			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Length);
 		}
 
@@ -259,20 +260,6 @@ window.clearTimeout(timer);"));
 			
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
-		}
-
-		[Test]
-		public void ZeroLevelNodes()
-		{
-			var engine = new Engine(Mocks.ResourceProvider("http://localhost", "<!DOCTYPE html><html><head></head><body></body></html>"));
-			engine.OpenUrl("http://localhost");
-
-			engine.Document.Assert(doc =>
-				doc.ChildNodes.Count == 2 &&
-				doc.ChildNodes[0].NodeType == Node.DOCUMENT_TYPE_NODE &&
-				doc.ChildNodes[1].NodeType == Node.ELEMENT_NODE &&
-				((HtmlElement)doc.ChildNodes[1]).TagName == "HTML" &&
-				doc.DocumentElement.TagName == "HTML");
 		}
 	}
 }

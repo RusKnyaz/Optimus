@@ -1,9 +1,9 @@
 ﻿#if NUNIT
-using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
 using WebBrowser.Dom;
+using WebBrowser.Dom.Elements;
 
 namespace WebBrowser.Tests.Dom
 {
@@ -18,6 +18,16 @@ namespace WebBrowser.Tests.Dom
 				doc.DocumentElement.FirstChild.NodeName == "HEAD");
 		}
 
+		[Test]
+		public void ZeroLevelNodes()
+		{
+			Build("<!DOCTYPE html><html><head></head><body></body></html>").Assert(doc =>
+				doc.ChildNodes.Count == 2 &&
+					doc.ChildNodes[0].NodeType == Node.DOCUMENT_TYPE_NODE &&
+					doc.ChildNodes[1].NodeType == Node.ELEMENT_NODE &&
+					((HtmlElement) doc.ChildNodes[1]).TagName == "HTML" &&
+					doc.DocumentElement.TagName == "HTML");
+		}
 
 		private Document Build(string txt)
 		{

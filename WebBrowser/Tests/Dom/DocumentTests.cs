@@ -32,8 +32,8 @@ namespace WebBrowser.Tests
 			document.Write("<html><body><span></span></body></html>");
 			Assert.IsNotNull(document.DocumentElement);
 			Assert.AreEqual(1, document.DocumentElement.ChildNodes.Count);
-			Assert.AreEqual("body", ((Element)document.DocumentElement.FirstChild).TagName);
-			Assert.AreEqual("span", ((Element)((Element)document.DocumentElement.FirstChild).FirstChild).TagName);
+			Assert.AreEqual("BODY", ((Element)document.DocumentElement.FirstChild).TagName);
+			Assert.AreEqual("SPAN", ((Element)(document.DocumentElement.FirstChild).FirstChild).TagName);
 			Assert.AreEqual(document, document.DocumentElement.ParentNode);
 			Assert.AreEqual(document, document.DocumentElement.OwnerDocument);
 		}
@@ -43,7 +43,7 @@ namespace WebBrowser.Tests
 		{
 			var document = new Document();
 			var el = document.CreateElement("div");
-			Assert.AreEqual("div", el.TagName);
+			Assert.AreEqual("DIV", el.TagName);
 			Assert.AreEqual(document, el.OwnerDocument);
 		}
 
@@ -157,7 +157,7 @@ namespace WebBrowser.Tests
 		{
 			var document = new Document();
 			document.Write("<html><head><meta/></head><body><div></div></body></html>");
-			document.Assert(doc => doc.Body.InnerHTML == "<div></div>" && doc.Head.InnerHTML == "<meta></meta>");
+			document.Assert(doc => doc.Body.InnerHTML == "<DIV></DIV>" && doc.Head.InnerHTML == "<META></META>");
 		}
 
 		[Test]
@@ -165,7 +165,7 @@ namespace WebBrowser.Tests
 		{
 			var document = new Document();
 			document.Write("<html><head><meta></head><body><div></div></body></html>");
-			document.Assert(doc => doc.Body.InnerHTML == "<div></div>" && doc.Head.InnerHTML == "<meta></meta>");
+			document.Assert(doc => doc.Body.InnerHTML == "<DIV></DIV>" && doc.Head.InnerHTML == "<META></META>");
 		}
 
 		[Test]
