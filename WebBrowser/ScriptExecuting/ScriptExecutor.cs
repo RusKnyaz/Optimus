@@ -88,6 +88,28 @@ namespace WebBrowser.ScriptExecuting
 			AddGlobalAct("clearInterval", (_,x) => engine.Window.ClearInterval(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
+			
+			AddGlobalAct("addEventListener", (_, x) =>
+				engine.Window.AddEventListener(
+				x.Length > 0 ? x[0].AsString() : null, 
+				x.Length > 1 ? (Action<Event>)(e =>
+				{
+					JsValue val;
+					_typeConverter.TryConvert(e, out val);
+					x[1].Invoke(val);
+				}): null,
+				x.Length > 2 ? x[2].AsBoolean() : false));
+
+			AddGlobalAct("removeEventListener", (_, x) =>
+				engine.Window.RemoveEventListener(
+				x.Length > 0 ? x[0].AsString() : null,
+				x.Length > 1 ? (Action<Event>)(e =>
+				{
+					JsValue val;
+					_typeConverter.TryConvert(e, out val);
+					x[1].Invoke(val);
+				}) : null,
+				x.Length > 2 ? x[2].AsBoolean() : false));
 		}
 
 		private void AddGlobalAct(string name, Action<JsValue, JsValue[]> action)

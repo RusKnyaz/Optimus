@@ -1,9 +1,6 @@
 ﻿var window = this;
 
 (function (engine) {
-	window.addEventListener = function(a, b, c) { engine.Window.AddEventListener(a, b, c); };
-	window.removeEventListener = function (a, b, c) { engine.Window.RemoveEventListener(a, b, c); };
-	
 	window.setTimeout = function (handler, timeout) {
 		if (!handler)
 			return;
