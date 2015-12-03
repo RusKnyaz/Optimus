@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Reflection;
 using Jint.Native;
 using Jint.Runtime;
+using Jint.Runtime.Descriptors;
+using Jint.Runtime.Descriptors.Specialized;
+using Jint.Runtime.Interop;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Dom.Perf;
@@ -17,6 +19,7 @@ namespace WebBrowser.ScriptExecuting
 		private string _scopeEmbeddingObjectName = "A89A3DC7FB5944849D4DE0781117A595";
 		
 		private Jint.Engine _jsEngine;
+		private DomConverter _typeConverter;
 
 		class EngineAdapter
 		{
@@ -40,9 +43,9 @@ namespace WebBrowser.ScriptExecuting
 
 		private void CreateEngine(Engine engine)
 		{
-			var typeConverter = new DomConverter(() => _jsEngine);
+			_typeConverter = new DomConverter(() => _jsEngine);
 
-			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(typeConverter))
+			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(_typeConverter))
 				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine));
 
 			_jsEngine.SetValue("console", new {log = (Action<object>) (o => engine.Console.Log(o))});
@@ -73,6 +76,31 @@ namespace WebBrowser.ScriptExecuting
 			AddClrType("Uint8Array", typeof(UInt8Array));
 			AddClrType("Int16Array", typeof(Int16Array));
 			AddClrType("Uint16Array", typeof(UInt16Array));
+
+			AddGlobalGetter("document", () => engine.Document);
+			AddGlobalGetter("location", () => engine.Window.Location);
+			AddGlobalGetter("navigator", () => engine.Window.Navigator);
+			AddGlobalGetter("screen", () => engine.Window.Screen);
+			AddGlobalGetter("innerWidth", () => engine.Window.InnerWidth);
+			AddGlobalGetter("innerHeight", () => engine.Window.InnerHeight);
+
+			var alert = new ClrFunctionInstance(_jsEngine, (jsValue, values) =>
+				{
+					engine.Window.Alert(values[0].AsString());
+					return JsValue.Undefined;
+				});
+
+			_jsEngine.Global.DefineOwnProperty("alert", new ClrAccessDescriptor(_jsEngine, value => alert), true);
+		}
+
+		private void AddGlobalGetter(string name, Func<object> getter)
+		{
+			_jsEngine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_jsEngine, value =>
+			{
+				JsValue res;
+				_typeConverter.TryConvert(getter(), out res);
+				return res;
+			}), true);
 		}
 
 		private void AddClrType(string jsName, Type type)
