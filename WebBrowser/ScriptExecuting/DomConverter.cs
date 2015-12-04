@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Array;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
+using WebBrowser.Dom.Elements;
 
 namespace WebBrowser.ScriptExecuting
 {
@@ -67,6 +69,38 @@ namespace WebBrowser.ScriptExecuting
 		{
 			get { return _getEngine(); }
 		}
+
+		public Action<T> ConvertDelegate<T>(JsValue jsValue)
+		{
+			var callable = jsValue.AsObject() as ICallable;
+			Action<T> handler = null;
+			if (callable != null)
+			{
+				handler = (Action<T>)_delegatesCache.GetValue(callable, key => (Action<T>)(e =>
+				{
+					JsValue val;
+					TryConvert(e, out val);
+					key.Call(JsValue.Undefined, new[] { val });
+				}));
+			}
+			return handler;
+		}
+
+		public Action ConvertDelegate(JsValue jsValue)
+		{
+			var callable = jsValue.AsObject() as ICallable;
+			Action handler = null;
+			if (callable != null)
+			{
+				handler = (Action)_delegatesCache.GetValue(callable, key => (Action)(() =>
+				{
+					key.Call(JsValue.Undefined, new JsValue[0]);
+				}));
+			}
+			return handler;
+		}
+
+		readonly ConditionalWeakTable<ICallable, object> _delegatesCache = new ConditionalWeakTable<ICallable, object>();
 	}
 
 	internal class DomItemAttribute : Attribute

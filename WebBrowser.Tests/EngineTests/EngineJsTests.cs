@@ -536,7 +536,7 @@ console.log(arr[0]);");
 			_engine.Load(
 				"<html><head><script>var x = setTimeout(function(){ console.log('called');}, 100);clearTimeout(x);</script></head><body></body></html>");
 			Thread.Sleep(100);
-			Assert.AreEqual(0, _log.Count);
+			CollectionAssert.AreEqual(new object[0], _log);
 		}
 
 		[Test]
@@ -664,7 +664,7 @@ var evt = document.createEvent('Event');
 evt.initEvent('click', true,true);
 dispatchEvent(evt);");
 
-			Assert.AreEqual(0, _log.Count);
+			CollectionAssert.AreEqual(new object[0], _log);
 		}
 	}
 }

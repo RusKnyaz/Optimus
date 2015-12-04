@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
@@ -89,27 +90,37 @@ namespace WebBrowser.ScriptExecuting
 			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
 			
-			AddGlobalAct("addEventListener", (_, x) =>
-				engine.Window.AddEventListener(
-				x.Length > 0 ? x[0].AsString() : null, 
-				x.Length > 1 ? (Action<Event>)(e =>
-				{
-					JsValue val;
-					_typeConverter.TryConvert(e, out val);
-					x[1].Invoke(val);
-				}): null,
-				x.Length > 2 ? x[2].AsBoolean() : false));
-
-			AddGlobalAct("removeEventListener", (_, x) =>
-				engine.Window.RemoveEventListener(
+			AddGlobalAct("addEventListener", (_, x) => engine.Window.AddEventListener(
 				x.Length > 0 ? x[0].AsString() : null,
-				x.Length > 1 ? (Action<Event>)(e =>
-				{
-					JsValue val;
-					_typeConverter.TryConvert(e, out val);
-					x[1].Invoke(val);
-				}) : null,
-				x.Length > 2 ? x[2].AsBoolean() : false));
+				_typeConverter.ConvertDelegate<Event>(x[1]),
+				x.Length > 2 && x[2].AsBoolean()));
+
+			AddGlobalAct("removeEventListener", (_, x) => engine.Window.RemoveEventListener(
+				x.Length > 0 ? x[0].AsString() : null,
+				_typeConverter.ConvertDelegate<Event>(x[1]),
+				x.Length > 2 && x[2].AsBoolean()));
+
+			AddGlobalFunc("setTimeout", (_, x) =>
+			{
+				if (x.Length == 0)
+					return JsValue.Undefined;
+				var res= engine.Window.SetTimeout(_typeConverter.ConvertDelegate(x[0]), x.Length > 1 ? x[1].AsNumber() : 1);
+				return new JsValue(res);
+			});
+
+			AddGlobalFunc("setInterval", (_, x) =>
+			{
+				if (x.Length == 0)
+					return JsValue.Undefined;
+				var res = engine.Window.SetInterval(_typeConverter.ConvertDelegate(x[0]), x.Length > 1 ? x[1].AsNumber() : 1);
+				return new JsValue(res);
+			});
+		}
+
+		private void AddGlobalFunc(string name, Func<JsValue, JsValue[], JsValue> action)
+		{
+			var jsFunc = new ClrFunctionInstance(_jsEngine, action);
+			_jsEngine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_jsEngine, value => jsFunc), true);
 		}
 
 		private void AddGlobalAct(string name, Action<JsValue, JsValue[]> action)

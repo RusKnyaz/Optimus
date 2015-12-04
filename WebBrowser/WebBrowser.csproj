@@ -130,6 +130,7 @@
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Mocks.cs" />
+    <Compile Include="Tools\Disposable.cs" />
     <Compile Include="Tools\EngineExtension.cs" />
     <Compile Include="Tools\EngineQueryExtension.cs" />
     <Compile Include="Tools\ListExtension.cs" />

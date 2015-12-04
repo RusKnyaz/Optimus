@@ -1,22 +1,5 @@
 ﻿var window = this;
-
 (function (engine) {
-	window.setTimeout = function (handler, timeout) {
-		if (!handler)
-			return;
-		var args = Array.prototype.slice.call(arguments, 2);
-		return engine.Window.SetTimeout(function () {
-			handler.apply({}, args);
-		}, timeout);
-	};
-
-	window.setInterval = function(handler, timeout) {
-		if (!handler)
-			return;
-		var args = Array.prototype.slice.call(arguments, 2);
-		return engine.Window.SetInterval(function() { handler.apply({}, args); }, timeout);
-	};
-	
 	//ajax:http://www.w3.org/TR/XMLHttpRequest/
 	window.XMLHttpRequest = function () {
 		var r = engine.XmlHttpRequest();
