@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using Jint.Native;
-using Jint.Native.Function;
 using Jint.Native.Object;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
@@ -10,34 +9,6 @@ using Jint.Runtime.Interop;
 
 namespace WebBrowser.ScriptExecuting
 {
-	public class ClrPrototype : FunctionInstance
-	{
-		private readonly Type _type;
-
-		public ClrPrototype(Jint.Engine engine, Type type) : 
-			base(engine, null, null, false)
-		{
-			_type = type;
-			Prototype = engine.Object;
-		}
-
-		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override bool HasInstance(JsValue v)
-		{
-			var clrObject = v.TryCast<ClrObject>();
-			if (clrObject != null && clrObject.Target != null)
-			{
-				return _type.IsInstanceOfType(clrObject.Target);
-			}
-
-			return base.HasInstance(v);
-		}
-	}
-
 	public class ClrObject : ObjectInstance, IObjectWrapper
 	{
 		public Object Target { get; set; }
@@ -203,6 +174,16 @@ namespace WebBrowser.ScriptExecuting
 				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
+
+			//Look for static fields
+			var staticField = type.GetField(propertyName);
+			if (staticField != null)
+			{
+				var descriptor = new FieldInfoDescriptor(Engine, staticField, Target);
+				Properties.Add(propertyName, descriptor);
+				return descriptor;
+			}
+
 
 			return PropertyDescriptor.Undefined;
 		}

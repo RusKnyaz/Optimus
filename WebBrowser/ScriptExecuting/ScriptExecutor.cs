@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Runtime;
-using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
 using WebBrowser.Dom;
 using WebBrowser.Dom.Elements;
 using WebBrowser.Dom.Perf;
 using WebBrowser.Environment;
-using WebBrowser.Properties;
 
 namespace WebBrowser.ScriptExecuting
 {
@@ -51,7 +48,7 @@ namespace WebBrowser.ScriptExecuting
 
 			_jsEngine.SetValue("console", new {log = (Action<object>) (o => engine.Console.Log(o))});
 
-			_jsEngine.Execute(Resources.clrBridge);
+			_jsEngine.Execute("var window = this");
 
 			AddClrType("Node", typeof(Node));
 			AddClrType("Element", typeof(Element));
@@ -115,6 +112,21 @@ namespace WebBrowser.ScriptExecuting
 				var res = engine.Window.SetInterval(_typeConverter.ConvertDelegate(x[0]), x.Length > 1 ? x[1].AsNumber() : 1);
 				return new JsValue(res);
 			});
+
+			var jsFunc = new ClrFuncCtor(_jsEngine, (x) =>
+			{
+				JsValue res;
+				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document), out res);
+				return res.AsObject();
+			});
+
+			jsFunc.FastAddProperty("UNSENT", new JsValue(0), false, false, false);
+			jsFunc.FastAddProperty("OPENED", new JsValue(1), false, false, false);
+			jsFunc.FastAddProperty("HEADERS_RECEIVED", new JsValue(2), false, false, false);
+			jsFunc.FastAddProperty("LOADING", new JsValue(3), false, false, false);
+			jsFunc.FastAddProperty("DONE", new JsValue(4),false,false,false );
+
+			_jsEngine.Global.FastAddProperty("XMLHttpRequest", jsFunc, false, false, false);
 		}
 
 		private void AddGlobalFunc(string name, Func<JsValue, JsValue[], JsValue> action)

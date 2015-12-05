@@ -298,6 +298,25 @@ console.log(style['width']);");
 		}
 
 		[Test]
+		public void XmlHttpRequestCtor()
+		{
+			CreateEngine("", @"var xhr = new XMLHttpRequest();
+console.log(xhr.UNSENT);
+console.log(xhr.OPENED);
+console.log(xhr.HEADERS_RECEIVED);
+console.log(xhr.LOADING);
+console.log(xhr.DONE);
+console.log(XMLHttpRequest.UNSENT);
+console.log(XMLHttpRequest.OPENED);
+console.log(XMLHttpRequest.HEADERS_RECEIVED);
+console.log(XMLHttpRequest.LOADING);
+console.log(XMLHttpRequest.DONE);
+console.log(xhr.readyState);");
+
+			CollectionAssert.AreEqual(new []{0,1,2,3,4,0,1,2,3,4,0}, _log);
+		}
+
+		[Test]
 		public void Ajax()
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>();

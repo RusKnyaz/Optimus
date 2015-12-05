@@ -95,11 +95,8 @@
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
+    <Compile Include="ScriptExecuting\ClrPrototype.cs" />
     <Compile Include="ScriptExecuting\DomConverter.cs" />
     <Compile Include="ScriptExecuting\IScriptExecutor.cs" />
     <Compile Include="Html\HtmlParser.cs" />
@@ -144,16 +141,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\clrBridge.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\jint-master\Jint\Jint.csproj">
