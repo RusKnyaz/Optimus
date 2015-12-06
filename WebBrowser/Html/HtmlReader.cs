@@ -23,6 +23,7 @@ namespace WebBrowser.Html
 
 	public enum HtmlChunkTypes
 	{
+		Undefined,
 		TagStart,
 		TagEnd,
 		AttributeName,
@@ -34,7 +35,7 @@ namespace WebBrowser.Html
 
 	public class HtmlReader
 	{
-		static string[] _noContentTags = new []{"meta", "br", "link"};
+		static string[] _noContentTags = {"meta", "br", "link"};
 
 		enum States
 		{
@@ -255,15 +256,15 @@ namespace WebBrowser.Html
 			return -1;
 		}
 
-		private static bool ReadToChar(StreamReader reader, List<char> buffer, char end, bool unescape = false)
+		private static void ReadToChar(StreamReader reader, List<char> buffer, char end, bool unescape = false)
 		{
 			for (var code = reader.Read(); code != -1; code = reader.Read())
 			{
 				var symbol = (char)code;
 				if (symbol == end)
-					return true;
+					return;
 
-				if (symbol == '&')
+				if (symbol == '&' && !unescape)
 				{
 					buffer.AddRange(ReadSpecial(reader));
 				}
@@ -272,10 +273,9 @@ namespace WebBrowser.Html
 					buffer.Add(symbol);	
 				}
 			}
-			return false;
 		}
 
-		private static string ReadToPhrase(StreamReader reader, List<char> buffer, string end)
+		private static void ReadToPhrase(StreamReader reader, List<char> buffer, string end)
 		{
 			var lowerBuffer = new List<char>();
 			for (var code = reader.Read(); code != -1; code = reader.Read())
@@ -287,10 +287,8 @@ namespace WebBrowser.Html
 
 				if(!IsEndsWith(lowerBuffer, end)) continue;
 				buffer.RemoveRange(buffer.Count-end.Length, end.Length);
-				return end;
+				return ;
 			}
-
-			return string.Empty;
 		}
 
 		
@@ -314,6 +312,15 @@ namespace WebBrowser.Html
 			}
 			return true;
 		}
+
+		private static HtmlChunk ReadText(StreamReader reader)
+		{
+			var buffer = new List<char>();
+			ReadToChar(reader, buffer, '<', true);
+			return buffer.Count > 0 ? 
+				new HtmlChunk { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()).Replace("\u000D", "\u000A") } 
+				: new HtmlChunk();
+		}
 		
 		public static IEnumerable<HtmlChunk> Read(Stream stream)
 		{
@@ -331,19 +338,26 @@ namespace WebBrowser.Html
 				{
 					if (state == States.ReadText)
 					{
-						//Read text node to tag start or stream end
-						var ex = ReadToChar(reader, buffer, '<', true);
-						if (buffer.Count > 0)
-						{
-							yield return
-								new HtmlChunk {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()).Replace("\u000D", "\u000A")};
-						}
-						if (!ex)
+						var txt = ReadText(reader);
+						if (txt.Type != HtmlChunkTypes.Undefined)
+							yield return txt;
+						
+						if(reader.Peek() == -1)
 							yield break;
-
+						
 						buffer.Clear();
 
 						newState = state = States.ReadTagName;
+
+						/*//Read Tag Name
+						var x = ReadToChars(reader, buffer, ' ', '/', '>');
+						if (buffer.Count > 0)
+						{
+							var tag = HtmlChunk.TagStart(buffer);
+							yield return tag;
+							lastTag = tag.Value;
+							buffer.Clear();
+						}*/
 					}
 
 					code = reader.Read();
@@ -354,18 +368,8 @@ namespace WebBrowser.Html
 						if (symbol == '\u000D')
 							symbol = '\u000A';
 
-						if (state == States.ReadText && symbol == '&')
-						{
-							buffer.AddRange(ReadSpecial(reader));
-							continue;
-						}
-
 						switch (state)
 						{
-							case States.ReadText:
-								if (symbol == '<') newState = States.ReadTagName;
-								break;
-
 							case States.ReadTagName:
 								switch (symbol)
 								{
@@ -497,10 +501,6 @@ namespace WebBrowser.Html
 
 					switch (state)
 					{
-						case States.ReadText:
-							if (buffer.Count > 0)
-								yield return new HtmlChunk {Type = HtmlChunkTypes.Text, Value = data};
-							break;
 						case States.ReadTagName:
 							if (newState != States.ReadCloseTagName && newState != States.ReadSpecTag)
 							{
