@@ -58,7 +58,7 @@
 		
 		<call target="set-props" />
 		
-		<property name="args" value="&quot;${solution}/&quot;"/>
+		<property name="args" value="&quot;${solution}&quot;"/>
 		<property name="args" value="${args} /t:Rebuild /p:Configuration=Debug" if="${config.environment == 'nunit'}"/>
 		<property name="args" value="${args} /t:Rebuild /p:Configuration=Release" if="${config.environment == 'release'}"/>
 		<property name="args" value="${args} /t:Rebuild /p:Configuration=Debug" if="${config.environment == 'debug'}"/>
