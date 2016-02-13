@@ -36,7 +36,7 @@
 	<property name="publish.d" value="${work.d}/publish"/>
 	<property name="artifacts.d" value="${work.d}/artifacts"/>
 	<property name="optimus.dll" value="WebEngine.dll"/>
-	<property name="bin.optimus.dll" value="${bin.d}/${optimus.dll}"/>
+	<property name="bin.optimus.dll" value="${bin.d}/${config.environment}/${optimus.dll}"/>
 	
 	<!--Targets -->
 	<target name="clean" description="Remove binary files.">
