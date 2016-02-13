@@ -69,7 +69,7 @@
 		
 		<copy todir="${bin.d}">
 			<fileset>
-				<include name="${sources.app.d}/WebBrowser/bin/${config.environment}/*.dll"/>
+				<include name="${sources.d}/WebBrowser/bin/${config.environment}/*.dll"/>
 			</fileset>
 		</copy>
 		<echo message="Build finished at: ${datetime::now()}"/>
