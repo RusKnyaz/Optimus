@@ -79,7 +79,7 @@
 		<exec if="${iswin}"
 		      program="${nuget.exe}" workingdir = "${work.d}/sources" commandline="install .nuget\packages.config -o packages"/>
 		<exec if="${not iswin}"
-		      program="mono" workingdir = "${work.d}/sources" commandline="${nuget.exe} install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
+		      program="mono" workingdir = "${sources.d}" commandline="${nuget.exe} install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
 	</target>
 		
 	<target name="artifacts-zip" description="Create zip archive from 'publish' directory">
