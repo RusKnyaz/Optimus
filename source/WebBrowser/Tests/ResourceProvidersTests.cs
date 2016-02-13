@@ -7,7 +7,7 @@ namespace WebBrowser.Tests
 	[TestFixture]
 	public class ResourceProvidersTests
 	{
-		[Test, Ignore]
+		[Test, Ignore("For manual run")]
 		public async void HttpRequest()
 		{
 			var provider = new ResourceProvider();
