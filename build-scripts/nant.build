@@ -35,6 +35,8 @@
 	<!-- Publish properties-->
 	<property name="publish.d" value="${work.d}/publish"/>
 	<property name="artifacts.d" value="${work.d}/artifacts"/>
+	<property name="optimus.dll" value="WebEngine.dll"/>
+	<property name="bin.optimus.dll" value="${bin.d}/${optimus.dll}"/>
 	
 	<!--Targets -->
 	<target name="clean" description="Remove binary files.">
@@ -105,8 +107,7 @@
 	<target name="nunit-run" description="Run unit-tests">
 		<echo message="Launch NUnit." />
 		<mkdir dir="${test.res.d}" />
-		<exec program="nunit-console" commandline="&quot;${bin.todosoft.dll}&quot; -xml=&quot;${test.res.d}/TodoSoft.dll-results.xml&quot; -noshadow"/>
-		<exec program="nunit-console" commandline="&quot;${bin.kwinto.dll}&quot; -xml=&quot;${test.res.d}/${kwinto.dll}-results.xml&quot; -noshadow"/>
+		<exec program="nunit-console" commandline="&quot;${bin.optimus.dll}&quot; -xml=&quot;${test.res.d}/${optimus.dll}-results.xml&quot; -noshadow"/>
 		<echo message="Target completed at: ${datetime::now()}." />
 	</target>
 	
