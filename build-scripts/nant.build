@@ -88,7 +88,7 @@
 	</target>
 		
 	<target name="artifacts-zip" description="Create zip archive from 'publish' directory">
-		<mkdir dir="${artifacts.d}" />		
+		<mkdir dir="${artifacts.d}" />
 		<zip zipfile="${artifacts.d}/optimus.zip">
 			<fileset basedir="${publish.d}">
 			        <include name="**/*" />
@@ -96,13 +96,14 @@
 		</zip>
 	</target>
 
-	<target name="artifacts-nuget" description="Create nuget package from 'publish directory">
-		<copy todir="${publish.d}">
+	<target name="artifacts-nuget" description="Create nuget package from 'bin' directory">
+		<mkdir dir="${artifacts.d}" />
+		<copy todir="${bin.d}">
 			<fileset>
 				<include name="${work.d}/build-scripts/package.nuspec"/>
 			</fileset>
 		</copy>
-		<property name="args" value="pack ${publish.d}/Package.nuspec -Properties version=${version}"/>
+		<property name="args" value="pack ${bin.d}/Package.nuspec -Properties version=${version}"/>
 		<exec program="mono" commandline="${nuget.exe} ${args}" workingdir = "${artifacts.d}" if="${not iswin}"/>
 		<exec program="${nuget.exe}" commandline="${args}" workingdir = "${artifacts.d}" if="${iswin}"/>
 	</target>
