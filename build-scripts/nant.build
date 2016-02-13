@@ -15,6 +15,7 @@
 	<property name="net-4.0" value="net-4.0" if="${iswin == 'true'}"/>
 	<property name="build.exe" value="xbuild"/>
 	<property name="build.exe" value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe" if="${iswin == 'true'}"/>
+	
 		
 	<!-- Property -->
 	<property name="buildnumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
@@ -52,6 +53,10 @@
 		<property name="define" value="DEBUG;NUNIT" if="${config.environment == 'nunit'}"/>
 		<property name="define" value="TRACE;RELEASE" if="${config.environment == 'release'}"/>
 		<property name="define" value="TRACE;DEBUG" if="${config.environment == 'debug'}"/>
+		
+		<property name="msconfig" value="Debug" if="${config.environment == 'nunit'}"/>
+		<property name="msconfig" value="Release" if="${config.environment == 'release'}"/>
+		<property name="msconfig" value="Debug" if="${config.environment == 'debug'}"/>
 	</target>
 
 	<target name="build" description="Compiles the source code.">
@@ -61,9 +66,7 @@
 		<call target="set-props" />
 		
 		<property name="args" value="&quot;${solution}&quot;"/>
-		<property name="args" value="${args} /t:Rebuild /p:Configuration=Debug" if="${config.environment == 'nunit'}"/>
-		<property name="args" value="${args} /t:Rebuild /p:Configuration=Release" if="${config.environment == 'release'}"/>
-		<property name="args" value="${args} /t:Rebuild /p:Configuration=Debug" if="${config.environment == 'debug'}"/>
+		<property name="args" value="${args} /t:Rebuild /p:Configuration=${msconfig}"/>
 		
 		<echo message="exec: ${build.exe} ${args}"/>
 		
@@ -71,7 +74,7 @@
 		
 		<copy todir="${bin.d}">
 			<fileset>
-				<include name="${sources.d}/WebBrowser/bin/${config.environment}/*.dll"/>
+				<include name="${sources.d}/WebBrowser/bin/${msconfig}/*.dll"/>
 			</fileset>
 		</copy>
 		<echo message="Build finished at: ${datetime::now()}"/>
