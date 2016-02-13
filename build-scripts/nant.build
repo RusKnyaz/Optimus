@@ -15,8 +15,7 @@
 	<property name="net-4.0" value="net-4.0" if="${iswin == 'true'}"/>
 	<property name="build.exe" value="xbuild"/>
 	<property name="build.exe" value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe" if="${iswin == 'true'}"/>
-	<property name="nuget.exe" value="${work.d}/sources/.nuget/NuGet.exe"/>
-	
+		
 	<!-- Property -->
 	<property name="buildnumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
 	<property name="version" value="1.0.${buildnumber}.0"/>
@@ -29,8 +28,9 @@
 	
 	<!-- Sources -->
 	<property name="sources.d" value="${work.d}/source"/>
-	<property name="sources.assemblyversioninfo.cs" value="${work.d}/sources/AssemblyVersionInfo.cs"/>
+	<property name="sources.assemblyversioninfo.cs" value="${sources.d}/AssemblyVersionInfo.cs"/>
 	<property name="solution" value="${sources.d}/WebBrowser.sln"/>
+	<property name="nuget.exe" value="${sources.d}/.nuget/NuGet.exe"/>	
 	
 	<!-- Publish properties-->
 	<property name="publish.d" value="${work.d}/publish"/>
