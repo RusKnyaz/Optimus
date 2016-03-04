@@ -316,9 +316,10 @@ namespace WebBrowser.Html
 		private static HtmlChunk ReadText(StreamReader reader)
 		{
 			var buffer = new List<char>();
-			ReadToChar(reader, buffer, '<', true);
+			ReadToChar(reader, buffer, '<');
 			return buffer.Count > 0 ? 
-				new HtmlChunk { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()).Replace("\u000D", "\u000A") } 
+				new HtmlChunk { Type = HtmlChunkTypes.Text, Value = 
+					new string(buffer.ToArray()).Replace("\u000D", "\u000A") } 
 				: new HtmlChunk();
 		}
 		
