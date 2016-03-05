@@ -66,7 +66,7 @@
 		<call target="set-props" />
 		
 		<property name="args" value="&quot;${solution}&quot;"/>
-		<property name="args" value="${args} /t:Knyaz.Optimus:Rebuild /p:Configuration=${msconfig}"/>
+		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig}"/>
 		
 		<echo message="exec: ${build.exe} ${args}"/>
 		

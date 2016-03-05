@@ -62,7 +62,7 @@ namespace Knyaz.Optimus.Dom.Elements
 							Loaded = true;
 						}
 					}
-					catch (Exception ex)
+					catch
 					{
 						RaiseError();
 					}

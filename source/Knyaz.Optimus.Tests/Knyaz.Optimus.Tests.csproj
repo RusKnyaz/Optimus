@@ -89,11 +89,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj">
-      <Project>{42593765-6de4-4846-bc61-7c74336dd977}</Project>
-      <Name>WebBrowser</Name>
+      <Project>{42593765-6DE4-4846-BC61-7C74336DD977}</Project>
+      <Name>Knyaz.Optimus</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

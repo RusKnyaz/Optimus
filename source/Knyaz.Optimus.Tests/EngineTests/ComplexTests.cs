@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[SetUp]
 		public void SetUp()
 		{
-			_resourceProvider = Moq.Mocks.ResourceProvider("jquery.js", Resources.jquery_2_1_3)
+			_resourceProvider = Mocks.ResourceProvider("jquery.js", Resources.jquery_2_1_3)
 				.Resource("knockout.js", Resources.knockout)
 				.Resource("require.js", Resources.requirejs)
 				.Resource("./template.js", Resources.template)
