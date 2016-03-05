@@ -100,7 +100,7 @@
 		<mkdir dir="${artifacts.d}" />
 		<copy todir="${bin.d}">
 			<fileset>
-				<include name="${work.d}/build-scripts/package.nuspec"/>
+				<include name="${work.d}/build-scripts/Package.nuspec"/>
 			</fileset>
 		</copy>
 		<property name="args" value="pack ${bin.d}/Package.nuspec -Properties version=${version}"/>
