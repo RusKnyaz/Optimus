@@ -17,6 +17,6 @@
 	</dependencies>
   </metadata>
   <files>
-    <file src="Bin/Knyaz.Optimus.dll" target="lib/net45"/>
+    <file src="Knyaz.Optimus.dll" target="lib/net45"/>
   </files>
 </package>
