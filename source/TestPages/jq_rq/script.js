@@ -1,0 +1,1 @@
+define(function(){	document.getElementById('greeting').innerHTML = 'Hello, Browser!';});

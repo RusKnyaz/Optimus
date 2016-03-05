@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title></title>
+		<script>
+			var html = document.documentElement;
+			alert(html.childNodes.length); //expected 2 - head and body
+			alert(html.firstChild.nodeName); //expected head
+			alert(html.firstChild.firstChild.nodeName); //expected #text (new line);
+	</script>
+	</head>
+	<body>
+	
+	</body>
+</html>

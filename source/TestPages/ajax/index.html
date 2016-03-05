@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+        
+</head>
+<body>
+    <div id="t"></div>
+    <script>
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var headers = xmlhttp.getAllResponseHeaders();
+            document.getElementById("t").innerHTML = headers;
+            var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
+            while (match = rheaders.exec()) {
+                console.log(match[1].toLowerCase());
+                console.log(match[2]);
+            }
+        }
+        else if (xmlhttp.readyState == 4) {
+            alert(xmlhttp.status);
+        }
+        
+    }
+    xmlhttp.open("GET", "data.html", true);
+    xmlhttp.send();
+    </script>
+
+</body>
+</html>

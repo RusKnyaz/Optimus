@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Optimus</id>
+    <version>$version$</version>
+    <authors>TodoSoft</authors>
+    <owners>TodoSoft</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Optimus web browser engine.</description>
+    <releaseNotes>Optimus</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+	<dependencies>
+		<group targetFramework="net45">
+		  <dependency id="Newtonsoft.Json" version="8.0.2"/>
+      <dependency id="Jint" version="2.8.0"/>
+		</group>
+	</dependencies>
+  </metadata>
+  <files>
+    <file src="Knyaz.Optimus.dll" target="lib/net45"/>
+  </files>
+</package>
