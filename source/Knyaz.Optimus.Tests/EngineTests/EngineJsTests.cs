@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using Knyaz.Optimus.ResourceProviders;
 using Moq;
 using NUnit.Framework;
-using WebBrowser.ResourceProviders;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class EngineJsTests

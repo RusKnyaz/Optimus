@@ -1,6 +1,6 @@
-﻿using WebBrowser.ScriptExecuting;
+﻿using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	public class Attr : Node, IAttr
 	{

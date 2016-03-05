@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Windows.Forms;
 
-namespace WebBrowser.WfApp.Controls
+namespace Knyaz.Optimus.WfApp.Controls
 {
 	public partial class AddressBar : UserControl
 	{

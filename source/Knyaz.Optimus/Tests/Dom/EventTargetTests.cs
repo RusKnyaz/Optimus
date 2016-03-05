@@ -1,9 +1,10 @@
 ﻿#if NUNIT
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
 using Moq;
 using NUnit.Framework;
-using WebBrowser.Dom.Elements;
 
-namespace WebBrowser.Tests.Dom
+namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
 	public class EventTargetTests

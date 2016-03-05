@@ -1,4 +1,4 @@
-namespace WebBrowser.Dom.Perf
+namespace Knyaz.Optimus.Dom.Perf
 {
 	public class ArrayBuffer
 	{

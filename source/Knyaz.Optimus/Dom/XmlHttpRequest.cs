@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using WebBrowser.ResourceProviders;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	[DomItem]
 	public interface IXmlHttpRequest

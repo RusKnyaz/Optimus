@@ -2,10 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Html;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Html;
+using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
+using IHtmlElement = Knyaz.Optimus.Html.IHtmlElement;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	//todo: chose one
 
@@ -129,7 +131,7 @@ namespace WebBrowser.Dom
 		{
 			foreach (var htmlNode in parse)
 			{
-				var tag = htmlNode as Html.HtmlElement;
+				var tag = htmlNode as HtmlElement;
 				if (tag != null && tag.Name.ToLowerInvariant() == "html")
 				{
 					foreach (var child in tag.Children)
@@ -181,7 +183,7 @@ namespace WebBrowser.Dom
 				return;
 			}
 
-			var htmlElement = htmlNode as Html.IHtmlElement;
+			var htmlElement = htmlNode as IHtmlElement;
 			if (htmlElement == null)
 				return;
 

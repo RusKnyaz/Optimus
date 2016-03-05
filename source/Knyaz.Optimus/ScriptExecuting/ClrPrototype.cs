@@ -2,7 +2,7 @@ using System;
 using Jint.Native;
 using Jint.Native.Function;
 
-namespace WebBrowser.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting
 {
 	public class ClrPrototype : FunctionInstance
 	{

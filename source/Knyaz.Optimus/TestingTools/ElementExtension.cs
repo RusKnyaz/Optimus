@@ -1,6 +1,6 @@
-﻿using WebBrowser.Dom.Elements;
+﻿using Knyaz.Optimus.Dom.Elements;
 
-namespace WebBrowser.TestingTools
+namespace Knyaz.Optimus.TestingTools
 {
 	public static class ElementExtension
 	{

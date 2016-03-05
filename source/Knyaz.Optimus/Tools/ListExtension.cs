@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace WebBrowser.Tools
+namespace Knyaz.Optimus.Tools
 {
 	internal static class ListExtension
 	{
@@ -9,6 +9,5 @@ namespace WebBrowser.Tools
 		{
 			return list.Count <= count ? list : list.Skip(list.Count - count);
 		}
-
 	}
 }

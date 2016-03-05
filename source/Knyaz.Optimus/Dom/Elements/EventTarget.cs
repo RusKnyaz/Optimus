@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Knyaz.Optimus.Dom.Events;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	public class EventTarget : IEventTarget
 	{

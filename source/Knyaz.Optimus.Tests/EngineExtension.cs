@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace WebBrowser.Tests
+namespace Knyaz.Optimus.Tests
 {
 	internal static class EngineExtension
 	{

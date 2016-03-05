@@ -9,9 +9,8 @@ using Jint.Native.Array;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
-using WebBrowser.Dom.Elements;
 
-namespace WebBrowser.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting
 {
 	internal class DomConverter : IObjectConverter
 	{

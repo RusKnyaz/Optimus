@@ -3,12 +3,13 @@ using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Dom.Perf;
-using WebBrowser.Environment;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Perf;
+using Knyaz.Optimus.Environment;
 
-namespace WebBrowser.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting
 {
 	internal class ScriptExecutor : IScriptExecutor
 	{

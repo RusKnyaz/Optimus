@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using WebBrowser.ScriptExecuting;
+﻿using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Events
 {
 	public class KeyboardEvent : UIEvent
 	{

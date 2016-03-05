@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/2012/WD-html5-20121025/elements.html#htmlelement

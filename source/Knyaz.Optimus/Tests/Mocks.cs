@@ -3,10 +3,10 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Knyaz.Optimus.ResourceProviders;
 using Moq;
-using WebBrowser.ResourceProviders;
 
-namespace WebBrowser.Tests
+namespace Knyaz.Optimus.Tests
 {
 	public static class Mocks
 	{

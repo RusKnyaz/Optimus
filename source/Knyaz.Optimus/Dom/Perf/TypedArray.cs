@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace WebBrowser.Dom.Perf
+namespace Knyaz.Optimus.Dom.Perf
 {
 	public class TypedArray<T>
 	{

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	public class DOMException : Exception
 	{

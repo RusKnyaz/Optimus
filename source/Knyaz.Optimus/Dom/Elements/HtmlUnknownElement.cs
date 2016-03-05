@@ -1,4 +1,4 @@
-﻿namespace WebBrowser.Dom.Elements
+﻿namespace Knyaz.Optimus.Dom.Elements
 {
 	public sealed class HtmlUnknownElement : HtmlElement
 	{

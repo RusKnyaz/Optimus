@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using WebBrowser.ResourceProviders;
 
-namespace WebBrowser
+namespace Knyaz.Optimus.ResourceProviders
 {
 	public interface IResourceProvider
 	{

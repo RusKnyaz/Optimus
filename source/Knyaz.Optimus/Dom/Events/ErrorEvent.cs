@@ -1,6 +1,4 @@
-﻿using WebBrowser.Dom.Elements;
-
-namespace WebBrowser.Dom.Events
+﻿namespace Knyaz.Optimus.Dom.Events
 {
 	public class ErrorEvent : Event
 	{

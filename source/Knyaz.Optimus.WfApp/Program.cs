@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace WebBrowser.WfApp
+namespace Knyaz.Optimus.WfApp
 {
 	static class Program
 	{

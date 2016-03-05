@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebBrowser
+namespace Knyaz.Optimus
 {
 	public class Console
 	{

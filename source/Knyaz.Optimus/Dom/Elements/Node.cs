@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	public enum NodeSources
 	{

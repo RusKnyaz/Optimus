@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace WebBrowser.Html
+namespace Knyaz.Optimus.Html
 {
 	public struct HtmlChunk
 	{

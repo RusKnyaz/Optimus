@@ -1,6 +1,6 @@
-﻿using WebBrowser.ScriptExecuting;
+﻿using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/html-markup/input.text.html

@@ -1,5 +1,6 @@
 ﻿using System.IO;
-namespace WebBrowser
+
+namespace Knyaz.Optimus.ResourceProviders
 {
 	public interface IResource
 	{

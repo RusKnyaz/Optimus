@@ -1,12 +1,12 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Html;
 using NUnit.Framework;
-using System.IO;
-using WebBrowser.Html;
 
-namespace WebBrowser.Tests.Html
+namespace Knyaz.Optimus.Tests.Html
 {
 	[TestFixture]
 	public class HtmlParserTests
@@ -52,8 +52,8 @@ namespace WebBrowser.Tests.Html
 
 			elem.Assert(e =>
 				e.Name == "head" && 
-				(e.Children.First() as HtmlText).Value == "\n\n\t" &&
-				(e.Children.Skip(1).First() as HtmlElement).Name == "script");
+				(Enumerable.First<IHtmlNode>(e.Children) as HtmlText).Value == "\n\n\t" &&
+				(Enumerable.Skip<IHtmlNode>(e.Children, 1).First() as HtmlElement).Name == "script");
 		}
 
 		[Test]

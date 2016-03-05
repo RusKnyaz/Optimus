@@ -1,8 +1,8 @@
 ﻿#if NUNIT
+using Knyaz.Optimus.Dom;
 using NUnit.Framework;
-using WebBrowser.Dom;
 
-namespace WebBrowser.Tests.Dom
+namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
 	class DocumentFragmentTests

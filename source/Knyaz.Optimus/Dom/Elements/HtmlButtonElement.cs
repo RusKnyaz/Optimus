@@ -1,4 +1,6 @@
-﻿namespace WebBrowser.Dom.Elements
+﻿using Knyaz.Optimus.Dom.Events;
+
+namespace Knyaz.Optimus.Dom.Elements
 {
 	public class HtmlButtonElement : HtmlElement, IFormElement
 	{

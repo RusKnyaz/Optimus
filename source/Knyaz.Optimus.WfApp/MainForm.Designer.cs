@@ -1,4 +1,6 @@
-﻿namespace WebBrowser.WfApp
+﻿using Knyaz.Optimus.WfApp.Controls;
+
+namespace Knyaz.Optimus.WfApp
 {
 	partial class MainForm
 	{
@@ -32,10 +34,10 @@
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-			this.domTreeControl = new WebBrowser.WfApp.Controls.DomTreeControl();
-			this.consoleControl = new WebBrowser.WfApp.Controls.ConsoleControl();
-			this.timeLineControl = new WebBrowser.WfApp.Controls.TimeLineControl();
-			this.addressBar = new WebBrowser.WfApp.Controls.AddressBar();
+			this.domTreeControl = new DomTreeControl();
+			this.consoleControl = new ConsoleControl();
+			this.timeLineControl = new TimeLineControl();
+			this.addressBar = new AddressBar();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -186,14 +188,14 @@
 
 		#endregion
 
-		private Controls.AddressBar addressBar;
+		private AddressBar addressBar;
 		private System.Windows.Forms.SplitContainer splitContainer1;
-		private Controls.DomTreeControl domTreeControl;
+		private DomTreeControl domTreeControl;
 		private System.Windows.Forms.SplitContainer splitContainer2;
-		private Controls.ConsoleControl consoleControl;
+		private ConsoleControl consoleControl;
 		private System.Windows.Forms.TextBox textBox1;
 		private System.Windows.Forms.SplitContainer splitContainer3;
-		private Controls.TimeLineControl timeLineControl;
+		private TimeLineControl timeLineControl;
 
 	}
 }

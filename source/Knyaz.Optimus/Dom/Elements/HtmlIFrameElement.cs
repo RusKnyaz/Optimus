@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WebBrowser.Dom.Elements
+﻿namespace Knyaz.Optimus.Dom.Elements
 {
 	public class HtmlIFrameElement : HtmlElement
 	{

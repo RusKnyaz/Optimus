@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebBrowser.Tests.Properties {
+namespace Knyaz.Optimus.Tests.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace WebBrowser.Tests.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WebBrowser.Tests.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Knyaz.Optimus.Tests.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -135,7 +135,23 @@ namespace WebBrowser.Tests.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to 
+        ///&lt;html&gt;
+        ///
+        ///&lt;head&gt;
+        ///&lt;!--&lt;meta HTTP-EQUIV=&quot;Content-Type&quot; CONTENT=&quot;text/html; charset=ISO-8859-1&quot;&gt;  --&gt;
+        ///
+        ///&lt;title&gt;Large HTML page with images&lt;/title&gt;
+        ///
+        ///&lt;!-- The following link block and style block present methods how to load external CSS documents.
+        ///     The link tag forces an immediate download of the CSS document whereas the import clause in
+        ///     the style block has the document downloaded some random time later.  --&gt;
+        ///
+        ///&lt;link href=&quot;htmlparser/sections.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;
+        ///
+        ///
+        ///&lt;!--
+        ///&lt;s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Large_Html {
             get {

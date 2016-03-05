@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 using NUnit.Framework;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Tools;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture, Ignore]
 	public class OpenSites

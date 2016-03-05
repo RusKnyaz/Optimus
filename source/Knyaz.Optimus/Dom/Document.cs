@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Dom.Events;
-using WebBrowser.Environment;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	public static class DocumentReadyStates
 	{

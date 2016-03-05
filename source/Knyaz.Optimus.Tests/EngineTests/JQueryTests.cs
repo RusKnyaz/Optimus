@@ -1,15 +1,15 @@
-﻿#if NUNIT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Tests.Properties;
+using Knyaz.Optimus.Tools;
 using Moq;
 using NUnit.Framework;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Properties;
-using WebBrowser.Tools;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class JQueryTests
@@ -198,4 +198,3 @@ document.body.appendChild(e);";
 		}
 	}
 }
-#endif

@@ -1,7 +1,7 @@
 using System;
-using WebBrowser.Dom.Elements;
+using Knyaz.Optimus.Dom.Elements;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	class AttributeMappedValue<T>
 	{

@@ -7,8 +7,8 @@
     <ProjectGuid>{7058025F-3C8B-453E-B1DB-D4F0C13FCE57}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WebBrowser.Tests</RootNamespace>
-    <AssemblyName>WebBrowser.Tests</AssemblyName>
+    <RootNamespace>Knyaz.Optimus.Tests</RootNamespace>
+    <AssemblyName>Knyaz.Optimus.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -88,7 +88,7 @@
     <EmbeddedResource Include="Resources\knockout.js" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebBrowser\WebBrowser.csproj">
+    <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj">
       <Project>{42593765-6de4-4846-bc61-7c74336dd977}</Project>
       <Name>WebBrowser</Name>
     </ProjectReference>

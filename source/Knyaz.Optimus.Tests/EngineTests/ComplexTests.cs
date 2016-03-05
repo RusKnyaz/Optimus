@@ -1,10 +1,9 @@
-﻿#if NUNIT
-using System.Threading;
-using Moq;
+﻿using System.Threading;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
-using WebBrowser.Properties;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class ComplexTests
@@ -32,7 +31,7 @@ namespace WebBrowser.Tests.EngineTests
 		[SetUp]
 		public void SetUp()
 		{
-			_resourceProvider = Mocks.ResourceProvider("jquery.js", Resources.jquery_2_1_3)
+			_resourceProvider = Moq.Mocks.ResourceProvider("jquery.js", Resources.jquery_2_1_3)
 				.Resource("knockout.js", Resources.knockout)
 				.Resource("require.js", Resources.requirejs)
 				.Resource("./template.js", Resources.template)
@@ -88,4 +87,3 @@ namespace WebBrowser.Tests.EngineTests
 		}
 	}
 }
-#endif

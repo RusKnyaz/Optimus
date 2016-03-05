@@ -1,7 +1,8 @@
 ﻿using System;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Events
 {
 	public class Event : IEvent
 	{

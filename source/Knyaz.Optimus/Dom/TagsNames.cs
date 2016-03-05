@@ -1,4 +1,4 @@
-﻿namespace WebBrowser.Dom
+﻿namespace Knyaz.Optimus.Dom
 {
 	public static class TagsNames
 	{

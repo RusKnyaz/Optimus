@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Tools;
 using Moq;
 using NUnit.Framework;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
-using WebBrowser.ResourceProviders;
-using WebBrowser.Tools;
-using Text = WebBrowser.Dom.Text;
+using Text = Knyaz.Optimus.Dom.Elements.Text;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class EngineUnitTests

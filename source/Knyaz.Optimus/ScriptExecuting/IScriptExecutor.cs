@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebBrowser.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting
 {
 	public interface IScriptExecutor
 	{

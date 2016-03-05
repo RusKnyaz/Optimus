@@ -1,7 +1,8 @@
 ﻿using System;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	[DomItem]
 	public interface IEventTarget

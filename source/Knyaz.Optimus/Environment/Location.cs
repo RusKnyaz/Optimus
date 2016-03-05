@@ -1,7 +1,7 @@
 ﻿using System;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Environment
+namespace Knyaz.Optimus.Environment
 {
 	[DomItem]
 	public interface ILocation

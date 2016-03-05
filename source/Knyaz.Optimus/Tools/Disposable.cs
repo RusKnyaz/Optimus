@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebBrowser.Tools
+namespace Knyaz.Optimus.Tools
 {
 	public class Disposable : IDisposable
 	{

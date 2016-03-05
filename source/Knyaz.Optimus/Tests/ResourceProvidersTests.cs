@@ -1,8 +1,8 @@
 ﻿#if NUNIT
+using Knyaz.Optimus.ResourceProviders;
 using NUnit.Framework;
-using WebBrowser.ResourceProviders;
 
-namespace WebBrowser.Tests
+namespace Knyaz.Optimus.Tests
 {
 	[TestFixture]
 	public class ResourceProvidersTests

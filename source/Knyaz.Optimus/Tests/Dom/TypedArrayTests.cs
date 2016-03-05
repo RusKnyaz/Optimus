@@ -1,8 +1,8 @@
 ﻿#if NUNIT
+using Knyaz.Optimus.Dom.Perf;
 using NUnit.Framework;
-using WebBrowser.Dom.Perf;
 
-namespace WebBrowser.Tests.Dom
+namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
 	public class TypedArrayTests

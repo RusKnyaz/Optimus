@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 using NUnit.Framework;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Tools;
 
-namespace WebBrowser.Tests
+namespace Knyaz.Optimus.Tests
 {
 	[TestFixture, Ignore]
 	public class TestPages

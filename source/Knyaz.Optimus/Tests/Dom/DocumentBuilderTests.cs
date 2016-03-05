@@ -1,11 +1,11 @@
 ﻿#if NUNIT
 using System.IO;
 using System.Text;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
 
-namespace WebBrowser.Tests.Dom
+namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
 	public class DocumentBuilderTests

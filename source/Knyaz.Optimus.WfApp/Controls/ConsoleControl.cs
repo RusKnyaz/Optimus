@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Windows.Forms;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
 
-namespace WebBrowser.WfApp.Controls
+namespace Knyaz.Optimus.WfApp.Controls
 {
 	public partial class ConsoleControl : UserControl
 	{

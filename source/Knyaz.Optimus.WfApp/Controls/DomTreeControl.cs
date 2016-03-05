@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
-using HtmlElement = WebBrowser.Dom.Elements.HtmlElement;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
+using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
-namespace WebBrowser.WfApp.Controls
+namespace Knyaz.Optimus.WfApp.Controls
 {
 	public partial class DomTreeControl : UserControl
 	{

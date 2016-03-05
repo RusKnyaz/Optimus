@@ -1,13 +1,12 @@
-﻿#if NUNIT
-using System.Linq;
+﻿using System.Linq;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Properties;
-using WebBrowser.TestingTools;
-using Text = WebBrowser.Dom.Text;
+using Text = Knyaz.Optimus.Dom.Elements.Text;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class KnockoutTests
@@ -285,4 +284,3 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		}
 	}
 }
-#endif

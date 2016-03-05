@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using WebBrowser.Dom.Elements;
+using Knyaz.Optimus.Dom.Elements;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	internal static class ElementExtension
 	{

@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
-using WebBrowser.Dom.Elements;
-using WebBrowser.WfApp.Controls;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.WfApp.Controls;
 
-namespace WebBrowser.WfApp
+namespace Knyaz.Optimus.WfApp
 {
 	public partial class MainForm : Form
 	{

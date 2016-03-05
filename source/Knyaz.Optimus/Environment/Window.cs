@@ -1,8 +1,9 @@
 ﻿using System;
 using Jint.Runtime;
-using WebBrowser.Dom.Elements;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
 
-namespace WebBrowser.Environment
+namespace Knyaz.Optimus.Environment
 {
 	/// <summary>
 	/// http://www.w3.org/TR/html5/browsers.html#window

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Knyaz.Optimus.Dom.Events;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/html5/forms.html

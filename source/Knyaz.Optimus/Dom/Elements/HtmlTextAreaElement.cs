@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace WebBrowser.Dom.Elements
+﻿namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents textarea html element (see http://www.w3.org/TR/html5/forms.html#the-textarea-element).

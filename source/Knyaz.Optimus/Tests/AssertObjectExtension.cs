@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace WebBrowser.Tests
+namespace Knyaz.Optimus.Tests
 {
 	public static class AssertObjectExtension
 	{

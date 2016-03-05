@@ -1,10 +1,8 @@
-﻿#if NUNIT
-using System.Collections.Generic;
-using Moq;
+﻿using System.Collections.Generic;
+using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
-using WebBrowser.Properties;
 
-namespace WebBrowser.Tests.EngineTests
+namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class RequireJsTests
@@ -61,4 +59,3 @@ namespace WebBrowser.Tests.EngineTests
 		}
 	}
 }
-#endif

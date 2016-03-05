@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebBrowser.Html
+namespace Knyaz.Optimus.Html
 {
 	class HtmlParser
 	{

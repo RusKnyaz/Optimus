@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
+using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
-namespace WebBrowser.WfApp.Controls
+namespace Knyaz.Optimus.WfApp.Controls
 {
 	public partial class SetAttributeForm : Form
 	{
@@ -9,7 +10,7 @@ namespace WebBrowser.WfApp.Controls
 			InitializeComponent();
 		}
 
-		public Dom.Elements.HtmlElement Element { get; set; }
+		public HtmlElement Element { get; set; }
 		
 		private void button2_Click(object sender, System.EventArgs e)
 		{

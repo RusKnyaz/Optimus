@@ -4,7 +4,7 @@ using Jint.Native.Array;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Interop;
 
-namespace WebBrowser.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting
 {
 	/// <summary>
 	/// List to JS Array adapter

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 
-namespace WebBrowser.Tools
+namespace Knyaz.Optimus.Tools
 {
 	public static class EngineExtension
 	{

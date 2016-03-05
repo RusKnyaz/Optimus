@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebBrowser.ResourceProviders
+namespace Knyaz.Optimus.ResourceProviders
 {
 	internal class ResourceProvider : IResourceProvider
 	{

@@ -3,7 +3,7 @@ using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
 
-namespace WebBrowser.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting
 {
 	internal class ClrFuncCtor : FunctionInstance, IConstructor
 	{

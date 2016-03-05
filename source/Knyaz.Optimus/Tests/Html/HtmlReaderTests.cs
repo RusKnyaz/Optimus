@@ -1,12 +1,12 @@
 ﻿#if NUNIT
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Html;
 using NUnit.Framework;
-using System.IO;
-using WebBrowser.Html;
 
-namespace WebBrowser.Tests.Html
+namespace Knyaz.Optimus.Tests.Html
 {
 	[TestFixture]
 	public class HtmlReaderTests

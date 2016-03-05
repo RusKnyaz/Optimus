@@ -1,6 +1,4 @@
-﻿using WebBrowser.Dom.Elements;
-
-namespace WebBrowser.Dom
+﻿namespace Knyaz.Optimus.Dom.Elements
 {
 	public class DocumentFragment : Element
 	{

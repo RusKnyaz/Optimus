@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom.Elements
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// http://www.w3.org/TR/html5/scripting-1.html#the-script-element

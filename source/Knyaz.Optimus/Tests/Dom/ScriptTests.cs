@@ -1,9 +1,8 @@
 ﻿#if NUNIT
-using Moq;
+using Knyaz.Optimus.Dom;
 using NUnit.Framework;
-using WebBrowser.Dom;
 
-namespace WebBrowser.Tests.Dom
+namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
 	public class ScriptTests

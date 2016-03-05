@@ -1,4 +1,4 @@
-﻿namespace WebBrowser.WfApp.Controls
+﻿namespace Knyaz.Optimus.WfApp.Controls
 {
 	partial class TimeLineControl
 	{

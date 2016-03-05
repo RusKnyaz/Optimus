@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Dom.Events;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser.Dom
+namespace Knyaz.Optimus.Dom
 {
 	/// <summary>
 	/// Executes scripts for the Document in proper order.

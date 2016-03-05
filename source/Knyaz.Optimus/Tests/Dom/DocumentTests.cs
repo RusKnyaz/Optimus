@@ -1,10 +1,9 @@
 ﻿#if NUNIT
-using System.Collections.Generic;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
 
-namespace WebBrowser.Tests
+namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
 	public class DocumentTests

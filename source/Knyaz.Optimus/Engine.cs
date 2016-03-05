@@ -2,13 +2,13 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using WebBrowser.Dom;
-using WebBrowser.Dom.Elements;
-using WebBrowser.Environment;
-using WebBrowser.ResourceProviders;
-using WebBrowser.ScriptExecuting;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting;
 
-namespace WebBrowser
+namespace Knyaz.Optimus
 {
 	public class Engine: IDisposable
 	{
