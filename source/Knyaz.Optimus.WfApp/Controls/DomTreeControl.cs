@@ -145,7 +145,14 @@ namespace Knyaz.Optimus.WfApp.Controls
 				
 			var treeNode = new TreeNode(name) {Tag = node};
 
-			foreach (var child in node.ChildNodes.ToArray().Select(x => CreateBranch(x)).Where(x => x!=null))
+
+			Node[] nodes;
+			lock (node.OwnerDocument)
+			{
+				nodes = node.ChildNodes.ToArray();	
+			}
+			
+			foreach (var child in nodes.Select(CreateBranch).Where(x => x!=null))
 			{
 				treeNode.Nodes.Add(child);
 			}

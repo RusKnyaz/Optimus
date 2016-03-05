@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,69 +24,68 @@ namespace Knyaz.Optimus.ResourceProviders
 			return new HttpRequest("GET", url);
 		}
 
-		public IResource SendRequest(IRequest request)
+		private async Task<IResource> SendRequestEx(IRequest request)
 		{
-			var httpRequest = (HttpRequest) request;
-			var webRequest = MakeWebRequest(httpRequest);
-			var response = (HttpWebResponse) webRequest.GetResponse();
-			return MakeResponse(response);
+			var httpRequest = request as HttpRequest;
+
+			var req = MakeWebRequest(httpRequest);
+			
+			using (var client = new HttpClient(new HttpClientHandler { CookieContainer = _cookies })
+			{
+				Timeout = httpRequest != null && httpRequest.Timeout > 0 ? TimeSpan.FromMilliseconds(httpRequest.Timeout) : Timeout.InfiniteTimeSpan
+			})
+			using (var response = await client.SendAsync(req))
+			using (var content = response.Content)
+			{
+				var result = await content.ReadAsByteArrayAsync();
+				return new HttpResponse(
+					response.StatusCode,
+					new MemoryStream(result),
+					content.Headers.ToString(),
+					content.Headers.ContentType.MediaType,
+					content.Headers.ContentLocation);
+			}
 		}
 
 		public Task<IResource> SendRequestAsync(IRequest request)
 		{
-			var httpRequest = (HttpRequest)request;
-			var webRequest = MakeWebRequest(httpRequest);
-			return webRequest.GetResponseAsync().ContinueWith(task => (IResource)MakeResponse((HttpWebResponse) task.Result));
+			return SendRequestEx(request);
 		}
 
-		private HttpResponse MakeResponse(HttpWebResponse response)
+		private HttpRequestMessage MakeWebRequest(HttpRequest request)
 		{
-			return new HttpResponse(
-				response.StatusCode, 
-				response.GetResponseStream(), 
-				response.Headers, 
-				response.ContentType.ToLowerInvariant().Split(';')[0],
-				response.ResponseUri);
-		}
+			var u = MakeUri(request.Url);
+			var result = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
 
-		private HttpWebRequest MakeWebRequest(HttpRequest request)
-		{
-			var uri = request.Url;
-
-			if (uri.Substring(0, 2) == "./")
-				uri = uri.Remove(0, 2);
-
-			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri); ;
-			var result = WebRequest.CreateHttp(u);
-			result.Timeout = request.Timeout == 0 ? Timeout.Infinite : request.Timeout;
-			result.Method = request.Method;
-			result.CookieContainer = _cookies;
-
+			if (request.Data != null && result.Method.Method != "GET")
+			{
+				result.Content = new StreamContent(new MemoryStream(request.Data));
+			}
+			
 			if(request.Headers != null)
 			foreach (var keyValue in request.Headers)
 			{
 				switch (keyValue.Key)
 				{
 					case "Content-Type":
-						result.ContentType = keyValue.Value;
-						break;
-					case "Accept":
-						result.Accept = keyValue.Value;
+						result.Content.Headers.ContentType = new MediaTypeHeaderValue(keyValue.Value);
 						break;
 					default:
-						result.Headers[keyValue.Key] = keyValue.Value;
+						result.Content.Headers.Add(keyValue.Key, keyValue.Value);
 						break;
 				}
 			}
 
-			if (request.Data != null && request.Method.ToUpperInvariant() != "GET")
-			{
-				using (var writer = result.GetRequestStream())
-				{
-					writer.Write(request.Data, 0, request.Data.Length);
-				}
-			}
 			return result;
+		}
+
+		private Uri MakeUri(string uri)
+		{
+			if (uri.Substring(0, 2) == "./")
+				uri = uri.Remove(0, 2);
+
+			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
+			return u;
 		}
 	}
 
@@ -117,7 +118,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 	public class HttpResponse : IResource
 	{
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers, string contentType, Uri uri)
+		public HttpResponse(HttpStatusCode statusCode, Stream stream, string headers, string contentType, Uri uri)
 		{
 			StatusCode = statusCode;
 			Stream = stream;
@@ -126,11 +127,11 @@ namespace Knyaz.Optimus.ResourceProviders
 			Uri = uri;
 		}
 
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, WebHeaderCollection headers)
+		public HttpResponse(HttpStatusCode statusCode, Stream stream, string headers)
 			:this(statusCode, stream, headers, ResourceTypes.Html, null) { }
 
 		public HttpStatusCode StatusCode { get; private set; }
-		public WebHeaderCollection Headers { get; private set; }
+		public string Headers { get; private set; }
 		public string Type { get; private set; }
 		public Stream Stream { get; private set; }
 		public Uri Uri { get; private set; }
