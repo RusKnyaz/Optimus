@@ -137,6 +137,7 @@
 	</target>
 
 	<target name="test-and-release">
+    <call target="clean"/>
 		<call target="nuget-restore"/>
 		<call target="build-nunit"/>
 		<call target="nunit-run"/>
