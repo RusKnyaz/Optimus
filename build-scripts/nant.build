@@ -103,7 +103,7 @@
 				<include name="${work.d}/build-scripts/Package.nuspec"/>
 			</fileset>
 		</copy>
-		<property name="args" value="pack ${bin.d}/Package.nuspec -Properties version=${version}"/>
+		<property name="args" value="pack &quot;${bin.d}/Package.nuspec&quot; -Properties version=${version}"/>
 		<exec program="mono" commandline="&quot;${nuget.exe}&quot; ${args}" workingdir = "${artifacts.d}" if="${not iswin}"/>
 		<exec program="${nuget.exe}" commandline="${args}" workingdir = "${artifacts.d}" if="${iswin}"/>
 	</target>
