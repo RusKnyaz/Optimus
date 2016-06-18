@@ -136,7 +136,7 @@ namespace Knyaz.Optimus
 		public Uri Uri
 		{
 			get { return _uri; }
-			private set
+			internal set
 			{
 				_uri = value;
 				if (OnUriChanged != null)

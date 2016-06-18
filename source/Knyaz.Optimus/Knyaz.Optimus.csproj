@@ -97,6 +97,7 @@
     <Compile Include="Dom\Perf\TypedArray.cs" />
     <Compile Include="Dom\TagsNames.cs" />
     <Compile Include="Dom\XmlHttpRequest.cs" />
+    <Compile Include="Environment\History.cs" />
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
