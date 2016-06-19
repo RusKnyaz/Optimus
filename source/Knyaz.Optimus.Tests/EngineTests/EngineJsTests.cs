@@ -690,6 +690,19 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
+		public void WindowAddEventListenerNotBoolArg()
+		{
+			CreateEngine("<div id=d></div>", @"
+var listener = function(){console.log('ok');};
+addEventListener('click', listener, 1);
+var evt = document.createEvent('Event');
+evt.initEvent('click', true,true);
+dispatchEvent(evt);");
+
+			CollectionAssert.AreEqual(new object[] { "ok" }, _log);
+		}
+
+		[Test]
 		public void WindowRemoveEventListener()
 		{
 			CreateEngine("<div id=d></div>", @"

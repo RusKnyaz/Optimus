@@ -92,12 +92,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalAct("addEventListener", (_, x) => engine.Window.AddEventListener(
 				x.Length > 0 ? x[0].AsString() : null,
 				_typeConverter.ConvertDelegate<Event>(x[1]),
-				x.Length > 2 && x[2].AsBoolean()));
+				x.Length > 2 && ToBoolean(x[2])));
 
 			AddGlobalAct("removeEventListener", (_, x) => engine.Window.RemoveEventListener(
 				x.Length > 0 ? x[0].AsString() : null,
 				_typeConverter.ConvertDelegate<Event>(x[1]),
-				x.Length > 2 && x[2].AsBoolean()));
+				x.Length > 2 && ToBoolean(x[2])));
 
 			AddGlobalFunc("setTimeout", (_, x) =>
 			{
@@ -129,6 +129,17 @@ namespace Knyaz.Optimus.ScriptExecuting
 			jsFunc.FastAddProperty("DONE", new JsValue(4),false,false,false );
 
 			_jsEngine.Global.FastAddProperty("XMLHttpRequest", jsFunc, false, false, false);
+		}
+
+		private bool ToBoolean(JsValue x)
+		{
+			if (x.Type == Types.Boolean)
+				return x.AsBoolean();
+
+			if (x.Type == Types.Number)
+				return x.AsNumber() != 0;
+
+			return x.AsObject() != null;
 		}
 
 		private void AddGlobalFunc(string name, Func<JsValue, JsValue[], JsValue> action)

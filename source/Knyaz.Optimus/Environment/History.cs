@@ -15,6 +15,8 @@ namespace Knyaz.Optimus.Environment
 
 		public void PushState(object a, object b, string url)
 		{
+			//todo: raise events
+
 			_engine.Uri = UriHelper.IsAbsolete(url) ? new Uri(url) : new Uri(new Uri(_engine.Uri.GetLeftPart(UriPartial.Authority)), url);
 		}
 	}

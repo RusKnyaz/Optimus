@@ -55,11 +55,11 @@ namespace Knyaz.Optimus.ResourceProviders
 		private HttpRequestMessage MakeWebRequest(HttpRequest request)
 		{
 			var u = MakeUri(request.Url);
-			var result = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
+			var resultRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
 
-			if (request.Data != null && result.Method.Method != "GET")
+			if (request.Data != null && resultRequest.Method.Method != "GET")
 			{
-				result.Content = new StreamContent(new MemoryStream(request.Data));
+				resultRequest.Content = new StreamContent(new MemoryStream(request.Data));
 			}
 			
 			if(request.Headers != null)
@@ -68,15 +68,15 @@ namespace Knyaz.Optimus.ResourceProviders
 				switch (keyValue.Key)
 				{
 					case "Content-Type":
-						result.Content.Headers.ContentType = new MediaTypeHeaderValue(keyValue.Value);
+						resultRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(keyValue.Value);
 						break;
 					default:
-						result.Content.Headers.Add(keyValue.Key, keyValue.Value);
+						resultRequest.Headers.Add(keyValue.Key, keyValue.Value);
 						break;
 				}
 			}
 
-			return result;
+			return resultRequest;
 		}
 
 		private Uri MakeUri(string uri)
