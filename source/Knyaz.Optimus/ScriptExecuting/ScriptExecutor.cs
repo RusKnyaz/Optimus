@@ -77,6 +77,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Uint16Array", typeof(UInt16Array));
 
 			AddGlobalGetter("document", () => engine.Document);
+			AddGlobalGetter("history", () => engine.Window.History);
 			AddGlobalGetter("location", () => engine.Window.Location);
 			AddGlobalGetter("navigator", () => engine.Window.Navigator);
 			AddGlobalGetter("screen", () => engine.Window.Screen);

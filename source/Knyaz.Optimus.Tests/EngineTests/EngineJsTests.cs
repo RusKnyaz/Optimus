@@ -281,6 +281,23 @@ console.log(style['width']);");
 		}
 
 		[Test]
+		public void HistoryExist()
+		{
+			var engine = CreateEngine("", @"console.log(history != null);console.log(window.history != null);");
+			engine.Console.OnLog += x => _log.Add(x.ToString());
+			
+			CollectionAssert.AreEqual(new[] { true, true }, _log);
+		}
+
+		[Test]
+		public void HistoryPushState()
+		{
+			var engine = CreateEngine("",@"window.history.pushState(null, null, 'a.html');");
+
+			Assert.AreEqual("http://localhost/a.html", engine.Uri.AbsoluteUri);
+		}
+
+		[Test]
 		public void SetLocationHref()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org",
