@@ -43,7 +43,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					new MemoryStream(result),
 					content.Headers.ToString(),
 					content.Headers.ContentType.MediaType,
-					content.Headers.ContentLocation);
+					response.RequestMessage.RequestUri);
 			}
 		}
 
