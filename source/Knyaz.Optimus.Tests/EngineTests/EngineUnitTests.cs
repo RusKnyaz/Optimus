@@ -146,7 +146,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		
 		[Test]
-		public void SetTimeout()
+		public void SetTimeoutWithData()
 		{
 			var engine = new Engine();
 			var log = new List<string>();
@@ -154,8 +154,19 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
 			Assert.AreEqual(0, log.Count);
 			Thread.Sleep(1000);
-			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("ok",  log[0]);
+			CollectionAssert.AreEqual(new[] { "ok" }, log);
+		}
+
+		[Test]
+		public void SetTimeout()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log('ok');}, 300);"));
+			Assert.AreEqual(0, log.Count);
+			Thread.Sleep(1000);
+			CollectionAssert.AreEqual(new[]{"ok"}, log);
 		}
 
 		[Test, Ignore]

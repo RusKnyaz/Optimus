@@ -103,7 +103,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				if (x.Length == 0)
 					return JsValue.Undefined;
-				var res= engine.Window.SetTimeout(_typeConverter.ConvertDelegate(x[0]), x.Length > 1 ? x[1].AsNumber() : 1);
+				var res= engine.Window.SetTimeout(_typeConverter.ConvertDelegate<object>(x[0]), x.Length > 1 ? x[1].AsNumber() : 1, x.Length > 2 ? x[2].ToObject() : null);
 				return new JsValue(res);
 			});
 

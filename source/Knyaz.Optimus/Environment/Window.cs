@@ -57,11 +57,11 @@ namespace Knyaz.Optimus.Environment
 		public Navigator Navigator { get; private set; }
 		public History History { get; private set; }
 
-		private WindowTimers _timers;
+		private readonly WindowTimers _timers;
 
-		public int SetTimeout(Action handler, double? delay)
+		public int SetTimeout(Action<object> handler, double? delay, object ctx)
 		{
-			return _timers.SetTimeout(handler, (int)(delay ?? 1));
+			return _timers.SetTimeout(handler, (int)(delay ?? 1), ctx);
 		}
 
 		public void ClearTimeout(int handle)

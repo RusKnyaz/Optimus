@@ -26,13 +26,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		/// <param name="handler"></param>
 		/// <param name="timeout"></param>
+		/// <param name="ctx">The data object passed to callback function.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action handler, int timeout)
+		public int SetTimeout(Action<object> handler, int timeout, object ctx)
 		{
 			var timer = new TimeoutTimer(t =>
 				{
 					RaiseOnExecuting();
-					handler();
+					handler(ctx);
 					lock (_activeTimers)
 					{
 						_activeTimers.Remove(t);
