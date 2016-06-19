@@ -144,6 +144,7 @@
     <Compile Include="Dom\DocumentScripting.cs" />
     <Compile Include="Tests\Dom\TypedArrayTests.cs" />
     <Compile Include="Dom\Perf\ArrayBuffer.cs" />
+    <Compile Include="Tools\UriHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
