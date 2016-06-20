@@ -129,8 +129,8 @@ ko.applyBindings(new VM());",
 				"<input type='checkbox' data-bind='checked:Checked' id='in'/>" +
 				"<div id = 'button' data-bind='click:Click'>Click me</div>");
 
-			var div = (HtmlElement)doc.Body.GetElementsByTagName("div").First();
-			var checkbox = (HtmlInputElement) doc.Body.GetElementsByTagName("input").First();
+			var div = (HtmlElement)doc.GetElementById("button");
+			var checkbox = (HtmlInputElement) doc.GetElementById("in");
 			Assert.IsNotNull(checkbox);
 			Assert.IsNotNull(div);
 			Assert.IsTrue(checkbox.Checked);
