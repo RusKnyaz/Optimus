@@ -202,7 +202,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				foreach (var childNode in ChildNodes)
 				{
-					node.AppendChild(childNode.CloneNode());
+					node.AppendChild(childNode.CloneNode(true));
 				}
 			}
 			return node;

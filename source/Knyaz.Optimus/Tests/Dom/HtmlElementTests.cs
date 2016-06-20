@@ -17,6 +17,48 @@ namespace Knyaz.Optimus.Tests.Dom
 			elem.SetAttribute("style","color:black");
 			Assert.AreEqual("black", elem.Style.GetPropertyValue("color"));
 		}
+
+		[TestCase(true, 1)]
+		[TestCase(false, 0)]
+		public void CloneNode(bool deep, int expectedChildCount)
+		{
+			var document = new Document();
+			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html");
+			var span = document.GetElementById("s");
+
+			document.Assert(doc => 
+				doc.Body.ChildNodes.Count == 1 &&
+				doc.GetElementById("p1").ChildNodes.Count == 1 &&
+				doc.GetElementById("s").ChildNodes.Count == 1);
+
+			var clone = span.CloneNode(deep) as HtmlElement;
+			Assert.IsNotNull(clone);
+
+			//sate of all old elements should be the same as before
+			document.Assert(doc =>
+				doc.Body.ChildNodes.Count == 1 &&
+				doc.GetElementById("p1").ChildNodes.Count == 1 &&
+				doc.GetElementById("s").ChildNodes.Count == 1);
+
+			Assert.AreEqual(expectedChildCount, clone.ChildNodes.Count);
+			Assert.IsNotNull(clone.OwnerDocument, "Clone's ownerDocument");
+			Assert.AreEqual(span.OwnerDocument, clone.OwnerDocument, "Clone's ownerDocument");
+			Assert.IsNull(clone.ParentNode, "Clone's parentNode");
+			Assert.AreEqual("s", clone.Id);
+		}
+
+		[Test]
+		public void DeepClone()
+		{
+			var document = new Document();
+			document.Write("<html><body><div id='p1'><div id=p2><span id='s'>Span text</span></div></div></body></html");
+
+			var p1 = document.GetElementById("p1");
+
+			var clone = p1.CloneNode(true);
+			Assert.AreEqual(1, clone.ChildNodes.Count);
+			Assert.AreEqual(1, clone.ChildNodes[0].ChildNodes.Count);
+		}
 	}
 }
 #endif

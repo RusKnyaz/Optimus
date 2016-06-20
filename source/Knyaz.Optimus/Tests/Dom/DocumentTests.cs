@@ -92,7 +92,6 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			var document = new Document();
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></body></html");
-			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
 
 			document.Assert(doc => 

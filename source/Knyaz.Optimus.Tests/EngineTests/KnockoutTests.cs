@@ -282,5 +282,26 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 			Assert.AreEqual(4, newDivs.Length);
 
 		}
+
+		[Test]
+		public void ComponentBinding()
+		{
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>" +
+@"<body> <div id='view' data-bind=""component:{name:'myco'}""></div> </body>
+<script>
+	ko.components.register('myco', { 
+		viewModel: {instance: { name:'Kos' }}, 
+		template: '<div id=inner><div><span data-bind=""text:name""></span></div></div>'	
+	});
+	ko.applyBindings({});
+</script>
+</html>");
+			
+			var inner = doc.GetElementById("inner");
+			Assert.NotNull(inner, "First component's div");
+			Assert.AreEqual(1, inner.ChildNodes.Count, "First component's div children count");
+			Assert.AreEqual(1, inner.ChildNodes[0].ChildNodes.Count);
+			Assert.AreEqual("Kos", ((HtmlElement)inner.ChildNodes[0].ChildNodes[0]).InnerHTML);
+		}
 	}
 }
