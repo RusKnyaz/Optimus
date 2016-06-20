@@ -339,26 +339,29 @@ namespace Knyaz.Optimus.Html
 				{
 					if (state == States.ReadText)
 					{
-						var txt = ReadText(reader);
-						if (txt.Type != HtmlChunkTypes.Undefined)
-							yield return txt;
-						
-						if(reader.Peek() == -1)
-							yield break;
-						
-						buffer.Clear();
-
-						newState = state = States.ReadTagName;
-
-						/*//Read Tag Name
-						var x = ReadToChars(reader, buffer, ' ', '/', '>');
-						if (buffer.Count > 0)
+						var tagInvariantName = lastTag == null ? null : lastTag.ToLowerInvariant();
+						if (tagInvariantName == "script")
 						{
-							var tag = HtmlChunk.TagStart(buffer);
-							yield return tag;
-							lastTag = tag.Value;
+							yield return ReadScript(reader, "</" + tagInvariantName);
+							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = tagInvariantName };
 							buffer.Clear();
-						}*/
+							newState = state = States.ReadText;
+							lastTag = string.Empty;
+							continue;
+						}
+						else
+						{
+							var txt = ReadText(reader);
+							if (txt.Type != HtmlChunkTypes.Undefined)
+								yield return txt;
+
+							if (reader.Peek() == -1)
+								yield break;
+
+							buffer.Clear();
+
+							newState = state = States.ReadTagName;
+						}
 					}
 
 					code = reader.Read();
