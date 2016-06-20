@@ -40,11 +40,11 @@ namespace Knyaz.Optimus.Tests.Dom
 				doc.GetElementById("p1").ChildNodes.Count == 1 &&
 				doc.GetElementById("s").ChildNodes.Count == 1);
 
-			Assert.AreEqual(expectedChildCount, clone.ChildNodes.Count);
-			Assert.IsNotNull(clone.OwnerDocument, "Clone's ownerDocument");
-			Assert.AreEqual(span.OwnerDocument, clone.OwnerDocument, "Clone's ownerDocument");
-			Assert.IsNull(clone.ParentNode, "Clone's parentNode");
-			Assert.AreEqual("s", clone.Id);
+			clone.Assert(c => 
+				c.ChildNodes.Count == expectedChildCount &&
+				c.OwnerDocument == document &&
+				c.ParentNode == null &&
+				c.Id == "s");
 		}
 
 		[Test]
