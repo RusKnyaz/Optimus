@@ -102,17 +102,6 @@ namespace Knyaz.Optimus.Tests.Html
 			Assert.IsNotNull(e);
 			Assert.AreEqual(1, e.Attributes.Count);
 		}
-
-		[Test]
-		public void ScriptWithHtmlStrings()
-		{
-			var elems = Parse("<script defer>var a = $('<input type=\"file\">');console.log(a?'ok':'error');</script>").ToArray();
-			Assert.AreEqual(1, elems.Length);
-			var e = (HtmlElement)elems.FirstOrDefault();
-			Assert.IsNotNull(e);
-			Assert.AreEqual(1, e.Attributes.Count);
-			Assert.AreEqual("var a = $('<input type=\"file\">');console.log(a?'ok':'error');", e.InnerText);
-		}
 	}
 }
 #endif
