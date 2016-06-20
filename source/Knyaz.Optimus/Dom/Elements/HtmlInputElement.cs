@@ -61,14 +61,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			set { SetAttribute("required", value.ToString()); }
 		}
 
-		public bool Checked{get; set; }
-
-		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
+		private bool? _checked;
+		public bool Checked
 		{
-			if (invariantName == "checked")
-				Checked = value == "checked" || value == null;
-			else
-				base.UpdatePropertyFromAttribute(value, invariantName);
+			get { return _checked ?? HasAttribute("checked"); }
+			set { _checked = value; } 
 		}
 
 		void IResettableElement.Reset()

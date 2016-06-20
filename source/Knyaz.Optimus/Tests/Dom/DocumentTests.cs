@@ -47,15 +47,6 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void InputChecked()
-		{
-			var document = new Document();
-			document.Write("<html><body><input id='i' type='checkbox' checked='true'></input></body></html>");
-			var el = (HtmlInputElement)document.GetElementById("i");
-			Assert.IsTrue(el.Checked);
-		}
-
-		[Test]
 		public void Comment()
 		{
 			var document = new Document();
