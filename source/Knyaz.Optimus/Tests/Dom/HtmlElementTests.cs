@@ -23,7 +23,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void CloneNode(bool deep, int expectedChildCount)
 		{
 			var document = new Document();
-			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html");
+			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
 			var span = document.GetElementById("s");
 
 			document.Assert(doc => 
@@ -51,7 +51,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void DeepClone()
 		{
 			var document = new Document();
-			document.Write("<html><body><div id='p1'><div id=p2><span id='s'>Span text</span></div></div></body></html");
+			document.Write("<html><body><div id='p1'><div id=p2><span id='s'>Span text</span></div></div></body></html>");
 
 			var p1 = document.GetElementById("p1");
 

@@ -7,7 +7,6 @@ using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.PhantomJS;
 using OpenQA.Selenium.Support.UI;
-using Console = System.Console;
 
 namespace Optimus.Comparison
 {
@@ -27,12 +26,12 @@ namespace Optimus.Comparison
 			}
 		}
 
-		//[TestCase("http://dc.okkamtech.com", "logon")]
+		[TestCase("http://chi.todosoft.org", "logon")]
 		public void OpenChicoryOptimus(string url, string itemId)
 		{
-			var engine = new Knyaz.Optimus.Engine();
+			var engine = new Engine();
 			//engine.AttachConsole();
-			engine.ResourceProvider.OnRequest += s => Console.WriteLine(s);
+			//engine.ResourceProvider.OnRequest += s => Console.WriteLine(s);
 			engine.OpenUrl(url);
 			engine.WaitId(itemId);
 			Assert.IsNotNull(engine.Document.GetElementById(itemId));
@@ -44,7 +43,7 @@ namespace Optimus.Comparison
 			var engine = new Engine();
 			engine.OpenUrl("https://html5test.com");
 			engine.WaitDocumentLoad();
-			Thread.Sleep(5000);//wait calculation
+			Thread.Sleep(3000);//wait calculation
 
 			var score = engine.Document.GetElementById("score");
 			Assert.IsNotNull(score, "score");
