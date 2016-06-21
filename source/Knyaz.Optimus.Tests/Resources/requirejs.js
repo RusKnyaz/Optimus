@@ -1197,7 +1197,6 @@ var requirejs, require, define;
 					node.detachEvent(ieName, func);
 				}
 			} else {
-			    console.log("asdasdasdadasdasd");
 			    //node.removeEventListener(name, func, false);
 			    node.removeEventListener(name, null, false);
 			}
@@ -1685,7 +1684,6 @@ var requirejs, require, define;
 
 				    //Pull out the name of the module and the context.
 				    var data = getScriptData(evt);
-				    console.log("2222222222: " +data.id);
 					context.completeLoad(data.id);
 				}
 			},

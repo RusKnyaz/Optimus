@@ -66,11 +66,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("./stringTemplateEngine.js"), Times.Once());
 			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("template.htm"), Times.Once());
 
-			
-			var template1 = engine.Document.GetElementById("t1");
-			var template2 = engine.Document.GetElementById("t2");
-			Assert.IsNotNull(template1, "template1 != null");
-			Assert.IsNotNull(template2, "template2 != null");
+			engine.Document.Assert(doc =>
+				doc.GetElementById("t1") != null &&
+				doc.GetElementById("t2") != null);
 		}
 
 		[Test]
