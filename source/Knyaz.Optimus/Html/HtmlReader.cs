@@ -62,6 +62,11 @@ namespace Knyaz.Optimus.Html
 			var specialSymbol = false;
 
 			var escaped = false;
+
+			//hack: one symbold unqoted attribte value
+			if (qMark == ' ' && reader.Peek() == '>')
+				return "";
+
 			for(var code = reader.Read(); code != -1; code = reader.Read())
 			{
 				var symbol = (char)code;

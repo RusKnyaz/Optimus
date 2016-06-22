@@ -65,6 +65,7 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public HtmlElement[] GetElementsByClassName(string name)
 		{
+			var arr = ChildNodes.SelectMany(x => x.Flatten()).ToArray();
 			return ChildNodes.SelectMany(x => x.Flatten()).OfType<HtmlElement>().Where(x => x.ClassName.Split(' ').Contains(name)).ToArray();
 		}
 
@@ -237,11 +238,12 @@ namespace Knyaz.Optimus.Dom.Elements
 	}
 
 	[DomItem]
-	public interface IElement
+	public interface IElement : INode
 	{
 		string TagName { get; }
 		string InnerHTML { get; set; }
 		Element[] GetElementsByTagName(string tagName);
+		HtmlElement[] GetElementsByClassName(string tagName);
 		Attr GetAttributeNode(string name);
 		string GetAttribute(string name);
 		void RemoveAttribute(string name);

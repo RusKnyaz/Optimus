@@ -133,6 +133,7 @@
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Mocks.cs" />
+    <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tools\Disposable.cs" />
     <Compile Include="Tools\EngineExtension.cs" />
     <Compile Include="Tools\EngineQueryExtension.cs" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

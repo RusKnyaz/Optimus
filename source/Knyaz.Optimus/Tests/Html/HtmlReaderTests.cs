@@ -67,6 +67,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("\u000D", "Text:\u000A")]
 		[TestCase("<script>var a = $('<input type=\"file\">')</script>", "TagStart:script, Text:var a = $('<input type=\"file\">'), TagEnd:script")]
 		[TestCase("<script defer>var a = $('<input type=\"file\">')</script>", "TagStart:script, AttributeName:defer, Text:var a = $('<input type=\"file\">'), TagEnd:script")]
+		[TestCase("<div class=A>1</div>", "TagStart:div, AttributeName:class, AttributeValue:A, Text:1, TagEnd:div")]
 		public void ReadString(string source, string expectedChunkTypesString)
 		{
 			var result = Read(source).ToArray();

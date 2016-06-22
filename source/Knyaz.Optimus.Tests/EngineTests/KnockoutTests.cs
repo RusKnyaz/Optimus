@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	[TestFixture]
 	public class KnockoutTests
 	{
-		Document Load(string html)
+		static Document Load(string html)
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
