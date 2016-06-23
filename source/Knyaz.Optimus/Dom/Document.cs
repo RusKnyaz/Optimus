@@ -247,6 +247,8 @@ namespace Knyaz.Optimus.Dom
 		{
 			get { return ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat"; }
 		}
+
+		public string Title { get; set; }
 	}
 
 	[DomItem]
@@ -266,5 +268,6 @@ namespace Knyaz.Optimus.Dom
 		//not a part of public API
 		event Action<Node> NodeInserted;
 		event Action<IDocument> DomContentLoaded;
+		string Title { get; set; }
 	}
 }

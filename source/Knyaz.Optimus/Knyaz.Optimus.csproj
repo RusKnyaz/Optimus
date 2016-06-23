@@ -125,6 +125,7 @@
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="Tests\Dom\EventsTests.cs" />
     <Compile Include="Tests\Dom\EventTargetTests.cs" />
+    <Compile Include="Tests\Dom\HistoryTests.cs" />
     <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />

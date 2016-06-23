@@ -65,7 +65,6 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public HtmlElement[] GetElementsByClassName(string name)
 		{
-			var arr = ChildNodes.SelectMany(x => x.Flatten()).ToArray();
 			return ChildNodes.SelectMany(x => x.Flatten()).OfType<HtmlElement>().Where(x => x.ClassName.Split(' ').Contains(name)).ToArray();
 		}
 
