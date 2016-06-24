@@ -344,8 +344,77 @@ namespace Knyaz.Optimus.Html
 							text.Clear();
 						}
 
-						foreach (var chunk in ReadTag(reader))
-							yield return chunk;
+						var tagName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>');
+						yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagStart };
+
+						bool end = false;
+						while (!reader.EndOfStream && !end)
+						{
+							var sym = (char)reader.Peek();
+							if (sym == '/')//may be self-closed tag
+							{
+								reader.Read();
+								sym = (char)reader.Peek();
+								if (sym == '>')
+								{
+									reader.Read();
+									yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
+									end = true;
+									continue;
+								}
+							}
+							else if (sym == '>') //end of tag
+							{
+								reader.Read();
+								var invariantTagName = tagName.ToLowerInvariant();
+								if (_noContentTags.Contains(invariantTagName))
+								{
+									yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
+									end = true;
+									continue;
+								}
+
+								if (invariantTagName == "script")
+								{
+									yield return ReadScript(reader, "</" + tagName); //todo: revise concatination
+								}
+								else if (invariantTagName == "textarea")
+								{
+									var textAreaContent = new StringBuilder();
+									ReadToPhrase(reader, textAreaContent, "</textarea>");
+									yield return HtmlChunk.Text(textAreaContent.ToString());
+								}
+								else
+								{
+									foreach (var chunk in Read(reader, tagName.ToLowerInvariant()))
+										yield return chunk;
+								}
+
+								yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
+								end = true;
+								continue;
+							}
+
+
+							//Read attribute
+							SkipWhiteSpace(reader);
+
+							var attrName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>' && c != '=');
+							if (!string.IsNullOrEmpty(attrName))
+							{
+								yield return new HtmlChunk { Type = HtmlChunkTypes.AttributeName, Value = attrName };
+								var s = SkipWhiteSpace(reader);
+								if (s == '=')
+								{
+									reader.Read();
+									var q = SkipWhiteSpace(reader);
+
+									var val = (q == '\'' || q == '\"') ? ReadAttributeValue(reader) : ReadWhile(reader, c => c != '/' && c != ' ' && c != '>');
+									if (!string.IsNullOrEmpty(val))
+										yield return new HtmlChunk { Type = HtmlChunkTypes.AttributeValue, Value = val };
+								}
+							}
+						}
 					}
 					else if (next == '?')
 					{
@@ -368,81 +437,6 @@ namespace Knyaz.Optimus.Html
 
 			if (text.Length > 0)
 				yield return HtmlChunk.Text(text.ToString());
-		}
-
-		private static IEnumerable<HtmlChunk> ReadTag(StreamReader reader)
-		{
-			var tagName = ReadWhile(reader, c => c!='/' && c!=' ' && c!='>');
-			yield return new HtmlChunk{Value = tagName, Type = HtmlChunkTypes.TagStart};
-
-			bool end = false;
-			while (!reader.EndOfStream && !end)
-			{
-				var sym = (char)reader.Peek();
-				if (sym == '/')//may be self-closed tag
-				{
-					reader.Read();
-					sym = (char)reader.Peek();
-					if (sym == '>')
-					{
-						reader.Read();
-						yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
-						end = true;
-						continue;
-					}
-				}
-				else if (sym == '>') //end of tag
-				{
-					reader.Read();
-					var invariantTagName = tagName.ToLowerInvariant();
-					if (_noContentTags.Contains(invariantTagName))
-					{
-						yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
-						end = true;
-						continue;
-					}
-
-					if (invariantTagName == "script")
-					{
-						yield return ReadScript(reader, "</" + tagName); //todo: revise concatination
-					}
-					else if (invariantTagName == "textarea")
-					{
-						var text = new StringBuilder();
-						ReadToPhrase(reader, text, "</textarea>");
-						yield return HtmlChunk.Text(text.ToString());
-					}
-					else
-					{
-						foreach (var chunk in Read(reader, tagName.ToLowerInvariant()))
-							yield return chunk;
-					}
-
-					yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
-					end = true;
-					continue;
-				}
-				
-
-				//Read attribute
-				SkipWhiteSpace(reader);
-
-				var attrName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>' && c != '=');
-				if (!string.IsNullOrEmpty(attrName))
-				{
-					yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = attrName};
-					var s = SkipWhiteSpace(reader);
-					if (s == '=')
-					{
-						reader.Read();
-						var q = SkipWhiteSpace(reader);
-
-						var val = (q == '\'' || q == '\"') ? ReadAttributeValue(reader) : ReadWhile(reader, c => c!='/' && c!=' ' && c!='>');
-						if (!string.IsNullOrEmpty(val))
-							yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeValue, Value = val};
-					}
-				}
-			}
 		}
 
 		private static char SkipWhiteSpace(StreamReader reader)
