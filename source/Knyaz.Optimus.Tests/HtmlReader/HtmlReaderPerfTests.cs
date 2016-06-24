@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 	[TestFixture]
 	public class HtmlReaderPerfTests
 	{
-		private IEnumerable<HtmlChunk> Read(string str)
+		private IList<HtmlChunk> Read(string str)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(str)))
 			{
@@ -23,16 +23,44 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 		[Test]
 		public void ParseLargeFile()
 		{
+			Read(Resources.Large_Html);
+
+			Test(Resources.Large_Html, 10);
+			//2.4sec
+		}
+
+		private void Test(string html, int count)
+		{
 			var sw = Stopwatch.StartNew();
 			int c = 0;
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < count; i++)
 			{
-				c += Read(Resources.Large_Html).Count();	
+				c += Read(html).Count;
 			}
 			sw.Stop();
-			System.Console.WriteLine("Read {0} chunks from {2}*100 chars, elsaped {1} ms", c, sw.ElapsedMilliseconds, Resources.Large_Html.Length);
+			System.Console.WriteLine("Read {0} chunks from {2}*100 chars, elsaped {1} ms", c, sw.ElapsedMilliseconds,
+				Resources.Large_Html.Length);
+		}
 
-			//2.4sec
+		[Test]
+		public void DeepNesting()
+		{
+			var tagsCount = 1000;
+
+			var html = string.Join("", Enumerable.Range(0, tagsCount).Select(x => "<div>"))
+			           + string.Join("", Enumerable.Range(0, tagsCount).Select(x => "/<div>"));
+
+			Test(html, 10);
+		}
+
+		[Test]
+		public void LongFlat()
+		{
+			var tagsCount = 1000;
+
+			var html = string.Join("", Enumerable.Range(0, tagsCount).Select(x => "<div></div>"));
+
+			Test(html, 10);
 		}
 	}
 }
