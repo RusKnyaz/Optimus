@@ -238,8 +238,9 @@ namespace Knyaz.Optimus.Html
 			} 
 		}
 
-		private static void ReadToChar(StreamReader reader, StringBuilder buffer, char end, bool unescape = false)
+		private static string ReadToChar(StreamReader reader, char end, bool unescape = false)
 		{
+			var buffer = new StringBuilder();
 			while (!reader.EndOfStream)
 			{
 				var sym = (char)reader.Peek();
@@ -250,13 +251,15 @@ namespace Knyaz.Optimus.Html
 					buffer.Append(ReadSpecial(reader));
 					continue;
 				}
-				
+
 				if (sym == end)
-					return;
+					break;
 
 				reader.Read();
 				buffer.Append(sym);
 			}
+
+			return buffer.ToString();
 		}
 
 
@@ -319,9 +322,7 @@ namespace Knyaz.Optimus.Html
 					if (endTag != null && next == '/') //probably end of tag
 					{
 						reader.Read();
-						var t2 = new StringBuilder();
-						ReadToChar(reader, t2, '>');
-						var closedTagName = t2.ToString();
+						var closedTagName = ReadToChar(reader, '>');
 						if (closedTagName.ToLowerInvariant() == endTag)
 						{
 							if (text.Length > 0)
@@ -333,7 +334,7 @@ namespace Knyaz.Optimus.Html
 
 						text.Append('<');
 						text.Append('/');
-						text.Append(t2);
+						text.Append(closedTagName);
 					}
 					else if (char.IsLetter(next))
 					{
@@ -374,7 +375,8 @@ namespace Knyaz.Optimus.Html
 			var tagName = ReadWhile(reader, c => c!='/' && c!=' ' && c!='>');
 			yield return new HtmlChunk{Value = tagName, Type = HtmlChunkTypes.TagStart};
 
-			while (!reader.EndOfStream)
+			bool end = false;
+			while (!reader.EndOfStream && !end)
 			{
 				var sym = (char)reader.Peek();
 				if (sym == '/')//may be self-closed tag
@@ -385,18 +387,19 @@ namespace Knyaz.Optimus.Html
 					{
 						reader.Read();
 						yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
-						yield break;
+						end = true;
+						continue;
 					}
 				}
 				else if (sym == '>') //end of tag
 				{
 					reader.Read();
 					var invariantTagName = tagName.ToLowerInvariant();
-
 					if (_noContentTags.Contains(invariantTagName))
 					{
 						yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
-						break;
+						end = true;
+						continue;
 					}
 
 					if (invariantTagName == "script")
@@ -416,7 +419,8 @@ namespace Knyaz.Optimus.Html
 					}
 
 					yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
-					yield break;
+					end = true;
+					continue;
 				}
 				
 
@@ -486,49 +490,7 @@ namespace Knyaz.Optimus.Html
 		}
 	}
 
-	public class LookingStreamReader
-	{
-		private readonly StreamReader _reader;
-		readonly Queue<char> _queue = new Queue<char>(); 
-
-		public LookingStreamReader(StreamReader reader)
-		{
-			_reader = reader;
-		}
-
-		public bool EndOfStream {get { return _reader.EndOfStream && _queue.Count == 0; }}
-
-		public char Read()
-		{
-			return _queue.Count > 0 ? _queue.Dequeue() : (char)_reader.Read();
-		}
-
-		public char Peek()
-		{
-			return _queue.Count > 0 ? _queue.Peek() : (char)_reader.Peek();
-		}
-
-		public char Look(int offset)
-		{
-			if(offset == 1)
-				return Peek();
-
-			if (offset < _queue.Count)
-			{
-				return _queue.Skip(offset - 1).First();
-			}
-				
-			var res = (char)_reader.Peek();
-			var dif = offset - _queue.Count;
-			for (var i = 0; i < dif; i++)
-			{
-				res = (char)_reader.Read();
-				_queue.Enqueue(res);
-			}
-			return res;
-		}
-	}
-
+	
 	public static class StreamReaderExtension
 	{
 		public static string ReadLineWithEndings(this StreamReader streamReader)
