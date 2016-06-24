@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Knyaz.Optimus.Tests.HtmlReader
 {
 	[TestFixture]
-	public class HtmlReaderTests
+	public class HtmlReaderPerfTests
 	{
 		private IEnumerable<HtmlChunk> Read(string str)
 		{
@@ -25,7 +25,7 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 		{
 			var sw = Stopwatch.StartNew();
 			int c = 0;
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				c += Read(Resources.Large_Html).Count();	
 			}
