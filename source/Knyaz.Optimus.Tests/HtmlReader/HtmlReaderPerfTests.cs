@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -42,23 +43,21 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 				Resources.Large_Html.Length);
 		}
 
-		[Test]
-		public void DeepNesting()
+		[TestCase(1000, 0, 1, Description = "Deep")]
+		[TestCase(1, 1000, 1, Description = "Attributes")]
+		[TestCase(1, 0, 1000, Description = "Long")]
+		[TestCase(10, 10, 10, Description = "Long")]
+		public void Syntetic(int deep, int attrs, int count)
 		{
-			var tagsCount = 1000;
+			var tag =
+				"<div " +
+				String.Join(" ", Enumerable.Range(0, attrs).Select(x => "attr" + x + "=" + "val" + x))
+				+">";
 
-			var html = string.Join("", Enumerable.Range(0, tagsCount).Select(x => "<div>"))
-			           + string.Join("", Enumerable.Range(0, tagsCount).Select(x => "/<div>"));
+			var deepTag = string.Join("", Enumerable.Range(0, deep).Select(x => tag))
+            			           + string.Join("", Enumerable.Range(0, deep).Select(x => "/<div>"));
 
-			Test(html, 10);
-		}
-
-		[Test]
-		public void LongFlat()
-		{
-			var tagsCount = 1000;
-
-			var html = string.Join("", Enumerable.Range(0, tagsCount).Select(x => "<div></div>"));
+			var html = string.Join("", Enumerable.Range(0, count).Select(x => deepTag));
 
 			Test(html, 10);
 		}
