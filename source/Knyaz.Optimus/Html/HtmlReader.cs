@@ -305,12 +305,14 @@ namespace Knyaz.Optimus.Html
 			return Read(new StreamReader(stream));
 		}
 
-		private static IEnumerable<HtmlChunk> Read(StreamReader reader, string endTag = null)
+		private static IEnumerable<HtmlChunk> Read(StreamReader reader)
 		{
 			if(reader.EndOfStream)
 				yield break;
 
 			var text = new StringBuilder();
+
+			var tagsStack = new Stack<string>();
 
 			while (!reader.EndOfStream)
 			{
@@ -319,21 +321,27 @@ namespace Knyaz.Optimus.Html
 				{
 					var next = (char)reader.Peek();
 
-					if (endTag != null && next == '/') //probably end of tag
+					if (tagsStack.Count > 0 && next == '/') //probably end of tag
 					{
+						var endTag = tagsStack.Peek();
 						reader.Read();
 						var closedTagName = ReadToChar(reader, '>');
-						if (closedTagName.ToLowerInvariant() == endTag)
+						if (closedTagName.Equals(endTag, StringComparison.InvariantCultureIgnoreCase))
 						{
 							if (text.Length > 0)
+							{
 								yield return HtmlChunk.Text(text.ToString());
+								text.Clear();
+							}
+
+							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = closedTagName};
 
 							reader.Read();
-							yield break;
+							tagsStack.Pop();
+							continue;
 						}
 
-						text.Append('<');
-						text.Append('/');
+						text.Append("</");
 						text.Append(closedTagName);
 					}
 					else if (char.IsLetter(next))
@@ -386,8 +394,8 @@ namespace Knyaz.Optimus.Html
 								}
 								else
 								{
-									foreach (var chunk in Read(reader, tagName.ToLowerInvariant()))
-										yield return chunk;
+									tagsStack.Push(tagName.ToLowerInvariant());
+									break;
 								}
 
 								yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
