@@ -347,8 +347,7 @@ namespace Knyaz.Optimus.Html
 						if (sym == '/') //may be self-closed tag
 						{
 							reader.Read();
-							sym = (char) reader.Peek();
-							if (sym == '>')
+							if (reader.Peek() == '>')
 							{
 								reader.Read();
 								yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
