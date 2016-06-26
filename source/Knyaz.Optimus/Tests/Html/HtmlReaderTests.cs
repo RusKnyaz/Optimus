@@ -68,6 +68,8 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<script defer/>", "TagStart:script, AttributeName:defer, TagEnd:script")]
 		[TestCase("<script>var a = $('<input type=\"file\">')</script>", "TagStart:script, Text:var a = $('<input type=\"file\">'), TagEnd:script")]
 		[TestCase("<script defer>var a = $('<input type=\"file\">')</script>", "TagStart:script, AttributeName:defer, Text:var a = $('<input type=\"file\">'), TagEnd:script")]
+		[TestCase("<script>/*</script>*/hi();</script>", "TagStart:script, Text:/*</script>*/hi();, TagEnd:script")]
+		[TestCase("<script>var a='\\\\';</script>", "TagStart:script, Text:var a='\\\\';, TagEnd:script")]
 		//
 		[TestCase("<meta><meta>", "TagStart:meta, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		[TestCase("<meta name='viewport'><meta>", "TagStart:meta, AttributeName:name, AttributeValue:viewport, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
