@@ -11,15 +11,6 @@ namespace Knyaz.Optimus.Tests.Html
 	[TestFixture]
 	public class HtmlReaderTests
 	{
-		private IEnumerable<HtmlChunk> Read(string str)
-		{
-			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-			{
-				return HtmlReader.Read(stream).ToList();
-			}
-		}
-
-
 		//Doctype
 		[TestCase("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">", "DocType:HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"")]
 		[TestCase("<!DOCTYPE html>", "DocType:html")]
@@ -83,11 +74,30 @@ namespace Knyaz.Optimus.Tests.Html
 			"TagStart:head, Text:\n\n\t, TagStart:script, Text:somecode, TagEnd:script, TagEnd:head")]
 		[TestCase("\u000D", "Text:\u000A")]
 		[TestCase("<div class=A>1</div>", "TagStart:div, AttributeName:class, AttributeValue:A, Text:1, TagEnd:div")]
-		public void ReadString(string source, string expectedChunkTypesString)
+		public void ReadString(string source, string expectedChunks)
 		{
-			var result = Read(source).ToArray();
-			
-			Assert.AreEqual(expectedChunkTypesString, string.Join(", ", result.Select(x => x.Type+":"+x.Value).ToArray()));
+			Assert.AreEqual(expectedChunks, Read(source));
+		}
+
+
+		//http://www.w3schools.com/html/html_symbols.asp
+		[TestCase("&rang;&lang;", "Text:<>")]
+		[TestCase("&euro;", "Text:€", Description = "Currency symbols")]
+        [TestCase("<div data='&rang;&lang;'></div>", "TagStart:div, AttributeName:data, AttribtueValue:><, TagEnd:div")]
+        [TestCase("<s&rang;/>", "TagStart:s&rang;, TagEnd:s&rang;")]
+		public void SpecialSymbolsTest(string source, string expectedChunks)
+		{
+			Assert.AreEqual(expectedChunks, Read(source));
+		}
+
+
+		private string Read(string html)
+		{
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
+			{
+				var result = ((IEnumerable<HtmlChunk>) HtmlReader.Read(stream).ToList()).ToArray();
+				return string.Join(", ", result.Select(x => x.Type + ":" + x.Value).ToArray());
+			}
 		}
 	}
 }

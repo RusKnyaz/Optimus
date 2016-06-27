@@ -72,6 +72,8 @@ namespace Knyaz.Optimus.Html
 				reader.Read();
 				switch (s)
 				{
+					case"euro":
+						return "\u20AC";
 					case "rang":
 						return "\u27E9";
 					case "lang":
