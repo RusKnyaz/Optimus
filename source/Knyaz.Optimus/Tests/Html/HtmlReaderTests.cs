@@ -44,6 +44,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<h1>Header1</h1><h2>Header2</h2>", "TagStart:h1, Text:Header1, TagEnd:h1, TagStart:h2, Text:Header2, TagEnd:h2")]
 		[TestCase("<p>Hello '<b>World</b>'!</p>", "TagStart:p, Text:Hello ', TagStart:b, Text:World, TagEnd:b, Text:'!, TagEnd:p")]
 		[TestCase("<div></div><span></span>", "TagStart:div, TagEnd:div, TagStart:span, TagEnd:span")]
+		[TestCase("<d\\iv></d\\iv>", "TagStart:d\\iv, TagEnd:d\\iv", Ignored = true)]
 		//Attributes
 		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
 		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]

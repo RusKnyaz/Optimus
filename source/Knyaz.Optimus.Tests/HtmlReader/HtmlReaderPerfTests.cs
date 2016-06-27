@@ -26,7 +26,7 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 		{
 			Read(Resources.Large_Html);
 
-			Test(Resources.Large_Html, 10);
+			Test(Resources.Large_Html, 100);
 			//2.4sec
 		}
 
