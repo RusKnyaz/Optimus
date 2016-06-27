@@ -72,18 +72,14 @@ namespace Knyaz.Optimus.Html
 				reader.Read();
 				switch (s)
 				{
-					case"euro":
-						return "\u20AC";
-					case "rang":
-						return "\u27E9";
-					case "lang":
-						return "\u27E8";
-					case "notinva":
-						return "\u2209";
+					case"euro": return "\u20AC";
+					case "rang": return "\u27E9";
+					case "lang": return "\u27E8";
+					case "notinva": return "\u2209";
+					case "amp": return "&";
 					case "apos": return "'";
 					case "Kopf": return "\uD835\uDD42";
-					case "ImaginaryI":
-						return "\u2148";
+					case "ImaginaryI": return "\u2148";
 				}
 			}
 

@@ -79,12 +79,14 @@ namespace Knyaz.Optimus.Tests.Html
 			Assert.AreEqual(expectedChunks, Read(source));
 		}
 
-
 		//http://www.w3schools.com/html/html_symbols.asp
-		[TestCase("&rang;&lang;", "Text:<>")]
+		[TestCase("&rang;&lang;&amp;", "Text:<>&")]
 		[TestCase("&euro;", "Text:€", Description = "Currency symbols")]
-        [TestCase("<div data='&rang;&lang;'></div>", "TagStart:div, AttributeName:data, AttribtueValue:><, TagEnd:div")]
-        [TestCase("<s&rang;/>", "TagStart:s&rang;, TagEnd:s&rang;")]
+        [TestCase("<div data='&rang;&lang;'></div>", "TagStart:div, AttributeName:data, AttribtueValue:><, TagEnd:div", Description = "Symbols in attribute should be translated")]
+		[TestCase("<div>&lang;</div>", "TagStart:div, Text:<, TagEnd:div", Description = "Text inside tags should be translated.")]
+		[TestCase("<div>\\&lang;</div>", "TagStart:div, Text:\\<, TagEnd:div", Description = "'&' can't be escaped by \\")]
+		[TestCase("&amp;rang;", "Text:&rang;")]
+		[TestCase("<s&rang;/>", "TagStart:s&rang;, TagEnd:s&rang;", Description = "Tags names should not be translated")]
 		public void SpecialSymbolsTest(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));
