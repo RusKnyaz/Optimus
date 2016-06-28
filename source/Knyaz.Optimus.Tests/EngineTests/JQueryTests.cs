@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Properties;
 using Knyaz.Optimus.Tools;
 using Moq;

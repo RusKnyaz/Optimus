@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 

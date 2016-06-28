@@ -3,7 +3,6 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Properties;
-using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
 

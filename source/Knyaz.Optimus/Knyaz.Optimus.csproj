@@ -119,6 +119,7 @@
     <Compile Include="ScriptExecuting\ListAdapter.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
+    <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
@@ -136,8 +137,6 @@
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tools\Disposable.cs" />
-    <Compile Include="Tools\EngineExtension.cs" />
-    <Compile Include="Tools\EngineQueryExtension.cs" />
     <Compile Include="Tools\ListExtension.cs" />
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />

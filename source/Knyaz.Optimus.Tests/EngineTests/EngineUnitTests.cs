@@ -3,6 +3,7 @@ using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
 using Moq;
 using NUnit.Framework;

@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
-	[TestFixture, Ignore]
+	[TestFixture]
 	public class OpenSites
 	{
 		[TestCase("http://okkamtech.com")]
@@ -27,11 +27,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var engine = new Engine();
 			engine.OpenUrl("https://html5test.com");
 			engine.WaitDocumentLoad();
-			Thread.Sleep(5000);//wait calculation
 
-			var score = engine.Document.GetElementById("score");
-			Assert.IsNotNull(score, "score");
-			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
+			var tagWithValue = engine.WaitSelector("#score strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
 			System.Console.WriteLine("Score: " + tagWithValue.InnerHTML);
 			Thread.Sleep(500);

@@ -153,7 +153,7 @@ namespace Knyaz.Optimus
 			//todo: clear timers!!!!
 			ScriptExecutor.Clear();
 			Document = new Document(Window);
-			var uri = Uri.IsWellFormedUriString(path, UriKind.Absolute) ? new Uri(path) : new Uri(Uri, path);
+			var uri = Tools.UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
 			var resource = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));

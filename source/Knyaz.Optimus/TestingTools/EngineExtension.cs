@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 
-namespace Knyaz.Optimus.Tools
+namespace Knyaz.Optimus.TestingTools
 {
 	public static class EngineExtension
 	{
@@ -70,6 +72,41 @@ namespace Knyaz.Optimus.Tools
 				Thread.Sleep(timespan);
 			}
 			return document.GetElementById(id);
+		}
+
+
+		public static IEnumerable<IElement> Select(this Engine engine, string query)
+		{
+			return engine.Document.Select(query);
+		}
+
+		public static IElement First(this Engine engine, string query)
+		{
+			return engine.Select(query).First();
+		}
+
+		public static HtmlElement FirstElement(this Engine engine, string query)
+		{
+			return engine.Select(query).OfType<HtmlElement>().First();
+		}
+
+		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout = DefaultTimeout)
+		{
+			engine.WaitDocumentLoad();
+            			var timespan = 100;
+			for (int i = 0; i < timeout / timespan; i++)
+			{
+				var doc = engine.Document;
+				lock (doc)
+				{
+					var elt = doc.Select(query).ToList();
+					if (elt.Any())
+						return elt;
+				}
+
+				Thread.Sleep(timespan);
+			}
+			return engine.Select(query);
 		}
 	}
 }
