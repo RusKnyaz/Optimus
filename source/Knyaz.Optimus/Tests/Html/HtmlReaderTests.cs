@@ -35,10 +35,10 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<h1>Header1</h1><h2>Header2</h2>", "TagStart:h1, Text:Header1, TagEnd:h1, TagStart:h2, Text:Header2, TagEnd:h2")]
 		[TestCase("<p>Hello '<b>World</b>'!</p>", "TagStart:p, Text:Hello ', TagStart:b, Text:World, TagEnd:b, Text:'!, TagEnd:p")]
 		[TestCase("<div></div><span></span>", "TagStart:div, TagEnd:div, TagStart:span, TagEnd:span")]
-		[TestCase("<d\\iv></d\\iv>", "TagStart:d\\iv, TagEnd:d\\iv", Ignored = true)]
+		[TestCase("<d\\iv></d\\iv>", "TagStart:d\\iv, TagEnd:d\\iv")]
+		[TestCase("\\<span/>", "Text:\\, TagStart:span, TagEnd:span")]
 		//Attributes
 		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
-		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]
 		[TestCase("<a href=\"http://x.x\"/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
 		[TestCase("<a href=\'http://x.x\'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
 		[TestCase("<span data-bind = '\"'/>", "TagStart:span, AttributeName:data-bind, AttributeValue:\", TagEnd:span")]
@@ -47,6 +47,12 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<option value='1' selected>A</option>", "TagStart:option, AttributeName:value, AttributeValue:1, AttributeName:selected, Text:A, TagEnd:option")]
 		[TestCase("<option selected>A</option>", "TagStart:option, AttributeName:selected, Text:A, TagEnd:option")]
 		[TestCase("<option selected id='dd'>A</option>", "TagStart:option, AttributeName:selected, AttributeName:id, AttributeValue:dd, Text:A, TagEnd:option")]
+		[TestCase("<div att1></div>", "TagStart:div, AttributeName:att1, TagEnd:div", Description = "Attribute name can contains digits")]
+		[TestCase("<div na\\me='a'></div>", "TagStart:div, AttributeName:na\\me, AttributeValue:a, TagEnd:div")]
+		[TestCase("<div name=a\\ b></div>", "TagStart:div, AttributeName:name, AttributeValue:a\\, AttributeName:b, TagEnd:div")]
+		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]
+        [TestCase("<span name=a\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\b, TagEnd:span")]
+        [TestCase("<span name=a\\\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\\\b, TagEnd:span")]
 		//Scripts
 		[TestCase("<script>for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];</script>", "TagStart:script, Text:for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];, TagEnd:script")]
 		[TestCase("<script>var a = x > 5;</script>", "TagStart:script, Text:var a = x > 5;, TagEnd:script")]
@@ -80,13 +86,16 @@ namespace Knyaz.Optimus.Tests.Html
 		}
 
 		//http://www.w3schools.com/html/html_symbols.asp
-		[TestCase("&rang;&lang;&amp;", "Text:<>&")]
+		[TestCase("&lang;&rang;&amp;", "Text:〈〉&")]
 		[TestCase("&euro;", "Text:€", Description = "Currency symbols")]
-        [TestCase("<div data='&rang;&lang;'></div>", "TagStart:div, AttributeName:data, AttribtueValue:><, TagEnd:div", Description = "Symbols in attribute should be translated")]
-		[TestCase("<div>&lang;</div>", "TagStart:div, Text:<, TagEnd:div", Description = "Text inside tags should be translated.")]
-		[TestCase("<div>\\&lang;</div>", "TagStart:div, Text:\\<, TagEnd:div", Description = "'&' can't be escaped by \\")]
-		[TestCase("&amp;rang;", "Text:&rang;")]
+        [TestCase("<div data='&amp;'></div>", "TagStart:div, AttributeName:data, AttributeValue:&, TagEnd:div", Description = "Symbols in attribute should be translated")]
+		[TestCase("<div>&amp;</div>", "TagStart:div, Text:&, TagEnd:div", Description = "Text inside tags should be translated.")]
+		[TestCase("<div>\\&amp;</div>", "TagStart:div, Text:\\&, TagEnd:div", Description = "'&' can't be escaped by \\")]
+		[TestCase("&amp;amp;", "Text:&amp;")]
 		[TestCase("<s&rang;/>", "TagStart:s&rang;, TagEnd:s&rang;", Description = "Tags names should not be translated")]
+		[TestCase("<span>&ra</span>", "TagStart:span, Text:&ra, TagEnd:span")]
+		[TestCase("<span>&raduga;</span>", "TagStart:span, Text:&raduga;, TagEnd:span", Description = "Unregistered symbol")]
+		[TestCase("<option name='&ra' selected/>", "TagStart:option, AttributeName:name, AttributeValue:&ra, AttributeName:selected, TagEnd:option", Description = "Part of symbol")]
 		public void SpecialSymbolsTest(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));

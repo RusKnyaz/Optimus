@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Knyaz.Optimus.Html
@@ -16,6 +17,12 @@ namespace Knyaz.Optimus.Html
 			return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray())};
 		}
 
+		public static HtmlChunk AttributeValue(string val)
+		{
+			return new HtmlChunk {Type = HtmlChunkTypes.AttributeValue, Value = WebUtility.HtmlDecode(val)};
+
+		}
+
 		internal static HtmlChunk TagStart(List<char> buffer)
 		{
 			return new HtmlChunk { Type = HtmlChunkTypes.TagStart, Value = new string(buffer.ToArray()) };
@@ -23,12 +30,12 @@ namespace Knyaz.Optimus.Html
 
 		internal static HtmlChunk Text(List<char> buffer)
 		{
-			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()).Replace("\u000D", "\u000A") };
+			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = WebUtility.HtmlDecode(new string(buffer.ToArray())).Replace("\u000D", "\u000A") };
 		}
 
 		internal static HtmlChunk Text(string buffer)
 		{
-			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = buffer.Replace("\u000D", "\u000A") };
+			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = WebUtility.HtmlDecode(buffer).Replace("\u000D", "\u000A") };
 		}
 
 		internal static HtmlChunk Comment(string res)
@@ -55,37 +62,6 @@ namespace Knyaz.Optimus.Html
 	{
 		static string[] _noContentTags = { "meta", "br", "link" };
 
-		private static string ReadSpecial(StreamReader reader)
-		{
-			var buffer = new List<char>();
-
-			var symbol = (char)reader.Peek();
-			while (char.IsLetter(symbol) && !reader.EndOfStream)
-			{
-				buffer.Add((char)reader.Read());
-				symbol = (char)reader.Peek();
-			}
-
-			var s = new string(buffer.ToArray());
-			if (symbol == ';')
-			{
-				reader.Read();
-				switch (s)
-				{
-					case"euro": return "\u20AC";
-					case "rang": return "\u27E9";
-					case "lang": return "\u27E8";
-					case "notinva": return "\u2209";
-					case "amp": return "&";
-					case "apos": return "'";
-					case "Kopf": return "\uD835\uDD42";
-					case "ImaginaryI": return "\u2148";
-				}
-			}
-
-			return "&" + s + ";";
-		}
-
 		private static HtmlChunk ReadScript(StreamReader reader, string endWord)
 		{
 			var buffer = new List<char>();
@@ -102,7 +78,6 @@ namespace Knyaz.Optimus.Html
 					var txt = ReadScriptString(reader, x => x != symbol);
 					buffer.AddRange(txt);
 					buffer.Add((char)reader.Read());
-					continue;
 				}
 				else if (symbol == '>' && IsEndsWith(buffer, endWord.ToLowerInvariant()))
 				{
@@ -176,7 +151,7 @@ namespace Knyaz.Optimus.Html
 			return buffer.ToString();
 		}
 
-		private static void ReadToCharWithChar(StreamReader reader, StringBuilder buffer, char end, bool unescape = false)
+		private static void ReadToCharWithChar(StreamReader reader, StringBuilder buffer, char end)
 		{
 			while(!reader.EndOfStream)
 			{
@@ -184,37 +159,9 @@ namespace Knyaz.Optimus.Html
 				if (symbol == end)
 					return;
 
-				if (symbol == '&' && !unescape)
-					buffer.Append(ReadSpecial(reader));
-				else
-					buffer.Append(symbol);
+				buffer.Append(symbol);
 			}
 		}
-
-		private static string ReadToChar(StreamReader reader, char end)
-		{
-			var buffer = new StringBuilder();
-			while (!reader.EndOfStream)
-			{
-				var sym = (char)reader.Peek();
-
-				if (sym == '&')
-				{
-					reader.Read();
-					buffer.Append(ReadSpecial(reader));
-					continue;
-				}
-
-				if (sym == end)
-					break;
-
-				reader.Read();
-				buffer.Append(sym);
-			}
-
-			return buffer.ToString();
-		}
-
 
 		private static void ReadToPhrase(StreamReader reader, StringBuilder buffer, string end)
 		{
@@ -279,7 +226,7 @@ namespace Knyaz.Optimus.Html
 				{
 					var endTag = tagsStack.Peek();
 					reader.Read();
-					var closedTagName = ReadToChar(reader, '>');
+					var closedTagName = ReadWhile(reader, x => x != '>');
 					if (closedTagName.Equals(endTag, StringComparison.InvariantCultureIgnoreCase))
 					{
 						if (text.Length > 0)
@@ -360,7 +307,7 @@ namespace Knyaz.Optimus.Html
 								SkipWhiteSpace(reader);
 								var val = ReadAttributeValue(reader);
 								if (!string.IsNullOrEmpty(val))
-									yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeValue, Value = val};
+									yield return HtmlChunk.AttributeValue(val);
 							}
 						}
 					}
@@ -385,12 +332,12 @@ namespace Knyaz.Optimus.Html
 			var q = (char)reader.Read();
 			if (q == '\'' || q == '\"')
 			{
-				var res = ReadWhile(reader, c => c != q);
+				var res = ReadWhileWithEscapes(reader, "\\\"'", c => c != q);
 				reader.Read();
 				return res;
 			}
 
-			return  q + ReadWhile(reader, c => c != '/' && c != ' ' && c != '>');
+			return  q + ReadWhileWithEscapes(reader, "\"'", c => c != '/' && c != ' ' && c != '>');
 		}
 
 		private static string ReadToPhrase(StreamReader reader, string end)
@@ -436,6 +383,22 @@ namespace Knyaz.Optimus.Html
 		private static string ReadWhile(StreamReader reader, Func<char, bool> condition)
 		{
 			var buffer = new StringBuilder();
+			while (!reader.EndOfStream)
+			{
+				var symbol = (char) reader.Peek();
+
+				if (!condition(symbol))
+					break;
+
+				reader.Read();
+				buffer.Append(symbol);
+			}
+			return buffer.ToString();
+		}
+
+		private static string ReadWhileWithEscapes(StreamReader reader, string escapes, Func<char, bool> condition)
+		{
+			var buffer = new StringBuilder();
 
 			while (!reader.EndOfStream)
 			{
@@ -444,7 +407,15 @@ namespace Knyaz.Optimus.Html
 				if (symbol == '\\')
 				{
 					reader.Read();
-					buffer.Append((char)reader.Read());
+					symbol = (char) reader.Read();
+					if (escapes.IndexOf(symbol) < 0)
+					{
+						buffer.Append('\\');
+						if (!condition(symbol))
+							break;
+					}
+
+					buffer.Append(symbol);
 					continue;
 				}
 
@@ -452,11 +423,7 @@ namespace Knyaz.Optimus.Html
 					break;
 
 				reader.Read();
-
-				if (symbol == '&')
-					buffer.Append(ReadSpecial(reader));
-				else
-					buffer.Append(symbol);
+				buffer.Append(symbol);
 			}
 
 			return buffer.ToString();
