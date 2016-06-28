@@ -37,22 +37,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<div></div><span></span>", "TagStart:div, TagEnd:div, TagStart:span, TagEnd:span")]
 		[TestCase("<d\\iv></d\\iv>", "TagStart:d\\iv, TagEnd:d\\iv")]
 		[TestCase("\\<span/>", "Text:\\, TagStart:span, TagEnd:span")]
-		//Attributes
-		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
-		[TestCase("<a href=\"http://x.x\"/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
-		[TestCase("<a href=\'http://x.x\'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
-		[TestCase("<span data-bind = '\"'/>", "TagStart:span, AttributeName:data-bind, AttributeValue:\", TagEnd:span")]
-		[TestCase("<img src=\"\\\\\"></img>", "TagStart:img, AttributeName:src, AttributeValue:\\, TagEnd:img")]
-		[TestCase("<div data-bind=\"template:\\\"itemTemplate\\\"\"></div>", "TagStart:div, AttributeName:data-bind, AttributeValue:template:\"itemTemplate\", TagEnd:div")]
-		[TestCase("<option value='1' selected>A</option>", "TagStart:option, AttributeName:value, AttributeValue:1, AttributeName:selected, Text:A, TagEnd:option")]
-		[TestCase("<option selected>A</option>", "TagStart:option, AttributeName:selected, Text:A, TagEnd:option")]
-		[TestCase("<option selected id='dd'>A</option>", "TagStart:option, AttributeName:selected, AttributeName:id, AttributeValue:dd, Text:A, TagEnd:option")]
-		[TestCase("<div att1></div>", "TagStart:div, AttributeName:att1, TagEnd:div", Description = "Attribute name can contains digits")]
-		[TestCase("<div na\\me='a'></div>", "TagStart:div, AttributeName:na\\me, AttributeValue:a, TagEnd:div")]
-		[TestCase("<div name=a\\ b></div>", "TagStart:div, AttributeName:name, AttributeValue:a\\, AttributeName:b, TagEnd:div")]
-		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]
-        [TestCase("<span name=a\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\b, TagEnd:span")]
-        [TestCase("<span name=a\\\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\\\b, TagEnd:span")]
+		[TestCase("<div<div/>", "TagStart:div<div, TagEnd:div<div")]
 		//Scripts
 		[TestCase("<script>for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];</script>", "TagStart:script, Text:for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];, TagEnd:script")]
 		[TestCase("<script>var a = x > 5;</script>", "TagStart:script, Text:var a = x > 5;, TagEnd:script")]
@@ -83,6 +68,28 @@ namespace Knyaz.Optimus.Tests.Html
 		public void ReadString(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));
+		}
+
+		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
+		[TestCase("<a href=\"http://x.x\"/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
+		[TestCase("<a href=\'http://x.x\'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
+		[TestCase("<span data-bind = '\"'/>", "TagStart:span, AttributeName:data-bind, AttributeValue:\", TagEnd:span")]
+		[TestCase("<img src=\"\\\\\"></img>", "TagStart:img, AttributeName:src, AttributeValue:\\, TagEnd:img")]
+		[TestCase("<div data-bind=\"template:\\\"itemTemplate\\\"\"></div>", "TagStart:div, AttributeName:data-bind, AttributeValue:template:\"itemTemplate\", TagEnd:div")]
+		[TestCase("<option value='1' selected>A</option>", "TagStart:option, AttributeName:value, AttributeValue:1, AttributeName:selected, Text:A, TagEnd:option")]
+		[TestCase("<option selected>A</option>", "TagStart:option, AttributeName:selected, Text:A, TagEnd:option")]
+		[TestCase("<option selected id='dd'>A</option>", "TagStart:option, AttributeName:selected, AttributeName:id, AttributeValue:dd, Text:A, TagEnd:option")]
+		[TestCase("<div att1></div>", "TagStart:div, AttributeName:att1, TagEnd:div", Description = "Attribute name can contains digits")]
+		[TestCase("<div na\\me='a'></div>", "TagStart:div, AttributeName:na\\me, AttributeValue:a, TagEnd:div")]
+		[TestCase("<div name=a\\ b></div>", "TagStart:div, AttributeName:name, AttributeValue:a\\, AttributeName:b, TagEnd:div")]
+		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]
+		[TestCase("<span name=a\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\b, TagEnd:span")]
+		[TestCase("<span name=a\\\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\\\b, TagEnd:span")]
+		[TestCase("<span at<tr=1>", "TagStart:span, AttributeName:at<tr, AttributeValue:1")]
+		[TestCase("<span at<tr=''>", "TagStart:span, AttributeName:at<tr, AttributeValue:")]
+		public void ReadAttributes(string source, string expectedChunks)
+		{
+			Assert.AreEqual(expectedChunks, Read(source));	
 		}
 
 		//http://www.w3schools.com/html/html_symbols.asp

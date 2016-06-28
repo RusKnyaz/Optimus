@@ -279,7 +279,7 @@ namespace Knyaz.Optimus.Html
 								reader.Read();
 								ReadWhile(reader, c => c == ' ');
 								var val = ReadAttributeValue(reader);
-								if (!string.IsNullOrEmpty(val))
+								if (val != null)
 									yield return new HtmlChunk {Type = HtmlChunk.Types.AttributeValue, Value = WebUtility.HtmlDecode(val)};
 							}
 						}
