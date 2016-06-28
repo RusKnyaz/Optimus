@@ -9,64 +9,36 @@ namespace Knyaz.Optimus.Html
 {
 	public struct HtmlChunk
 	{
-		public HtmlChunkTypes Type;
+		public Types Type;
 		public string Value;
 
-		public static HtmlChunk AttributeName(List<char> buffer)
+		public enum Types
 		{
-			return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray())};
+			Undefined,
+			TagStart,
+			TagEnd,
+			AttributeName,
+			AttributeValue,
+			Text,
+			Comment,
+			DocType
 		}
-
-		public static HtmlChunk AttributeValue(string val)
-		{
-			return new HtmlChunk {Type = HtmlChunkTypes.AttributeValue, Value = WebUtility.HtmlDecode(val)};
-
-		}
-
-		internal static HtmlChunk TagStart(List<char> buffer)
-		{
-			return new HtmlChunk { Type = HtmlChunkTypes.TagStart, Value = new string(buffer.ToArray()) };
-		}
-
-		internal static HtmlChunk Text(List<char> buffer)
-		{
-			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = WebUtility.HtmlDecode(new string(buffer.ToArray())).Replace("\u000D", "\u000A") };
-		}
-
-		internal static HtmlChunk Text(string buffer)
-		{
-			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = WebUtility.HtmlDecode(buffer).Replace("\u000D", "\u000A") };
-		}
-
-		internal static HtmlChunk Comment(string res)
-		{
-			return res.ToLowerInvariant().StartsWith("doctype")
-				? new HtmlChunk { Type = HtmlChunkTypes.DocType, Value = res.Remove(0, 7).TrimStart() }
-				: new HtmlChunk { Type = HtmlChunkTypes.Comment, Value = res };
-		}
-	}
-
-	public enum HtmlChunkTypes
-	{
-		Undefined,
-		TagStart,
-		TagEnd,
-		AttributeName,
-		AttributeValue,
-		Text,
-		Comment,
-		DocType
 	}
 
 	public class HtmlReader
 	{
+		private static string HtmlDecode(string txt)
+		{
+			return WebUtility.HtmlDecode(txt).Replace("\u000D", "\u000A");
+		}
+
 		static string[] _noContentTags = { "meta", "br", "link" };
 
 		private static HtmlChunk ReadScript(StreamReader reader, string endWord)
 		{
 			var buffer = new List<char>();
 			if (reader.EndOfStream)
-				return new HtmlChunk {Type = HtmlChunkTypes.Text, Value = string.Empty};
+				return new HtmlChunk {Type = HtmlChunk.Types.Text, Value = string.Empty};
 
 			do
 			{
@@ -75,14 +47,14 @@ namespace Knyaz.Optimus.Html
 				if (symbol == '"' || symbol == '\'')
 				{
 					buffer.Add(symbol);
-					var txt = ReadScriptString(reader, x => x != symbol);
+					var txt = ReadWhileWithEscapes(reader, _ => false, (c,e) => e || ((Func<char, bool>) (x => x != symbol))(c));
 					buffer.AddRange(txt);
 					buffer.Add((char)reader.Read());
 				}
 				else if (symbol == '>' && IsEndsWith(buffer, endWord.ToLowerInvariant()))
 				{
 					buffer.RemoveRange(buffer.Count - endWord.Length, endWord.Length);
-					return new HtmlChunk {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray())};
+					return new HtmlChunk {Type = HtmlChunk.Types.Text, Value = new string(buffer.ToArray())};
 				}
 				else if (symbol == '/')
 				{
@@ -107,7 +79,7 @@ namespace Knyaz.Optimus.Html
 					else if (buffer.Last() != '<') //regexp
 					{
 						buffer.Add('/');
-						buffer.AddRange(ReadScriptString(reader, x => x != '/'));
+						buffer.AddRange(ReadWhileWithEscapes(reader, _ => false, (c,e) => e || ((Func<char, bool>) (x => x != '/'))(c)));
 						buffer.Add((char) reader.Read());
 					}
 					else
@@ -122,7 +94,7 @@ namespace Knyaz.Optimus.Html
 			}
 			while (!reader.EndOfStream);
 
-			return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()) };
+			return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = new string(buffer.ToArray()) };
 		}
 
 		private static string ReadComment(StreamReader reader, bool minusable)
@@ -231,11 +203,11 @@ namespace Knyaz.Optimus.Html
 					{
 						if (text.Length > 0)
 						{
-							yield return HtmlChunk.Text(text.ToString());
+							yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
 							text.Clear();
 						}
 
-						yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = closedTagName};
+						yield return new HtmlChunk {Type = HtmlChunk.Types.TagEnd, Value = closedTagName};
 
 						reader.Read();
 						tagsStack.Pop();
@@ -249,12 +221,12 @@ namespace Knyaz.Optimus.Html
 				{
 					if (text.Length > 0)
 					{
-						yield return HtmlChunk.Text(text.ToString());
+						yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
 						text.Clear();
 					}
 
 					var tagName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>');
-					yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagStart};
+					yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagStart};
 
 					while (!reader.EndOfStream)
 					{
@@ -265,7 +237,7 @@ namespace Knyaz.Optimus.Html
 							if (reader.Peek() == '>')
 							{
 								reader.Read();
-								yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
+								yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagEnd};
 								break;
 							}
 						}
@@ -275,17 +247,17 @@ namespace Knyaz.Optimus.Html
 							var invariantTagName = tagName.ToLowerInvariant();
 							if (_noContentTags.Contains(invariantTagName))
 							{
-								yield return new HtmlChunk {Value = tagName, Type = HtmlChunkTypes.TagEnd};
+								yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagEnd};
 							}
 							else if (invariantTagName == "script" || invariantTagName == "style")
 							{
 								yield return ReadScript(reader, "</" + tagName); //todo: revise concatination
-								yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
+								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
 							}
 							else if (invariantTagName == "textarea")
 							{
-								yield return HtmlChunk.Text(ReadToPhrase(reader, "</textarea>"));
-								yield return new HtmlChunk { Value = tagName, Type = HtmlChunkTypes.TagEnd };
+								yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(ReadToPhrase(reader, "</textarea>")) };
+								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
 							}
 							else
 							{
@@ -295,36 +267,40 @@ namespace Knyaz.Optimus.Html
 						}
 
 						//Read attribute
-						SkipWhiteSpace(reader);
+						ReadWhile(reader, c => c == ' ');
 
 						var attrName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>' && c != '=');
 						if (!string.IsNullOrEmpty(attrName))
 						{
-							yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = attrName};
-							if (SkipWhiteSpace(reader) == '=')
+							yield return new HtmlChunk {Type = HtmlChunk.Types.AttributeName, Value = attrName};
+							ReadWhile(reader, c => c == ' ');
+							if ((char)reader.Peek() == '=')
 							{
 								reader.Read();
-								SkipWhiteSpace(reader);
+								ReadWhile(reader, c => c == ' ');
 								var val = ReadAttributeValue(reader);
 								if (!string.IsNullOrEmpty(val))
-									yield return HtmlChunk.AttributeValue(val);
+									yield return new HtmlChunk {Type = HtmlChunk.Types.AttributeValue, Value = WebUtility.HtmlDecode(val)};
 							}
 						}
 					}
 				}
 				else if (next == '?')
 				{
-					yield return new HtmlChunk {Type = HtmlChunkTypes.Comment, Value = ReadComment(reader, false)};
+					yield return new HtmlChunk {Type = HtmlChunk.Types.Comment, Value = ReadComment(reader, false)};
 				}
 				else if (next == '!') //comment
 				{
 					reader.Read();
-					yield return HtmlChunk.Comment(ReadComment(reader, true));
+					string txt = ReadComment(reader, true);
+					yield return txt.ToLowerInvariant().StartsWith("doctype")
+						? new HtmlChunk { Type = HtmlChunk.Types.DocType, Value = txt.Remove(0, 7).TrimStart() }
+						: new HtmlChunk { Type = HtmlChunk.Types.Comment, Value = txt };
 				}
 			}
 
 			if (text.Length > 0)
-				yield return HtmlChunk.Text(text.ToString());
+				yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
 		}
 
 		private static string ReadAttributeValue(StreamReader reader)
@@ -332,12 +308,12 @@ namespace Knyaz.Optimus.Html
 			var q = (char)reader.Read();
 			if (q == '\'' || q == '\"')
 			{
-				var res = ReadWhileWithEscapes(reader, "\\\"'", c => c != q);
+				var res = ReadWhileWithEscapes(reader, c => c == '\'' || c == '"' || c=='\\', (c, _) => c != q);
 				reader.Read();
 				return res;
 			}
 
-			return  q + ReadWhileWithEscapes(reader, "\"'", c => c != '/' && c != ' ' && c != '>');
+			return  q + ReadWhileWithEscapes(reader, c => c == '\'' || c == '"', (c, _) => c != '/' && c != ' ' && c != '>');
 		}
 
 		private static string ReadToPhrase(StreamReader reader, string end)
@@ -345,38 +321,6 @@ namespace Knyaz.Optimus.Html
 			var textAreaContent = new StringBuilder();
 			ReadToPhrase(reader, textAreaContent, end);
 			return textAreaContent.ToString();
-		}
-
-		private static char SkipWhiteSpace(StreamReader reader)
-		{
-			ReadWhile(reader, c => c == ' ');
-			return (char)reader.Peek();
-		}
-
-		private static string ReadScriptString(StreamReader reader, Func<char, bool> condition)
-		{
-			var buffer = new StringBuilder();
-
-			while (!reader.EndOfStream)
-			{
-				var symbol = (char) reader.Peek();
-
-				if (symbol == '\\')
-				{
-					buffer.Append((char)reader.Read());
-					buffer.Append((char) reader.Read());
-					continue;
-				}
-
-				if (!condition(symbol))
-					break;
-
-				reader.Read();
-
-				buffer.Append(symbol);
-			}
-
-			return buffer.ToString();
 		}
 
 
@@ -396,7 +340,7 @@ namespace Knyaz.Optimus.Html
 			return buffer.ToString();
 		}
 
-		private static string ReadWhileWithEscapes(StreamReader reader, string escapes, Func<char, bool> condition)
+		private static string ReadWhileWithEscapes(StreamReader reader, Func<char, bool> escapeCondition, Func<char, bool, bool> continueCondition)
 		{
 			var buffer = new StringBuilder();
 
@@ -408,10 +352,10 @@ namespace Knyaz.Optimus.Html
 				{
 					reader.Read();
 					symbol = (char) reader.Read();
-					if (escapes.IndexOf(symbol) < 0)
+					if (!escapeCondition(symbol))
 					{
 						buffer.Append('\\');
-						if (!condition(symbol))
+						if (!continueCondition(symbol, true))
 							break;
 					}
 
@@ -419,7 +363,7 @@ namespace Knyaz.Optimus.Html
 					continue;
 				}
 
-				if (!condition(symbol))
+				if (!continueCondition(symbol, false))
 					break;
 
 				reader.Read();
