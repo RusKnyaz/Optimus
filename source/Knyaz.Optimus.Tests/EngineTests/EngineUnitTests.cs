@@ -272,5 +272,25 @@ window.clearTimeout(timer);"));
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
 		}
+
+		[Test]
+		public void RaiseExecuteScript()
+		{
+			var engine = new Engine();
+			engine.Load("<html><head></head><body></body></html>");
+			var doc = engine.Document;
+			
+			var beforeCount = 0;
+			var afterCount = 0;
+			doc.AddEventListener("BeforeScriptExecute", @event => beforeCount++, false);
+			doc.AddEventListener("AfterScriptExecute", @event => afterCount++, false);
+
+			var script = doc.CreateElement("script");
+			script.InnerHTML = "console.log('hi');";
+			doc.Head.AppendChild(script);
+
+			Assert.AreEqual(1, beforeCount, "BeforeScriptExecute Event handlers calls count");
+			Assert.AreEqual(1, afterCount, "AfterScriptExecute Event handlers calls count");
+		}
 	}
 }

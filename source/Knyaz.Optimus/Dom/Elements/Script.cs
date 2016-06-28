@@ -91,10 +91,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public void Execute(IScriptExecutor scriptExecutor)
 		{
-			this.RaiseEvent("BeforeScriptExecute", true, true);
 			scriptExecutor.Execute(Type ?? "text/javascript", Text);
 			Executed = true;
-			this.RaiseEvent("AfterScriptExecute", true, true);
 			RaiseOnLoad();
 		}
 	}
