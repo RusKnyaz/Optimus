@@ -3,6 +3,7 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Properties;
+using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
 
@@ -284,7 +285,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		}
 
 		[Test]
-		public void ComponentBinding()
+		public static void ComponentBinding()
 		{
 			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>" +
 @"<body> <div id='view' data-bind=""component:{name:'myco'}""></div> </body>
@@ -297,7 +298,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 </script>
 </html>");
 			
-			var inner = doc.GetElementById("inner");
+			var inner = doc.WaitId("inner");
 			Assert.NotNull(inner, "First component's div");
 			Assert.AreEqual(1, inner.ChildNodes.Count, "First component's div children count");
 			Assert.AreEqual(1, inner.ChildNodes[0].ChildNodes.Count);

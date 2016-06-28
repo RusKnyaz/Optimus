@@ -191,7 +191,7 @@ window.clearTimeout(timer);"));
 			var resourceProvider = Mocks.ResourceProvider("http://todosoft.ru", "");
 			var engine = new Engine(resourceProvider);
 			engine.OpenUrl("http://todosoft.ru");
-			Assert.AreEqual("http://todosoft.ru", engine.Window.Location.Href);
+			Assert.AreEqual("http://todosoft.ru/", engine.Window.Location.Href);
 			Assert.AreEqual("http:", engine.Window.Location.Protocol);
 		}
 

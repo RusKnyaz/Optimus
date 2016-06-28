@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.Tests.Properties;
+using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
@@ -42,15 +43,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void StringTemplateEngine()
 		{
-			_resourceProvider.Resource("template.htm",
+			_resourceProvider.Resource("/templ.htm",
 				"<script id='t1'><div id='templateDiv'></div></script><script id='t2'></script>");
 
 			_resourceProvider.Resource("http://localhost/index.html",
 @"<html>
 <head>
-<script src='require.js'/>
 <script src='knockout.js'/>
-<script>require(['template!/template.htm'], function(){ console('loaded');});</script>
+<script src='require.js'/>
+<script>require(['template!/templ.htm'], function(){ console('loaded');});</script>
 </head>
 <body></body></html>");
 

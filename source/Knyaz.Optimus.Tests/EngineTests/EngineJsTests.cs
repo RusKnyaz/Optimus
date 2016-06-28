@@ -277,7 +277,7 @@ console.log(style['width']);");
 			engine.Console.OnLog += x => _log.Add(x.ToString());
 			engine.OpenUrl("http://todosoft.org");
 			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[] {"http://todosoft.org", "http:"}, _log);
+			CollectionAssert.AreEqual(new[] {"http://todosoft.org/", "http:"}, _log);
 		}
 
 		[Test]
