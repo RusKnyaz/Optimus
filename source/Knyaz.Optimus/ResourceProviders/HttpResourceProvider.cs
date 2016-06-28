@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
@@ -84,8 +85,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (uri.Substring(0, 2) == "./")
 				uri = uri.Remove(0, 2);
 
-			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-			return u;
+			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 		}
 	}
 
