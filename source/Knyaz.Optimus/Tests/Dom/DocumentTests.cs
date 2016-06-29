@@ -75,11 +75,11 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void InsertBeforeRemovesNodeFromOldParrent()
 		{
 			var document = new Document();
-			document.Write("<html><body><div id='p1'><span id='s'></span></body></html");
+			document.Write("<html><body><div id='p1'><span id='s'></span></div></body></html>");
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
 			
-			Assert.AreEqual(1, div1.ChildNodes.Count);
+			Assert.AreEqual(1, div1.ChildNodes.Count, "Child nodes count before inserting");
 			Assert.AreEqual(1, document.Body.ChildNodes.Count);
 			document.Body.InsertBefore(span, div1);
 			Assert.AreEqual(0, div1.ChildNodes.Count);
@@ -91,7 +91,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void CloneNode(bool deep, int expectedChildCount)
 		{
 			var document = new Document();
-			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></body></html");
+			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
 			var span = document.GetElementById("s");
 
 			document.Assert(doc => 
@@ -238,7 +238,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[TestCase("\u000D", "\u000A")]
-		[TestCase("&lang;&rang;", "\u27E8\u27E9")]
+		[TestCase("&lang;&rang;", "〈〉")]
 		[TestCase("&apos;", "'")]
 		[TestCase("&ImaginaryI;", "\u2148")]
 		[TestCase("&Kopf;", "\uD835\uDD42")]

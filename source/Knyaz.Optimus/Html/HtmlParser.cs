@@ -30,34 +30,34 @@ namespace Knyaz.Optimus.Html
 				var htmlChunk = enumerator.Current;
 				switch(htmlChunk.Type)
 				{
-					case HtmlChunkTypes.AttributeName:
+					case HtmlChunk.Types.AttributeName:
 						if(attributeName!=null)
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), null);
-						attributeName = htmlChunk.Value.ToLower();		
+						attributeName = htmlChunk.Value.ToLower();
 						break;
-					case HtmlChunkTypes.AttributeValue:
+					case HtmlChunk.Types.AttributeValue:
 						if (string.IsNullOrEmpty(attributeName))
 							throw new HtmlParseException("Unexpected attribute value.");
 						if(!elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))//todo:
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
 						attributeName = null;
 						break;
-					case HtmlChunkTypes.TagStart:
+					case HtmlChunk.Types.TagStart:
 						var childElem = new HtmlElement() {Name = htmlChunk.Value.ToLower()};
 						ParseElement(childElem, enumerator);
 						elem.Children.Add(childElem);
 						break;
-					case HtmlChunkTypes.TagEnd:
+					case HtmlChunk.Types.TagEnd:
 						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
 						return true;
-					case HtmlChunkTypes.Text:
+					case HtmlChunk.Types.Text:
 						elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
 						break;
-					case HtmlChunkTypes.Comment:
+					case HtmlChunk.Types.Comment:
 						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });
 						break;
-					case HtmlChunkTypes.DocType:
+					case HtmlChunk.Types.DocType:
 						elem.Children.Add(new HtmlDocType());
 						break;
 				}

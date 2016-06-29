@@ -11,15 +11,6 @@ namespace Knyaz.Optimus.Tests.Html
 	[TestFixture]
 	public class HtmlReaderTests
 	{
-		private IEnumerable<HtmlChunk> Read(string str)
-		{
-			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-			{
-				return HtmlReader.Read(stream).ToList();
-			}
-		}
-
-
 		//Doctype
 		[TestCase("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">", "DocType:HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"")]
 		[TestCase("<!DOCTYPE html>", "DocType:html")]
@@ -44,17 +35,9 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<h1>Header1</h1><h2>Header2</h2>", "TagStart:h1, Text:Header1, TagEnd:h1, TagStart:h2, Text:Header2, TagEnd:h2")]
 		[TestCase("<p>Hello '<b>World</b>'!</p>", "TagStart:p, Text:Hello ', TagStart:b, Text:World, TagEnd:b, Text:'!, TagEnd:p")]
 		[TestCase("<div></div><span></span>", "TagStart:div, TagEnd:div, TagStart:span, TagEnd:span")]
-		//Attributes
-		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
-		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]
-		[TestCase("<a href=\"http://x.x\"/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
-		[TestCase("<a href=\'http://x.x\'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
-		[TestCase("<span data-bind = '\"'/>", "TagStart:span, AttributeName:data-bind, AttributeValue:\", TagEnd:span")]
-		[TestCase("<img src=\"\\\\\"></img>", "TagStart:img, AttributeName:src, AttributeValue:\\, TagEnd:img")]
-		[TestCase("<div data-bind=\"template:\\\"itemTemplate\\\"\"></div>", "TagStart:div, AttributeName:data-bind, AttributeValue:template:\"itemTemplate\", TagEnd:div")]
-		[TestCase("<option value='1' selected>A</option>", "TagStart:option, AttributeName:value, AttributeValue:1, AttributeName:selected, Text:A, TagEnd:option")]
-		[TestCase("<option selected>A</option>", "TagStart:option, AttributeName:selected, Text:A, TagEnd:option")]
-		[TestCase("<option selected id='dd'>A</option>", "TagStart:option, AttributeName:selected, AttributeName:id, AttributeValue:dd, Text:A, TagEnd:option")]
+		[TestCase("<d\\iv></d\\iv>", "TagStart:d\\iv, TagEnd:d\\iv")]
+		[TestCase("\\<span/>", "Text:\\, TagStart:span, TagEnd:span")]
+		[TestCase("<div<div/>", "TagStart:div<div, TagEnd:div<div")]
 		//Scripts
 		[TestCase("<script>for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];</script>", "TagStart:script, Text:for (var i = 0; i < tokens.length - 1; i++) target = target[tokens[i]];, TagEnd:script")]
 		[TestCase("<script>var a = x > 5;</script>", "TagStart:script, Text:var a = x > 5;, TagEnd:script")]
@@ -68,6 +51,8 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<script defer/>", "TagStart:script, AttributeName:defer, TagEnd:script")]
 		[TestCase("<script>var a = $('<input type=\"file\">')</script>", "TagStart:script, Text:var a = $('<input type=\"file\">'), TagEnd:script")]
 		[TestCase("<script defer>var a = $('<input type=\"file\">')</script>", "TagStart:script, AttributeName:defer, Text:var a = $('<input type=\"file\">'), TagEnd:script")]
+		[TestCase("<script>/*</script>*/hi();</script>", "TagStart:script, Text:/*</script>*/hi();, TagEnd:script")]
+		[TestCase("<script>var a='\\\\';</script>", "TagStart:script, Text:var a='\\\\';, TagEnd:script")]
 		//
 		[TestCase("<meta><meta>", "TagStart:meta, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
 		[TestCase("<meta name='viewport'><meta>", "TagStart:meta, AttributeName:name, AttributeValue:viewport, TagEnd:meta, TagStart:meta, TagEnd:meta", Description = "Unclosed tag")]
@@ -80,11 +65,58 @@ namespace Knyaz.Optimus.Tests.Html
 			"TagStart:head, Text:\n\n\t, TagStart:script, Text:somecode, TagEnd:script, TagEnd:head")]
 		[TestCase("\u000D", "Text:\u000A")]
 		[TestCase("<div class=A>1</div>", "TagStart:div, AttributeName:class, AttributeValue:A, Text:1, TagEnd:div")]
-		public void ReadString(string source, string expectedChunkTypesString)
+		public void ReadString(string source, string expectedChunks)
 		{
-			var result = Read(source).ToArray();
-			
-			Assert.AreEqual(expectedChunkTypesString, string.Join(", ", result.Select(x => x.Type+":"+x.Value).ToArray()));
+			Assert.AreEqual(expectedChunks, Read(source));
+		}
+
+		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
+		[TestCase("<a href=\"http://x.x\"/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
+		[TestCase("<a href=\'http://x.x\'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
+		[TestCase("<span data-bind = '\"'/>", "TagStart:span, AttributeName:data-bind, AttributeValue:\", TagEnd:span")]
+		[TestCase("<img src=\"\\\\\"></img>", "TagStart:img, AttributeName:src, AttributeValue:\\, TagEnd:img")]
+		[TestCase("<div data-bind=\"template:\\\"itemTemplate\\\"\"></div>", "TagStart:div, AttributeName:data-bind, AttributeValue:template:\"itemTemplate\", TagEnd:div")]
+		[TestCase("<option value='1' selected>A</option>", "TagStart:option, AttributeName:value, AttributeValue:1, AttributeName:selected, Text:A, TagEnd:option")]
+		[TestCase("<option selected>A</option>", "TagStart:option, AttributeName:selected, Text:A, TagEnd:option")]
+		[TestCase("<option selected id='dd'>A</option>", "TagStart:option, AttributeName:selected, AttributeName:id, AttributeValue:dd, Text:A, TagEnd:option")]
+		[TestCase("<div att1></div>", "TagStart:div, AttributeName:att1, TagEnd:div", Description = "Attribute name can contains digits")]
+		[TestCase("<div na\\me='a'></div>", "TagStart:div, AttributeName:na\\me, AttributeValue:a, TagEnd:div")]
+		[TestCase("<div name=a\\ b></div>", "TagStart:div, AttributeName:name, AttributeValue:a\\, AttributeName:b, TagEnd:div")]
+		[TestCase("<span name=a\\'b></span>", "TagStart:span, AttributeName:name, AttributeValue:a'b, TagEnd:span")]
+		[TestCase("<span name=a\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\b, TagEnd:span")]
+		[TestCase("<span name=a\\\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\\\b, TagEnd:span")]
+		[TestCase("<span at<tr=1>", "TagStart:span, AttributeName:at<tr, AttributeValue:1")]
+		[TestCase("<span at<tr=''>", "TagStart:span, AttributeName:at<tr, AttributeValue:")]
+		public void ReadAttributes(string source, string expectedChunks)
+		{
+			Assert.AreEqual(expectedChunks, Read(source));	
+		}
+
+		//http://www.w3schools.com/html/html_symbols.asp
+		[TestCase("&lang;&rang;&amp;", "Text:〈〉&")]
+		[TestCase("&euro;", "Text:€", Description = "Currency symbols")]
+        [TestCase("<div data='&amp;'></div>", "TagStart:div, AttributeName:data, AttributeValue:&, TagEnd:div", Description = "Symbols in attribute should be decoded")]
+		[TestCase("<div>&amp;</div>", "TagStart:div, Text:&, TagEnd:div", Description = "Text inside tags should be decoded.")]
+		[TestCase("<script>&amp;</script>","TagStart:script, Text:&amp;, TagEnd:script", Description = "Text inside script tags should not be decoded.")]
+		[TestCase("<div>\\&amp;</div>", "TagStart:div, Text:\\&, TagEnd:div", Description = "'&' can't be escaped by \\")]
+		[TestCase("&amp;amp;", "Text:&amp;")]
+		[TestCase("<s&rang;/>", "TagStart:s&rang;, TagEnd:s&rang;", Description = "Tags names should not be decoded")]
+		[TestCase("<span>&ra</span>", "TagStart:span, Text:&ra, TagEnd:span")]
+		[TestCase("<span>&raduga;</span>", "TagStart:span, Text:&raduga;, TagEnd:span", Description = "Unregistered symbol")]
+		[TestCase("<option name='&ra' selected/>", "TagStart:option, AttributeName:name, AttributeValue:&ra, AttributeName:selected, TagEnd:option", Description = "Part of symbol")]
+		public void SpecialSymbolsTest(string source, string expectedChunks)
+		{
+			Assert.AreEqual(expectedChunks, Read(source));
+		}
+
+
+		private string Read(string html)
+		{
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
+			{
+				var result = ((IEnumerable<HtmlChunk>) HtmlReader.Read(stream).ToList()).ToArray();
+				return string.Join(", ", result.Select(x => x.Type + ":" + x.Value).ToArray());
+			}
 		}
 	}
 }
