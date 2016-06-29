@@ -22,6 +22,33 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
+		public void Octane()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://chromium.github.io/octane");
+			engine.WaitDocumentLoad();
+			var startButton = engine.WaitId("main-banner") /*as HtmlElement*/;
+			Assert.IsNotNull(startButton);
+
+			//startButton.Click();
+
+			Thread.Sleep(10000);
+
+			System.Console.WriteLine("Score: " + startButton.InnerHTML);
+		}
+
+		[Test]
+		public void Css3test()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://css3test.com");
+			engine.WaitDocumentLoad();
+			var score = engine.WaitId("score");
+			Assert.IsNotNull("score");
+			System.Console.WriteLine("Score: " + score.InnerHTML);
+		}
+
+		[Test]
 		public void Html5Score()
 		{
 			var engine = new Engine();
