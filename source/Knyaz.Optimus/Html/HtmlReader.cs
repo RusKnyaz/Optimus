@@ -29,7 +29,13 @@ namespace Knyaz.Optimus.Html
 	{
 		private static string HtmlDecode(string txt)
 		{
-			return WebUtility.HtmlDecode(txt).Replace("\u000D", "\u000A");
+			var result = new StringBuilder(WebUtility.HtmlDecode(txt))
+				.Replace("&notinva;", "\u2209")
+				.Replace("&Kopf;","\uD835\uDD42")
+				.Replace("&ImaginaryI;", "\u2148")
+				.Replace("\u000D", "\u000A");
+
+			return result.ToString();
 		}
 
 		static string[] _noContentTags = { "meta", "br", "link" };
