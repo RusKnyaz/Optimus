@@ -206,6 +206,16 @@ namespace Knyaz.Optimus.Tests.Dom
 			return (HtmlElement)div;
 		}
 
+		[TestCase("")]
+		[TestCase("<BODY></BODY>")]
+		[TestCase("<BODY></BODY><HEAD></HEAD>")]
+		public void HeadBodyAlwaysExists(string html)
+		{
+			var h = _document.CreateElement("html");
+			h.InnerHTML = html;
+			h.Assert(x => x.FirstChild.NodeName == "HEAD" && x.LastChild.NodeName == "BODY" && x.FirstChild.NextSibling == x.LastChild);
+		}
+
 		[Test]
 		//Parsing tests stoled from html5test project
 		public void Parsing()
