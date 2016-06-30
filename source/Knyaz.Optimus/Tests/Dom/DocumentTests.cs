@@ -248,7 +248,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[TestCase("\u000D", "\u000A")]
-		[TestCase("&lang;&rang;", "〈〉")]
+		[TestCase("&lang;&rang;", "\u27E8\u27E9")]
 		[TestCase("&apos;", "'")]
 		[TestCase("&ImaginaryI;", "\u2148")]
 		[TestCase("&Kopf;", "\uD835\uDD42")]

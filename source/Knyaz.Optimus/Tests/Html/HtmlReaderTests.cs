@@ -93,7 +93,7 @@ namespace Knyaz.Optimus.Tests.Html
 		}
 
 		//http://www.w3schools.com/html/html_symbols.asp
-		[TestCase("&lang;&rang;&amp;", "Text:〈〉&")]
+		[TestCase("&lang;&rang;&amp;", "Text:\u27E8\u27E9&")]
 		[TestCase("&euro;", "Text:€", Description = "Currency symbols")]
         [TestCase("<div data='&amp;'></div>", "TagStart:div, AttributeName:data, AttributeValue:&, TagEnd:div", Description = "Symbols in attribute should be decoded")]
 		[TestCase("<div>&amp;</div>", "TagStart:div, Text:&, TagEnd:div", Description = "Text inside tags should be decoded.")]

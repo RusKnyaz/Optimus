@@ -29,6 +29,8 @@ namespace Knyaz.Optimus.Html
 	{
 		private static string HtmlDecode(string txt)
 		{
+			txt = txt.Replace("&rang;", "\u27E9").Replace("&lang;", "\u27E8");
+
 			var result = new StringBuilder(WebUtility.HtmlDecode(txt))
 				.Replace("&notinva;", "\u2209")
 				.Replace("&Kopf;","\uD835\uDD42")
