@@ -48,6 +48,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					return HttpResourceProvider;
 				case "file://":
 					return FileResourceProvider;
+				case "data://": //mono
 				case "data:":
 					return new DataResourceProvider();
 				default:
@@ -94,7 +95,9 @@ namespace Knyaz.Optimus.ResourceProviders
 				var data = uri.Substring(5);
 				var type = new string(data.TakeWhile(c => c != ',').ToArray());
 				var content = data.Substring(type.Length);
-				return new Task<IResource>(() => new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
+				return
+					Task.Run(
+						() => (IResource)new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
 			}
 
 			class DataRequest : IRequest
