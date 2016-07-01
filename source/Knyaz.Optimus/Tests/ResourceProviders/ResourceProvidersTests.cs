@@ -1,9 +1,9 @@
-﻿#if NUNIT
+﻿﻿#if NUNIT
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.ResourceProviders;
 using NUnit.Framework;
 
-namespace Knyaz.Optimus.Tests
+namespace Knyaz.Optimus.Tests.ResourceProviders
 {
 	[TestFixture]
 	public class ResourceProvidersTests

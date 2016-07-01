@@ -101,6 +101,7 @@
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
+    <Compile Include="ResourceProviders\PredictedResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
     <Compile Include="ScriptExecuting\ClrPrototype.cs" />
     <Compile Include="ScriptExecuting\DomConverter.cs" />
@@ -135,12 +136,13 @@
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Mocks.cs" />
+    <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
+    <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
     <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tools\Disposable.cs" />
     <Compile Include="Tools\ListExtension.cs" />
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
-    <Compile Include="Tests\ResourceProvidersTests.cs" />
     <Compile Include="Environment\Window.cs" />
     <Compile Include="Dom\DocumentScripting.cs" />
     <Compile Include="Tests\Dom\TypedArrayTests.cs" />
@@ -148,6 +150,9 @@
     <Compile Include="Tools\UriHelper.cs" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tests\ResourceProviders" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

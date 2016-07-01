@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -108,6 +109,23 @@ namespace Knyaz.Optimus.ResourceProviders
 			Headers = new Dictionary<string, string>();
 			Method = method;
 			Url = url;
+		}
+
+		public override int GetHashCode()
+		{
+			return ((Url ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
+		}
+
+		public override bool Equals(object obj)
+		{
+			var other = obj as HttpRequest;
+			if (other == null)
+				return false;
+
+			return Url == other.Url &&
+			       Method == other.Method &&
+			       Headers.Count == other.Headers.Count &&
+			       Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]));
 		}
 	}
 
