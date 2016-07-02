@@ -5,8 +5,10 @@ using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus
 {
@@ -16,8 +18,21 @@ namespace Knyaz.Optimus
 		private Uri _uri;
 		public IResourceProvider ResourceProvider { get; private set; }
 		public IScriptExecutor ScriptExecutor { get; private set; }
-
 		public DocumentScripting Scripting	{get; private set;}
+
+		public Console Console { get; private set; }
+   		public Window Window { get; private set; }
+
+		public Engine() : this(new PredictedResourceProvider(new ResourceProvider())) { }
+
+   		public Engine(IResourceProvider resourceProvider)
+   		{
+   			ResourceProvider = resourceProvider;
+   			Console = new Console();
+   			Window = new Window(() => Document, this);
+   			ScriptExecutor = new ScriptExecutor(this);
+   			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+   		}
 
 		public Document Document
 		{
@@ -55,17 +70,7 @@ namespace Knyaz.Optimus
 			Console.Log("Node event handler exception: " + exception.Message);
 		}
 
-		public Console Console { get; private set; }
-		public Window Window { get; private set; }
 
-		public Engine(IResourceProvider resourceProvider)
-		{
-			ResourceProvider = resourceProvider;
-			Console = new Console();
-			Window = new Window(() => Document, this);
-			ScriptExecutor = new ScriptExecutor(this);
-			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
-		}
 
 		/// <summary>
 		/// todo: rewrite and complete the stuff
@@ -131,8 +136,6 @@ namespace Knyaz.Optimus
 			//todo: handle 'about:blank'
 		}
 
-		public Engine() : this(new ResourceProvider()) { }
-
 		public Uri Uri
 		{
 			get { return _uri; }
@@ -190,7 +193,24 @@ namespace Knyaz.Optimus
 				Uri = new Uri("http://localhost");
 
 			//todo: clear js runtime context
-			DocumentBuilder.Build(Document, stream);
+
+			var html = HtmlParser.Parse(stream).ToList();
+
+			var resourceProvider = ResourceProvider as PredictedResourceProvider;
+			if (resourceProvider != null)
+			{
+				foreach (var script in html.OfType<Html.IHtmlElement>()
+					.Flat(x => x.Children.OfType<Html.IHtmlElement>())
+					.Where(x => x.Name == "script")
+					.Select(x => x.Attributes["src"])
+					.Where(x => !string.IsNullOrEmpty(x))
+					)
+				{
+					resourceProvider.Preload(script);
+				}
+			}
+
+			DocumentBuilder.Build(Document, html);
 			Document.Complete();
 		}
 

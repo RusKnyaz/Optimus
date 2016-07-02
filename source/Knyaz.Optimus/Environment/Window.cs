@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.Environment
 					}
 					else
 					{
-						engine.Console.Log("Unhandled exception in timer handler function: " + exception.Message);
+						engine.Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
 					}
 				};
 

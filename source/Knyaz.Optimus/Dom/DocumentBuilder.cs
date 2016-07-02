@@ -17,14 +17,8 @@ namespace Knyaz.Optimus.Dom
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
 				var html = HtmlParser.Parse(stream);
-				Build(parentNode, html, source);
+				BuildInternal(parentNode, html, source);
 			}
-		}
-
-		public static void Build(Document parentNode, Stream stream)
-		{
-			var html = ExpandHtmlTag(HtmlParser.Parse(stream));
-			Build(parentNode.DocumentElement, html);
 		}
 
 		private static IEnumerable<IHtmlNode> ExpandHtmlTag(IEnumerable<IHtmlNode> parse)
@@ -46,7 +40,18 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private static void Build(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
+		public static void Build(Document document, Stream stream)
+		{
+			var html = HtmlParser.Parse(stream);
+			Build(document, html);
+		}
+
+		public static void Build(Document document, IEnumerable<IHtmlNode> htmlElements)
+		{
+			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements));
+		}
+
+		private static void BuildInternal(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
 		{
 			foreach (var htmlElement in htmlElements)
 			{
@@ -120,7 +125,7 @@ namespace Knyaz.Optimus.Dom
 			if(append)
 				node.AppendChild(elem);
 
-			Build(elem, htmlElement.Children, source);
+			BuildInternal(elem, htmlElement.Children, source);
 		}
 	}
 }

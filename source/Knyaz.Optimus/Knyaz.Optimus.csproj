@@ -140,6 +140,7 @@
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
     <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tools\Disposable.cs" />
+    <Compile Include="Tools\IEnumerableExtension.cs" />
     <Compile Include="Tools\ListExtension.cs" />
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
