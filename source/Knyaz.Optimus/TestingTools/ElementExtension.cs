@@ -37,7 +37,14 @@ namespace Knyaz.Optimus.TestingTools
 				{
 					var doc = elt as IDocument;
 					if (doc != null)
-						return new[] {doc.GetElementById(selector.Substring(1))};
+					{
+						var res = doc.GetElementById(selector.Substring(1));
+						if (res != null)
+							return new[] {res};
+						
+						return new IElement[0];
+					}
+						
 					throw new InvalidOperationException("Id search can be performed only on document");
 				}
 				case '.':
