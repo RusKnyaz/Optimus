@@ -201,7 +201,7 @@ namespace Knyaz.Optimus
 			{
 				foreach (var script in html.OfType<Html.IHtmlElement>()
 					.Flat(x => x.Children.OfType<Html.IHtmlElement>())
-					.Where(x => x.Name == "script")
+					.Where(x => x.Name == "script" && x.Attributes.ContainsKey("src"))
 					.Select(x => x.Attributes["src"])
 					.Where(x => !string.IsNullOrEmpty(x))
 					)
