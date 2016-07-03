@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using Knyaz.Optimus;
-using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.PhantomJS;
@@ -12,14 +11,16 @@ namespace Optimus.Comparison
 {
 	[TestFixture]
     public class ComparisonTests
-    {
+	{
+		private string pathToPhantomJs =
+			@"c:\projects\Optimus\samples\Optimus.Comparison\packages\PhantomJS.2.1.1\tools\phantomjs";
+
 		[TestCase("http://chi.todosoft.org", "logon")]
 		public void OpenChicoryPhantom(string url, string itemId)
 		{
 			var options = new PhantomJSOptions();
 			options.AddAdditionalCapability("ignoreProtectedModeSettings", true);
-			using(var browser = new PhantomJSDriver(
-					@"c:\projects\Optimus.Comparison\Optimus.Comparison\packages\PhantomJS.2.1.1\tools\phantomjs", options))
+			using(var browser = new PhantomJSDriver(pathToPhantomJs, options))
 			{
 				browser.Navigate().GoToUrl(url);
 				Assert.IsNotNull(PhFind(browser, By.Id(itemId)));
@@ -43,11 +44,8 @@ namespace Optimus.Comparison
 			var engine = new Engine();
 			engine.OpenUrl("https://html5test.com");
 			engine.WaitDocumentLoad();
-			Thread.Sleep(3000);//wait calculation
 
-			var score = engine.Document.GetElementById("score");
-			Assert.IsNotNull(score, "score");
-			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
+			var tagWithValue = engine.WaitSelector("#score strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
 			System.Console.WriteLine("Score: " + tagWithValue.InnerHTML);
 		}
@@ -57,8 +55,7 @@ namespace Optimus.Comparison
 		{
 			var options = new PhantomJSOptions();
 			options.AddAdditionalCapability("ignoreProtectedModeSettings", true);
-			using(var browser = new PhantomJSDriver(
-					@"c:\projects\Optimus.Comparison\Optimus.Comparison\packages\PhantomJS.2.1.1\tools\phantomjs", options))
+			using(var browser = new PhantomJSDriver(pathToPhantomJs, options))
 			{
 				browser.Navigate().GoToUrl("https://html5test.com");
 				var scoreElement = PhFind(browser, By.Id("score"));
