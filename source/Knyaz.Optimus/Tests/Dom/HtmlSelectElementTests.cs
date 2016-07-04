@@ -107,6 +107,67 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(1, _select.Options.Length);
 			Assert.AreEqual(optX, _select.Options.Item(0));
 		}
+
+		[Test]
+		public void TypeTest()
+		{
+			_select.Multiple = true;
+			Assert.AreEqual("select-multiple", _select.Type);
+			_select.Multiple = false;
+			Assert.AreEqual("select-one", _select.Type);
+		}
+
+		[Test]
+		public void SetSelectedIndex()
+		{
+			var opt1 = (HtmlOptionElement)_document.CreateElement("option");
+			var opt2 = (HtmlOptionElement)_document.CreateElement("option");
+			_select.Add(opt1);
+			_select.Add(opt2);
+
+			_select.SelectedIndex = 1;
+			_select.Assert(x => x.SelectedIndex == 1 && x.SelectedOptions[0] == opt2);
+		}
+
+		[Test]
+		public void SelectedIndexOfEmptyIsMunusOne()
+		{
+			Assert.AreEqual(-1, _select.SelectedIndex);
+		}
+
+		[Test]
+		public void DefaultSelectedIndexIsZeroForSingle()
+		{
+			_select.AppendChild(_select.OwnerDocument.CreateElement("option"));
+			Assert.AreEqual(0, _select.SelectedIndex);
+		}
+
+		[Test]
+		public void DefaultSelectedIndesIsMinusOneForMultiple()
+		{
+			_select.Multiple = true;
+			Assert.AreEqual(-1, _select.SelectedIndex);
+		}
+
+		[Test]
+		public void ValueTest()
+		{
+			var option = (HtmlOptionElement)_select.OwnerDocument.CreateElement("option");
+			option.Value = "ABC";
+			_select.AppendChild(option);
+
+			_select.Assert(x => x.SelectedOptions[0] == option && x.Value == "ABC");
+		}
+
+		[Test]
+		public void Add()
+		{
+			var opt1 = (HtmlOptionElement)_document.CreateElement("option");
+			var opt2 = (HtmlOptionElement) _document.CreateElement("option");
+			_select.Add(opt1);
+			_select.Add(opt2,opt1);
+			_select.Assert(x => x.Options[0] == opt2 && x.Options[1] == opt1);
+		}
 	}
 }
 #endif

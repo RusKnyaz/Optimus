@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
-	[TestFixture]
+	[TestFixture, Ignore]
 	public class OpenSites
 	{
 		[TestCase("http://okkamtech.com")]
