@@ -44,7 +44,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					response.StatusCode,
 					new MemoryStream(result),
 					content.Headers.ToString(),
-					content.Headers.ContentType.MediaType,
+					content.Headers.ContentType != null ? content.Headers.ContentType.ToString() : null,
 					response.RequestMessage.RequestUri);
 			}
 		}
@@ -70,7 +70,7 @@ namespace Knyaz.Optimus.ResourceProviders
 				switch (keyValue.Key)
 				{
 					case "Content-Type":
-						resultRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(keyValue.Value);
+						resultRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(keyValue.Value);
 						break;
 					default:
 						resultRequest.Headers.Add(keyValue.Key, keyValue.Value);

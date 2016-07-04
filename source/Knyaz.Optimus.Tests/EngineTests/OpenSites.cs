@@ -141,8 +141,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.IsNotNull(userName, "UserName");
 			Assert.IsNotNull(password, "Password");
 
-			userName.Value = "admin";
-			password.Value = "b";
+			userName.EnterText("admin");
+			password.EnterText("b");
 			logonButton.Click();
 
 			var error = engine.WaitId("validationError");
@@ -158,16 +158,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.OpenUrl("http://localhost:2930");
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
-			Thread.Sleep(5000);
-
-			var userName = engine.Document.GetElementById("UserName") as HtmlInputElement;
-			var password = engine.Document.GetElementById("Password") as HtmlInputElement;
+			
+			var userName = engine.WaitId("UserName") as HtmlInputElement;
+			var password = engine.WaitId("Password") as HtmlInputElement;
 			Assert.IsNotNull(logonButton, "LogonButton");
 			Assert.IsNotNull(userName, "UserName");
 			Assert.IsNotNull(password, "Password");
 
-			userName.Value = "admin";
-			password.Value = "admin";
+			userName.EnterText("admin");
+			password.EnterText("admin");
 			logonButton.Click();
 
 			var error = engine.WaitId("logout");

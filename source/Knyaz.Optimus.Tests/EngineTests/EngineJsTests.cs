@@ -715,5 +715,19 @@ dispatchEvent(evt);");
 
 			CollectionAssert.AreEqual(new object[0], _log);
 		}
+
+		[Test]
+		public void SelectZeroLength()
+		{
+			CreateEngine("<select id=s></select>", "console.log(document.getElementById('s').length);");
+			CollectionAssert.AreEqual(new []{0.0}, _log);
+		}
+
+		[Test]
+		public void SelectLength()
+		{
+			CreateEngine("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
+			CollectionAssert.AreEqual(new[] { 1.0 }, _log);
+		}
 	}
 }

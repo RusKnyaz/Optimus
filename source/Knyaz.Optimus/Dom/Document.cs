@@ -102,6 +102,8 @@ namespace Knyaz.Optimus.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
+				case TagsNames.Select: return new HtmlSelectElement(this);
+				case TagsNames.Option: return new HtmlOptionElement(this);
 				case "DIV": return new HtmlDivElement(this);
 				case "SPAN":
 				case TagsNames.Nav:
@@ -249,6 +251,8 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		public string Title { get; set; }
+
+		public object ActiveElement { get; set; }
 	}
 
 	[DomItem]
@@ -269,5 +273,6 @@ namespace Knyaz.Optimus.Dom
 		event Action<Node> NodeInserted;
 		event Action<IDocument> DomContentLoaded;
 		string Title { get; set; }
+		object ActiveElement { get; set; }
 	}
 }

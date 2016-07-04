@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Knyaz.Optimus;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 using OpenQA.Selenium;
@@ -31,11 +32,9 @@ namespace Optimus.Comparison
 		public void OpenChicoryOptimus(string url, string itemId)
 		{
 			var engine = new Engine();
-			//engine.AttachConsole();
-			//engine.ResourceProvider.OnRequest += s => Console.WriteLine(s);
 			engine.OpenUrl(url);
-			engine.WaitId(itemId);
-			Assert.IsNotNull(engine.Document.GetElementById(itemId));
+			var item = engine.WaitId(itemId) as IHtmlElement;
+			Assert.IsNotNull(item);
 		}
 
 		[Test]

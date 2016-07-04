@@ -43,7 +43,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public Node AppendChild(Node node)
+		public virtual Node AppendChild(Node node)
 		{
 			if(node == this)
 				throw new InvalidOperationException();
