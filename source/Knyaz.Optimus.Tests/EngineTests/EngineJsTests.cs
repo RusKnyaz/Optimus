@@ -729,5 +729,13 @@ dispatchEvent(evt);");
 			CreateEngine("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
 			CollectionAssert.AreEqual(new[] { 1.0 }, _log);
 		}
+
+		[Test]
+		public void SelectOptionsItem()
+		{
+			CreateEngine("<select id=s><option id=X/></select>", "console.log(document.getElementById('s').options.Item(0).Id);" +
+																 "console.log(document.getElementById('s').options[0].Id);");
+			CollectionAssert.AreEqual(new[] { "X","X" }, _log);
+		}
 	}
 }
