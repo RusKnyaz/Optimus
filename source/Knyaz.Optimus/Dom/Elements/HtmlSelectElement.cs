@@ -35,10 +35,13 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public void Remove(int index)
 		{
-			var options = ChildNodes.ToArray();
+			var options = Options;
 			if (index >= 0 && index < options.Length)
 			{
-				RemoveChild(options[index]);
+				var optionToRemove = options[index];
+				RemoveChild(optionToRemove);
+				if (SelectedOptions.IndexOf(optionToRemove) != -1)
+					SelectedOptions.Remove(optionToRemove);
 			}
 		}
 

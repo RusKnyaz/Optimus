@@ -168,6 +168,19 @@ namespace Knyaz.Optimus.Tests.Dom
 			_select.Add(opt2,opt1);
 			_select.Assert(x => x.Options[0] == opt2 && x.Options[1] == opt1);
 		}
+
+		[Test]
+		public void RemoveSelectedOption()
+		{
+			var opt1 = (HtmlOptionElement)_document.CreateElement("option");
+			var opt2 = (HtmlOptionElement)_document.CreateElement("option");
+			_select.Add(opt1);
+			_select.Add(opt2);
+			_select.Remove(0);
+			_select.Assert(x => x.Options[0] == opt2 && x.SelectedOptions[0] == opt2);
+			_select.Remove(0);
+			Assert.AreEqual(-1, _select.SelectedIndex);
+		}
 	}
 }
 #endif
