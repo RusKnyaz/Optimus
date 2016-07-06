@@ -95,6 +95,13 @@ namespace Knyaz.Optimus.Dom.Elements
 			Executed = true;
 			RaiseOnLoad();
 		}
+
+		public override Node CloneNode(bool deep)
+		{
+			var node = (Script)base.CloneNode(deep);
+			node.Text = Text;
+			return node;
+		}
 	}
 
 	[DomItem]

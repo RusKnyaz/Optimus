@@ -169,6 +169,28 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));",
 		}
 
 		[Test]
+		public void ArrayPushAll()
+		{
+			var doc = Load(
+@"function VM() {
+	var _this = this;	
+	this.Peoples = ko.observableArray();
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+var vm = new VM();
+ko.applyBindings(vm);
+ko.utils.arrayPushAll(vm.Peoples, [{Name:'Ivan'},{Name:'Vasil'}]);peoples",
+@"<!-- ko foreach: Peoples -->
+		<span data-bind='text:Name'></span>
+<!-- /ko -->");
+
+			var spans = doc.Body.GetElementsByTagName("span").ToArray();
+			Assert.AreEqual(2, spans.Length);
+			Assert.AreEqual("Ivan", spans[0].InnerHTML);
+			Assert.AreEqual("Vasil", spans[1].InnerHTML);
+		}
+
+		[Test]
 		public void Template()
 		{
 			var vm =

@@ -1,5 +1,6 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -15,6 +16,16 @@ namespace Knyaz.Optimus.Tests.Dom
 			document.Write(html);
 			var s = document.GetElementById("s");
 			Assert.AreEqual(expectedInnerHtml, s.InnerHTML);
+		}
+
+		[Test]
+		public void CloneTest()
+		{
+			var document = new Document();
+			document.Write("<script id=d>ABC</script>");
+			var script = document.GetElementById("d");
+			var clone = script.CloneNode() as Script;
+			clone.Assert(x => x.Text == "ABC");
 		}
 	}
 }
