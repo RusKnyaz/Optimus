@@ -60,15 +60,11 @@ namespace Knyaz.Optimus.TestingTools
 
 		private static IEnumerable<IElement> GetElementsByAttributes(this IElement elt, string selector)
 		{
-			var attrs = selector.Split(',');
 			foreach (var child in elt.ChildNodes.Flat(x => x.ChildNodes).OfType<IElement>())
 			{
 				var notMatched = false;
-				foreach (var attr in attrs)
-				{
-					var arr = attr.Split('=');
-					notMatched = child.GetAttribute(arr[0]) != arr[1];
-				}
+				var arr = selector.Split('=');
+				notMatched = child.GetAttribute(arr[0]) != arr[1];
 
 				if (!notMatched)
 					yield return child;

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
@@ -107,6 +109,15 @@ namespace Knyaz.Optimus.TestingTools
 				Thread.Sleep(timespan);
 			}
 			return engine.Select(query);
+		}
+
+		public static void DumpToFile(this Engine engine, string fileName)
+		{
+			var data = Encoding.UTF8.GetBytes(engine.Document.InnerHTML);
+			using (var stream = File.OpenWrite(fileName))
+			{
+				stream.Write(data, 0, data.Length);
+			}
 		}
 	}
 }
