@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -21,7 +22,7 @@ namespace Knyaz.Optimus.TestingTools
 
 		public static IEnumerable<IElement> Select(this IElement doc, string selector)
 		{
-			var selectors = selector.Split(' ');
+			var selectors = selector.Split(' ', '[').Where(x => !string.IsNullOrEmpty(x)).ToArray();
 			if (selectors.Length == 0)
 				return Enumerable.Empty<IElement>();
 
@@ -50,7 +51,27 @@ namespace Knyaz.Optimus.TestingTools
 				case '.':
 					return elt.GetElementsByClassName(selector.Substring(1));
 				default:
+					if (selector[selector.Length - 1] == ']')
+						return elt.GetElementsByAttributes(selector.Substring(0, selector.Length-1));
+
 					return elt.GetElementsByTagName(selector);
+			}
+		}
+
+		private static IEnumerable<IElement> GetElementsByAttributes(this IElement elt, string selector)
+		{
+			var attrs = selector.Split(',');
+			foreach (var child in elt.ChildNodes.Flat(x => x.ChildNodes).OfType<IElement>())
+			{
+				var notMatched = false;
+				foreach (var attr in attrs)
+				{
+					var arr = attr.Split('=');
+					notMatched = child.GetAttribute(arr[0]) != arr[1];
+				}
+
+				if (!notMatched)
+					yield return child;
 			}
 		}
 	}
