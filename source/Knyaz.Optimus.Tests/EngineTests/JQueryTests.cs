@@ -189,6 +189,20 @@ document.body.appendChild(e);";
 			u.Click();
 			Assert.AreEqual("hi", result);
 		}
+
+		[Test]
+		public void SetHtmlWithScript()
+		{
+			var script = "$('#target')['html']('<script>console.log(1);</script>');";
+			var engine = new Engine();
+			object result = null;
+			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
+
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
+
+			engine.DumpToFile("c:\\temp\\c.html");
+			Assert.AreEqual(1, result);
+		}
 	}
 
 	public static class StringExtension

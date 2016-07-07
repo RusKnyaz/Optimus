@@ -59,6 +59,29 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(1, clone.ChildNodes.Count);
 			Assert.AreEqual(1, clone.ChildNodes[0].ChildNodes.Count);
 		}
+
+		[Test]
+		public void Contains()
+		{
+			var document = new Document();
+			var elt = document.CreateElement("div");
+			var sub = document.CreateElement("span");
+			elt.AppendChild(sub);
+			var subsub = document.CreateElement("script");
+			sub.AppendChild(subsub);
+			Assert.IsTrue(elt.Contains(sub));
+			Assert.IsTrue(elt.Contains(subsub));
+			Assert.IsFalse(sub.Contains(elt));
+		}
+
+		[Test]
+		public void TextContent()
+		{
+			var document = new Document();
+			document.Write("<html><body><ul id=\"myList\"><li id=\"item1\">Coffee</li><li id=\"item2\">Tea</li></ul></body></html>");
+			var ul = document.GetElementById("myList");
+			Assert.AreEqual("Coffee Tea", ul.TextContent);
+		}
 	}
 }
 #endif

@@ -293,5 +293,20 @@ window.clearTimeout(timer);"));
 			Assert.AreEqual(1, beforeCount, "BeforeScriptExecute Event handlers calls count");
 			Assert.AreEqual(1, afterCount, "AfterScriptExecute Event handlers calls count");
 		}
+
+		[Test]
+		public void AppendScriptAsInnerHtml()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+			engine.Load("<html><head></head><body></body></html>");
+			engine.Document.Body.InnerHTML = "<script>console.log('HI');</script>";
+			Assert.AreEqual(new[]{"HI"}, log);
+		}
 	}
 }

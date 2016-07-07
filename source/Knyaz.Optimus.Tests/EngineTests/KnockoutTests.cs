@@ -325,5 +325,39 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 			Assert.AreEqual(1, inner.ChildNodes[0].ChildNodes.Count);
 			Assert.AreEqual("Kos", ((HtmlElement)inner.ChildNodes[0].ChildNodes[0]).InnerHTML);
 		}
+
+		[Test]
+		public void HtmlWithScriptBinding()
+		{
+			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>" +
+@"<body> <div id='view' data-bind=""html:html""></div> </body>
+<script>
+	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
+</script>
+</html>");
+			Assert.IsNotNull(doc.GetElementById("d"));
+		}
+
+		[Test]
+		public void HtmlWithScriptBindingWithJquery()
+		{
+			var engine = new Engine();
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load("<html><head><script>" + Resources.jquery_2_1_3+"</script><script> " + Resources.knockout + " </script></head>" +
+			            @"<body> <div id='view' data-bind=""html:html""></div> </body>
+<script>
+	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
+</script>
+</html>");
+			var doc = engine.Document;
+			try
+			{
+				Assert.IsNotNull(doc.GetElementById("d"));
+			}
+			finally
+			{
+				engine.DumpToFile("c:\\temp\\c.html");
+			}
+		}
 	}
 }
