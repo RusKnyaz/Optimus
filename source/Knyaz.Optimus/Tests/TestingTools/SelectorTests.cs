@@ -17,6 +17,7 @@ namespace Knyaz.Optimus.Tests.TestingTools
 		[TestCase("<span class='B A'></span>", ".A", "<SPAN class=\"B A\"></SPAN>", Description = "Simple class selector from multiclass defenition")]
 		[TestCase("<div class=A><span>1</span></div><DIV><SPAN>2</SPAN></DIV>", ".A span", "<SPAN>1</SPAN>", Description = "By class than by tag name")]
 		[TestCase("<div id=a></div><div id=b></div>", "[id=b]","<DIV id=\"b\"></DIV>")]
+		[TestCase("<div><div><label for='OrganizationId'></label></div></div>", "label[for=OrganizationId]", "<LABEL for=\"OrganizationId\"></LABEL>")]
 		public void DocumentSelectorTests(string html, string selector, string expectedResult)
 		{
 			var doc = new Document();
