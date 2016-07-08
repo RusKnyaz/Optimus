@@ -255,6 +255,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	public interface IElement : INode
 	{
 		string TagName { get; }
+		string Id { get; }
 		string InnerHTML { get; set; }
 		string TextContent { get; set; }
 		Element[] GetElementsByTagName(string tagName);
