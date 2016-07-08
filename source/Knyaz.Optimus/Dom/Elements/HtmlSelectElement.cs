@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -76,7 +77,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 	}
 
-	public class HtmlOptionsCollection
+	public class HtmlOptionsCollection : IEnumerable<HtmlOptionElement>
 	{
 		private readonly HtmlSelectElement _owner;
 
@@ -121,6 +122,16 @@ namespace Knyaz.Optimus.Dom.Elements
 				int idx;
 				return int.TryParse(strKey, out idx) ? Item(idx) : NamedItem(strKey);
 			}
+		}
+
+		public IEnumerator<HtmlOptionElement> GetEnumerator()
+		{
+			return _owner.ChildNodes.OfType<HtmlOptionElement>().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 	}
 }
