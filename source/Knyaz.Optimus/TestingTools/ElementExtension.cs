@@ -62,12 +62,18 @@ namespace Knyaz.Optimus.TestingTools
 		{
 			foreach (var child in elt.Flatten().OfType<IElement>())
 			{
-				var notMatched = false;
 				var arr = selector.Split('=');
-				notMatched = child.GetAttribute(arr[0]) != arr[1];
-
-				if (!notMatched)
-					yield return child;
+				if (arr[0].Last() == '^')
+				{
+					var attrVal = child.GetAttribute(arr[0].TrimEnd('^'));
+					if (attrVal != null && attrVal.StartsWith(arr[1]))
+						yield return child;
+				}
+				else
+				{
+					if (child.GetAttribute(arr[0]) == arr[1])
+						yield return child;	
+				}
 			}
 		}
 	}
