@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -13,6 +12,17 @@ namespace Knyaz.Optimus.TestingTools
 		/// Emulate entering text by user into input textbox.
 		/// </summary>
 		public static void EnterText(this HtmlInputElement input, string text)
+		{
+			input.Value = text;
+			var evt = input.OwnerDocument.CreateEvent("Event");
+			evt.InitEvent("change", false, false);
+			input.DispatchEvent(evt);
+		}
+
+		/// <summary>
+		/// Emulate entering text by user into input textbox.
+		/// </summary>
+		public static void EnterText(this HtmlTextAreaElement input, string text)
 		{
 			input.Value = text;
 			var evt = input.OwnerDocument.CreateEvent("Event");

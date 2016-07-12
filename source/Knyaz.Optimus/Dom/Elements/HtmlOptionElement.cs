@@ -1,6 +1,6 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlOptionElement : HtmlElement
+	public class  HtmlOptionElement : HtmlElement
 	{
 		public HtmlOptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Option)
 		{
@@ -23,6 +23,18 @@
 		{
 			get { return InnerHTML;}
 			set { InnerHTML = value; }
+		}
+
+		public bool Selected
+		{
+			get { return HasAttribute("selected"); }
+			set
+			{
+				if(value)
+					SetAttribute("selected","selected");
+				else
+					RemoveAttribute("selected");
+			}	
 		}
 	}
 }

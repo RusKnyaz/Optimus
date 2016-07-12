@@ -350,9 +350,26 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 </script>
 </html>");
 			var doc = engine.Document;
+			Assert.IsNotNull(doc.GetElementById("d"));
+		}
+
+		[Test]
+		public void SelectOptionsTest()
+		{
+			var engine = new Engine();
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load("<html><head><script>" + Resources.jquery_2_1_3 + "</script><script> " + Resources.knockout + " </script></head>" +
+						@"<body> <select id='s' data-bind=""options:options""></select> </body>
+<script>
+	ko.applyBindings({ options: ['A','B']});
+</script>
+</html>");
+			var doc = engine.Document;
 			try
 			{
-				Assert.IsNotNull(doc.GetElementById("d"));
+				var select = doc.GetElementById("s") as HtmlSelectElement;
+				Assert.IsNotNull(select);
+				Assert.AreEqual(2, select.Options.Length);
 			}
 			finally
 			{

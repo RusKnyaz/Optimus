@@ -113,10 +113,10 @@ namespace Knyaz.Optimus.TestingTools
 
 		public static void DumpToFile(this Engine engine, string fileName)
 		{
-			var data = Encoding.UTF8.GetBytes(engine.Document.InnerHTML);
-			using (var stream = File.OpenWrite(fileName))
+			var data = engine.Document.InnerHTML;
+			using (var stream = File.CreateText(fileName))
 			{
-				stream.Write(data, 0, data.Length);
+				stream.Write(data);
 			}
 		}
 	}
