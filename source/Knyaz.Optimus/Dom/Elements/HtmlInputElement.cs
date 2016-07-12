@@ -9,7 +9,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		static class Defaults
 		{
-			public static bool Disabled = false;
 			public static bool Readonly = false;
 			public static bool Required = false;
 			public static string Value = string.Empty;
@@ -39,8 +38,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public bool Disabled
 		{
-			get { return GetAttribute("disabled", Defaults.Disabled); }
-			set { SetAttribute("disabled", value.ToString()); }
+			get { return AttributeMapper.GetExistAttributeValue(this, "disabled"); }
+			set { AttributeMapper.SetExistAttributeValue(this, "disabled", value); }
 		}
 
 		public string Type

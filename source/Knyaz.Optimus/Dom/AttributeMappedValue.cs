@@ -56,4 +56,20 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 	}
+
+	internal class AttributeMapper
+	{
+		public static bool GetExistAttributeValue(HtmlElement element, string attributeName)
+		{
+			return element.HasAttribute(attributeName);
+		}
+
+		public static void SetExistAttributeValue(HtmlElement element, string attributeName, bool value)
+		{
+			if(value)
+				element.SetAttribute(attributeName, string.Empty);
+			else
+				element.RemoveAttribute(attributeName);
+		}
+	}
 }

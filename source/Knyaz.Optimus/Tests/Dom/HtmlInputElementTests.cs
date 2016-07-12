@@ -24,7 +24,8 @@ namespace Knyaz.Optimus.Tests.Dom
 			_input.Assert(input => 
 				input.Type == "text" &&
 				input.GetAttribute("type") == null &&
-				input.Checked == false
+				input.Checked == false &&
+				input.Disabled == false
 				
 				/* todo: implement default styles
 				input.Style.Position == "absolute" &&
@@ -93,6 +94,15 @@ namespace Knyaz.Optimus.Tests.Dom
 			_input.Checked = false;
 			_input.SetAttribute("checked", "checked");
 			Assert.IsFalse(_input.Checked);//note: it's IE's behavior. Chrome produces 'True'
+		}
+
+		[TestCase("true", true)]
+		[TestCase("abc", true)]
+		[TestCase(null, true)]
+		public void DisabledFromAttribute(string attrValue, bool expectedValue)
+		{
+			_input.SetAttribute("disabled", attrValue);	
+			Assert.AreEqual(expectedValue, _input.Disabled);
 		}
 	}
 }
