@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	internal class ResourceProvider : IResourceProvider
 	{
 		public event Action<string> OnRequest;
-		public event Action<string> Received;
+		public event EventHandler<ReceivedEventArguments> Received;
 
 		private readonly CookieContainer _cookies;
 		private string _root;
@@ -75,7 +75,7 @@ namespace Knyaz.Optimus.ResourceProviders
 						try
 						{
 							if (Received != null)
-								Received(req.Url);
+								Received(this, new ReceivedEventArguments(req, t.Result));
 						}
 						catch { }
 						return t.Result;

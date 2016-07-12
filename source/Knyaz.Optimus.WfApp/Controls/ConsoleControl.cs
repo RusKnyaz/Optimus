@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.WfApp.Controls
 {
@@ -102,9 +103,9 @@ namespace Knyaz.Optimus.WfApp.Controls
 			Log("Request: " + s);
 		}
 
-		private void ResourceProviderOnReceived(string s)
+		private void ResourceProviderOnReceived(object sender, ReceivedEventArguments args)
 		{
-			Log("Received: " + s);
+			Log("Received: " + args.Request.Url);
 		}
 
 		private void ConsoleOnOnLog(object o)

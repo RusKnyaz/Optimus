@@ -27,7 +27,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			remove { _resourceProvider.OnRequest -= value; }
 		}
 
-		public event Action<string> Received
+		public event EventHandler<ReceivedEventArguments> Received
 		{
 			add { _resourceProvider.Received += value; }
 			remove { _resourceProvider.Received -= value; }
