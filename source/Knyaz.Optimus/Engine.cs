@@ -165,14 +165,14 @@ namespace Knyaz.Optimus
 
 		private void LoadFromResponse(IResource resource)
 		{
-			if (resource.Type == ResourceTypes.Html)
-			{
-				var httpResponse = resource as HttpResponse;
-				if (httpResponse != null && httpResponse.Uri != null)
-					Uri = httpResponse.Uri;
+			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
+				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
 
-				BuildDocument(resource.Stream);
-			}
+			var httpResponse = resource as HttpResponse;
+			if (httpResponse != null && httpResponse.Uri != null)
+				Uri = httpResponse.Uri;
+
+			BuildDocument(resource.Stream);
 		}
 
 		/// <summary>
