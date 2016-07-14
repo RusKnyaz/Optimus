@@ -63,13 +63,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (methods.Any())
 			{
-				var func = new MethodInfoFunctionInstance(Engine, methods);
-				func.FastAddProperty("toString",
-					new JsValue(new ClrFunctionInstance(Engine, (value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
-					false, false, false);
-				var descriptor = new PropertyDescriptor(func, false, true, false);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return MethodDescriptor(propertyName, methods);
 			}
 
 			// look for methods using pascal cased name.
@@ -79,14 +73,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (pascalCasedMethods.Any())
 			{
-				var func = new MethodInfoFunctionInstance(Engine, pascalCasedMethods);
-				func.FastAddProperty("toString",
-					new JsValue(new ClrFunctionInstance(Engine, (value, values) => new JsValue("function " + propertyName + "() { [native code] }"))), 
-					false, false, false);
-
-				var descriptor = new PropertyDescriptor(func, false, true, false);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return MethodDescriptor(propertyName, pascalCasedMethods);
 			}
 
 			// if no methods are found check if target implemented indexing
@@ -186,6 +173,23 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 
 			return PropertyDescriptor.Undefined;
+		}
+
+		private PropertyDescriptor MethodDescriptor(string propertyName, MethodInfo[] methods)
+		{
+			var func = new MethodInfoFunctionInstance(Engine, methods);
+			func.FastAddProperty("toString",
+				new JsValue(new ClrFunctionInstance(Engine,
+					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
+				false, false, false);
+
+			/*func.FastAddProperty("apply",
+					new JsValue(new ClrFunctionInstance(Engine, (value, values) => Undefined.Instance)),
+					false, false, false);*/
+
+			var descriptor = new PropertyDescriptor(func, false, true, false);
+			Properties.Add(propertyName, descriptor);
+			return descriptor;
 		}
 	}
 }

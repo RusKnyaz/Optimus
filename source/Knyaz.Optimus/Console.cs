@@ -1,7 +1,9 @@
 ﻿using System;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus
 {
+	[DomItem]
 	public class Console
 	{
 		public void Log(object obj)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using System.Threading;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
@@ -736,6 +737,20 @@ dispatchEvent(evt);");
 			CreateEngine("<select id=s><option id=X/></select>", "console.log(document.getElementById('s').options.Item(0).Id);" +
 																 "console.log(document.getElementById('s').options[0].Id);");
 			CollectionAssert.AreEqual(new[] { "X","X" }, _log);
+		}
+
+		[Test]
+		public void ApplyToJsFunc()
+		{
+			CreateEngine("", "function log(x){console.log(x);} log.apply(console, ['asd']);");
+			CollectionAssert.AreEqual(new[] { "asd" }, _log);
+		}
+
+		[Test]
+		public void ApplyToClrFunc()
+		{
+			CreateEngine("", "console.log.apply(console, ['asd']);");
+			CollectionAssert.AreEqual(new[] { "asd" }, _log);
 		}
 	}
 }

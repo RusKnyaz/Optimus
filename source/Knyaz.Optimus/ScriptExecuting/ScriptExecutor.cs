@@ -7,7 +7,6 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
-using Knyaz.Optimus.Environment;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -15,24 +14,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 	{
 		private readonly Engine _engine;
 
-		private string _scopeEmbeddingObjectName = "A89A3DC7FB5944849D4DE0781117A595";
-		
 		private Jint.Engine _jsEngine;
 		private DomConverter _typeConverter;
-
-		class EngineAdapter
-		{
-			private readonly Engine _engine;
-
-			public EngineAdapter(Engine engine)
-			{
-				_engine = engine;
-			}
-
-			public Document Document { get { return _engine.Document; } }
-			public Window Window { get { return _engine.Window; } }
-			public XmlHttpRequest XmlHttpRequest(){ return new XmlHttpRequest(_engine.ResourceProvider, () => Document);}
-		}
 
 		public ScriptExecutor(Engine engine)
 		{
@@ -44,10 +27,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 		{
 			_typeConverter = new DomConverter(() => _jsEngine);
 
-			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(_typeConverter))
-				.SetValue(_scopeEmbeddingObjectName, new EngineAdapter(engine));
-
-			_jsEngine.SetValue("console", new {log = (Action<object>) (o => engine.Console.Log(o))});
+			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(_typeConverter));
 
 			_jsEngine.Execute("var window = this");
 
@@ -76,6 +56,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Int16Array", typeof(Int16Array));
 			AddClrType("Uint16Array", typeof(UInt16Array));
 
+			AddGlobalGetter("console", () => engine.Console);
 			AddGlobalGetter("document", () => engine.Document);
 			AddGlobalGetter("history", () => engine.Window.History);
 			AddGlobalGetter("location", () => engine.Window.Location);
