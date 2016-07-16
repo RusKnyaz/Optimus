@@ -302,7 +302,6 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 
 			var newDivs = doc.Body.GetElementsByTagName("div").ToArray();
 			Assert.AreEqual(4, newDivs.Length);
-
 		}
 
 		[Test]
@@ -365,16 +364,9 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 </script>
 </html>");
 			var doc = engine.Document;
-			try
-			{
-				var select = doc.GetElementById("s") as HtmlSelectElement;
-				Assert.IsNotNull(select);
-				Assert.AreEqual(2, select.Options.Length);
-			}
-			finally
-			{
-				engine.DumpToFile("c:\\temp\\c.html");
-			}
+			var select = doc.GetElementById("s") as HtmlSelectElement;
+			Assert.IsNotNull(select);
+			Assert.AreEqual(2, select.Options.Length);
 		}
 	}
 }
