@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -56,6 +57,15 @@ namespace Knyaz.Optimus.Dom.Elements
 				ChildNodes.Clear();
 				DocumentBuilder.Build(this, value, NodeSources.Script);
 			} 
+		}
+
+		public string TextContent
+		{
+			get
+			{
+				return string.Join(" ", ChildNodes.Flat(x => x.ChildNodes).OfType<CharacterData>().Select(x => x.Data));
+			}
+			set { InnerHTML = value; }
 		}
 
 		public Element[] GetElementsByTagName(string tagName)
@@ -156,6 +166,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			return Attributes.Count > 0;
 		}
 
+		public bool Contains(INode element)
+		{
+			return ChildNodes.Flat(x => x.ChildNodes).Contains(element);
+		}
+
 		public override string NodeName { get { return TagName;} }
 
 		public override string ToString()
@@ -202,7 +217,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				foreach (var childNode in ChildNodes)
 				{
-					node.AppendChild(childNode.CloneNode());
+					node.AppendChild(childNode.CloneNode(true));
 				}
 			}
 			return node;
@@ -237,11 +252,14 @@ namespace Knyaz.Optimus.Dom.Elements
 	}
 
 	[DomItem]
-	public interface IElement
+	public interface IElement : INode
 	{
 		string TagName { get; }
+		string Id { get; }
 		string InnerHTML { get; set; }
+		string TextContent { get; set; }
 		Element[] GetElementsByTagName(string tagName);
+		HtmlElement[] GetElementsByClassName(string tagName);
 		Attr GetAttributeNode(string name);
 		string GetAttribute(string name);
 		void RemoveAttribute(string name);
@@ -250,5 +268,6 @@ namespace Knyaz.Optimus.Dom.Elements
 		void RemoveAttributeNode(Attr attr);
 		bool HasAttribute(string name);
 		bool HasAttributes();
+		bool Contains(INode element);
 	}
 }

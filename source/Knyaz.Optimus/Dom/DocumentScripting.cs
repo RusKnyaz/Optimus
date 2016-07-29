@@ -72,7 +72,7 @@ namespace Knyaz.Optimus.Dom
 						if (!async)
 							task.Wait();
 					}
-					else if (!string.IsNullOrEmpty(script.Text))
+					else if (!string.IsNullOrEmpty(script.Text) && script.Type == "text/javascript" || string.IsNullOrEmpty(script.Type))
 					{
 						ExecuteScript(script);
 					}

@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.WfApp.Controls
 {
@@ -27,7 +28,7 @@ namespace Knyaz.Optimus.WfApp.Controls
 				{
 					_engine.Console.OnLog -= ConsoleOnOnLog;
 					_engine.ResourceProvider.OnRequest -= ResourceProviderOnOnRequest;
-					_engine.ResourceProvider.OnRequest -= ResourceProviderOnReceived;
+					_engine.ResourceProvider.Received -= ResourceProviderOnReceived;
 					_engine.Window.OnAlert -= OnAlert;
 
 					_engine.Scripting.ScriptExecutionError -= DocumentOnScriptExecutionError;
@@ -38,7 +39,8 @@ namespace Knyaz.Optimus.WfApp.Controls
 				if (_engine != null)
 				{
 					_engine.Console.OnLog += ConsoleOnOnLog;
-					_engine.ResourceProvider.OnRequest += ResourceProviderOnReceived;
+					_engine.ResourceProvider.OnRequest += ResourceProviderOnOnRequest;
+					_engine.ResourceProvider.Received += ResourceProviderOnReceived;
 					_engine.Window.OnAlert += OnAlert;
 					Document = _engine.Document;
 					_engine.DocumentChanged += OnDocumentChanged;
@@ -101,9 +103,9 @@ namespace Knyaz.Optimus.WfApp.Controls
 			Log("Request: " + s);
 		}
 
-		private void ResourceProviderOnReceived(string s)
+		private void ResourceProviderOnReceived(object sender, ReceivedEventArguments args)
 		{
-			Log("Received: " + s);
+			Log("Received: " + args.Request.Url);
 		}
 
 		private void ConsoleOnOnLog(object o)

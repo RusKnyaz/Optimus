@@ -9,106 +9,6 @@ using IHtmlElement = Knyaz.Optimus.Html.IHtmlElement;
 
 namespace Knyaz.Optimus.Dom
 {
-	//todo: chose one
-
-	//Build document parsed by HtmlAgilityPack
-	/*internal class DocumentBuilder
-	{
-		public static void Build(Node parentNode, string htmlString, NodeSources source = NodeSources.DocumentBuilder)
-		{
-			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
-			{
-				var html = Parse(stream);
-				Build(parentNode, html);
-			}
-		}
-
-		private static IEnumerable<HtmlNode> Parse(Stream stream)
-		{
-			var doc = new HtmlDocument();
-			doc.Load(stream);
-
-			return doc.DocumentNode.ChildNodes;
-			//return HtmlParser.Parse(stream);
-		}
-
-		public static void Build(Document parentNode, Stream stream)
-		{
-			var html = ExpandHtmlTag(Parse(stream));
-			Build(parentNode.DocumentElement, html);
-		}
-
-		private static IEnumerable<HtmlNode> ExpandHtmlTag(IEnumerable<HtmlNode> parse)
-		{
-			foreach (var htmlNode in parse)
-			{
-				if (htmlNode != null && htmlNode.Name.ToLowerInvariant() == "html")
-				{
-					foreach (var child in htmlNode.ChildNodes)
-					{
-						yield return child;
-					}
-				}
-				else
-				{
-					yield return htmlNode;
-				}
-			}
-		}
-
-		private static void Build(Node parentNode, IEnumerable<HtmlNode> htmlElements)
-		{
-			foreach (var htmlElement in htmlElements)
-			{
-				BuildElem(parentNode, htmlElement);
-			}
-		}
-
-		private static void BuildElem(Node node, HtmlNode htmlNode)
-		{
-			var comment = htmlNode as HtmlCommentNode;
-			if (comment != null)
-			{
-				node.AppendChild(node.OwnerDocument.CreateComment(comment.Comment));
-				return;
-			}
-
-			var txt = htmlNode as HtmlTextNode;
-			if (txt != null)
-			{
-				var c = node.OwnerDocument.CreateTextNode(txt.Text);
-				c.Source = NodeSources.DocumentBuilder;
-				node.AppendChild(c);
-				return;
-			}
-
-			if (!string.IsNullOrEmpty(htmlNode.Name))
-			{
-				var elem = node.OwnerDocument.CreateElement(htmlNode.Name);
-				elem.Source = NodeSources.DocumentBuilder;
-
-				if (elem is Script)
-				{
-					var htmlText = htmlNode.ChildNodes.FirstOrDefault() as HtmlTextNode;
-					elem.InnerHTML = htmlText != null ? htmlText.Text : string.Empty;
-				}
-
-				foreach (var attribute in htmlNode.Attributes)
-				{
-					elem.SetAttribute(attribute.Name, attribute.Value);
-				}
-
-				node.AppendChild(elem);
-
-				Build(elem, htmlNode.ChildNodes);
-			}
-			else
-			{
-				Build(node, htmlNode.ChildNodes);
-			}
-		}
-	}*/
-
 	//Build document using own parser
 	internal class DocumentBuilder
 	{
@@ -117,14 +17,8 @@ namespace Knyaz.Optimus.Dom
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
 				var html = HtmlParser.Parse(stream);
-				Build(parentNode, html, source);
+				BuildInternal(parentNode, html, source);
 			}
-		}
-
-		public static void Build(Document parentNode, Stream stream)
-		{
-			var html = ExpandHtmlTag(HtmlParser.Parse(stream));
-			Build(parentNode.DocumentElement, html);
 		}
 
 		private static IEnumerable<IHtmlNode> ExpandHtmlTag(IEnumerable<IHtmlNode> parse)
@@ -146,7 +40,18 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private static void Build(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
+		public static void Build(Document document, Stream stream)
+		{
+			var html = HtmlParser.Parse(stream);
+			Build(document, html);
+		}
+
+		public static void Build(Document document, IEnumerable<IHtmlNode> htmlElements)
+		{
+			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements));
+		}
+
+		private static void BuildInternal(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
 		{
 			foreach (var htmlElement in htmlElements)
 			{
@@ -187,7 +92,23 @@ namespace Knyaz.Optimus.Dom
 			if (htmlElement == null)
 				return;
 
-			var elem = node.OwnerDocument.CreateElement(htmlElement.Name);
+			Element elem = null;
+			var append = false;
+
+			var html = node as HtmlHtmlElement;
+			if (html != null)
+			{
+				var invariantName = htmlElement.Name.ToUpperInvariant();
+				if (invariantName == "HEAD" || invariantName == "BODY")
+					elem = html.GetElementsByTagName(invariantName).FirstOrDefault();
+			}
+
+			if (elem == null)
+			{
+				append = true;
+				elem = node.OwnerDocument.CreateElement(htmlElement.Name);	
+			}
+			
 			elem.Source = source;
 			
 			if (elem is Script)
@@ -201,11 +122,10 @@ namespace Knyaz.Optimus.Dom
 				elem.SetAttribute(attribute.Key, attribute.Value);
 			}
 
-			node.AppendChild(elem);
+			if(append)
+				node.AppendChild(elem);
 
-			Build(elem, htmlElement.Children, source);
+			BuildInternal(elem, htmlElement.Children, source);
 		}
-
-
 	}
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Properties;
 using Knyaz.Optimus.Tools;
 using Moq;
@@ -187,6 +188,20 @@ document.body.appendChild(e);";
 			var u = engine.Document.GetElementById("u") as HtmlElement;
 			u.Click();
 			Assert.AreEqual("hi", result);
+		}
+
+		[Test]
+		public void SetHtmlWithScript()
+		{
+			var script = "$('#target')['html']('<script>console.log(1);</script>');";
+			var engine = new Engine();
+			object result = null;
+			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
+
+			engine.Load("<html><head><script> " + Resources.jquery_2_1_3 + " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
+
+			engine.DumpToFile("c:\\temp\\c.html");
+			Assert.AreEqual(1, result);
 		}
 	}
 

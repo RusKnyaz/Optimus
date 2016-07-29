@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -58,6 +59,25 @@ namespace Knyaz.Optimus.ScriptExecuting
 					_cache[value] = result;
 					return true;
 				}
+			}
+
+			var stringValue = value as string;
+			if (value is string)
+			{
+				result = new JsValue(stringValue);
+				return true;
+			}
+
+			if (value is double)
+			{
+				result = new JsValue((double)value);
+				return true;
+			}
+
+			if (value is bool)
+			{
+				result = new JsValue((bool)value);
+				return true;
 			}
 		
 			result = JsValue.Null;

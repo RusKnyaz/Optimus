@@ -47,15 +47,6 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void InputChecked()
-		{
-			var document = new Document();
-			document.Write("<html><body><input id='i' type='checkbox' checked='true'></input></body></html>");
-			var el = (HtmlInputElement)document.GetElementById("i");
-			Assert.IsTrue(el.Checked);
-		}
-
-		[Test]
 		public void Comment()
 		{
 			var document = new Document();
@@ -84,11 +75,11 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void InsertBeforeRemovesNodeFromOldParrent()
 		{
 			var document = new Document();
-			document.Write("<html><body><div id='p1'><span id='s'></span></body></html");
+			document.Write("<html><body><div id='p1'><span id='s'></span></div></body></html>");
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
 			
-			Assert.AreEqual(1, div1.ChildNodes.Count);
+			Assert.AreEqual(1, div1.ChildNodes.Count, "Child nodes count before inserting");
 			Assert.AreEqual(1, document.Body.ChildNodes.Count);
 			document.Body.InsertBefore(span, div1);
 			Assert.AreEqual(0, div1.ChildNodes.Count);
@@ -100,8 +91,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void CloneNode(bool deep, int expectedChildCount)
 		{
 			var document = new Document();
-			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></body></html");
-			var div1 = document.GetElementById("p1");
+			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
 			var span = document.GetElementById("s");
 
 			document.Assert(doc => 
@@ -198,9 +188,15 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<!DOCTYPE html><html></html>", "CSS1Compat")]
 		public void CompatMode(string html, string expectedMode)
 		{
+			var document = Document(html);
+			Assert.AreEqual(expectedMode, document.CompatMode);
+		}
+
+		private Document Document(string html)
+		{
 			var document = new Document();
 			document.Write(html);
-			Assert.AreEqual(expectedMode, document.CompatMode);
+			return document;
 		}
 
 		private HtmlElement Div(string innerHtml)
@@ -208,6 +204,16 @@ namespace Knyaz.Optimus.Tests.Dom
 			var div = _document.CreateElement("div");
 			div.InnerHTML = innerHtml;
 			return (HtmlElement)div;
+		}
+
+		[TestCase("")]
+		[TestCase("<BODY></BODY>")]
+		[TestCase("<BODY></BODY><HEAD></HEAD>")]
+		public void HeadBodyAlwaysExists(string html)
+		{
+			var h = _document.CreateElement("html");
+			h.InnerHTML = html;
+			h.Assert(x => x.FirstChild.NodeName == "HEAD" && x.LastChild.NodeName == "BODY" && x.FirstChild.NextSibling == x.LastChild);
 		}
 
 		[Test]
@@ -250,6 +256,16 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void ParsingChars(string innerHtml, string expectedNodeValue)
 		{
 			Div(innerHtml).Assert(e => ((CharacterData)e.FirstChild).NodeValue == expectedNodeValue);
+		}
+
+		[TestCase("<span></span><span></span>", "span", 2)]
+		[TestCase("<span><span></span></span>", "span", 2)]
+		[TestCase("<span><div><span></span><div></span>", "span", 2)]
+		[TestCase("<SpAn></sPaN>", "span", 1)]
+		public void GetElementsByTagName(string html, string tagName, int expectedCount)
+		{
+			var tags = Document(html).GetElementsByTagName("span");
+			Assert.AreEqual(expectedCount, tags.Length);
 		}
 	}
 }

@@ -31,10 +31,8 @@ namespace Knyaz.Optimus.WfApp
 			}));
 
 			var beforeScriptExecute = (Action<Script>)(s =>
-				{
-					var scriptName = !string.IsNullOrEmpty(s.Src)
-						? s.Src
-						: "Script_" + s.GetHashCode();
+			{
+				var scriptName = GetScriptName(s);
 
 				action(new TimePoint
 				{
@@ -46,9 +44,8 @@ namespace Knyaz.Optimus.WfApp
 
 			var afterScriptExecute = (Action<Script>)(s =>
 			{
-				var scriptName = !string.IsNullOrEmpty(s.Src)
-						? s.Src
-						: "Script_" + s.GetHashCode();
+				var scriptName = GetScriptName(s);
+
 				action(new TimePoint
 				{
 					DateTime = DateTime.Now,
@@ -59,9 +56,8 @@ namespace Knyaz.Optimus.WfApp
 
 			var scriptError = (Action<Script, Exception>) ((s, r) =>
 			{
-				var scriptName = !string.IsNullOrEmpty(s.Src)
-						? s.Src
-						: "Script_" + s.GetHashCode();
+				var scriptName = GetScriptName(s);
+
 				action(new TimePoint
 				{
 					DateTime = DateTime.Now,
@@ -134,6 +130,18 @@ namespace Knyaz.Optimus.WfApp
 				engine.Window.Timers.OnExecuted -= timerExecuted;
 				engine.Window.Timers.OnException -= timerFailed;
 			};
+		}
+
+		private static string GetScriptName(Script s)
+		{
+			var scriptName = !string.IsNullOrEmpty(s.Src)
+				? s.Src
+				: s.Text.Substring(0, Math.Min(30, s.Text.Length)).Replace("\r", "").Replace("\n","");
+
+			if (string.IsNullOrEmpty(scriptName))
+				scriptName = "Script_" + s.GetHashCode();
+
+			return scriptName;
 		}
 	}
 

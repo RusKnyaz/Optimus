@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
@@ -42,8 +44,8 @@ namespace Knyaz.Optimus.ResourceProviders
 					response.StatusCode,
 					new MemoryStream(result),
 					content.Headers.ToString(),
-					content.Headers.ContentType.MediaType,
-					content.Headers.ContentLocation);
+					content.Headers.ContentType != null ? content.Headers.ContentType.ToString() : null,
+					response.RequestMessage.RequestUri);
 			}
 		}
 
@@ -55,11 +57,11 @@ namespace Knyaz.Optimus.ResourceProviders
 		private HttpRequestMessage MakeWebRequest(HttpRequest request)
 		{
 			var u = MakeUri(request.Url);
-			var result = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
+			var resultRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
 
-			if (request.Data != null && result.Method.Method != "GET")
+			if (request.Data != null && resultRequest.Method.Method != "GET")
 			{
-				result.Content = new StreamContent(new MemoryStream(request.Data));
+				resultRequest.Content = new StreamContent(new MemoryStream(request.Data));
 			}
 			
 			if(request.Headers != null)
@@ -68,15 +70,15 @@ namespace Knyaz.Optimus.ResourceProviders
 				switch (keyValue.Key)
 				{
 					case "Content-Type":
-						result.Content.Headers.ContentType = new MediaTypeHeaderValue(keyValue.Value);
+						resultRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(keyValue.Value);
 						break;
 					default:
-						result.Content.Headers.Add(keyValue.Key, keyValue.Value);
+						resultRequest.Headers.Add(keyValue.Key, keyValue.Value);
 						break;
 				}
 			}
 
-			return result;
+			return resultRequest;
 		}
 
 		private Uri MakeUri(string uri)
@@ -84,8 +86,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (uri.Substring(0, 2) == "./")
 				uri = uri.Remove(0, 2);
 
-			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-			return u;
+			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 		}
 	}
 
@@ -108,6 +109,23 @@ namespace Knyaz.Optimus.ResourceProviders
 			Headers = new Dictionary<string, string>();
 			Method = method;
 			Url = url;
+		}
+
+		public override int GetHashCode()
+		{
+			return ((Url ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
+		}
+
+		public override bool Equals(object obj)
+		{
+			var other = obj as HttpRequest;
+			if (other == null)
+				return false;
+
+			return Url == other.Url &&
+			       Method == other.Method &&
+			       Headers.Count == other.Headers.Count &&
+			       Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]));
 		}
 	}
 

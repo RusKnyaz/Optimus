@@ -1421,7 +1421,6 @@ Sizzle.matchesSelector = function( elem, expr ) {
 };
 
 Sizzle.contains = function (context, elem) {
-	console.log(context ? "o" : "Mnull");
 	// Set document vars if needed
 	if ( ( context.ownerDocument || context ) !== document ) {
 		setDocument( context );
@@ -8816,9 +8815,7 @@ jQuery.parseHTML = function( data, context, keepScripts ) {
 		return [ context.createElement( parsed[1] ) ];
 	}
 
-	console.log('1 - ' + data);
 	parsed = jQuery.buildFragment([data], context, scripts);
-	console.log('2');
 
 	if ( scripts && scripts.length ) {
 		jQuery( scripts ).remove();

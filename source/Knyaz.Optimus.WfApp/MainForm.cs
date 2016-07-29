@@ -29,6 +29,7 @@ namespace Knyaz.Optimus.WfApp
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			Engine.Dispose();
+			Properties.Settings.Default.Save();
 			base.OnClosing(e);
 		}
 

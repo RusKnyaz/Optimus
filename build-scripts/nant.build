@@ -19,7 +19,7 @@
 		
 	<!-- Property -->
 	<property name="buildnumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
-	<property name="version" value="1.0.${buildnumber}.0"/>
+	<property name="version" value="1.0.${buildnumber}.1"/>
 	<property name="config.work.d"      value="${work.d}/${config.environment}" />
 	
 	<!-- Binaries-->        
@@ -84,7 +84,7 @@
 		<exec if="${iswin}"
 		      program="${nuget.exe}" workingdir = "${work.d}/sources" commandline="install .nuget\packages.config -o packages"/>
 		<exec if="${not iswin}"
-		      program="mono" workingdir = "${sources.d}" commandline="${nuget.exe} install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
+		      program="mono" workingdir = "${sources.d}" commandline="&quot;${nuget.exe}&quot; install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
 	</target>
 		
 	<target name="artifacts-zip" description="Create zip archive from 'publish' directory">
@@ -103,8 +103,8 @@
 				<include name="${work.d}/build-scripts/Package.nuspec"/>
 			</fileset>
 		</copy>
-		<property name="args" value="pack ${bin.d}/Package.nuspec -Properties version=${version}"/>
-		<exec program="mono" commandline="${nuget.exe} ${args}" workingdir = "${artifacts.d}" if="${not iswin}"/>
+		<property name="args" value="pack &quot;${bin.d}/Package.nuspec&quot; -Properties version=${version}"/>
+		<exec program="mono" commandline="&quot;${nuget.exe}&quot; ${args}" workingdir = "${artifacts.d}" if="${not iswin}"/>
 		<exec program="${nuget.exe}" commandline="${args}" workingdir = "${artifacts.d}" if="${iswin}"/>
 	</target>
 	

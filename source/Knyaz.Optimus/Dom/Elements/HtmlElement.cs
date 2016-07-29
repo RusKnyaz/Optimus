@@ -79,6 +79,16 @@ namespace Knyaz.Optimus.Dom.Elements
 				}
 			} 
 		}
+
+		public void Blur()
+		{
+			OwnerDocument.ActiveElement = null;
+		}
+
+		public void Focus()
+		{
+			OwnerDocument.ActiveElement = this;
+		}
 	}
 
 	[DomItem]
@@ -88,5 +98,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		void Click();
 		event Action OnClick;
 		string ClassName { get; set; }
+		void Blur();
+		void Focus();
 	}
 }

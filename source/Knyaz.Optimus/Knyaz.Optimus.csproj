@@ -37,9 +37,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Jint, Version=2.6.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
+    <Reference Include="Jint, Version=2.8.1.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Jint.2.8\lib\portable-net40+sl50+win+WindowsPhoneApp81+wp80\Jint.dll</HintPath>
+      <HintPath>..\packages\Jint.2.9.1\lib\portable-net40+sl50+win+WindowsPhoneApp81+wp80\Jint.dll</HintPath>
     </Reference>
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
@@ -75,6 +75,8 @@
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlIFrameElement.cs" />
+    <Compile Include="Dom\Elements\HtmlOptionElement.cs" />
+    <Compile Include="Dom\Elements\HtmlSelectElement.cs" />
     <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
     <Compile Include="Dom\Elements\IFormElement.cs" />
@@ -97,9 +99,11 @@
     <Compile Include="Dom\Perf\TypedArray.cs" />
     <Compile Include="Dom\TagsNames.cs" />
     <Compile Include="Dom\XmlHttpRequest.cs" />
+    <Compile Include="Environment\History.cs" />
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
+    <Compile Include="ResourceProviders\PredictedResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
     <Compile Include="ScriptExecuting\ClrPrototype.cs" />
     <Compile Include="ScriptExecuting\DomConverter.cs" />
@@ -118,35 +122,39 @@
     <Compile Include="ScriptExecuting\ListAdapter.cs" />
     <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
     <Compile Include="TestingTools\ElementExtension.cs" />
+    <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
     <Compile Include="Tests\Dom\EventsTests.cs" />
     <Compile Include="Tests\Dom\EventTargetTests.cs" />
+    <Compile Include="Tests\Dom\HistoryTests.cs" />
     <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Mocks.cs" />
+    <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
+    <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
+    <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tools\Disposable.cs" />
-    <Compile Include="Tools\EngineExtension.cs" />
-    <Compile Include="Tools\EngineQueryExtension.cs" />
+    <Compile Include="Tools\IEnumerableExtension.cs" />
     <Compile Include="Tools\ListExtension.cs" />
     <Compile Include="Tests\Html\HtmlParserTests.cs" />
     <Compile Include="Tests\Html\HtmlReaderTests.cs" />
-    <Compile Include="Tests\ResourceProvidersTests.cs" />
     <Compile Include="Environment\Window.cs" />
     <Compile Include="Dom\DocumentScripting.cs" />
     <Compile Include="Tests\Dom\TypedArrayTests.cs" />
     <Compile Include="Dom\Perf\ArrayBuffer.cs" />
+    <Compile Include="Tools\UriHelper.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

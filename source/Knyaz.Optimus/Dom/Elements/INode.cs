@@ -5,7 +5,7 @@ namespace Knyaz.Optimus.Dom.Elements
 {
 	public static class DocumentElementExtension
 	{
-		public static IEnumerable<Node> Flatten(this Node elem)
+		public static IEnumerable<INode> Flatten(this INode elem)
 		{
 			yield return elem;
 			foreach (var documentElement in elem.ChildNodes.SelectMany(x => x.Flatten()))

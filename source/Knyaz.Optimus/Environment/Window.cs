@@ -30,6 +30,7 @@ namespace Knyaz.Optimus.Environment
 			InnerHeight = 768;
 			Location = new Location(engine);//todo: remove the stub href value
 			Navigator = new Navigator();
+			History = new History(engine);
 
 			_timers = new WindowTimers(getSyncObj);
 			_timers.OnException += exception =>
@@ -41,7 +42,7 @@ namespace Knyaz.Optimus.Environment
 					}
 					else
 					{
-						engine.Console.Log("Unhandled exception in timer handler function: " + exception.Message);
+						engine.Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
 					}
 				};
 
@@ -54,12 +55,13 @@ namespace Knyaz.Optimus.Environment
 		public Screen Screen { get; private set; }
 		public Location Location { get; private set; }
 		public Navigator Navigator { get; private set; }
+		public History History { get; private set; }
 
-		private WindowTimers _timers;
+		private readonly WindowTimers _timers;
 
-		public int SetTimeout(Action handler, double? delay)
+		public int SetTimeout(Action<object> handler, double? delay, object ctx)
 		{
-			return _timers.SetTimeout(handler, (int)(delay ?? 1));
+			return _timers.SetTimeout(handler, (int)(delay ?? 1), ctx);
 		}
 
 		public void ClearTimeout(int handle)

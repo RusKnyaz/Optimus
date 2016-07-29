@@ -13,5 +13,7 @@
 		public const string Button = "BUTTON";
 		public const string Nav = "NAV";
 		public const string Div = "DIV";
+		public const string Select = "SELECT";
+		public const string Option = "OPTION";
 	}
 }

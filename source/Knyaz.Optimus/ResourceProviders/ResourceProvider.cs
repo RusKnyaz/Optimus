@@ -1,16 +1,17 @@
-﻿using System;
+﻿﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
 	internal class ResourceProvider : IResourceProvider
 	{
 		public event Action<string> OnRequest;
-		public event Action<string> Received;
+		public event EventHandler<ReceivedEventArguments> Received;
 
 		private readonly CookieContainer _cookies;
 		private string _root;
@@ -35,18 +36,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		private bool IsAbsoleteUri(string uri)
-		{
-			return !uri.StartsWith("/") && (
-				uri.StartsWith("http://") || uri.StartsWith("https://") || uri.StartsWith("file://") ||
-			       uri.StartsWith("data:"));
-		}
-
-		private Uri GetUri(string uri)
-		{
-			return IsAbsoleteUri(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-		}
-
+		
 		private ISpecResourceProvider GetResourceProvider(Uri u)
 		{
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
@@ -58,6 +48,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					return HttpResourceProvider;
 				case "file://":
 					return FileResourceProvider;
+				case "data://": //mono
 				case "data:":
 					return new DataResourceProvider();
 				default:
@@ -67,7 +58,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public IRequest CreateRequest(string uri)
 		{
-			return GetResourceProvider(GetUri(uri)).CreateRequest(uri);
+			return GetResourceProvider(UriHelper.GetUri(Root, uri)).CreateRequest(uri);
 		}
 
 		public Task<IResource> GetResourceAsync(IRequest req)
@@ -75,7 +66,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (OnRequest != null)
 				OnRequest(req.Url);
 			
-			var u = GetUri(req.Url);
+			var u = UriHelper.GetUri(Root, req.Url);
 
 			var provider = GetResourceProvider(u);
 
@@ -84,7 +75,7 @@ namespace Knyaz.Optimus.ResourceProviders
 						try
 						{
 							if (Received != null)
-								Received(req.Url);
+								Received(this, new ReceivedEventArguments(req, t.Result));
 						}
 						catch { }
 						return t.Result;
@@ -104,7 +95,9 @@ namespace Knyaz.Optimus.ResourceProviders
 				var data = uri.Substring(5);
 				var type = new string(data.TakeWhile(c => c != ',').ToArray());
 				var content = data.Substring(type.Length);
-				return new Task<IResource>(() => new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
+				return
+					Task.Run(
+						() => (IResource)new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
 			}
 
 			class DataRequest : IRequest

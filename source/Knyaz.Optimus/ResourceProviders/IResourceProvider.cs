@@ -7,7 +7,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	{
 		string Root { get; set; }
 		event Action<string> OnRequest;
-		event Action<string> Received;
+		event EventHandler<ReceivedEventArguments> Received;
 		Task<IResource> GetResourceAsync(IRequest req);
 		IRequest CreateRequest(string uri);
 	}
@@ -22,6 +22,18 @@ namespace Knyaz.Optimus.ResourceProviders
 			var req = provider.CreateRequest(uri);
 
 			return provider.GetResourceAsync(req);
+		}
+	}
+
+	public class ReceivedEventArguments : EventArgs
+	{
+		public IRequest Request { get; private set; }
+		public IResource Resource { get; private set; }
+
+		public ReceivedEventArguments(IRequest request, IResource resource)
+		{
+			Request = request;
+			Resource = resource;
 		}
 	}
 }

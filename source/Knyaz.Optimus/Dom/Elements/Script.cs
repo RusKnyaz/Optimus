@@ -24,7 +24,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string Type { get { return _type.Value; } set { _type.Value = value; }}
 
 		public string CrossOrigin { get; set; }
-
+	
 		public Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
 		{
 			_type = new AttributeMappedValue<string>(this, "type");
@@ -91,11 +91,16 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public void Execute(IScriptExecutor scriptExecutor)
 		{
-			this.RaiseEvent("BeforeScriptExecute", true, true);
 			scriptExecutor.Execute(Type ?? "text/javascript", Text);
 			Executed = true;
-			this.RaiseEvent("AfterScriptExecute", true, true);
 			RaiseOnLoad();
+		}
+
+		public override Node CloneNode(bool deep)
+		{
+			var node = (Script)base.CloneNode(deep);
+			node.Text = Text;
+			return node;
 		}
 	}
 

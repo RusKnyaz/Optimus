@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using System.Threading;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
@@ -277,7 +278,24 @@ console.log(style['width']);");
 			engine.Console.OnLog += x => _log.Add(x.ToString());
 			engine.OpenUrl("http://todosoft.org");
 			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[] {"http://todosoft.org", "http:"}, _log);
+			CollectionAssert.AreEqual(new[] {"http://todosoft.org/", "http:"}, _log);
+		}
+
+		[Test]
+		public void HistoryExist()
+		{
+			var engine = CreateEngine("", @"console.log(history != null);console.log(window.history != null);");
+			engine.Console.OnLog += x => _log.Add(x.ToString());
+			
+			CollectionAssert.AreEqual(new[] { true, true }, _log);
+		}
+
+		[Test]
+		public void HistoryPushState()
+		{
+			var engine = CreateEngine("",@"window.history.pushState(null, null, 'a.html');");
+
+			Assert.AreEqual("http://localhost/a.html", engine.Uri.AbsoluteUri);
 		}
 
 		[Test]
@@ -673,6 +691,19 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
+		public void WindowAddEventListenerNotBoolArg()
+		{
+			CreateEngine("<div id=d></div>", @"
+var listener = function(){console.log('ok');};
+addEventListener('click', listener, 1);
+var evt = document.createEvent('Event');
+evt.initEvent('click', true,true);
+dispatchEvent(evt);");
+
+			CollectionAssert.AreEqual(new object[] { "ok" }, _log);
+		}
+
+		[Test]
 		public void WindowRemoveEventListener()
 		{
 			CreateEngine("<div id=d></div>", @"
@@ -684,6 +715,42 @@ evt.initEvent('click', true,true);
 dispatchEvent(evt);");
 
 			CollectionAssert.AreEqual(new object[0], _log);
+		}
+
+		[Test]
+		public void SelectZeroLength()
+		{
+			CreateEngine("<select id=s></select>", "console.log(document.getElementById('s').length);");
+			CollectionAssert.AreEqual(new []{0.0}, _log);
+		}
+
+		[Test]
+		public void SelectLength()
+		{
+			CreateEngine("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
+			CollectionAssert.AreEqual(new[] { 1.0 }, _log);
+		}
+
+		[Test]
+		public void SelectOptionsItem()
+		{
+			CreateEngine("<select id=s><option id=X/></select>", "console.log(document.getElementById('s').options.Item(0).Id);" +
+																 "console.log(document.getElementById('s').options[0].Id);");
+			CollectionAssert.AreEqual(new[] { "X","X" }, _log);
+		}
+
+		[Test]
+		public void ApplyToJsFunc()
+		{
+			CreateEngine("", "function log(x){console.log(x);} log.apply(console, ['asd']);");
+			CollectionAssert.AreEqual(new[] { "asd" }, _log);
+		}
+
+		[Test]
+		public void ApplyToClrFunc()
+		{
+			CreateEngine("", "console.log.apply(console, ['asd']);");
+			CollectionAssert.AreEqual(new[] { "asd" }, _log);
 		}
 	}
 }

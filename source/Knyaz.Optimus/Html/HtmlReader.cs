@@ -2,296 +2,165 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 
 namespace Knyaz.Optimus.Html
 {
 	public struct HtmlChunk
 	{
-		public HtmlChunkTypes Type;
+		public Types Type;
 		public string Value;
 
-		public static HtmlChunk AttributeName(List<char> buffer)
+		public enum Types
 		{
-			return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray())};
+			Undefined,
+			TagStart,
+			TagEnd,
+			AttributeName,
+			AttributeValue,
+			Text,
+			Comment,
+			DocType
 		}
-
-		public static HtmlChunk TagStart(List<char> buffer)
-		{
-			return new HtmlChunk { Type = HtmlChunkTypes.TagStart, Value = new string(buffer.ToArray()) };
-		}
-	}
-
-	public enum HtmlChunkTypes
-	{
-		Undefined,
-		TagStart,
-		TagEnd,
-		AttributeName,
-		AttributeValue,
-		Text,
-		Comment,
-		DocType
 	}
 
 	public class HtmlReader
 	{
-		static string[] _noContentTags = {"meta", "br", "link"};
-
-		enum States
+		private static string HtmlDecode(string txt)
 		{
-			ReadText,
-			ReadTagName,
-			ReadAttributeName,
-			ReadSelfClosedTagEnd,
-			ReadCloseTagName,
-			WaitAttributeValue,
-			ReadSpecTag,
-			ReadDocType
+			txt = txt.Replace("&rang;", "\u27E9").Replace("&lang;", "\u27E8");
+
+			var result = new StringBuilder(WebUtility.HtmlDecode(txt))
+				.Replace("&notinva;", "\u2209")
+				.Replace("&Kopf;","\uD835\uDD42")
+				.Replace("&ImaginaryI;", "\u2148")
+				.Replace("\u000D", "\u000A");
+
+			return result.ToString();
 		}
 
-		enum ReadScriptStates
-		{
-			Script,
-			String,
-			Comment
-		}
-
-		private static string ReadAttributeValue(char qMark, StreamReader reader)
-		{
-			var buffer = new List<char>();
-			var specialSymbol = false;
-
-			var escaped = false;
-			for(var code = reader.Read(); code != -1; code = reader.Read())
-			{
-				var symbol = (char)code;
-
-				if (symbol == '&' && !specialSymbol && !escaped)
-				{
-					buffer.AddRange(ReadSpecial(reader));
-				}
-
-				if (!escaped && symbol == '\\')
-				{
-					escaped = true;
-				}
-				else if (symbol != qMark || escaped)
-				{
-					escaped = false;
-					buffer.Add(symbol);
-				}
-				else
-				{
-					break;
-				}
-
-				if (qMark == ' ' && reader.Peek() == '>')
-					break;
-			}
-
-			return new string(buffer.ToArray());
-		}
-
-		private static string ReadSpecial(StreamReader reader)
-		{
-			var buffer = new List<char>();
-			while (char.IsLetter((char)reader.Peek()))
-			{
-				buffer.Add((char)reader.Read());
-			}
-
-			var s = new string(buffer.ToArray());
-			var symbol = (char)reader.Peek();
-			if (symbol == ';')
-			{
-				reader.Read();
-				switch (s)
-				{
-					case "rang":
-						return "\u27E9";
-					case "lang":
-						return "\u27E8";
-					case "notinva":
-						return "\u2209";
-					case "apos":return "'";
-					case "Kopf":return "\uD835\uDD42"; 
-					case "ImaginaryI":
-						return "\u2148";
-				}
-			}
-
-			return "&" + s + ";";
-		}
+		static string[] _noContentTags = { "meta", "br", "link" };
 
 		private static HtmlChunk ReadScript(StreamReader reader, string endWord)
 		{
 			var buffer = new List<char>();
-			var state = ReadScriptStates.Script;
-			var qMark = '\0';
-			var escape = false;
+			if (reader.EndOfStream)
+				return new HtmlChunk {Type = HtmlChunk.Types.Text, Value = string.Empty};
 
-			for (var code = reader.Read(); code != -1; code = reader.Read())
+			do
 			{
-				var symbol = (char) code;
+				var symbol = (char)reader.Read();
 
-				switch (state)
+				if (symbol == '"' || symbol == '\'')
 				{
-					case ReadScriptStates.Script:
-						if (symbol == '"' || symbol == '\'')
-						{
-							state = ReadScriptStates.String;
-							qMark = symbol;
-						}
-						else if (symbol == '>')
-						{
-							if (IsEndsWith(buffer, endWord))
-							{
-								buffer.RemoveRange(buffer.Count - endWord.Length, endWord.Length);
-								return new HtmlChunk { Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray()) };
-							}
-						}
-						else if (symbol == '/')
-						{
-							var next = reader.Read();
-							if (next == -1)
-							{
-								code = -1;
-								break;
-							}
-
-							var nextChar = (char) next;
-							if (nextChar == '/')
-							{
-								buffer.Add(symbol);
-								buffer.Add('/');
-								buffer.AddRange(reader.ReadLine());
-								buffer.Add('\r');
-								buffer.Add('\n');
-								continue;
-							}
-							if (nextChar == '*')
-							{
-								state = ReadScriptStates.Comment;
-							}
-							else //regexp
-							{
-								if (buffer.Last() != '<')
-								{
-									qMark = '/';
-									state = ReadScriptStates.String;
-									escape = nextChar == '\\';
-									buffer.Add(symbol);
-									buffer.Add(nextChar);
-									continue;
-								}
-							}
-
-							buffer.Add(symbol);
-							symbol = nextChar;
-						}
-						break;
-					case ReadScriptStates.String:
-						if (symbol == qMark && !escape)
-							state = ReadScriptStates.Script;
-						escape = !escape && symbol == '\\';
-						break;
-					case ReadScriptStates.Comment:
-						if (symbol == '*')
-						{
-							code = reader.Read();
-							if (code == -1)
-								break;
-
-							symbol = (char)code;
-							if (symbol == '/')
-								state = ReadScriptStates.Script;
-								
-							buffer.Add('*');
-						}
-						break;
-				}
-				if(code != -1)
 					buffer.Add(symbol);
-			}
-
-			return new HtmlChunk {Type = HtmlChunkTypes.Text, Value = new string(buffer.ToArray())};
-		}
-
-		private static HtmlChunk ReadComment(StreamReader reader, bool minusable)
-		{
-			var buffer = new List<char>();
-			var endsByMinus = false;
-			if (minusable && reader.Peek() == '-')
-			{
-				reader.Read();
-				if (reader.Peek() == '-')
+					var txt = ReadWhileWithEscapes(reader, _ => false, (c,e) => e || ((Func<char, bool>) (x => x != symbol))(c));
+					buffer.AddRange(txt);
+					buffer.Add((char)reader.Read());
+				}
+				else if (symbol == '>' && IsEndsWith(buffer, endWord.ToLowerInvariant()))
 				{
-					reader.Read();
-					endsByMinus = true;
+					buffer.RemoveRange(buffer.Count - endWord.Length, endWord.Length);
+					return new HtmlChunk {Type = HtmlChunk.Types.Text, Value = new string(buffer.ToArray())};
+				}
+				else if (symbol == '/')
+				{
+					if (reader.EndOfStream)
+						break;
+
+					var next = reader.Peek();
+					var nextChar = (char) next;
+					if (nextChar == '/') // Line commet - //
+					{
+						buffer.Add(symbol);
+						buffer.Add((char) reader.Read());
+						buffer.AddRange(reader.ReadLineWithEndings());
+					}
+					else if (nextChar == '*') // Block comment - /* */
+					{
+						buffer.Add(symbol);
+						buffer.Add((char) reader.Read());
+						buffer.AddRange(ReadToPhrase(reader, "*/"));
+						buffer.AddRange("*/");
+					}
+					else if (buffer.Last() != '<') //regexp
+					{
+						buffer.Add('/');
+						buffer.AddRange(ReadWhileWithEscapes(reader, _ => false, (c,e) => e || ((Func<char, bool>) (x => x != '/'))(c)));
+						buffer.Add((char) reader.Read());
+					}
+					else
+					{
+						buffer.Add(symbol);
+					}
 				}
 				else
 				{
-					buffer.Add('-');
+					buffer.Add(symbol);
+				}
+			}
+			while (!reader.EndOfStream);
+
+			return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = new string(buffer.ToArray()) };
+		}
+
+		private static string ReadComment(StreamReader reader, bool minusable)
+		{
+			var buffer = new StringBuilder();
+			var endsByMinus = false;
+			if (minusable)
+			{
+				var x = (char)reader.Read();
+				if (x != '-' || reader.Peek() != '-')
+				{
+					buffer.Append(x);
+				}
+				else
+				{
+					reader.Read();
+					endsByMinus = true;
 				}
 			}
 
 			if (endsByMinus)
 				ReadToPhrase(reader, buffer, "-->");
-			else 
-				ReadToChar(reader, buffer, '>');
-			
-			return new HtmlChunk {Value = new string(buffer.ToArray()), Type = HtmlChunkTypes.Comment};
+			else
+				ReadToCharWithChar(reader, buffer, '>');
+
+			return buffer.ToString();
 		}
 
-		private static int ReadToChars(StreamReader reader, List<char> buffer, params char[] end)
+		private static void ReadToCharWithChar(StreamReader reader, StringBuilder buffer, char end)
 		{
-			for (var code = reader.Read(); code != -1; code = reader.Read())
+			while(!reader.EndOfStream)
 			{
-				var symbol = (char)code;
-				if (end.Contains(symbol))
-					return symbol;
-
-				buffer.Add(symbol);
-			}
-			return -1;
-		}
-
-		private static void ReadToChar(StreamReader reader, List<char> buffer, char end, bool unescape = false)
-		{
-			for (var code = reader.Read(); code != -1; code = reader.Read())
-			{
-				var symbol = (char)code;
+				var symbol = (char)reader.Read();
 				if (symbol == end)
 					return;
 
-				if (symbol == '&' && !unescape)
-				{
-					buffer.AddRange(ReadSpecial(reader));
-				}
-				else
-				{
-					buffer.Add(symbol);	
-				}
+				buffer.Append(symbol);
 			}
 		}
 
-		private static void ReadToPhrase(StreamReader reader, List<char> buffer, string end)
+		private static void ReadToPhrase(StreamReader reader, StringBuilder buffer, string end)
 		{
 			var lowerBuffer = new List<char>();
-			for (var code = reader.Read(); code != -1; code = reader.Read())
-			{
-				var symbol = (char)code;
 
-				buffer.Add(symbol);
+			while (!reader.EndOfStream)
+			{
+				var symbol = (char)reader.Read();
+
+				buffer.Append(symbol);
 				lowerBuffer.Add(char.ToLowerInvariant(symbol));
 
-				if(!IsEndsWith(lowerBuffer, end)) continue;
-				buffer.RemoveRange(buffer.Count-end.Length, end.Length);
-				return ;
+				if (!IsEndsWith(lowerBuffer, end)) continue;
+				buffer.Remove(buffer.Length - end.Length, end.Length);
+				return;
 			}
 		}
 
-		
+
 		/// <summary>
 		/// Case insensitive comparison
 		/// </summary>
@@ -302,299 +171,240 @@ namespace Knyaz.Optimus.Html
 		{
 			if (buffer.Count < endPhrase.Length)
 				return false;
-			
-			var end = endPhrase.ToLowerInvariant();
 
-			for (int i = 0, j = buffer.Count - end.Length; i < end.Length; i++, j++)
+			for (int i = 0, j = buffer.Count - endPhrase.Length; i < endPhrase.Length; i++, j++)
 			{
-				if(char.ToLowerInvariant(buffer[j]) != end[i])
+				if (char.ToLowerInvariant(buffer[j]) != endPhrase[i])
 					return false;
 			}
 			return true;
 		}
 
-		private static HtmlChunk ReadText(StreamReader reader)
-		{
-			var buffer = new List<char>();
-			ReadToChar(reader, buffer, '<');
-			return buffer.Count > 0 ? 
-				new HtmlChunk { Type = HtmlChunkTypes.Text, Value = 
-					new string(buffer.ToArray()).Replace("\u000D", "\u000A") } 
-				: new HtmlChunk();
-		}
-		
 		public static IEnumerable<HtmlChunk> Read(Stream stream)
 		{
-			var buffer = new List<char>();
+			return Read(new StreamReader(stream));
+		}
 
-			using (var reader = new StreamReader(stream))
+		private static IEnumerable<HtmlChunk> Read(StreamReader reader)
+		{
+			if(reader.EndOfStream)
+				yield break;
+
+			var text = new StringBuilder();
+
+			var tagsStack = new Stack<string>();
+
+			while (!reader.EndOfStream)
 			{
-				var code = -1;
-				var lastTag = string.Empty;
+				text.Append(ReadWhile(reader, x => x != '<'));
+				if (reader.EndOfStream) break;
 
-				var state = States.ReadText;
-				var newState = States.ReadText;
+				reader.Read();
+				var next = (char) reader.Peek();
 
-				do
+				if (tagsStack.Count > 0 && next == '/') //probably end of tag
 				{
-					if (state == States.ReadText)
+					var endTag = tagsStack.Peek();
+					reader.Read();
+					var closedTagName = ReadWhile(reader, x => x != '>');
+					if (closedTagName.Equals(endTag, StringComparison.InvariantCultureIgnoreCase))
 					{
-						var txt = ReadText(reader);
-						if (txt.Type != HtmlChunkTypes.Undefined)
-							yield return txt;
-						
-						if(reader.Peek() == -1)
-							yield break;
-						
-						buffer.Clear();
-
-						newState = state = States.ReadTagName;
-
-						/*//Read Tag Name
-						var x = ReadToChars(reader, buffer, ' ', '/', '>');
-						if (buffer.Count > 0)
+						if (text.Length > 0)
 						{
-							var tag = HtmlChunk.TagStart(buffer);
-							yield return tag;
-							lastTag = tag.Value;
-							buffer.Clear();
-						}*/
-					}
-
-					code = reader.Read();
-
-					if (code != -1)
-					{
-						var symbol = (char) code;
-						if (symbol == '\u000D')
-							symbol = '\u000A';
-
-						switch (state)
-						{
-							case States.ReadTagName:
-								switch (symbol)
-								{
-									case ' ':
-										if (buffer.Count > 0)
-										{
-											var tag = HtmlChunk.TagStart(buffer);
-											yield return tag;
-											lastTag = tag.Value;
-											buffer.Clear();
-										}
-
-										AAA:
-										var sym = ReadToChars(reader, buffer, '/', '>', '=', ' ');
-										if (buffer.Count > 0)
-										{
-											yield return HtmlChunk.AttributeName(buffer);
-											buffer.Clear();
-										}
-
-										if (sym == ' ')
-											sym = Skip(reader, ' ');
-									
-										switch (sym)
-										{
-											case '/':
-												state = newState= States.ReadSelfClosedTagEnd;
-												break;
-											case '>':
-												state = newState = States.ReadText;
-												break;
-											case '=':
-												state = newState = States.WaitAttributeValue;
-												break;
-											default:
-												buffer.Add((char)sym);
-												goto AAA;
-										}
-										
-										continue;
-									case '/':
-										newState = buffer.Count > 0
-											? States.ReadSelfClosedTagEnd
-											: States.ReadCloseTagName;
-										break;
-									case '>':
-										newState = States.ReadText;
-										break;
-									case '?':
-										var com = ReadComment(reader, false);
-										com.Value = "?" + com.Value;
-										yield return com;
-										state = newState = States.ReadText;
-										continue;
-									case '!':
-										var ss = reader.Peek();
-										if (ss != 'D' && ss != 'd')
-										{
-											yield return ReadComment(reader, true);
-											state = newState = States.ReadText;
-											continue;
-										}
-										newState = States.ReadSpecTag;
-										break;
-								}
-								break;
-
-							case States.ReadSelfClosedTagEnd:
-								if (symbol == '>')
-									newState = States.ReadText;
-								break;
-
-							case States.ReadAttributeName:
-								switch (symbol)
-								{
-									case '/':
-										newState = States.ReadSelfClosedTagEnd;
-										break;
-									case '>':
-										newState = States.ReadText;
-										break;
-									case '=':
-										newState = States.WaitAttributeValue;
-										break;
-								}
-								break;
-
-							case States.ReadCloseTagName:
-								if (symbol == '>')
-									newState = States.ReadText;
-								break;
-							case States.WaitAttributeValue:
-								if (symbol != '>' && symbol != ' ')
-								{
-									var quoted = symbol == '\"' || symbol == '\'';
-									var attrValue = ReadAttributeValue(quoted ? symbol : ' ', reader);
-									state = newState = States.ReadAttributeName;
-									yield return new HtmlChunk() {Type = HtmlChunkTypes.AttributeValue, Value = quoted ? attrValue : symbol + attrValue};
-									buffer.Clear();
-									continue;
-								}
-								break;
-							case States.ReadSpecTag:
-								switch (symbol)
-								{
-									case 'D':
-									case 'd':
-										newState = States.ReadDocType;
-										break;
-									default:
-										throw new HtmlInvalidFormatException("Unknown spec tag.");
-								}
-								break;
-
-							case States.ReadDocType:
-								if (symbol == '>') newState = States.ReadText;
-								break;
+							yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
+							text.Clear();
 						}
 
-						if (state == newState)
-						{
-							buffer.Add(symbol);
-							state = newState;
-							continue;
-						}
+						yield return new HtmlChunk {Type = HtmlChunk.Types.TagEnd, Value = closedTagName};
+
+						reader.Read();
+						tagsStack.Pop();
+						continue;
 					}
 
-					var data = new string(buffer.ToArray());
-
-					switch (state)
+					text.Append("</");
+					text.Append(closedTagName);
+				}
+				else if (char.IsLetter(next)) //start of tag
+				{
+					if (text.Length > 0)
 					{
-						case States.ReadTagName:
-							if (newState != States.ReadCloseTagName && newState != States.ReadSpecTag)
+						yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
+						text.Clear();
+					}
+
+					var tagName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>');
+					yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagStart};
+
+					while (!reader.EndOfStream)
+					{
+						var sym = (char) reader.Peek();
+						if (sym == '/') //may be self-closed tag
+						{
+							reader.Read();
+							if (reader.Peek() == '>')
 							{
-								lastTag = new string(buffer.ToArray());
-								yield return new HtmlChunk {Type = HtmlChunkTypes.TagStart, Value = lastTag};
+								reader.Read();
+								yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagEnd};
+								break;
+							}
+						}
+						else if (sym == '>') //end of tag
+						{
+							reader.Read();
+							var invariantTagName = tagName.ToLowerInvariant();
+							if (_noContentTags.Contains(invariantTagName))
+							{
+								yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagEnd};
+							}
+							else if (invariantTagName == "script" || invariantTagName == "style")
+							{
+								yield return ReadScript(reader, "</" + tagName); //todo: revise concatination
+								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
+							}
+							else if (invariantTagName == "textarea")
+							{
+								yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(ReadToPhrase(reader, "</textarea>")) };
+								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
+							}
+							else
+							{
+								tagsStack.Push(tagName.ToLowerInvariant());
 							}
 							break;
-						case States.ReadSelfClosedTagEnd:
-							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = lastTag};
-							lastTag = null;
-							break;
-						case States.ReadCloseTagName:
-							yield return new HtmlChunk {Type = HtmlChunkTypes.TagEnd, Value = new string(buffer.ToArray())};
-							lastTag = null;
-							break;
-						case States.ReadAttributeName:
-							if (buffer.Count > 0)
-								yield return new HtmlChunk {Type = HtmlChunkTypes.AttributeName, Value = new string(buffer.ToArray()).Trim()};
-							break;
-						case States.ReadDocType:
-							yield return new HtmlChunk {Type = HtmlChunkTypes.DocType, Value = data.Substring(7)};
-							break;
-					}
-
-					if (newState == States.ReadText && lastTag != null)
-					{
-						var tagInvariantName = lastTag.ToLowerInvariant();
-
-						if (tagInvariantName == "script" || tagInvariantName == "style")
-						{
-							yield return ReadScript(reader, "</"+tagInvariantName);
-							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = tagInvariantName };
-							buffer.Clear();
-							newState = state = States.ReadText;
-							lastTag = string.Empty;
-							continue;
 						}
-						else if (tagInvariantName == "textarea")
+
+						//Read attribute
+						ReadWhile(reader, c => c == ' ');
+
+						var attrName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>' && c != '=');
+						if (!string.IsNullOrEmpty(attrName))
 						{
-							var buffer1 = new List<char>();
-							ReadToPhrase(reader, buffer1, "</textarea>");
-							yield return new HtmlChunk { Value = new string(buffer1.ToArray()), Type = HtmlChunkTypes.Text };
-							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = tagInvariantName };
-							buffer.Clear();
-							newState = state = States.ReadText;
-							lastTag = string.Empty;
-							continue;
-						}
-						if (_noContentTags.Contains(tagInvariantName))
-						{
-							yield return new HtmlChunk { Type = HtmlChunkTypes.TagEnd, Value = lastTag };
-							lastTag = null;
+							yield return new HtmlChunk {Type = HtmlChunk.Types.AttributeName, Value = attrName};
+							ReadWhile(reader, c => c == ' ');
+							if ((char)reader.Peek() == '=')
+							{
+								reader.Read();
+								ReadWhile(reader, c => c == ' ');
+								var val = ReadAttributeValue(reader);
+								if (val != null)
+									yield return new HtmlChunk {Type = HtmlChunk.Types.AttributeValue, Value = WebUtility.HtmlDecode(val)};
+							}
 						}
 					}
-
-					if (newState != States.ReadSelfClosedTagEnd)
-						buffer.Clear();
-
-					state = newState;
-				} while (code != -1);
+				}
+				else if (next == '?')
+				{
+					yield return new HtmlChunk {Type = HtmlChunk.Types.Comment, Value = ReadComment(reader, false)};
+				}
+				else if (next == '!') //comment
+				{
+					reader.Read();
+					string txt = ReadComment(reader, true);
+					yield return txt.ToLowerInvariant().StartsWith("doctype")
+						? new HtmlChunk { Type = HtmlChunk.Types.DocType, Value = txt.Remove(0, 7).TrimStart() }
+						: new HtmlChunk { Type = HtmlChunk.Types.Comment, Value = txt };
+				}
 			}
+
+			if (text.Length > 0)
+				yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
 		}
 
-		private static int Skip(StreamReader reader, char c)
+		private static string ReadAttributeValue(StreamReader reader)
 		{
-			for (var s = reader.Read(); s != -1; s = reader.Read())
+			var q = (char)reader.Read();
+			if (q == '\'' || q == '\"')
 			{
-				if (s != c)
-					return s;
+				var res = ReadWhileWithEscapes(reader, c => c == '\'' || c == '"' || c=='\\', (c, _) => c != q);
+				reader.Read();
+				return res;
 			}
-			return -1;
-		}
-	}
 
-	public class HtmlInvalidFormatException : Exception
-	{
-		public HtmlInvalidFormatException(string message)
-			: base(message)
+			return  q + ReadWhileWithEscapes(reader, c => c == '\'' || c == '"', (c, _) => c != '/' && c != ' ' && c != '>');
+		}
+
+		private static string ReadToPhrase(StreamReader reader, string end)
 		{
+			var textAreaContent = new StringBuilder();
+			ReadToPhrase(reader, textAreaContent, end);
+			return textAreaContent.ToString();
+		}
 
+
+		private static string ReadWhile(StreamReader reader, Func<char, bool> condition)
+		{
+			var buffer = new StringBuilder();
+			while (!reader.EndOfStream)
+			{
+				var symbol = (char) reader.Peek();
+
+				if (!condition(symbol))
+					break;
+
+				reader.Read();
+				buffer.Append(symbol);
+			}
+			return buffer.ToString();
+		}
+
+		private static string ReadWhileWithEscapes(StreamReader reader, Func<char, bool> escapeCondition, Func<char, bool, bool> continueCondition)
+		{
+			var buffer = new StringBuilder();
+
+			while (!reader.EndOfStream)
+			{
+				var symbol = (char)reader.Peek();
+
+				if (symbol == '\\')
+				{
+					reader.Read();
+					symbol = (char) reader.Read();
+					if (!escapeCondition(symbol))
+					{
+						buffer.Append('\\');
+						if (!continueCondition(symbol, true))
+							break;
+					}
+
+					buffer.Append(symbol);
+					continue;
+				}
+
+				if (!continueCondition(symbol, false))
+					break;
+
+				reader.Read();
+				buffer.Append(symbol);
+			}
+
+			return buffer.ToString();
 		}
 	}
 
+	
 	public static class StreamReaderExtension
 	{
-		public static IEnumerable<char> ToEnumerable(this StreamReader reader)
+		public static string ReadLineWithEndings(this StreamReader streamReader)
 		{
-			for (var s = reader.Read(); s != -1; s = reader.Read())
+			var buffer = new List<char>();
+
+			while (!streamReader.EndOfStream)
 			{
-				yield return (char)s;
+				var s = (char)streamReader.Read();
+				buffer.Add(s);
+				if (s == '\r' && (streamReader.EndOfStream || streamReader.Peek() == '\n'))
+				{
+					s = (char)streamReader.Read();
+					buffer.Add(s);
+				}
+
+				if (s == '\n')
+					break;
 			}
+
+			return new string(buffer.ToArray());
 		}
 	}
-	
 }
 

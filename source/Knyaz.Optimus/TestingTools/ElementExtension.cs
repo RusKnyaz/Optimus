@@ -1,4 +1,8 @@
-﻿using Knyaz.Optimus.Dom.Elements;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -13,6 +17,74 @@ namespace Knyaz.Optimus.TestingTools
 			var evt = input.OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("change", false, false);
 			input.DispatchEvent(evt);
+		}
+
+		/// <summary>
+		/// Emulate entering text by user into input textbox.
+		/// </summary>
+		public static void EnterText(this HtmlTextAreaElement input, string text)
+		{
+			input.Value = text;
+			var evt = input.OwnerDocument.CreateEvent("Event");
+			evt.InitEvent("change", false, false);
+			input.DispatchEvent(evt);
+		}
+
+		public static IEnumerable<IElement> Select(this IElement doc, string selector)
+		{
+			var selectors = selector.Split(' ', '[').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+			if (selectors.Length == 0)
+				return Enumerable.Empty<IElement>();
+
+			return selectors.Aggregate((IEnumerable<IElement>)new[] { doc }, (current, s) => current.SelectMany(x => x.SelectByOneSelector(s)));
+		}
+
+		private static IEnumerable<IElement> SelectByOneSelector(this IElement elt, string selector)
+		{
+			var firstSymbol = selector[0];
+			switch (firstSymbol)
+			{
+				case '#':
+				{
+					var doc = elt as IDocument;
+					if (doc != null)
+					{
+						var res = doc.GetElementById(selector.Substring(1));
+						if (res != null)
+							return new[] {res};
+						
+						return new IElement[0];
+					}
+						
+					throw new InvalidOperationException("Id search can be performed only on document");
+				}
+				case '.':
+					return elt.GetElementsByClassName(selector.Substring(1));
+				default:
+					if (selector[selector.Length - 1] == ']')
+						return elt.GetElementsByAttributes(selector.Substring(0, selector.Length-1));
+
+					return elt.GetElementsByTagName(selector);
+			}
+		}
+
+		private static IEnumerable<IElement> GetElementsByAttributes(this IElement elt, string selector)
+		{
+			foreach (var child in elt.Flatten().OfType<IElement>())
+			{
+				var arr = selector.Split('=');
+				if (arr[0].Last() == '^')
+				{
+					var attrVal = child.GetAttribute(arr[0].TrimEnd('^'));
+					if (attrVal != null && attrVal.StartsWith(arr[1]))
+						yield return child;
+				}
+				else
+				{
+					if (child.GetAttribute(arr[0]) == arr[1])
+						yield return child;	
+				}
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
 using Moq;
 using NUnit.Framework;
@@ -146,7 +147,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		
 		[Test]
-		public void SetTimeout()
+		public void SetTimeoutWithData()
 		{
 			var engine = new Engine();
 			var log = new List<string>();
@@ -154,8 +155,19 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
 			Assert.AreEqual(0, log.Count);
 			Thread.Sleep(1000);
-			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("ok",  log[0]);
+			CollectionAssert.AreEqual(new[] { "ok" }, log);
+		}
+
+		[Test]
+		public void SetTimeout()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log('ok');}, 300);"));
+			Assert.AreEqual(0, log.Count);
+			Thread.Sleep(1000);
+			CollectionAssert.AreEqual(new[]{"ok"}, log);
 		}
 
 		[Test, Ignore]
@@ -180,7 +192,7 @@ window.clearTimeout(timer);"));
 			var resourceProvider = Mocks.ResourceProvider("http://todosoft.ru", "");
 			var engine = new Engine(resourceProvider);
 			engine.OpenUrl("http://todosoft.ru");
-			Assert.AreEqual("http://todosoft.ru", engine.Window.Location.Href);
+			Assert.AreEqual("http://todosoft.ru/", engine.Window.Location.Href);
 			Assert.AreEqual("http:", engine.Window.Location.Protocol);
 		}
 
@@ -260,6 +272,41 @@ window.clearTimeout(timer);"));
 			
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
+		}
+
+		[Test]
+		public void RaiseExecuteScript()
+		{
+			var engine = new Engine();
+			engine.Load("<html><head></head><body></body></html>");
+			var doc = engine.Document;
+			
+			var beforeCount = 0;
+			var afterCount = 0;
+			doc.AddEventListener("BeforeScriptExecute", @event => beforeCount++, false);
+			doc.AddEventListener("AfterScriptExecute", @event => afterCount++, false);
+
+			var script = doc.CreateElement("script");
+			script.InnerHTML = "console.log('hi');";
+			doc.Head.AppendChild(script);
+
+			Assert.AreEqual(1, beforeCount, "BeforeScriptExecute Event handlers calls count");
+			Assert.AreEqual(1, afterCount, "AfterScriptExecute Event handlers calls count");
+		}
+
+		[Test]
+		public void AppendScriptAsInnerHtml()
+		{
+			var engine = new Engine();
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+			engine.Load("<html><head></head><body></body></html>");
+			engine.Document.Body.InnerHTML = "<script>console.log('HI');</script>";
+			Assert.AreEqual(new[]{"HI"}, log);
 		}
 	}
 }

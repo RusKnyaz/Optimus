@@ -25,6 +25,7 @@ namespace Knyaz.Optimus.Tests
 					"Error script execution:" + (script.Src ?? script.Id ?? "<script>") + " " + exception.Message);
 			};
 
+			engine.ResourceProvider.OnRequest += s => System.Console.WriteLine("Request: " + s);
 			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
 			return engine;
 		}

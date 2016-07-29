@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
@@ -22,16 +22,40 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
+		public void Octane()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://chromium.github.io/octane");
+			engine.WaitDocumentLoad();
+			var startButton = engine.WaitId("main-banner") /*as HtmlElement*/;
+			Assert.IsNotNull(startButton);
+
+			//startButton.Click();
+
+			Thread.Sleep(10000);
+
+			System.Console.WriteLine("Score: " + startButton.InnerHTML);
+		}
+
+		[Test]
+		public void Css3test()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://css3test.com");
+			engine.WaitDocumentLoad();
+			var score = engine.WaitId("score");
+			Assert.IsNotNull("score");
+			System.Console.WriteLine("Score: " + score.InnerHTML);
+		}
+
+		[Test]
 		public void Html5Score()
 		{
 			var engine = new Engine();
 			engine.OpenUrl("https://html5test.com");
 			engine.WaitDocumentLoad();
-			Thread.Sleep(5000);//wait calculation
 
-			var score = engine.Document.GetElementById("score");
-			Assert.IsNotNull(score, "score");
-			var tagWithValue = score.GetElementsByTagName("strong").FirstOrDefault();
+			var tagWithValue = engine.WaitSelector("#score strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
 			System.Console.WriteLine("Score: " + tagWithValue.InnerHTML);
 			Thread.Sleep(500);
@@ -117,8 +141,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.IsNotNull(userName, "UserName");
 			Assert.IsNotNull(password, "Password");
 
-			userName.Value = "admin";
-			password.Value = "b";
+			userName.EnterText("admin");
+			password.EnterText("b");
 			logonButton.Click();
 
 			var error = engine.WaitId("validationError");
@@ -134,16 +158,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.OpenUrl("http://localhost:2930");
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
-			Thread.Sleep(5000);
-
-			var userName = engine.Document.GetElementById("UserName") as HtmlInputElement;
-			var password = engine.Document.GetElementById("Password") as HtmlInputElement;
+			
+			var userName = engine.WaitId("UserName") as HtmlInputElement;
+			var password = engine.WaitId("Password") as HtmlInputElement;
 			Assert.IsNotNull(logonButton, "LogonButton");
 			Assert.IsNotNull(userName, "UserName");
 			Assert.IsNotNull(password, "Password");
 
-			userName.Value = "admin";
-			password.Value = "admin";
+			userName.EnterText("admin");
+			password.EnterText("admin");
 			logonButton.Click();
 
 			var error = engine.WaitId("logout");
