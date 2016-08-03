@@ -16,5 +16,6 @@
 		public const string Select = "SELECT";
 		public const string Option = "OPTION";
 		public const string Style = "STYLE";
+		public const string Link = "LINK";
 	}
 }

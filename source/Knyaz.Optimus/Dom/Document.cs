@@ -102,6 +102,7 @@ namespace Knyaz.Optimus.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
+				case TagsNames.Link: return new HtmlLinkElement(this);
 				case TagsNames.Style: return new HtmlStyleElement(this);
 				case TagsNames.Select: return new HtmlSelectElement(this);
 				case TagsNames.Option: return new HtmlOptionElement(this);

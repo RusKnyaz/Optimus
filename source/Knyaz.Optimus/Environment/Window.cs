@@ -10,12 +10,14 @@ namespace Knyaz.Optimus.Environment
 	/// </summary>
 	public class Window : IEventTarget
 	{
+		private readonly Engine _engine;
 		private EventTarget _eventTarget;
 
 		public WindowTimers Timers { get { return _timers; } }
 
 		public Window(Func<object> getSyncObj, Engine engine)
 		{
+			_engine = engine;
 			Screen = new Screen
 				{
 					Width = 1024,
@@ -109,8 +111,13 @@ namespace Knyaz.Optimus.Environment
 		
 		public CssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
 		{
-			//throw new NotImplementedException();
-			//todo: implement style computing
+			var styling = _engine.Styling;
+			if (styling != null)
+				return styling.GetComputedStyle(element);
+
+			var htmlElement = element as HtmlElement;
+			if (htmlElement != null)
+				return htmlElement.Style;
 			
 			return new CssStyleDeclaration();
 		}

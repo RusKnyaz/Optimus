@@ -76,6 +76,7 @@
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlIFrameElement.cs" />
+    <Compile Include="Dom\Elements\HtmlLinkElement.cs" />
     <Compile Include="Dom\Elements\HtmlOptionElement.cs" />
     <Compile Include="Dom\Elements\HtmlSelectElement.cs" />
     <Compile Include="Dom\Elements\HtmlStyleElement.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlLinkElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
