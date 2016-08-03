@@ -155,16 +155,11 @@ namespace Knyaz.Optimus.Dom
 			return new Comment { Data = data, OwnerDocument = this };
 		}
 
-		public Element Body
-		{
-			get { return DocumentElement.GetElementsByTagName("body").FirstOrDefault(); }
-		}
+		public Element Body { get; private set; }
 
-		public Head Head
-		{
-			get { return (Head)DocumentElement.GetElementsByTagName("head").FirstOrDefault(); }
-		}
+		public Head Head { get; private set; }
 
+		
 		public Event CreateEvent(string type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
@@ -245,6 +240,16 @@ namespace Knyaz.Optimus.Dom
 			node.ParentNode = this;
 			node.OwnerDocument = this;
 			HandleNodeAdded(node);
+
+			if (Body == null)
+			{
+				Body = node as HtmlBodyElement;
+			}
+
+			if (Head == null)
+			{
+				Head = node as Head;
+			}
 		}
 
 		public string CompatMode
