@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
@@ -31,6 +32,7 @@ namespace Knyaz.Optimus.Dom
 
 		internal Document(Window window):base(null)
 		{
+			StyleSheets = new List<CssStyleSheet>();
 			NodeType = DOCUMENT_NODE;
 
 			DocumentElement = CreateElement(TagsNames.Html);
@@ -66,6 +68,8 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		public event Action<IDocument> DomContentLoaded;
+
+		public IList<CssStyleSheet> StyleSheets { get; private set; }
 
 		internal void Complete()
 		{

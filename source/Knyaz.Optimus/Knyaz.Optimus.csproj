@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="Dom\Css\CssStyleSheet.cs" />
     <Compile Include="Dom\Css\DocumentStyling.cs" />
     <Compile Include="Dom\DOMException.cs" />
     <Compile Include="Dom\ElementExtension.cs" />
