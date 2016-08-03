@@ -34,6 +34,8 @@ namespace Knyaz.Optimus.Dom
 			NodeType = DOCUMENT_NODE;
 
 			DocumentElement = CreateElement(TagsNames.Html);
+			DocumentElement.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
+			DocumentElement.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
 			ChildNodes.Add(DocumentElement);
 			DocumentElement.ParentNode = this;
 			DocumentElement.OwnerDocument = this;
@@ -155,7 +157,7 @@ namespace Knyaz.Optimus.Dom
 			return new Comment { Data = data, OwnerDocument = this };
 		}
 
-		public Element Body { get; private set; }
+		public HtmlBodyElement Body { get; private set; }
 
 		public Head Head { get; private set; }
 
@@ -240,16 +242,6 @@ namespace Knyaz.Optimus.Dom
 			node.ParentNode = this;
 			node.OwnerDocument = this;
 			HandleNodeAdded(node);
-
-			if (Body == null)
-			{
-				Body = node as HtmlBodyElement;
-			}
-
-			if (Head == null)
-			{
-				Head = node as Head;
-			}
 		}
 
 		public string CompatMode
@@ -270,7 +262,7 @@ namespace Knyaz.Optimus.Dom
 		void Write(string text);
 		Event CreateEvent(string type);
 		Head Head { get; }
-		Element Body { get; }
+		HtmlBodyElement Body { get; }
 		Comment CreateComment(string data);
 		Text CreateTextNode(string data);
 		DocumentFragment CreateDocumentFragment();
