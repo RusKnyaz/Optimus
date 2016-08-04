@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
@@ -10,6 +11,8 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public class HtmlElement : Element, IHtmlElement
 	{
+		private CssStyleDeclaration _style;
+
 		static class Defaults
 		{
 			public static bool Hidden = false;
@@ -18,7 +21,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		public HtmlElement(Document ownerDocument, string tagName)
 			: base(ownerDocument, tagName)
 		{
-			Style = new CssStyleDeclaration();
+			
 		}
 
 		public bool Hidden
@@ -55,7 +58,18 @@ namespace Knyaz.Optimus.Dom.Elements
 			return base.DispatchEvent(evt);
 		}
 
-		public CssStyleDeclaration Style { get; private set; }
+		public CssStyleDeclaration Style
+		{
+			get
+			{
+				if (_style == null)
+				{
+					_style = new CssStyleDeclaration();
+				}
+				_style.CssText = GetAttribute("style");
+				return _style;
+			}
+		}
 
 		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
 		{

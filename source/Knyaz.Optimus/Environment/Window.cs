@@ -1,5 +1,6 @@
 ﻿using System;
 using Jint.Runtime;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 
