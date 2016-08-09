@@ -30,9 +30,10 @@ namespace Knyaz.Optimus.Tests.Dom
 			var document = new Document();
 			document.Write("<html><body><span></span></body></html>");
 			Assert.IsNotNull(document.DocumentElement);
-			Assert.AreEqual(1, document.DocumentElement.ChildNodes.Count);
-			Assert.AreEqual("BODY", ((Element)document.DocumentElement.FirstChild).TagName);
-			Assert.AreEqual("SPAN", ((Element)(document.DocumentElement.FirstChild).FirstChild).TagName);
+			Assert.AreEqual(2, document.DocumentElement.ChildNodes.Count);
+			Assert.AreEqual("HEAD", ((Element)document.DocumentElement.FirstChild).TagName);
+			Assert.AreEqual("BODY", ((Element)document.DocumentElement.FirstChild.NextSibling).TagName);
+			Assert.AreEqual("SPAN", ((Element)(document.DocumentElement.FirstChild.NextSibling).FirstChild).TagName);
 			Assert.AreEqual(document, document.DocumentElement.ParentNode);
 			Assert.AreEqual(document, document.DocumentElement.OwnerDocument);
 		}

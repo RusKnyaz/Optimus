@@ -58,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="Dom\Css\CssRule.cs" />
+    <Compile Include="Dom\Css\CssStyleRule.cs" />
+    <Compile Include="Dom\Css\CssStyleSheet.cs" />
     <Compile Include="Dom\Css\DocumentStyling.cs" />
     <Compile Include="Dom\DOMException.cs" />
     <Compile Include="Dom\ElementExtension.cs" />
@@ -70,7 +73,7 @@
     <Compile Include="Dom\Elements\CharacterData.cs" />
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
-    <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Css\CssStyleDeclaration.cs" />
     <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
     <Compile Include="Dom\Elements\HtmlDivElement.cs" />
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
@@ -127,6 +130,7 @@
     <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
+    <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />

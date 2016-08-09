@@ -1,7 +1,8 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using Knyaz.Optimus.ScriptExecuting;
 
-namespace Knyaz.Optimus.Dom.Elements
+namespace Knyaz.Optimus.Dom.Css
 {
 	[DomItem]
 	public interface ICssStyleDeclaration
@@ -16,9 +17,12 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public class CssStyleDeclaration : ICssStyleDeclaration
 	{
-		public CssStyleDeclaration()
+		private string _cssText;
+
+		public CssStyleDeclaration(CssStyleRule parentRule = null)
 		{
 			Properties = new NameValueCollection();
+			ParentRule = parentRule;
 		}
 
 		public NameValueCollection Properties { get; private set; }
@@ -54,6 +58,34 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string GetPropertyValue(string propertyName)
 		{
 			return Properties[propertyName];
+		}
+
+		public string CssText
+		{
+			get { return _cssText; }
+			set { _cssText = value ?? string.Empty; }
+		}
+
+		public CssStyleRule ParentRule { get; private set; }
+
+		public string RemoveProperty(string propertyName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void SetProperty(string name, string value, string important)
+		{
+			throw new NotImplementedException();	
+		}
+
+		public string GetPropertyPriority(string propertyName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int Length
+		{
+			get { return Properties.Count; }
 		}
 	}
 }

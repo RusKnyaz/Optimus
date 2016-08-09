@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
@@ -31,9 +32,12 @@ namespace Knyaz.Optimus.Dom
 
 		public Document(IWindow window):base(null)
 		{
+			StyleSheets = new List<CssStyleSheet>();
 			NodeType = DOCUMENT_NODE;
 
 			DocumentElement = CreateElement(TagsNames.Html);
+			DocumentElement.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
+			DocumentElement.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
 			ChildNodes.Add(DocumentElement);
 			DocumentElement.ParentNode = this;
 			DocumentElement.OwnerDocument = this;
@@ -64,6 +68,8 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		public event Action<IDocument> DomContentLoaded;
+
+		public IList<CssStyleSheet> StyleSheets { get; private set; }
 
 		internal void Complete()
 		{
@@ -155,16 +161,11 @@ namespace Knyaz.Optimus.Dom
 			return new Comment { Data = data, OwnerDocument = this };
 		}
 
-		public Element Body
-		{
-			get { return DocumentElement.GetElementsByTagName("body").FirstOrDefault(); }
-		}
+		public HtmlBodyElement Body { get; private set; }
 
-		public Head Head
-		{
-			get { return (Head)DocumentElement.GetElementsByTagName("head").FirstOrDefault(); }
-		}
+		public Head Head { get; private set; }
 
+		
 		public Event CreateEvent(string type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
@@ -265,7 +266,7 @@ namespace Knyaz.Optimus.Dom
 		void Write(string text);
 		Event CreateEvent(string type);
 		Head Head { get; }
-		Element Body { get; }
+		HtmlBodyElement Body { get; }
 		Comment CreateComment(string data);
 		Text CreateTextNode(string data);
 		DocumentFragment CreateDocumentFragment();
