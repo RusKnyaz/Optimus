@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Environment
 	/// <summary>
 	/// http://www.w3.org/TR/html5/browsers.html#window
 	/// </summary>
-	public class Window : IEventTarget
+	public class Window : IWindow
 	{
 		private readonly Engine _engine;
 		private EventTarget _eventTarget;
@@ -121,5 +121,24 @@ namespace Knyaz.Optimus.Environment
 			
 			return new CssStyleDeclaration();
 		}
+	}
+
+	public interface IWindow : IEventTarget
+	{
+		int InnerWidth { get; set; }
+		int InnerHeight { get; set; }
+
+		Screen Screen { get; }
+		Location Location { get; }
+		Navigator Navigator { get; }
+		History History { get;  }
+		
+		int SetTimeout(Action<object> handler, double? delay, object ctx);
+		void ClearTimeout(int handle);
+		int SetInterval(Action handler, double? delay);
+		void ClearInterval(int handle);
+
+		CssStyleDeclaration GetComputedStyle(Element element);
+		CssStyleDeclaration GetComputedStyle(Element element, string pseudoElt);
 	}
 }

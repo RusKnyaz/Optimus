@@ -29,7 +29,7 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		internal Document(Window window):base(null)
+		public Document(IWindow window):base(null)
 		{
 			NodeType = DOCUMENT_NODE;
 
@@ -44,7 +44,7 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		public Window DefaultView { get; private set; }
+		public IWindow DefaultView { get; private set; }
 		public Element DocumentElement { get; private set; }
 		public string ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
