@@ -109,6 +109,7 @@
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
+    <Compile Include="Html\CssReader.cs" />
     <Compile Include="ResourceProviders\PredictedResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
     <Compile Include="ScriptExecuting\ClrPrototype.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
+    <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
     <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlStyleElementTests.cs" />
+    <Compile Include="Tests\Html\CssReaderTest.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
