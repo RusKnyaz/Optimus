@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Knyaz.Optimus.Html;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -18,8 +21,13 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public void InsertRule(string rule, int idx)
 		{
-			//todo: parse rule
-			//CssRules.Insert(idx, rule);
+			using (var enumerator = CssReader.Read(new StringReader(rule)).GetEnumerator())
+			{
+				enumerator.MoveNext();
+				CssStyleRule r;
+				StyleSheetBuilder.CreateRule(this, enumerator, out r);
+				CssRules.Add(r);
+			}
 		}
 	}
 }
