@@ -63,19 +63,31 @@ namespace Knyaz.Optimus.Dom.Css
 		public string CssText
 		{
 			get { return _cssText; }
-			set { _cssText = value ?? string.Empty; }
+			set
+			{
+				if (_cssText != value)
+				{
+					_cssText = value ?? string.Empty;
+					Properties.Clear();
+					if(!string.IsNullOrEmpty(value))
+						StyleSheetBuilder.FillStyle(this, value);
+				}
+			}
 		}
 
 		public CssStyleRule ParentRule { get; private set; }
 
 		public string RemoveProperty(string propertyName)
 		{
-			throw new NotImplementedException();
+			var val = Properties[propertyName];
+			Properties.Remove(propertyName);
+			return val;
 		}
 
 		public void SetProperty(string name, string value, string important)
 		{
-			throw new NotImplementedException();	
+			//todo: important
+			Properties.Add(name, value);
 		}
 
 		public string GetPropertyPriority(string propertyName)

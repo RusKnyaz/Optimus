@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
 
@@ -79,8 +80,32 @@ namespace Knyaz.Optimus.Dom.Css
 				throw new Exception("Unable to parse rule");
 
 			rule = new CssStyleRule(styleSheet) { SelectorText = enumerator.Current.Data };
+			enumerator.MoveNext();
+			return FillStyle(rule.Style, enumerator);
+		}
+
+		public static void FillStyle(CssStyleDeclaration style, string str)
+		{
+			if (str[0] != '{')
+				str = '{' + str;
+			str = "toskip" + str;
+
+			if (str.Last() != '}')
+				str += '}';
+
+			using (var enumerator = CssReader.Read(new StringReader(str)).GetEnumerator())
+			{
+				//skip selector
+				while (enumerator.MoveNext() && enumerator.Current.Type == CssChunkTypes.Selector) ;
+
+				FillStyle(style, enumerator);
+			}
+		}
+
+		private static bool FillStyle(CssStyleDeclaration style, IEnumerator<CssChunk> enumerator)
+		{
 			string property = null;
-			while (enumerator.MoveNext())
+			do
 			{
 				var cssChunk = enumerator.Current;
 				switch (cssChunk.Type)
@@ -91,12 +116,11 @@ namespace Knyaz.Optimus.Dom.Css
 						property = cssChunk.Data;
 						break;
 					case CssChunkTypes.Value:
-						rule.Style.SetProperty(property, cssChunk.Data, "");
+						style.SetProperty(property, cssChunk.Data, "");
 						property = null;
 						break;
 				}
-			}
-			
+			} while (enumerator.MoveNext());
 			return false;
 		}
 	}

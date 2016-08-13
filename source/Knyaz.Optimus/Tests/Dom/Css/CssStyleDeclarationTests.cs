@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom.Css
 {
-	[TestFixture(Ignore = true, IgnoreReason = "Not implemented yet")]
+	[TestFixture]
 	public class CssStyleDeclarationTests
 	{
 		[Test]
