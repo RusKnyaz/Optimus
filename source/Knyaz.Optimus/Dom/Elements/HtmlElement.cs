@@ -71,29 +71,6 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
-		{
-			base.UpdatePropertyFromAttribute(value, invariantName);
-
-			//todo: remove it to property
-			if (invariantName == "style")
-			{
-				if (!string.IsNullOrEmpty(value))
-				{
-					var styleParts = value.Split(';');
-					foreach (var stylePart in styleParts.Where(s => !string.IsNullOrEmpty(s)))
-					{
-						var keyValue = stylePart.Split(':');
-						if (keyValue.Length == 2)
-						{
-							//todo: handle duplicates
-							Style.Properties.Add(keyValue[0], keyValue[1]);
-						}
-					}
-				}
-			} 
-		}
-
 		public void Blur()
 		{
 			OwnerDocument.ActiveElement = null;

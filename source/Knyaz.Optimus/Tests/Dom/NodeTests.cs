@@ -29,12 +29,12 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void GetStyleTest()
 		{
 			var elem = (HtmlElement)CreateElement("<div style='width:100pt'></div>");
-			var style = elem.Style;
 
-			Assert.AreEqual(1, style.Properties.Count);
-			Assert.AreEqual("100pt", style["width"], "style[\"width\"]");
-			Assert.AreEqual("100pt", style.GetPropertyValue("width"));
-			Assert.AreEqual("width", style[0]);
+			elem.Style.Assert(style =>
+				style.Properties.Count == 1 &&
+				style["width"] == "100pt" &&
+				style.GetPropertyValue("width") == "100pt" &&
+				style[0] == "width");
 		}
 
 		[Test]

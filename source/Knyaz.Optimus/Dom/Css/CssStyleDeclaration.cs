@@ -87,7 +87,7 @@ namespace Knyaz.Optimus.Dom.Css
 		public void SetProperty(string name, string value, string important)
 		{
 			//todo: important
-			Properties.Add(name, value);
+			Properties[name] = value;
 		}
 
 		public string GetPropertyPriority(string propertyName)
