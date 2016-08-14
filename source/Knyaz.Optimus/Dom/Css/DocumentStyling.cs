@@ -7,6 +7,7 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.Properties;
 using Knyaz.Optimus.ResourceProviders;
+using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -64,11 +65,59 @@ namespace Knyaz.Optimus.Dom.Css
 			_document.StyleSheets.Add(styleSheet);
 		}
 
-		public CssStyleDeclaration GetComputedStyle(Element elt)
+		public ICssStyleDeclaration GetComputedStyle(Element elt)
 		{
-			//todo: waiting for loading all deferred styles and compute element style
+			var styles = GetStylesFor(elt);
+			return new ComputedCssStyleDeclaration(styles);
+		}
 
-			return new CssStyleDeclaration();
+		private ICssStyleDeclaration[] GetStylesFor(Element elt)
+		{
+			var htmlElt = elt as HtmlElement;
+			var lst = new List<ICssStyleDeclaration>();
+			if (htmlElt != null)
+				lst.Add(htmlElt.Style);
+			foreach (var result in _document.StyleSheets.SelectMany(x => x.CssRules).OfType<CssStyleRule>())
+			{
+				if(result.IsMatchesSelector(elt))
+					lst.Add(result.Style);
+			}
+			return lst.ToArray();
+		}
+	}
+
+	internal class ComputedCssStyleDeclaration : ICssStyleDeclaration
+	{
+		private readonly ICssStyleDeclaration[] _styles;
+
+		public ComputedCssStyleDeclaration(ICssStyleDeclaration[] styles)
+		{
+			_styles = styles;
+		}
+
+		public object this[string name]
+		{
+			get
+			{
+				int number;
+				return int.TryParse(name, out number) ? this[number] : GetPropertyValue(name);
+			}
+		}
+
+		public string this[int idx]
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public string GetPropertyValue(string propertyName)
+		{
+			foreach (var style in _styles)
+			{
+				var val = style.GetPropertyValue(propertyName);
+				if (val != null)
+					return val;
+			}
+			return null;
 		}
 	}
 
