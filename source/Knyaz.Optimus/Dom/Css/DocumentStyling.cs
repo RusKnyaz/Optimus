@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.Properties;

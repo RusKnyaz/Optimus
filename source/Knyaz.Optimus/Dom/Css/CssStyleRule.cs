@@ -1,8 +1,11 @@
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
 
 namespace Knyaz.Optimus.Dom.Css
 {
+	[DebuggerDisplay("CssStyleRule, Selector: {SelectorText}")]
 	public class CssStyleRule : CssRule
 	{
 		public string SelectorText { get; set; }
@@ -20,9 +23,9 @@ namespace Knyaz.Optimus.Dom.Css
 		/// <returns></returns>
 		internal bool IsMatchesSelector(Element elt)
 		{
-			var chunks = SelectorText.Split(' ');
-
-
+			var txt = NormalizeSelector(SelectorText);
+			
+			var chunks = txt.Split(' ');
 
 			var htmlElt = elt as HtmlElement;
 
@@ -41,11 +44,20 @@ namespace Knyaz.Optimus.Dom.Css
 					continue;
 				}
 				//todo: attributes
-				if(elt.TagName != chunk.ToUpper())
+
+				if(chunk.ToUpper().Split(',').All(x => elt.TagName != x))
 					return false;
 			}
 
 			return true;
+		}
+
+		private static Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
+
+		private string NormalizeSelector(string selector)
+		{
+			selector = selector.Replace('\n', ' ').Replace('\r', ' ');
+			return _normalizeCommas.Replace(selector, ",");
 		}
 	}
 }

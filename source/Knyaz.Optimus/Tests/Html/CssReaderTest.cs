@@ -15,6 +15,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("a {b:1} \n.c{d:2}", "Selector:a Property:b Value:1 Selector:.c Property:d Value:2")]
 		[TestCase("a {b:1 d}", "Selector:a Property:b Value:1 d")]
 		[TestCase("a {b:\"1\"}", "Selector:a Property:b Value:\"1\"")]
+		[TestCase("/*comment*/ a {b:1}", "Selector:a Property:b Value:1")]
 		public void ReadCss(string css, string result)
 		{
 			var res = CssReader.Read(new StringReader(css)).Select(x => x.Type.ToString()+":"+x.Data).ToArray();

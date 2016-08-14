@@ -17,7 +17,7 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	public class CssStyleDeclaration : ICssStyleDeclaration
 	{
-		private string _cssText;
+		private string _cssText = string.Empty;
 
 		public CssStyleDeclaration(CssStyleRule parentRule = null)
 		{

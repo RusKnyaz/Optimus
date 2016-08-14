@@ -28,7 +28,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				&& style.Length == 1);
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void DefaultValues()
 		{
 			_div.Style.Assert(style => 
@@ -37,7 +37,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				&& style.Length == 0);
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void DefaultComputedStyle()
 		{
 			_document.Body.AppendChild(_div);
@@ -45,9 +45,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			styling.LoadDefaultStyles();
 
 			styling.GetComputedStyle(_div).Assert(style =>
-				style.CssText != "" &&
 				style.GetPropertyValue("display") == "block");
-
 		}
 	}
 }

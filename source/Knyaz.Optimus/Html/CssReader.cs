@@ -21,8 +21,6 @@ namespace Knyaz.Optimus.Html
 	{
 		public static IEnumerable<CssChunk> Read(TextReader reader)
 		{
-			//todo: skip comments
-
 			var type = CssChunkTypes.Selector;
 			var newType = CssChunkTypes.Selector;
 			var data = new StringBuilder();
@@ -34,6 +32,23 @@ namespace Knyaz.Optimus.Html
 					break;
 
 				var c = (char) i;
+
+				if (c == '/' && reader.Peek() == '*')//skip comments
+				{
+					while(true)
+					{
+						var cc = reader.Read();
+						if (cc == -1)
+							yield break;
+
+						if (cc == '*' && reader.Peek() == '/')
+						{
+							reader.Read();
+							break;
+						}
+					} 
+					continue;
+				}
 
 				switch (type)
 				{
