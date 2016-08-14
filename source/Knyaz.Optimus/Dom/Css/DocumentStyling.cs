@@ -72,15 +72,19 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private ICssStyleDeclaration[] GetStylesFor(Element elt)
 		{
-			var htmlElt = elt as HtmlElement;
 			var lst = new List<ICssStyleDeclaration>();
-			if (htmlElt != null)
-				lst.Add(htmlElt.Style);
+			
 			foreach (var result in _document.StyleSheets.SelectMany(x => x.CssRules).OfType<CssStyleRule>())
 			{
 				if(result.IsMatchesSelector(elt))
 					lst.Add(result.Style);
 			}
+			var htmlElt = elt as HtmlElement;
+			if (htmlElt != null)
+				lst.Add(htmlElt.Style);
+
+			lst.Reverse();
+
 			return lst.ToArray();
 		}
 	}

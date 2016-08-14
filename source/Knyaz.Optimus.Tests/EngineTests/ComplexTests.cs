@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.Tests.Properties;
-using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
