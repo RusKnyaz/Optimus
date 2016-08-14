@@ -45,7 +45,9 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			styling.LoadDefaultStyles();
 
 			styling.GetComputedStyle(_div).Assert(style =>
-				style.GetPropertyValue("display") == "block");
+				style.GetPropertyValue("display") == "block" &&
+				style.GetPropertyValue("font-size") == "16px" &&
+				style.GetPropertyValue("font-family") == "\"Times New Roman\"");
 		}
 	}
 }

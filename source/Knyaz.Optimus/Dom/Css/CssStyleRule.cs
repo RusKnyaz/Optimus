@@ -24,6 +24,9 @@ namespace Knyaz.Optimus.Dom.Css
 		internal bool IsMatchesSelector(Element elt)
 		{
 			var txt = NormalizeSelector(SelectorText);
+
+			if (txt == "*")
+				return true;
 			
 			var chunks = txt.Split(' ');
 
