@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
+using Knyaz.Optimus.Properties;
+using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -13,10 +16,12 @@ namespace Knyaz.Optimus.Dom.Css
 	internal class DocumentStyling : IDisposable
 	{
 		private readonly Document _document;
+		private readonly IResourceProvider _resourceProvider;
 
-		public DocumentStyling(Document document)
+		public DocumentStyling(Document document, IResourceProvider resourceProvider)
 		{
 			_document = document;
+			_resourceProvider = resourceProvider;
 			document.NodeInserted += OnNodeInserted;
 		}
 
@@ -33,17 +38,27 @@ namespace Knyaz.Optimus.Dom.Css
 				var content = styleElt.InnerHTML;
 				var type = !string.IsNullOrEmpty(styleElt.Type) ? styleElt.Type : "text/css";
 				var media = !string.IsNullOrEmpty(styleElt.Media) ? styleElt.Type : "all";
-				AddStyleToDocument(content);
+				AddStyleToDocument(new StringReader(content));
 			}
 
 			var linkElt = obj as HtmlLinkElement;
-			if (linkElt != null && linkElt.Rel == "stylesheet")
+			if (linkElt != null && linkElt.Rel == "stylesheet" && _resourceProvider!=null)
 			{
-				//todo: enqueue styles to load.
+				var request = _resourceProvider.CreateRequest(linkElt.Href);
+				var task = _resourceProvider.GetResourceAsync(request);
+				task.Wait();
+				using(var reader = new StreamReader(task.Result.Stream))
+					AddStyleToDocument(reader);
 			}
 		}
 
-		private void AddStyleToDocument(string content)
+		public void LoadDefaultStyles()
+		{
+			using (var reader = new StringReader(Resources.moz_default))
+				AddStyleToDocument(reader);
+		}
+
+		private void AddStyleToDocument(TextReader content)
 		{
 			var styleSheet = StyleSheetBuilder.CreateStyleSheet(content);
 			_document.StyleSheets.Add(styleSheet);
@@ -59,10 +74,10 @@ namespace Knyaz.Optimus.Dom.Css
 
 	class StyleSheetBuilder
 	{
-		public static CssStyleSheet CreateStyleSheet(string content)
+		public static CssStyleSheet CreateStyleSheet(TextReader reader)
 		{
 			var styleSheet = new CssStyleSheet();
-			var enumerator = CssReader.Read(new StringReader(content)).GetEnumerator();
+			var enumerator = CssReader.Read(reader).GetEnumerator();
 			if(!enumerator.MoveNext())
 				throw new Exception("Unable to parse rule");
 			CssStyleRule rule;

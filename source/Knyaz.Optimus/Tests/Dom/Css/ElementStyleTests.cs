@@ -1,5 +1,6 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
@@ -27,13 +28,26 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				&& style.Length == 1);
 		}
 
-		[Test]
+		[Test, Ignore]
 		public void DefaultValues()
 		{
 			_div.Style.Assert(style => 
 				style.CssText == "" 
 				&& style.ParentRule == null
 				&& style.Length == 0);
+		}
+
+		[Test, Ignore]
+		public void DefaultComputedStyle()
+		{
+			_document.Body.AppendChild(_div);
+			var styling = new DocumentStyling(_document, null);
+			styling.LoadDefaultStyles();
+
+			styling.GetComputedStyle(_div).Assert(style =>
+				style.CssText != "" &&
+				style.GetPropertyValue("display") == "block");
+
 		}
 	}
 }

@@ -69,7 +69,7 @@ namespace Knyaz.Optimus
 
 					if (_computedStylesEnabled)
 					{
-						Styling = new DocumentStyling(_document);
+						EnableDocumentStyling();
 					}
 				}
 
@@ -249,7 +249,7 @@ namespace Knyaz.Optimus
 					return;
 
 				if(_computedStylesEnabled)
-					Styling = new DocumentStyling(_document);
+					EnableDocumentStyling();
 				else
 				{
 					Styling.Dispose();
@@ -257,5 +257,11 @@ namespace Knyaz.Optimus
 				}
 			}
 		}
-    }
+
+		private void EnableDocumentStyling()
+		{
+			Styling = new DocumentStyling(_document, ResourceProvider);
+			Styling.LoadDefaultStyles();
+		}
+	}
 }

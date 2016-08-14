@@ -110,6 +110,11 @@
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
     <Compile Include="Html\CssReader.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ResourceProviders\PredictedResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
     <Compile Include="ScriptExecuting\ClrPrototype.cs" />
@@ -165,8 +170,16 @@
     <Compile Include="Dom\Perf\ArrayBuffer.cs" />
     <Compile Include="Tools\UriHelper.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup />
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\moz_default.css" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

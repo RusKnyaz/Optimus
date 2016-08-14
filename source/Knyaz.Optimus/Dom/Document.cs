@@ -112,10 +112,10 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Style: return new HtmlStyleElement(this);
 				case TagsNames.Select: return new HtmlSelectElement(this);
 				case TagsNames.Option: return new HtmlOptionElement(this);
-				case "DIV": return new HtmlDivElement(this);
-				case "SPAN":
+				case TagsNames.Div: return new HtmlDivElement(this);
+				case TagsNames.Span:
 				case TagsNames.Nav:
-				case "B": return new HtmlElement(this, invariantTagName);
+				case TagsNames.B: return new HtmlElement(this, invariantTagName);
 				case TagsNames.Button: return new HtmlButtonElement(this);
 				case TagsNames.Input: return new HtmlInputElement(this);
 				case TagsNames.Script: return new Script(this);
