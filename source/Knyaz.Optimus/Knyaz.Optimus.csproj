@@ -58,10 +58,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
     <Compile Include="Dom\Css\CssRule.cs" />
     <Compile Include="Dom\Css\CssStyleRule.cs" />
     <Compile Include="Dom\Css\CssStyleSheet.cs" />
     <Compile Include="Dom\Css\DocumentStyling.cs" />
+    <Compile Include="Dom\Css\StyleSheetBuilder.cs" />
     <Compile Include="Dom\DOMException.cs" />
     <Compile Include="Dom\ElementExtension.cs" />
     <Compile Include="Dom\Elements\Attr.cs" />

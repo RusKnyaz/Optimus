@@ -80,9 +80,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public string GetAttribute(string name)
 		{
-			if(Attributes.ContainsKey(name))
-				return Attributes[name].Value;
-			return null;
+			var node = GetAttributeNode(name);
+			return node == null ? null : node.Value;
 		}
 
 		public override Document OwnerDocument
@@ -126,6 +125,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 
 			UpdatePropertyFromAttribute(value, invariantName);
+		}
+
+		protected virtual string PreGetAttribute(string invariantName, string value)
+		{
+			return value;
 		}
 
 		protected virtual void UpdatePropertyFromAttribute(string value, string invariantName)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
@@ -64,9 +63,14 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				if (_style == null)
 				{
-					_style = new CssStyleDeclaration();
+					_style = new CssStyleDeclaration {CssText = GetAttribute("style")};
+					_style.OnStyleChanged += css =>
+					{
+						if(GetAttribute("style") != css)
+							SetAttribute("style", css);
+					};
 				}
-				_style.CssText = GetAttribute("style");
+
 				return _style;
 			}
 		}
@@ -75,23 +79,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			base.UpdatePropertyFromAttribute(value, invariantName);
 
-			//todo: remove it to property
-			if (invariantName == "style")
-			{
-				if (!string.IsNullOrEmpty(value))
-				{
-					var styleParts = value.Split(';');
-					foreach (var stylePart in styleParts.Where(s => !string.IsNullOrEmpty(s)))
-					{
-						var keyValue = stylePart.Split(':');
-						if (keyValue.Length == 2)
-						{
-							//todo: handle duplicates
-							Style.Properties.Add(keyValue[0], keyValue[1]);
-						}
-					}
-				}
-			} 
+			if (invariantName == "style" && _style != null && Style.CssText != value)
+				Style.CssText = value;
 		}
 
 		public void Blur()

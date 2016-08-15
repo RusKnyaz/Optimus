@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Linq;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Css
@@ -18,6 +19,8 @@ namespace Knyaz.Optimus.Dom.Css
 	public class CssStyleDeclaration : ICssStyleDeclaration
 	{
 		private string _cssText = string.Empty;
+
+		internal event Action<string> OnStyleChanged;
 
 		public CssStyleDeclaration(CssStyleRule parentRule = null)
 		{
@@ -44,6 +47,21 @@ namespace Knyaz.Optimus.Dom.Css
 					return;
 
 				Properties[name] = value == null ? null : value.ToString();
+
+				UpdateCssText();
+			}
+		}
+
+		private void UpdateCssText()
+		{
+			var newCss =  string.Join(";",
+				Properties.AllKeys.Where(x => !string.IsNullOrEmpty(Properties[x])).Select(x => x + ":" + Properties[x]));
+
+			if (newCss != _cssText)
+			{
+				_cssText = newCss;
+				if (OnStyleChanged != null)
+					OnStyleChanged(_cssText);
 			}
 		}
 
@@ -65,12 +83,16 @@ namespace Knyaz.Optimus.Dom.Css
 			get { return _cssText; }
 			set
 			{
-				if (_cssText != value)
+				var newCssText = value ?? string.Empty;
+				if (_cssText != newCssText)
 				{
-					_cssText = value ?? string.Empty;
+					_cssText = newCssText;
 					Properties.Clear();
-					if(!string.IsNullOrEmpty(value))
-						StyleSheetBuilder.FillStyle(this, value);
+					if(newCssText != string.Empty)
+						StyleSheetBuilder.FillStyle(this, newCssText);
+
+					if (OnStyleChanged != null)
+						OnStyleChanged(_cssText);
 				}
 			}
 		}
@@ -87,7 +109,8 @@ namespace Knyaz.Optimus.Dom.Css
 		public void SetProperty(string name, string value, string important)
 		{
 			//todo: important
-			Properties.Add(name, value);
+			Properties[name] = value;
+			UpdateCssText();
 		}
 
 		public string GetPropertyPriority(string propertyName)

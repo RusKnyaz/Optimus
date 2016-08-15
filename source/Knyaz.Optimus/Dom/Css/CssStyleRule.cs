@@ -26,6 +26,9 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			var txt = NormalizeSelector(SelectorText);
 
+			if (txt == "*")
+				return true;
+			
 			var htmlElt = elt as HtmlElement;
 
 			foreach (var chunk in txt.Split(' ').Where(x => !string.IsNullOrEmpty(x)))
