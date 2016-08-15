@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
@@ -64,11 +63,24 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				if (_style == null)
 				{
-					_style = new CssStyleDeclaration();
+					_style = new CssStyleDeclaration {CssText = GetAttribute("style")};
+					_style.OnStyleChanged += css =>
+					{
+						if(GetAttribute("style") != css)
+							SetAttribute("style", css);
+					};
 				}
-				_style.CssText = GetAttribute("style");
+
 				return _style;
 			}
+		}
+
+		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
+		{
+			base.UpdatePropertyFromAttribute(value, invariantName);
+
+			if (invariantName == "style" && _style != null && Style.CssText != value)
+				Style.CssText = value;
 		}
 
 		public void Blur()

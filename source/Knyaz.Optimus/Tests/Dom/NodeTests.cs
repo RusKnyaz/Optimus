@@ -25,25 +25,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual("template:\"itemTemplate\"", clone.GetAttribute("data-bind"));
 		}
 
-		[Test]
-		public void GetStyleTest()
-		{
-			var elem = (HtmlElement)CreateElement("<div style='width:100pt'></div>");
 
-			elem.Style.Assert(style =>
-				style.Properties.Count == 1 &&
-				style["width"] == "100pt" &&
-				style.GetPropertyValue("width") == "100pt" &&
-				style[0] == "width");
-		}
-
-		[Test]
-		public void SetStyle()
-		{
-			var element = (HtmlElement) CreateElement("<div></div>");
-			element.Style["width"] = "10pt";
-			Assert.AreEqual("10pt", element.Style["width"]);
-		}
 
 		[Test]
 		public void GetNoStyle()
