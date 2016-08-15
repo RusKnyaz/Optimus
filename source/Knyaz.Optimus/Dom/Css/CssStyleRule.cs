@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -24,12 +25,10 @@ namespace Knyaz.Optimus.Dom.Css
 		internal bool IsMatchesSelector(Element elt)
 		{
 			var txt = NormalizeSelector(SelectorText);
-			
-			var chunks = txt.Split(' ');
 
 			var htmlElt = elt as HtmlElement;
 
-			foreach (var chunk in chunks)
+			foreach (var chunk in txt.Split(' ').Where(x => !string.IsNullOrEmpty(x)))
 			{
 				if (chunk[0] == '#')
 				{

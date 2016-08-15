@@ -185,9 +185,18 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void SetAttributeFromId()
 		{
 			var doc = new Document();
-			var d = doc.CreateElement("<div>");
+			var d = doc.CreateElement("div") as HtmlDivElement;
 			d.SetAttribute("Id", "d");
 			Assert.AreEqual("d", d.Id);
+		}
+
+		[Test]
+		public void TextParentTest()
+		{
+			var doc = new Document();
+			var div = doc.CreateElement("div");
+			div.InnerHTML = "text";
+			Assert.AreEqual(div, div.ChildNodes[0].ParentNode);
 		}
 	}
 }
