@@ -187,7 +187,7 @@
   <Target Name="BeforeBuild">
     <Message Text="Updating AssemblyInfo to Version $(BuildNumber)">
     </Message>
-    <AssemblyInfo Condition="$(Version) !=''" AssemblyInfoFiles="$(SolutionDir)\AssemblyVersionInfo.cs" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)">
+    <AssemblyInfo Condition="$(Version) !=''" AssemblyInfoFiles="$(ProjectDir)\Properties\AssemblyInfo.cs" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)">
     </AssemblyInfo>
   </Target>
 </Project>
