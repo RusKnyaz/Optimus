@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
@@ -19,6 +20,7 @@ namespace Knyaz.Optimus
 		public IResourceProvider ResourceProvider { get; private set; }
 		public IScriptExecutor ScriptExecutor { get; private set; }
 		public DocumentScripting Scripting	{get; private set;}
+		internal DocumentStyling Styling { get; private set; }
 
 		public Console Console { get; private set; }
    		public Window Window { get; private set; }
@@ -51,6 +53,12 @@ namespace Knyaz.Optimus
 					Scripting = null;
 				}
 
+				if (Styling != null)
+				{
+					Styling.Dispose();
+					Styling = null;
+				}
+
 				_document = value;
 				
 				if (_document != null)
@@ -58,6 +66,11 @@ namespace Knyaz.Optimus
 					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
+
+					if (_computedStylesEnabled)
+					{
+						EnableDocumentStyling();
+					}
 				}
 
 				if (DocumentChanged != null)
@@ -218,5 +231,37 @@ namespace Knyaz.Optimus
 		public void Dispose()
 		{
 		}
-    }
+
+		private bool _computedStylesEnabled;
+		public bool ComputedStylesEnabled
+		{
+			get
+			{
+				return _computedStylesEnabled;
+			}
+			set
+			{
+				if (_computedStylesEnabled == value)
+					return;
+
+				_computedStylesEnabled = value;
+				if (_document == null) 
+					return;
+
+				if(_computedStylesEnabled)
+					EnableDocumentStyling();
+				else
+				{
+					Styling.Dispose();
+					Styling = null;
+				}
+			}
+		}
+
+		private void EnableDocumentStyling()
+		{
+			Styling = new DocumentStyling(_document, ResourceProvider);
+			Styling.LoadDefaultStyles();
+		}
+	}
 }

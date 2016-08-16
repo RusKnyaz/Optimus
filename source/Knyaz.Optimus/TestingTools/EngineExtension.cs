@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
@@ -95,7 +94,7 @@ namespace Knyaz.Optimus.TestingTools
 		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout = DefaultTimeout)
 		{
 			engine.WaitDocumentLoad();
-            			var timespan = 100;
+            var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
 			{
 				var doc = engine.Document;

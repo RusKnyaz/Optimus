@@ -58,6 +58,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
+    <Compile Include="Dom\Css\CssRule.cs" />
+    <Compile Include="Dom\Css\CssStyleRule.cs" />
+    <Compile Include="Dom\Css\CssStyleSheet.cs" />
+    <Compile Include="Dom\Css\DocumentStyling.cs" />
+    <Compile Include="Dom\Css\StyleSheetBuilder.cs" />
     <Compile Include="Dom\DOMException.cs" />
     <Compile Include="Dom\ElementExtension.cs" />
     <Compile Include="Dom\Elements\Attr.cs" />
@@ -69,14 +75,16 @@
     <Compile Include="Dom\Elements\CharacterData.cs" />
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
-    <Compile Include="Dom\Elements\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Css\CssStyleDeclaration.cs" />
     <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
     <Compile Include="Dom\Elements\HtmlDivElement.cs" />
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
     <Compile Include="Dom\Elements\HtmlIFrameElement.cs" />
+    <Compile Include="Dom\Elements\HtmlLinkElement.cs" />
     <Compile Include="Dom\Elements\HtmlOptionElement.cs" />
     <Compile Include="Dom\Elements\HtmlSelectElement.cs" />
+    <Compile Include="Dom\Elements\HtmlStyleElement.cs" />
     <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
     <Compile Include="Dom\Elements\IFormElement.cs" />
@@ -103,6 +111,12 @@
     <Compile Include="Environment\Location.cs" />
     <Compile Include="Environment\Navigator.cs" />
     <Compile Include="Environment\Screen.cs" />
+    <Compile Include="Html\CssReader.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ResourceProviders\PredictedResourceProvider.cs" />
     <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
     <Compile Include="ScriptExecuting\ClrPrototype.cs" />
@@ -124,6 +138,8 @@
     <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
+    <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
+    <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
@@ -134,10 +150,13 @@
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlLinkElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlStyleElementTests.cs" />
+    <Compile Include="Tests\Html\CssReaderTest.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
@@ -153,8 +172,16 @@
     <Compile Include="Dom\Perf\ArrayBuffer.cs" />
     <Compile Include="Tools\UriHelper.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup />
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\moz_default.css" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

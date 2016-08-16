@@ -25,25 +25,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual("template:\"itemTemplate\"", clone.GetAttribute("data-bind"));
 		}
 
-		[Test]
-		public void GetStyleTest()
-		{
-			var elem = (HtmlElement)CreateElement("<div style='width:100pt'></div>");
-			var style = elem.Style;
 
-			Assert.AreEqual(1, style.Properties.Count);
-			Assert.AreEqual("100pt", style["width"], "style[\"width\"]");
-			Assert.AreEqual("100pt", style.GetPropertyValue("width"));
-			Assert.AreEqual("width", style[0]);
-		}
-
-		[Test]
-		public void SetStyle()
-		{
-			var element = (HtmlElement) CreateElement("<div></div>");
-			element.Style["width"] = "10pt";
-			Assert.AreEqual("10pt", element.Style["width"]);
-		}
 
 		[Test]
 		public void GetNoStyle()
@@ -185,9 +167,18 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void SetAttributeFromId()
 		{
 			var doc = new Document();
-			var d = doc.CreateElement("<div>");
+			var d = doc.CreateElement("div") as HtmlDivElement;
 			d.SetAttribute("Id", "d");
 			Assert.AreEqual("d", d.Id);
+		}
+
+		[Test]
+		public void TextParentTest()
+		{
+			var doc = new Document();
+			var div = doc.CreateElement("div");
+			div.InnerHTML = "text";
+			Assert.AreEqual(div, div.ChildNodes[0].ParentNode);
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
@@ -29,11 +30,14 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		internal Document(Window window):base(null)
+		public Document(IWindow window):base(null)
 		{
+			StyleSheets = new List<CssStyleSheet>();
 			NodeType = DOCUMENT_NODE;
 
 			DocumentElement = CreateElement(TagsNames.Html);
+			DocumentElement.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
+			DocumentElement.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
 			ChildNodes.Add(DocumentElement);
 			DocumentElement.ParentNode = this;
 			DocumentElement.OwnerDocument = this;
@@ -44,7 +48,7 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		public Window DefaultView { get; private set; }
+		public IWindow DefaultView { get; private set; }
 		public Element DocumentElement { get; private set; }
 		public string ReadyState { get; private set; }
 		public override string NodeName { get { return "#document"; }}
@@ -64,6 +68,8 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		public event Action<IDocument> DomContentLoaded;
+
+		public IList<CssStyleSheet> StyleSheets { get; private set; }
 
 		internal void Complete()
 		{
@@ -102,12 +108,14 @@ namespace Knyaz.Optimus.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
+				case TagsNames.Link: return new HtmlLinkElement(this);
+				case TagsNames.Style: return new HtmlStyleElement(this);
 				case TagsNames.Select: return new HtmlSelectElement(this);
 				case TagsNames.Option: return new HtmlOptionElement(this);
-				case "DIV": return new HtmlDivElement(this);
-				case "SPAN":
+				case TagsNames.Div: return new HtmlDivElement(this);
+				case TagsNames.Span:
 				case TagsNames.Nav:
-				case "B": return new HtmlElement(this, invariantTagName);
+				case TagsNames.B: return new HtmlElement(this, invariantTagName);
 				case TagsNames.Button: return new HtmlButtonElement(this);
 				case TagsNames.Input: return new HtmlInputElement(this);
 				case TagsNames.Script: return new Script(this);
@@ -153,16 +161,11 @@ namespace Knyaz.Optimus.Dom
 			return new Comment { Data = data, OwnerDocument = this };
 		}
 
-		public Element Body
-		{
-			get { return DocumentElement.GetElementsByTagName("body").FirstOrDefault(); }
-		}
+		public HtmlBodyElement Body { get; private set; }
 
-		public Head Head
-		{
-			get { return (Head)DocumentElement.GetElementsByTagName("head").FirstOrDefault(); }
-		}
+		public Head Head { get; private set; }
 
+		
 		public Event CreateEvent(string type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
@@ -263,7 +266,7 @@ namespace Knyaz.Optimus.Dom
 		void Write(string text);
 		Event CreateEvent(string type);
 		Head Head { get; }
-		Element Body { get; }
+		HtmlBodyElement Body { get; }
 		Comment CreateComment(string data);
 		Text CreateTextNode(string data);
 		DocumentFragment CreateDocumentFragment();

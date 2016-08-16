@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void HtmlSkipNewLines()
 		{
 			Build("<html>\r\n\t<head></head></html>").Assert(doc => 
-				doc.DocumentElement.ChildNodes.Count == 1 &&
+				doc.DocumentElement.ChildNodes.Count == 2 &&
 				doc.DocumentElement.FirstChild.NodeName == "HEAD");
 		}
 

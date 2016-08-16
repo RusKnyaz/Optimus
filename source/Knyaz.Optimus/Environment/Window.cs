@@ -1,5 +1,6 @@
 ﻿using System;
 using Jint.Runtime;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 
@@ -8,14 +9,16 @@ namespace Knyaz.Optimus.Environment
 	/// <summary>
 	/// http://www.w3.org/TR/html5/browsers.html#window
 	/// </summary>
-	public class Window : IEventTarget
+	public class Window : IWindow
 	{
+		private readonly Engine _engine;
 		private EventTarget _eventTarget;
 
 		public WindowTimers Timers { get { return _timers; } }
 
 		public Window(Func<object> getSyncObj, Engine engine)
 		{
+			_engine = engine;
 			Screen = new Screen
 				{
 					Width = 1024,
@@ -102,17 +105,41 @@ namespace Knyaz.Optimus.Environment
 
 		public event Action<string> OnAlert;
 
-		public CssStyleDeclaration GetComputedStyle(Element element)
+		public ICssStyleDeclaration GetComputedStyle(Element element)
 		{
 			return GetComputedStyle(element, null);
 		}
 		
-		public CssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
+		public ICssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
 		{
-			//throw new NotImplementedException();
-			//todo: implement style computing
+			var styling = _engine.Styling;
+			if (styling != null)
+				return styling.GetComputedStyle(element);
+
+			var htmlElement = element as HtmlElement;
+			if (htmlElement != null)
+				return htmlElement.Style;
 			
 			return new CssStyleDeclaration();
 		}
+	}
+
+	public interface IWindow : IEventTarget
+	{
+		int InnerWidth { get; set; }
+		int InnerHeight { get; set; }
+
+		Screen Screen { get; }
+		Location Location { get; }
+		Navigator Navigator { get; }
+		History History { get;  }
+		
+		int SetTimeout(Action<object> handler, double? delay, object ctx);
+		void ClearTimeout(int handle);
+		int SetInterval(Action handler, double? delay);
+		void ClearInterval(int handle);
+
+		ICssStyleDeclaration GetComputedStyle(Element element);
+		ICssStyleDeclaration GetComputedStyle(Element element, string pseudoElt);
 	}
 }

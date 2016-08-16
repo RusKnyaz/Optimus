@@ -15,5 +15,9 @@
 		public const string Div = "DIV";
 		public const string Select = "SELECT";
 		public const string Option = "OPTION";
+		public const string Style = "STYLE";
+		public const string Link = "LINK";
+		public const string Span = "SPAN";
+		public const string B = "B";
 	}
 }
