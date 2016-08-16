@@ -12,6 +12,7 @@
     <description>Optimus is headless Web Browser fully implemented on .net.</description>
     <releaseNotes>Added stylesheets support.</releaseNotes>
     <copyright>Copyright 2016</copyright>
+	<tags>headless web browser</tags>
 	<dependencies>
 		<group targetFramework="net45">
           <dependency id="Jint" version="2.9.1"/>
