@@ -4,11 +4,12 @@
     <id>Knyaz.Optimus</id>
     <version>$version$</version>
     <authors>Knyaz</authors>
+	<title>Optimus</title>
 	<projectUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/Home</projectUrl>
 	<licenseUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/License</licenseUrl>
     <owners>Knyaz</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Optimus is headless Web Browser fully implemented on .net. It's official package.</description>
+    <description>Optimus is headless Web Browser fully implemented on .net.</description>
     <releaseNotes>Added stylesheets support.</releaseNotes>
     <copyright>Copyright 2016</copyright>
 	<dependencies>
