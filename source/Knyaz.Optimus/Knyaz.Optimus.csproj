@@ -183,11 +183,11 @@
     <None Include="Resources\moz_default.css" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <UsingTask TaskName="AssemblyInfo" AssemblyFile="$(SolutionDir)\packages\MSBuild.Extension.Pack.1.8.0\tools\net40\MSBuild.ExtensionPack.dll" />
   <Target Name="BeforeBuild">
+    <Message Text="Updating AssemblyInfo to Version $(BuildNumber)">
+    </Message>
+    <AssemblyInfo Condition="$(Version) !=''" AssemblyInfoFiles="$(SolutionDir)\AssemblyVersionInfo.cs" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)">
+    </AssemblyInfo>
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

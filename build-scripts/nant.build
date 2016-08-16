@@ -29,7 +29,6 @@
 	
 	<!-- Sources -->
 	<property name="sources.d" value="${work.d}/source"/>
-	<property name="sources.assemblyversioninfo.cs" value="${sources.d}/AssemblyVersionInfo.cs"/>
 	<property name="solution" value="${sources.d}/Knyaz.Optimus.sln"/>
 	<property name="nuget.exe" value="${sources.d}/.nuget/NuGet.exe"/>	
 	
@@ -66,7 +65,7 @@
 		<call target="set-props" />
 		
 		<property name="args" value="&quot;${solution}&quot;"/>
-		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig}"/>
+		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
 		
 		<echo message="exec: ${build.exe} ${args}"/>
 		
