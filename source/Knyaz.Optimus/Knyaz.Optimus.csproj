@@ -140,6 +140,7 @@
     <Compile Include="Tests\AssertObjectExtension.cs" />
     <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
     <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
+    <Compile Include="Tests\Dom\Css\StyleSheetBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
     <Compile Include="Tests\Dom\DocumentTests.cs" />
