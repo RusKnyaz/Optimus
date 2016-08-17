@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				styleSheet.CssRules.Add(rule);
 			}
-
+			styleSheet.CssRules.Add(rule);
 			return styleSheet;
 		}
 
