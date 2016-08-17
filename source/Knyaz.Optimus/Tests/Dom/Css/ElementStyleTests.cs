@@ -1,4 +1,7 @@
 ﻿#if NUNIT
+using System.IO;
+using System.Linq;
+using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
@@ -92,6 +95,21 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			_div.Style.CssText = "width:10pt";
 			Assert.AreEqual("10pt", _div.Style["width"]);
 			Assert.AreEqual("width:10pt", _div.GetAttribute("style"));
+		}
+
+		[Test]
+		public void ComputedStyleTest()
+		{
+			var engine = new Engine() { ComputedStylesEnabled = true };
+			engine.Load(
+				new MemoryStream(
+					Encoding.UTF8.GetBytes(
+						"<head><style>div{display:inline-block}.a{width:100px;height:100px}</style></head><body><div class=a id=d></div></body>")));
+
+			var lastStyleSheet = engine.Document.StyleSheets.Last();
+			Assert.AreEqual(2, lastStyleSheet.CssRules.Count);
+			var div = engine.Document.GetElementById("d");
+			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "100px");
 		}
 	}
 }

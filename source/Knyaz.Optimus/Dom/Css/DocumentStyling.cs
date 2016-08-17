@@ -31,27 +31,40 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private void OnNodeInserted(Node obj)
 		{
-			var styleElt = obj as HtmlStyleElement;
-			if (styleElt != null)
-			{
-				var content = styleElt.InnerHTML;
-				var type = !string.IsNullOrEmpty(styleElt.Type) ? styleElt.Type : "text/css";
-				var media = !string.IsNullOrEmpty(styleElt.Media) ? styleElt.Type : "all";
-				AddStyleToDocument(new StringReader(content));
-			}
-
-			var linkElt = obj as HtmlLinkElement;
-			if (linkElt != null && linkElt.Rel == "stylesheet" && _resourceProvider!=null)
-			{
-				var request = _resourceProvider.CreateRequest(linkElt.Href);
-				var task = _resourceProvider.GetResourceAsync(request);
-				task.Wait();
-				using(var reader = new StreamReader(task.Result.Stream))
-					AddStyleToDocument(reader);
-			}
+		    foreach (var node in obj.Flatten())
+		    {
+		        HandleNode(node);
+		    }
 		}
 
-		public void LoadDefaultStyles()
+	    private void HandleNode(INode node)
+	    {
+            var txt = node as Text;
+            if (txt != null)
+            {
+                var styleElt = node.ParentNode as HtmlStyleElement;
+                if (styleElt != null && !string.IsNullOrWhiteSpace(txt.Data))
+                {
+                    //todo: chech type
+                    var type = !string.IsNullOrEmpty(styleElt.Type) ? styleElt.Type : "text/css";
+                    var media = !string.IsNullOrEmpty(styleElt.Media) ? styleElt.Type : "all";
+                    AddStyleToDocument(new StringReader(txt.Data));
+                }
+            }
+
+            var linkElt = node as HtmlLinkElement;
+            if (linkElt != null && linkElt.Rel == "stylesheet" && _resourceProvider != null)
+            {
+                //todo: check type
+                var request = _resourceProvider.CreateRequest(linkElt.Href);
+                var task = _resourceProvider.GetResourceAsync(request);
+                task.Wait();
+                using (var reader = new StreamReader(task.Result.Stream))
+                    AddStyleToDocument(reader);
+            }
+        }
+
+	    public void LoadDefaultStyles()
 		{
 			using (var reader = new StringReader(Resources.moz_default))
 				AddStyleToDocument(reader);
