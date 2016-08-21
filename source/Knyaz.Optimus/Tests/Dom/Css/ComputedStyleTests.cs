@@ -45,6 +45,17 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			doc.Head.AppendChild(newStyle);
 			Assert.AreEqual("green", divStyle.GetPropertyValue("color"));
 		}
+
+		[Test]
+		public void SpecificHtml5TestCom()
+		{
+			var engine = Load(@"<head><style>.pointsPanel h2 > strong {
+			font - size: 3.8em;
+		}</style></head><body><div class=""pointsPanel""><h2><strong id=test></strong></h2></div></body>");
+			var doc = engine.Document;
+			var elt = doc.GetElementById("test");
+			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "3.8em");
+		}
 	}
 }
 #endif

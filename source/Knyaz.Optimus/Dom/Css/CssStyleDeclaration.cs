@@ -109,6 +109,7 @@ namespace Knyaz.Optimus.Dom.Css
 		public void SetProperty(string name, string value, string important)
 		{
 			//todo: important
+			name = name.Replace(" ", "");
 			Properties[name] = value;
 			UpdateCssText();
 		}

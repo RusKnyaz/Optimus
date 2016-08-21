@@ -60,6 +60,7 @@
     <Compile Include="Console.cs" />
     <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
     <Compile Include="Dom\Css\CssRule.cs" />
+    <Compile Include="Dom\Css\CssSelector.cs" />
     <Compile Include="Dom\Css\CssStyleRule.cs" />
     <Compile Include="Dom\Css\CssStyleSheet.cs" />
     <Compile Include="Dom\Css\DocumentStyling.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
     <Compile Include="Tests\Dom\Css\ComputedStyleTests.cs" />
+    <Compile Include="Tests\Dom\Css\CssSelectorTests.cs" />
     <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
     <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
     <Compile Include="Tests\Dom\Css\StyleSheetBuilderTests.cs" />

@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
 
 namespace Knyaz.Optimus.Dom.Css
@@ -24,42 +21,9 @@ namespace Knyaz.Optimus.Dom.Css
 		/// <returns></returns>
 		internal bool IsMatchesSelector(IElement elt)
 		{
-			var txt = NormalizeSelector(SelectorText);
-
-			if (txt == "*")
-				return true;
+			var selector = new CssSelector(SelectorText);
+			return selector.IsMatches(elt);
 			
-			var htmlElt = elt as HtmlElement;
-
-			foreach (var chunk in txt.Split(' ').Where(x => !string.IsNullOrEmpty(x)))
-			{
-				if (chunk[0] == '#')
-				{
-					if(elt.Id != chunk.Substring(1))
-						return false;
-					continue;
-				}
-				if (chunk[0] == '.')
-				{
-					if(htmlElt == null || !htmlElt.ClassName.Split(' ').Contains(chunk.Substring(1)))
-						return false;
-					continue;
-				}
-				//todo: attributes
-
-				if(chunk.ToUpper().Split(',').All(x => elt.TagName != x))
-					return false;
-			}
-
-			return true;
-		}
-
-		private static Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
-
-		private string NormalizeSelector(string selector)
-		{
-			selector = selector.Replace('\n', ' ').Replace('\r', ' ');
-			return _normalizeCommas.Replace(selector, ",");
 		}
 	}
 }

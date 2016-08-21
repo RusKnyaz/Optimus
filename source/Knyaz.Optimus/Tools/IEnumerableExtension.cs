@@ -16,5 +16,15 @@ namespace Knyaz.Optimus.Tools
 				}
 			}
 		}
+
+		public static IEnumerable<T> GetRecursive<T>(this T item, Func<T, T> getNext) where T : class 
+		{
+			var cur = item;
+			while (cur != null)
+			{
+				yield return cur;
+				cur = getNext(cur);
+			}
+		}
 	}
 }
