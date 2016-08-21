@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 
 namespace Knyaz.Optimus.TestingTools
@@ -85,6 +86,11 @@ namespace Knyaz.Optimus.TestingTools
 						yield return child;	
 				}
 			}
+		}
+
+		public static ICssStyleDeclaration GetComputedStyle(this IElement elt)
+		{
+			return elt.OwnerDocument.DefaultView.GetComputedStyle(elt);
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace Knyaz.Optimus.Dom.Css
 		/// </summary>
 		/// <param name="elt"></param>
 		/// <returns></returns>
-		internal bool IsMatchesSelector(Element elt)
+		internal bool IsMatchesSelector(IElement elt)
 		{
 			var txt = NormalizeSelector(SelectorText);
 

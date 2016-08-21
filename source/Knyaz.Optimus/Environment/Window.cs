@@ -105,12 +105,12 @@ namespace Knyaz.Optimus.Environment
 
 		public event Action<string> OnAlert;
 
-		public ICssStyleDeclaration GetComputedStyle(Element element)
+		public ICssStyleDeclaration GetComputedStyle(IElement element)
 		{
 			return GetComputedStyle(element, null);
 		}
 		
-		public ICssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
+		public ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt)
 		{
 			var styling = _engine.Styling;
 			if (styling != null)
@@ -139,7 +139,7 @@ namespace Knyaz.Optimus.Environment
 		int SetInterval(Action handler, double? delay);
 		void ClearInterval(int handle);
 
-		ICssStyleDeclaration GetComputedStyle(Element element);
-		ICssStyleDeclaration GetComputedStyle(Element element, string pseudoElt);
+		ICssStyleDeclaration GetComputedStyle(IElement element);
+		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
 	}
 }

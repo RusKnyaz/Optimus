@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Properties;
 using Knyaz.Optimus.ResourceProviders;
-using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -76,28 +73,9 @@ namespace Knyaz.Optimus.Dom.Css
 			_document.StyleSheets.Add(styleSheet);
 		}
 
-		public ICssStyleDeclaration GetComputedStyle(Element elt)
+		public ICssStyleDeclaration GetComputedStyle(IElement elt)
 		{
-			var styles = GetStylesFor(elt);
-			return new ComputedCssStyleDeclaration(styles);
-		}
-
-		private ICssStyleDeclaration[] GetStylesFor(Element elt)
-		{
-			var lst = new List<ICssStyleDeclaration>();
-			
-			foreach (var result in _document.StyleSheets.SelectMany(x => x.CssRules).OfType<CssStyleRule>())
-			{
-				if(result.IsMatchesSelector(elt))
-					lst.Add(result.Style);
-			}
-			var htmlElt = elt as HtmlElement;
-			if (htmlElt != null)
-				lst.Add(htmlElt.Style);
-
-			lst.Reverse();
-
-			return lst.ToArray();
+			return new ComputedCssStyleDeclaration(elt);
 		}
 	}
 }

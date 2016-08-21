@@ -138,6 +138,7 @@
     <Compile Include="TestingTools\ElementExtension.cs" />
     <Compile Include="TestingTools\EngineExtension.cs" />
     <Compile Include="Tests\AssertObjectExtension.cs" />
+    <Compile Include="Tests\Dom\Css\ComputedStyleTests.cs" />
     <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
     <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
     <Compile Include="Tests\Dom\Css\StyleSheetBuilderTests.cs" />
