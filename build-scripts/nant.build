@@ -19,7 +19,7 @@
 		
 	<!-- Property -->
 	<property name="buildnumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
-	<property name="version" value="1.2.${buildnumber}.0"/>
+	<property name="version" value="1.2.${buildnumber}.1"/>
 	<property name="config.work.d"      value="${work.d}/${config.environment}" />
 	
 	<!-- Binaries-->        
