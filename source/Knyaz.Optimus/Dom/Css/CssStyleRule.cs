@@ -6,7 +6,21 @@ namespace Knyaz.Optimus.Dom.Css
 	[DebuggerDisplay("CssStyleRule, Selector: {SelectorText}")]
 	public class CssStyleRule : CssRule
 	{
-		public string SelectorText { get; set; }
+		private string _selectorText;
+
+		public string SelectorText
+		{
+			get { return _selectorText; }
+			set
+			{
+				if (_selectorText != null)
+					_selector = null;
+				_selectorText = value;
+			}
+		}
+
+		private CssSelector _selector = null;
+
 		public CssStyleDeclaration Style { get; private set; }
 
 		public CssStyleRule(CssStyleSheet parentStyleSheet) : base(parentStyleSheet)
@@ -21,9 +35,8 @@ namespace Knyaz.Optimus.Dom.Css
 		/// <returns></returns>
 		internal bool IsMatchesSelector(IElement elt)
 		{
-			var selector = new CssSelector(SelectorText);
+			var selector = _selector ?? (_selector = new CssSelector(SelectorText));
 			return selector.IsMatches(elt);
-			
 		}
 	}
 }

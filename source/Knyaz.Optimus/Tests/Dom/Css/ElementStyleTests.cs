@@ -1,7 +1,4 @@
 ﻿#if NUNIT
-using System.IO;
-using System.Linq;
-using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;

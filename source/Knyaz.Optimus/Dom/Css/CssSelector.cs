@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Html;
 using Knyaz.Optimus.Tools;
 using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
