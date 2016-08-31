@@ -13,10 +13,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		private Engine Load(string html)
 		{
 			var engine = new Engine() { ComputedStylesEnabled = true };
-			engine.Load(
-				new MemoryStream(
-			Encoding.UTF8.GetBytes(
-				html)));
+			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
 			return engine;
 		}
 
