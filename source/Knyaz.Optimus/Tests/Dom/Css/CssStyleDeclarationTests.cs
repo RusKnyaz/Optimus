@@ -38,7 +38,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("background-color") == "#ffffff");
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void SetBorderTest()
 		{
 			Style("border:1px solid white").Assert(style => 

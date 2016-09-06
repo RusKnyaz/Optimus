@@ -118,8 +118,16 @@ namespace Knyaz.Optimus.Dom.Css
 	        switch (name)
 	        {
 	        	case "padding":SetPadding(value);break;
-		        case "margin":SetMargin(value);break;
+		        case "margin":SetClockwise(MarginNames, value);break;
 				case "background":SetBackground(value);break;
+			    case "border":SetBorder(value);break;
+			    case "border-top": SetBorder("top", value);break;
+			    case "border-right":SetBorder("right", value);break;
+			    case "border-bottom":SetBorder("bottom", value);break;
+			    case "border-left":SetBorder("left", value);break;
+			    case "border-width":SetClockwise(BorderWidthNames, value);break;
+		        case "border-style":SetClockwise(BorderStyleNames, value);break;
+		        case "border-color":SetClockwise(BorderColorNames, value);break;
 	        }
 	    }
 
@@ -128,81 +136,94 @@ namespace Knyaz.Optimus.Dom.Css
 			Properties["background-color"] = value;
 		}
 
-		private void SetPadding(string value)
+		private void SetBorder(string value)
 		{
-			if (value == null)
+			SetBorder("top", value);
+			SetBorder("right", value);
+			SetBorder("bottom", value);
+			SetBorder("left", value);
+		}
+
+		private void SetBorder(string side, string value)
+		{
+			var args = value.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x));
+			var prefix = "border-" + side;
+			foreach (var arg in args)
 			{
-				Properties["padding-top"] =
-					Properties["padding-right"] =
-						Properties["padding-bottom"] =
-							Properties["padding-left"] = null;
-			}
-			else
-			{
-				var args = value.Split(' ');
-				if (args.Length == 1)
+				if (char.IsDigit(arg[0]))
 				{
-					Properties["padding-top"] =
-						Properties["padding-right"] =
-							Properties["padding-bottom"] =
-								Properties["padding-left"] = args[0];
+					Properties[prefix + "-width"] = arg;
 				}
-				else if(args.Length == 2)
+				else if (arg == "none" ||
+				         arg == "hidden" ||
+				         arg == "dotted" ||
+				         arg == "dashed" ||
+				         arg == "solid" ||
+				         arg == "double" ||
+				         arg == "groove" ||
+				         arg == "ridge" ||
+				         arg == "inset" ||
+				         arg == "outset" ||
+				         arg == "inherit")
 				{
-					Properties["padding-top"] = Properties["padding-bottom"] = args[0];
-					Properties["padding-right"] = Properties["padding-left"] = args[1];
+					Properties[prefix + "-style"] = arg;
 				}
-				else if (args.Length == 3)
+				else
 				{
-					Properties["padding-top"] = args[0];
-					Properties["padding-right"] = Properties["padding-left"] = args[1];
-					Properties["padding-bottom"] = args[2];
-				}else if (args.Length >= 4)
-				{
-					Properties["padding-top"] = args[0];
-					Properties["padding-right"] = args[1];
-					Properties["padding-bottom"] = args[2];
-					Properties["padding-left"] = args[3];
+					Properties[prefix + "-color"] = arg;
 				}
 			}
 		}
 
-		private void SetMargin(string value)
+		static string[] BorderStyleNames =
+			{"border-top-style", "border-right-style", "border-bottom-style", "border-left-style"};
+
+		static string[] BorderWidthNames =
+			{"border-top-width", "border-right-width", "border-bottom-width","border-left-width"};
+
+		static string[] BorderColorNames =
+			{"border-top-color", "border-right-color", "border-bottom-color","border-left-color"};
+
+		static string[] PaddingNames = {"padding-top", "padding-right", "padding-bottom", "padding-left"};
+		static string[] MarginNames = {"margin-top", "margin-right", "margin-bottom", "margin-left"};
+
+		private void SetPadding(string value)
 		{
+			SetClockwise(PaddingNames, value);
+		}
+		private void SetClockwise(string[] names, string value)
+		{
+			var top = names[0];
+			var right = names[1];
+			var bottom = names[2];
+			var left = names[3];
 			if (value == null)
 			{
-				Properties["margin-top"] =
-					Properties["margin-right"] =
-						Properties["margin-bottom"] =
-							Properties["margin-left"] = null;
+				Properties[top] = Properties[right] = Properties[bottom] = Properties[left] = null;
 			}
 			else
 			{
 				var args = value.Split(' ');
 				if (args.Length == 1)
 				{
-					Properties["margin-top"] =
-						Properties["margin-right"] =
-							Properties["margin-bottom"] =
-								Properties["margin-left"] = args[0];
+					Properties[top] = Properties[right] = Properties[bottom] = Properties[left] = args[0];
 				}
-				else if (args.Length == 2)
+				else if(args.Length == 2)
 				{
-					Properties["margin-top"] = Properties["margin-bottom"] = args[0];
-					Properties["margin-right"] = Properties["margin-left"] = args[1];
+					Properties[top] = Properties[bottom] = args[0];
+					Properties[right] = Properties[left] = args[1];
 				}
 				else if (args.Length == 3)
 				{
-					Properties["margin-top"] = args[0];
-					Properties["margin-right"] = Properties["margin-left"] = args[1];
-					Properties["margin-bottom"] = args[2];
-				}
-				else if (args.Length >= 4)
+					Properties[top] = args[0];
+					Properties[right] = Properties[left] = args[1];
+					Properties[bottom] = args[2];
+				}else if (args.Length >= 4)
 				{
-					Properties["margin-top"] = args[0];
-					Properties["margin-right"] = args[1];
-					Properties["margin-bottom"] = args[2];
-					Properties["margin-left"] = args[3];
+					Properties[top] = args[0];
+					Properties[right] = args[1];
+					Properties[bottom] = args[2];
+					Properties[left] = args[3];
 				}
 			}
 		}
