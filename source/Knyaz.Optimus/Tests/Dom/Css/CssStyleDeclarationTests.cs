@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			return new CssStyleDeclaration() {CssText = cssText};
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void SetBackground()
 		{
 			Style("background:#ffffff").Assert(style => 
@@ -59,24 +59,30 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("border-left-color") == "white");
 		}
 
-		[Test, Ignore]
-		public void SetPadding()
+		[TestCase("1px", "1px", "1px", "1px", "1px")]
+		[TestCase("1px 2px", "1px", "2px", "1px", "2px")]
+		[TestCase("1px 2px 3px", "1px", "2px", "3px", "2px")]
+		[TestCase("1px 2px 3px 4px", "1px", "2px", "3px", "4px")]
+		public void SetPadding(string padding, string top, string right, string bottom ,string left)
 		{
-			Style("padding:1px 2px 3px 4px").Assert(style =>
-				style.GetPropertyValue("padding-top") == "1px" &&
-				style.GetPropertyValue("padding-right") == "2px" &&
-				style.GetPropertyValue("padding-bottom") == "3px" &&
-				style.GetPropertyValue("padding-left") == "4px");
+			Style("padding:" + padding).Assert(style =>
+				style.GetPropertyValue("padding-top") == top &&
+				style.GetPropertyValue("padding-right") == right &&
+				style.GetPropertyValue("padding-bottom") == bottom &&
+				style.GetPropertyValue("padding-left") == left);
 		}
 
-		[Test, Ignore]
-		public void SetMargin()
+		[TestCase("1px", "1px", "1px", "1px", "1px")]
+		[TestCase("1px 2px", "1px", "2px", "1px", "2px")]
+		[TestCase("1px 2px 3px", "1px", "2px", "3px", "2px")]
+		[TestCase("1px 2px 3px 4px", "1px", "2px", "3px", "4px")]
+		public void SetMargin(string margin, string top, string right, string bottom, string left)
 		{
-			Style("margin:1px 2px 3px 4px").Assert(style =>
-				style.GetPropertyValue("margin-top") == "1px" &&
-				style.GetPropertyValue("margin-right") == "2px" &&
-				style.GetPropertyValue("margin-bottom") == "3px" &&
-				style.GetPropertyValue("margin-left") == "4px");
+			Style("margin:" + margin).Assert(style =>
+				style.GetPropertyValue("margin-top") == top &&
+				style.GetPropertyValue("margin-right") == right &&
+				style.GetPropertyValue("margin-bottom") == bottom &&
+				style.GetPropertyValue("margin-left") == left);
 		}
 
 		[Test, Ignore]

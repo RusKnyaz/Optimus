@@ -46,9 +46,7 @@ namespace Knyaz.Optimus.Dom.Css
 				if (int.TryParse(name, out number))
 					return;
 
-				Properties[name] = value == null ? null : value.ToString();
-
-				UpdateCssText();
+			    SetProperty(name, value == null ? null : value.ToString());
 			}
 		}
 
@@ -75,7 +73,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public string GetPropertyValue(string propertyName)
 		{
-			return Properties[propertyName];
+			return Properties[propertyName] ?? "";
 		}
 
 		public string CssText
@@ -106,12 +104,107 @@ namespace Knyaz.Optimus.Dom.Css
 			return val;
 		}
 
-		public void SetProperty(string name, string value, string important)
+		public void SetProperty(string name, string value, string important = null)
 		{
 			//todo: important
 			name = name.Replace(" ", "");
 			Properties[name] = value;
+		    HandleComplexProperty(name, value);
 			UpdateCssText();
+		}
+
+	    private void HandleComplexProperty(string name, string value)
+	    {
+	        switch (name)
+	        {
+	        	case "padding":SetPadding(value);break;
+		        case "margin":SetMargin(value);break;
+				case "background":SetBackground(value);break;
+	        }
+	    }
+
+		private void SetBackground(string value)
+		{
+			Properties["background-color"] = value;
+		}
+
+		private void SetPadding(string value)
+		{
+			if (value == null)
+			{
+				Properties["padding-top"] =
+					Properties["padding-right"] =
+						Properties["padding-bottom"] =
+							Properties["padding-left"] = null;
+			}
+			else
+			{
+				var args = value.Split(' ');
+				if (args.Length == 1)
+				{
+					Properties["padding-top"] =
+						Properties["padding-right"] =
+							Properties["padding-bottom"] =
+								Properties["padding-left"] = args[0];
+				}
+				else if(args.Length == 2)
+				{
+					Properties["padding-top"] = Properties["padding-bottom"] = args[0];
+					Properties["padding-right"] = Properties["padding-left"] = args[1];
+				}
+				else if (args.Length == 3)
+				{
+					Properties["padding-top"] = args[0];
+					Properties["padding-right"] = Properties["padding-left"] = args[1];
+					Properties["padding-bottom"] = args[2];
+				}else if (args.Length >= 4)
+				{
+					Properties["padding-top"] = args[0];
+					Properties["padding-right"] = args[1];
+					Properties["padding-bottom"] = args[2];
+					Properties["padding-left"] = args[3];
+				}
+			}
+		}
+
+		private void SetMargin(string value)
+		{
+			if (value == null)
+			{
+				Properties["margin-top"] =
+					Properties["margin-right"] =
+						Properties["margin-bottom"] =
+							Properties["margin-left"] = null;
+			}
+			else
+			{
+				var args = value.Split(' ');
+				if (args.Length == 1)
+				{
+					Properties["margin-top"] =
+						Properties["margin-right"] =
+							Properties["margin-bottom"] =
+								Properties["margin-left"] = args[0];
+				}
+				else if (args.Length == 2)
+				{
+					Properties["margin-top"] = Properties["margin-bottom"] = args[0];
+					Properties["margin-right"] = Properties["margin-left"] = args[1];
+				}
+				else if (args.Length == 3)
+				{
+					Properties["margin-top"] = args[0];
+					Properties["margin-right"] = Properties["margin-left"] = args[1];
+					Properties["margin-bottom"] = args[2];
+				}
+				else if (args.Length >= 4)
+				{
+					Properties["margin-top"] = args[0];
+					Properties["margin-right"] = args[1];
+					Properties["margin-bottom"] = args[2];
+					Properties["margin-left"] = args[3];
+				}
+			}
 		}
 
 		public string GetPropertyPriority(string propertyName)
