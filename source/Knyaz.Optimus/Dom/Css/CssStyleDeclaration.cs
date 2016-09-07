@@ -118,18 +118,19 @@ namespace Knyaz.Optimus.Dom.Css
 	    {
 	        switch (name)
 	        {
-	        	case "padding":SetPadding(value);break;
-		        case "margin":SetClockwise(MarginNames, value);break;
+				case "padding":SetPadding(value);break;
+				case "margin":SetClockwise(MarginNames, value);break;
 				case "background":SetBackground(value);break;
-			    case "border":SetBorder(value);break;
-			    case "border-top": SetBorder("top", value);break;
-			    case "border-right":SetBorder("right", value);break;
-			    case "border-bottom":SetBorder("bottom", value);break;
-			    case "border-left":SetBorder("left", value);break;
-			    case "border-width":SetClockwise(BorderWidthNames, value);break;
-		        case "border-style":SetClockwise(BorderStyleNames, value);break;
-		        case "border-color":SetClockwise(BorderColorNames, value);break;
+				case "border":SetBorder(value);break;
+				case "border-top": SetBorder("top", value);break;
+				case "border-right":SetBorder("right", value);break;
+				case "border-bottom":SetBorder("bottom", value);break;
+				case "border-left":SetBorder("left", value);break;
+				case "border-width":SetClockwise(BorderWidthNames, value);break;
+				case "border-style":SetClockwise(BorderStyleNames, value);break;
+				case "border-color":SetClockwise(BorderColorNames, value);break;
 				case "font":SetFont(value);break;
+				case "border-radius":SetClockwise(BorderRadiusNames, value);break;
 	        }
 	    }
 
@@ -229,6 +230,9 @@ namespace Knyaz.Optimus.Dom.Css
 
 		static string[] BorderColorNames =
 			{"border-top-color", "border-right-color", "border-bottom-color","border-left-color"};
+
+		static string[] BorderRadiusNames =
+			{"border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"};
 
 		static string[] PaddingNames = {"padding-top", "padding-right", "padding-bottom", "padding-left"};
 		static string[] MarginNames = {"margin-top", "margin-right", "margin-bottom", "margin-left"};
