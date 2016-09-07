@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Css
@@ -128,8 +129,53 @@ namespace Knyaz.Optimus.Dom.Css
 			    case "border-width":SetClockwise(BorderWidthNames, value);break;
 		        case "border-style":SetClockwise(BorderStyleNames, value);break;
 		        case "border-color":SetClockwise(BorderColorNames, value);break;
+				case "font":SetFont(value);break;
 	        }
 	    }
+
+		//Reges to remove spaces around commas
+		private static Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
+
+		private void SetFont(string value)
+		{
+			var args = _normalizeCommas.Replace(value, ",")
+				.Split(' ')
+				.Where(x => !string.IsNullOrWhiteSpace(x))
+				.Reverse()
+				.ToArray();
+
+			if (args.Length == 0)
+				return;
+
+			if (args.Length == 1)
+			{
+				//todo: implement
+				//one of caption|icon|menu|message-box|small-caption|status-bar|initial|inherit
+				return;
+			}
+
+			Properties["font-family"] = args[0];
+
+			var sz = args[1].Split('/');
+			Properties["font-size"] = sz[0];
+			if (sz.Length > 1)
+				Properties["line-height"] = sz[1];
+
+			if (args.Length == 2)
+				return;
+
+			Properties["font-weight"] = args[2];
+
+			if (args.Length == 3)
+				return;
+/*todo: try to parse enums to determine which property to set
+			Properties["font-variant"] = args[3];
+
+			if (args.Length == 4)
+				return;*/
+
+			Properties["font-style"] = args[3];
+		}
 
 		private void SetBackground(string value)
 		{

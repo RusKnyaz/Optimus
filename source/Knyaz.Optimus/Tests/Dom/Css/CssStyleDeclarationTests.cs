@@ -85,13 +85,27 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("margin-left") == left);
 		}
 
-		[Test, Ignore]
-		public void SetFont()
+		[TestCase("italic bold 12px/30px Georgia, serif", "12px", "Georgia,serif", "bold", "italic")]
+		[TestCase("italic   bold 12px/30px Georgia, serif", "12px", "Georgia,serif", "bold", "italic")]
+		[TestCase("12px Arial, sans-Serif", "12px", "Arial,sans-Serif", "normal", "normal", Ignored = true)]
+		public void SetFont(string font, string fontSize, string fontFamily, string fontWeight, string fontStyle)
 		{
-			Style("font:12px Arial, sans-Serif;").Assert(style =>
-				style.GetPropertyValue("font-size") == "12px" &&
-				style.GetPropertyValue("font-family") == "Arial, sans-Serif;");
+			Style("font:"+ font).Assert(style =>
+				style.GetPropertyValue("font-size") == fontSize &&
+				style.GetPropertyValue("font-family") == fontFamily &&
+				style.GetPropertyValue("font-weight") == fontWeight &&
+				style.GetPropertyValue("font-style") == fontStyle);
 		}
+
+		[Test]
+		public void SetFontLineHeight()
+		{
+			Style("font:12px/30px Arial").Assert(style =>
+				style.GetPropertyValue("font-size") == "12px" &&
+				style.GetPropertyValue("line-height") == "30px");
+		}
+
+
 	}
 }
 #endif
