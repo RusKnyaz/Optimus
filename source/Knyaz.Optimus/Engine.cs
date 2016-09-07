@@ -226,10 +226,10 @@ namespace Knyaz.Optimus
 				{
 					foreach (var script in html.OfType<Html.IHtmlElement>()
 					.Flat(x => x.Children.OfType<Html.IHtmlElement>())
-					.Where(x => x.Name == "link" && x.Attributes.ContainsKey("href") && x.Attributes["type"] == "text/css")
+					.Where(x => x.Name == "link" && x.Attributes.ContainsKey("href") &&
+					            (!x.Attributes.ContainsKey("type") || x.Attributes["type"] == "text/css"))
 					.Select(x => x.Attributes["href"])
-					.Where(x => !string.IsNullOrEmpty(x))
-					)
+					.Where(x => !string.IsNullOrEmpty(x)))
 					{
 						resourceProvider.Preload(script);
 					}
