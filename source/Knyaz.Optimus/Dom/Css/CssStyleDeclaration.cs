@@ -73,7 +73,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public string GetPropertyValue(string propertyName)
 		{
-			return Properties[propertyName] ?? "";
+			return Properties[propertyName];
 		}
 
 		public string CssText
