@@ -85,16 +85,18 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("margin-left") == left);
 		}
 
-		[TestCase("italic bold 12px/30px Georgia, serif", "12px", "Georgia,serif", "bold", "italic")]
-		[TestCase("italic   bold 12px/30px Georgia, serif", "12px", "Georgia,serif", "bold", "italic")]
-		[TestCase("12px Arial, sans-Serif", "12px", "Arial,sans-Serif", "normal", "normal", Ignored = true)]
-		public void SetFont(string font, string fontSize, string fontFamily, string fontWeight, string fontStyle)
+		[TestCase("italic bold 12px/30px Georgia, serif", "italic", "normal", "bold", "12px", "Georgia,serif")]
+		[TestCase("italic   bold 12px/30px Georgia, serif", "italic", "normal", "bold", "12px", "Georgia,serif")]
+		[TestCase("12px Arial, sans-Serif", "normal", "normal", "normal", "12px", "Arial,sans-Serif")]
+		[TestCase("normal small-caps 12px/14px fantasy", "normal", "small-caps", "normal", "12px", "fantasy")]
+		public void SetFont(string font, string fontStyle, string fontVariant, string fontWeight, string fontSize, string fontFamily)
 		{
 			Style("font:"+ font).Assert(style =>
 				style.GetPropertyValue("font-size") == fontSize &&
 				style.GetPropertyValue("font-family") == fontFamily &&
 				style.GetPropertyValue("font-weight") == fontWeight &&
-				style.GetPropertyValue("font-style") == fontStyle);
+				style.GetPropertyValue("font-style") == fontStyle &&
+				style.GetPropertyValue("font-variant") == fontVariant);
 		}
 
 		[Test]
@@ -104,8 +106,6 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("font-size") == "12px" &&
 				style.GetPropertyValue("line-height") == "30px");
 		}
-
-
 	}
 }
 #endif

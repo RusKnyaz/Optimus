@@ -38,7 +38,7 @@ namespace Knyaz.Optimus.Dom.Css
 				int number;
 				if (int.TryParse(name, out number))
 					return this[number];
-				
+
 				return Properties[name]; //return value
 			}
 			set
@@ -47,13 +47,13 @@ namespace Knyaz.Optimus.Dom.Css
 				if (int.TryParse(name, out number))
 					return;
 
-			    SetProperty(name, value == null ? null : value.ToString());
+				SetProperty(name, value == null ? null : value.ToString());
 			}
 		}
 
 		private void UpdateCssText()
 		{
-			var newCss =  string.Join(";",
+			var newCss = string.Join(";",
 				Properties.AllKeys.Where(x => !string.IsNullOrEmpty(Properties[x])).Select(x => x + ":" + Properties[x]));
 
 			if (newCss != _cssText)
@@ -66,10 +66,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public string this[int idx]
 		{
-			get
-			{
-				return idx < 0 || idx >= Properties.Count ? string.Empty: Properties.AllKeys[idx]; 
-			}
+			get { return idx < 0 || idx >= Properties.Count ? string.Empty : Properties.AllKeys[idx]; }
 		}
 
 		public string GetPropertyValue(string propertyName)
@@ -87,7 +84,7 @@ namespace Knyaz.Optimus.Dom.Css
 				{
 					_cssText = newCssText;
 					Properties.Clear();
-					if(newCssText != string.Empty)
+					if (newCssText != string.Empty)
 						StyleSheetBuilder.FillStyle(this, newCssText);
 
 					if (OnStyleChanged != null)
@@ -110,33 +107,63 @@ namespace Knyaz.Optimus.Dom.Css
 			//todo: important
 			name = name.Replace(" ", "");
 			Properties[name] = value;
-		    HandleComplexProperty(name, value);
+			HandleComplexProperty(name, value);
 			UpdateCssText();
 		}
 
-	    private void HandleComplexProperty(string name, string value)
-	    {
-	        switch (name)
-	        {
-				case "padding":SetPadding(value);break;
-				case "margin":SetClockwise(MarginNames, value);break;
-				case "background":SetBackground(value);break;
-				case "border":SetBorder(value);break;
-				case "border-top": SetBorder("top", value);break;
-				case "border-right":SetBorder("right", value);break;
-				case "border-bottom":SetBorder("bottom", value);break;
-				case "border-left":SetBorder("left", value);break;
-				case "border-width":SetClockwise(BorderWidthNames, value);break;
-				case "border-style":SetClockwise(BorderStyleNames, value);break;
-				case "border-color":SetClockwise(BorderColorNames, value);break;
-				case "font":SetFont(value);break;
-				case "border-radius":SetClockwise(BorderRadiusNames, value);break;
-	        }
-	    }
+		private void HandleComplexProperty(string name, string value)
+		{
+			switch (name)
+			{
+				case "padding":
+					SetPadding(value);
+					break;
+				case "margin":
+					SetClockwise(MarginNames, value);
+					break;
+				case "background":
+					SetBackground(value);
+					break;
+				case "border":
+					SetBorder(value);
+					break;
+				case "border-top":
+					SetBorder("top", value);
+					break;
+				case "border-right":
+					SetBorder("right", value);
+					break;
+				case "border-bottom":
+					SetBorder("bottom", value);
+					break;
+				case "border-left":
+					SetBorder("left", value);
+					break;
+				case "border-width":
+					SetClockwise(BorderWidthNames, value);
+					break;
+				case "border-style":
+					SetClockwise(BorderStyleNames, value);
+					break;
+				case "border-color":
+					SetClockwise(BorderColorNames, value);
+					break;
+				case "font":
+					SetFont(value);
+					break;
+				case "border-radius":
+					SetClockwise(BorderRadiusNames, value);
+					break;
+			}
+		}
 
 		//Reges to remove spaces around commas
 		private static Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
+		static string[] FontStyles = {"normal", "italic", "oblique", "inherit"};
+		private static string[] FontWeights = {"bold", "bolder", "lighter", "normal", "100", "200", "300","400","500","600","700","800","900"};
+		private static string[] FontVariants = {"normal", "small-caps", "inherit"};
 
+		///<param name="value">[font-style||font-variant||font-weight] font-size [/line-height] font-family | inherit</param>
 		private void SetFont(string value)
 		{
 			var args = _normalizeCommas.Replace(value, ",")
@@ -162,21 +189,49 @@ namespace Knyaz.Optimus.Dom.Css
 			if (sz.Length > 1)
 				Properties["line-height"] = sz[1];
 
-			if (args.Length == 2)
+			var i = 2;
+
+			if (args.Length == i)
+			{
+				Properties["font-weight"] = Properties["font-style"] = Properties["font-variant"] = "normal";
 				return;
+			}
 
-			Properties["font-weight"] = args[2];
+			var val = args[i];
+			if (FontWeights.Contains(val))
+			{
+				Properties["font-weight"] = val;
+				i++;
+				if (args.Length == i)
+					return;
+				val = args[i];
+			}
+			else
+			{
+				Properties["font-weight"] = "normal";
+			}
 
-			if (args.Length == 3)
-				return;
-/*todo: try to parse enums to determine which property to set
-			Properties["font-variant"] = args[3];
+			if (FontVariants.Contains(val))
+			{
+				Properties["font-variant"] = val;
+				i++;
+				if (args.Length == i)
+					return;
+				val = args[i];
+			}
+			else
+			{
+				Properties["font-variant"] = "normal";
+			}
 
-			if (args.Length == 4)
-				return;*/
-
-			Properties["font-style"] = args[3];
+			if(FontStyles.Contains(val))
+				Properties["font-style"] = val;
+			else
+			{
+				Properties["font-style"] = "normal";
+			}
 		}
+
 
 		private void SetBackground(string value)
 		{
