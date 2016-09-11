@@ -19,5 +19,7 @@
 		public const string Link = "LINK";
 		public const string Span = "SPAN";
 		public const string B = "B";
+		public const string Table = "TABLE";
+		public const string Caption = "CAPTION";
 	}
 }

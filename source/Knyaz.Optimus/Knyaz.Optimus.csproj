@@ -78,6 +78,7 @@
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Css\CssStyleDeclaration.cs" />
     <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
+    <Compile Include="Dom\Elements\HtmlCollection.cs" />
     <Compile Include="Dom\Elements\HtmlDivElement.cs" />
     <Compile Include="Dom\Elements\HtmlFormElement.cs" />
     <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
@@ -86,6 +87,9 @@
     <Compile Include="Dom\Elements\HtmlOptionElement.cs" />
     <Compile Include="Dom\Elements\HtmlSelectElement.cs" />
     <Compile Include="Dom\Elements\HtmlStyleElement.cs" />
+    <Compile Include="Dom\Elements\HtmlTableCaptionElement.cs" />
+    <Compile Include="Dom\Elements\HtmlTableElement.cs" />
+    <Compile Include="Dom\Elements\HtmlTableSectionElement.cs" />
     <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
     <Compile Include="Dom\Elements\IFormElement.cs" />

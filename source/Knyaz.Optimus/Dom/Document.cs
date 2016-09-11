@@ -108,6 +108,7 @@ namespace Knyaz.Optimus.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
+				case TagsNames.Table: return new HtmlTableElement(this);
 				case TagsNames.Link: return new HtmlLinkElement(this);
 				case TagsNames.Style: return new HtmlStyleElement(this);
 				case TagsNames.Select: return new HtmlSelectElement(this);
@@ -144,7 +145,6 @@ namespace Knyaz.Optimus.Dom
 		{
 			return DocumentElement.Flatten().OfType<Element>().Where(x => x.GetAttribute("name") == name).ToList().AsReadOnly();
 		}
-
 		
 		public DocumentFragment CreateDocumentFragment()
 		{
