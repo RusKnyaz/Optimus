@@ -160,6 +160,7 @@
     <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlLinkElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlTableElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
