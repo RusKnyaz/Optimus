@@ -356,6 +356,54 @@ namespace Knyaz.Optimus.Tests.Dom
 				table.TBodies[0].ChildNodes.Count == 1 &&
 				table.TBodies[1].ChildNodes.Count == 0);
 		}
+
+		[Test]
+		public void SetCaption()
+		{
+			_table.Caption = (HtmlTableCaptionElement)_document.CreateElement("caption");
+			_table.Assert(table => table.ChildNodes.Count == 1 && table.Caption != null && table.Caption.ParentNode == table);
+		}
+
+		[Test]
+		public void ReplaceCaption()
+		{
+			_table.Caption = (HtmlTableCaptionElement) _document.CreateElement("caption");
+			var cap2 = (HtmlTableCaptionElement)_document.CreateElement("caption");
+			_table.Caption = cap2;
+			_table.Assert(table => table.ChildNodes.Count == 1 && table.Caption == cap2);
+		}
+
+		[Test]
+		public void SetTFoot()
+		{
+			_table.TFoot = (HtmlTableSectionElement) _document.CreateElement("tfoot");
+			_table.Assert(table => table.ChildNodes.Count == 1 && table.TFoot != null);
+		}
+
+		[Test]
+		public void ReplaceTFoot()
+		{
+			_table.TFoot = (HtmlTableSectionElement) _document.CreateElement("tfoot");
+			var tfoot2 = (HtmlTableSectionElement) _document.CreateElement("tfoot");
+			_table.TFoot = tfoot2;
+			_table.Assert(table => table.ChildNodes.Count == 1 && table.TFoot == tfoot2);
+		}
+
+		[Test]
+		public void SetTHead()
+		{
+			_table.THead = (HtmlTableSectionElement) _document.CreateElement("thead");
+			_table.Assert(table => table.ChildNodes.Count == 1 && table.THead != null);
+		}
+
+		[Test]
+		public void ReplaceTHead()
+		{
+			_table.THead = (HtmlTableSectionElement) _document.CreateElement("thead");
+			var thead2 = (HtmlTableSectionElement) _document.CreateElement("thead");
+			_table.THead = thead2;
+			_table.Assert(table => table.ChildNodes.Count == 1 && table.THead == thead2);
+		}
 	}
 }
 #endif

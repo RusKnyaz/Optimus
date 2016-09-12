@@ -84,8 +84,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Align
 		{
-			get { throw new NotImplementedException();}
-			set { throw new NotImplementedException();}
+			get { return GetAttribute("align", string.Empty);}
+			set { SetAttribute("align", value);}
 		}
 
 		/// <summary>
@@ -93,8 +93,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string BgColor
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute<string>("bgcolor", null); }
+			set { SetAttribute("bgcolor", value); }
 		}
 
 		/// <summary>
@@ -102,8 +102,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Border
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("border", string.Empty); }
+			set { SetAttribute("border", value); }
 		}
 
 		/// <summary>
@@ -112,7 +112,22 @@ namespace Knyaz.Optimus.Dom.Elements
 		public HtmlTableCaptionElement Caption
 		{
 			get { return ChildNodes.OfType<HtmlTableCaptionElement>().FirstOrDefault(); }
-			set { throw new NotImplementedException(); }
+			set
+			{
+				var cap = Caption;
+				if (cap == null)
+				{
+					var fc = FirstChild;
+					if (fc != null)
+						InsertBefore(value, fc);
+					else
+						AppendChild(value);
+				}
+				else
+				{
+					cap.ParentNode.ReplaceChild(value, cap);
+				}
+			}
 		}
 
 		/// <summary>
@@ -120,8 +135,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string CellPadding
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("cellpadding", string.Empty); }
+			set { SetAttribute("cellpadding", value); }
 		}
 
 		/// <summary>
@@ -129,17 +144,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string CellSpacing
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("cellspacing", string.Empty); }
+			set { SetAttribute("cellspacing", value); }
 		}
 
 		/// <summary>
-		/// Specifies which external table borders to render.
+		/// Specifies which external table borders to render. One of:void|above|below|hsides|lhs|rhs|vsides|box|border
 		/// </summary>
 		public string Frame
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("frame", string.Empty); }
+			set { SetAttribute("frame", value); }
 		}
 
 		IEnumerable<HtmlElement> GetRows()
@@ -162,12 +177,12 @@ namespace Knyaz.Optimus.Dom.Elements
 		public HtmlCollection Rows { get; private set; }
 
 		/// <summary>
-		/// Specifies which internal table borders to render.
+		/// Specifies which internal table borders to render. On of:none|groups|rows|cols|all
 		/// </summary>
 		public string Rules
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("rules", string.Empty); }
+			set { SetAttribute("rules", value); }
 		}
 
 		/// <summary>
@@ -175,8 +190,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Summary
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("summary", string.Empty); }
+			set { SetAttribute("summary", value); }
 		}
 
 		/// <summary>
@@ -190,7 +205,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		public HtmlTableSectionElement TFoot
 		{
 			get { return ChildNodes.OfType<HtmlTableSectionElement>().FirstOrDefault(x => x.TagName == TagsNames.TFoot); }
-			set { throw new NotImplementedException(); }
+			set
+			{
+				var tfoot = TFoot;
+				if (tfoot == null)
+				{
+					AppendChild(value);
+				}
+				else
+				{
+					tfoot.ParentNode.ReplaceChild(value, tfoot);
+				}
+			}
 		}
 
 		/// <summary>
@@ -199,7 +225,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		public HtmlTableSectionElement THead
 		{
 			get { return ChildNodes.OfType<HtmlTableSectionElement>().FirstOrDefault(x => x.TagName == TagsNames.THead); }
-			set { throw new NotImplementedException(); }
+			set
+			{
+				var thead = THead;
+				if (thead == null)
+				{
+					AppendChild(value);
+				}
+				else
+				{
+					thead.ParentNode.ReplaceChild(value, thead);
+				}
+			}
 		}
 
 		/// <summary>
@@ -207,8 +244,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Width
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("width", string.Empty); }
+			set { SetAttribute("width", value); }
 		}
 
 		/// <summary>
