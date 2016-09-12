@@ -25,8 +25,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Align
 		{
-			get { throw new NotImplementedException();}
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("align", string.Empty); }
+			set { SetAttribute("align", value); }
 		}
 
 		/// <summary>
@@ -34,8 +34,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Ch
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("char"); }
+			set { SetAttribute("char", value); }
 		}
 
 		/// <summary>
@@ -43,8 +43,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string ChOff
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("charoff"); }
+			set { SetAttribute("charoff", value); }
 		}
 
 		/// <summary>
@@ -60,8 +60,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string VAlign
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("valign", string.Empty); }
+			set { SetAttribute("valign", value); }
 		}
 
 		/// <summary>

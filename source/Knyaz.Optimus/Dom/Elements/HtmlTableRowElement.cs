@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -27,8 +28,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Align
 		{
-			get { throw new NotImplementedException();}
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("align", string.Empty); }
+			set { SetAttribute("align", value); }
 		}
 
 		/// <summary>
@@ -36,8 +37,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string BgColor
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute<string>("bgcolor", null); }
+			set { SetAttribute("bgcolor", value); }
 		}
 
 		/// <summary>
@@ -50,8 +51,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Ch
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("char"); }
+			set { SetAttribute("char", value); }
 		}
 
 		/// <summary>
@@ -59,16 +60,20 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string ChOff
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("charoff"); }
+			set { SetAttribute("charoff", value); }
 		}
-		
+
 		/// <summary>
 		/// This is in logical order and not in document order.
 		/// </summary>
 		public int RowIndex
 		{
-			get { throw new NotImplementedException();}
+			get
+			{
+				var table = ParentNode as HtmlTableElement ?? ParentNode.ParentNode as HtmlTableElement;
+				return table.Rows.IndexOf(this);
+			}
 		}
 
 		/// <summary>
@@ -76,7 +81,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public int SectionRowIndex
 		{
-			get { throw new NotImplementedException(); }
+			get
+			{
+				var rows = (ParentNode as HtmlTableElement)?.Rows ?? ((HtmlTableSectionElement) ParentNode).Rows;
+				return rows.IndexOf(this);
+			}
 		}
 
 		/// <summary>
@@ -84,8 +93,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string VAlign
 		{
-			get { throw new NotImplementedException();}
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("valign", string.Empty); }
+			set { SetAttribute("valign", value); }
 		}
 
 

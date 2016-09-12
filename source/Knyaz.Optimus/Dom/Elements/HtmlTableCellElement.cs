@@ -26,8 +26,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Align
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("align", string.Empty); }
+			set { SetAttribute("align", value); }
 		}
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string BgColor
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute<string>("bgcolor", null); }
+			set { SetAttribute("bgcolor", value); }
 		}
 
 		/// <summary>
@@ -65,8 +65,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Ch
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("char"); }
+			set { SetAttribute("char", value); }
 		}
 
 		/// <summary>
@@ -75,8 +75,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string ChOff
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("charoff"); }
+			set { SetAttribute("charoff", value); }
 		}
 
 		/// <summary>
@@ -105,8 +105,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Height
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("height", string.Empty); }
+			set { SetAttribute("height", value); }
 		}
 
 		/// <summary>
@@ -145,8 +145,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string VAlign
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("valign", string.Empty); }
+			set { SetAttribute("valign", value); }
 		}
 
 		/// <summary>
@@ -155,8 +155,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Width
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("width", string.Empty); }
+			set { SetAttribute("width", value); }
 		}
 	}
 }

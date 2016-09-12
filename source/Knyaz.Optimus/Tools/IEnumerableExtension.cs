@@ -26,5 +26,17 @@ namespace Knyaz.Optimus.Tools
 				cur = getNext(cur);
 			}
 		}
+
+		public static int IndexOf<T>(this IEnumerable<T> e, T item)
+		{
+			var idx = 0;
+			foreach (var currentItem in e)
+			{
+				if (Equals(currentItem, item))
+					return idx;
+				idx++;
+			}
+			return -1;
+		}
 	}
 }
