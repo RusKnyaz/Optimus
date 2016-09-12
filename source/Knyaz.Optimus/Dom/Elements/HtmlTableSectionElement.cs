@@ -1,5 +1,5 @@
 using System;
-using NUnit.Framework;
+using HtmlCollection = System.Collections.Generic.IReadOnlyList<Knyaz.Optimus.Dom.Elements.HtmlElement>;
 
 namespace Knyaz.Optimus.Dom.Elements
 {

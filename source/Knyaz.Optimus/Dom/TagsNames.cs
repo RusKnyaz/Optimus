@@ -21,5 +21,10 @@
 		public const string B = "B";
 		public const string Table = "TABLE";
 		public const string Caption = "CAPTION";
+		public const string Tr = "TR";
+		public const string TBody = "TBODY";
+		public const string TFoot = "TFOOT";
+		public const string THead = "THEAD";
+		public const string Td = "TD";
 	}
 }

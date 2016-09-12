@@ -103,12 +103,18 @@ namespace Knyaz.Optimus.Dom
 					elem = html.GetElementsByTagName(invariantName).FirstOrDefault();
 			}
 
+			var table = node as HtmlTableElement;
+			if (table != null && htmlElement.Name.ToUpperInvariant() == TagsNames.Tr)
+			{
+				elem = table.InsertRow();
+			}
+
 			if (elem == null)
 			{
 				append = true;
 				elem = node.OwnerDocument.CreateElement(htmlElement.Name);	
 			}
-			
+
 			elem.Source = source;
 			
 			if (elem is Script)
