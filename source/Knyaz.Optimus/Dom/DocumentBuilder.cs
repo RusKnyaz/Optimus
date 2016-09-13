@@ -59,7 +59,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private static void BuildElem(Node node, IHtmlNode htmlNode, NodeSources source)
+		private static void BuildElem(Node node, IHtmlNode htmlNode, NodeSources source, Node insertBefore = null)
 		{
 			var docType = htmlNode as HtmlDocType;
 			if (docType != null)
@@ -103,10 +103,23 @@ namespace Knyaz.Optimus.Dom
 					elem = html.GetElementsByTagName(invariantName).FirstOrDefault();
 			}
 
+			//if parent is table
 			var table = node as HtmlTableElement;
-			if (table != null && htmlElement.Name.ToUpperInvariant() == TagsNames.Tr)
+			var elementInvariantName = htmlElement.Name.ToUpperInvariant();
+			if (table != null)
 			{
-				elem = table.InsertRow();
+				if(elementInvariantName == TagsNames.Tr)
+					elem = table.InsertRow();
+				else if (elementInvariantName != TagsNames.TBody &&
+				         elementInvariantName != TagsNames.Tr &&
+				         elementInvariantName != TagsNames.Caption &&
+				         elementInvariantName != TagsNames.THead &&
+				         elementInvariantName != TagsNames.TFoot &&
+				         elementInvariantName != TagsNames.Colgroup)
+				{
+					BuildElem(node.ParentNode, htmlNode, source, node);
+					return;
+				}
 			}
 
 			if (elem == null)
@@ -128,8 +141,13 @@ namespace Knyaz.Optimus.Dom
 				elem.SetAttribute(attribute.Key, attribute.Value);
 			}
 
-			if(append)
-				node.AppendChild(elem);
+			if (append)
+			{
+				if (insertBefore != null)
+					node.InsertBefore(elem, insertBefore);
+				else
+					node.AppendChild(elem);
+			}
 
 			BuildInternal(elem, htmlElement.Children, source);
 		}
