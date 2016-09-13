@@ -27,5 +27,6 @@
 		public const string THead = "THEAD";
 		public const string Td = "TD";
 		public const string Colgroup = "COLGROUP";
+		public const string Col = "COL";
 	}
 }

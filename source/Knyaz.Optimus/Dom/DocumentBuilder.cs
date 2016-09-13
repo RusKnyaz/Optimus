@@ -110,12 +110,13 @@ namespace Knyaz.Optimus.Dom
 			{
 				if(elementInvariantName == TagsNames.Tr)
 					elem = table.InsertRow();
-				else if (elementInvariantName != TagsNames.TBody &&
+				else if (node.ParentNode != null && elementInvariantName != TagsNames.TBody &&
 				         elementInvariantName != TagsNames.Tr &&
 				         elementInvariantName != TagsNames.Caption &&
 				         elementInvariantName != TagsNames.THead &&
 				         elementInvariantName != TagsNames.TFoot &&
-				         elementInvariantName != TagsNames.Colgroup)
+				         elementInvariantName != TagsNames.Colgroup &&
+						 elementInvariantName != TagsNames.Col)
 				{
 					BuildElem(node.ParentNode, htmlNode, source, node);
 					return;

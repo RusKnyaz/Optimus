@@ -1,6 +1,5 @@
 ﻿#if NUNIT
 using System.IO;
-using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
@@ -40,6 +39,16 @@ namespace Knyaz.Optimus.Tests.Dom
 				((HtmlElement) doc.Body.ChildNodes[1]).TagName == "SPAN" &&
 				((HtmlElement) doc.Body.ChildNodes[2]).TagName == "TABLE" &&
 				((HtmlElement)doc.Body.ChildNodes[2]).InnerHTML == "<TBODY><TR></TR></TBODY>");
+		}
+
+		[Test]
+		public void TableInnerHtml()
+		{
+			var document = Build("<html></html>");
+			var table = document.CreateElement("table");
+			table.InnerHTML = "<div></div>";
+			table.Assert(tbl => tbl.ChildNodes.Count == 1 && 
+				((HtmlElement)tbl.FirstChild).TagName == "DIV");
 		}
 
 		private Document Build(string txt)

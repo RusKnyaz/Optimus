@@ -16,8 +16,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Abbr
 		{
-			get { throw new NotImplementedException();}
-			set { throw new NotImplementedException(); }
+			get {return GetAttribute("abbr", string.Empty);}
+			set { SetAttribute("abbr", value); }
 		}
 
 		/// <summary>
@@ -36,8 +36,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Axis
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("axis", string.Empty); }
+			set { SetAttribute("axis", value); }
 		}
 
 		/// <summary>
@@ -85,8 +85,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public int ColSpan
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("colSpan", 1); }
+			set
+			{
+				SetAttribute("colSpan", value.ToString());
+			}
 		}
 
 		/// <summary>
@@ -95,8 +98,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Headers
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("headers", string.Empty); }
+			set { SetAttribute("headers", value); }
 		}
 
 		/// <summary>
@@ -125,8 +128,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public int RowSpan
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("rowSpan", 1); }
+			set { SetAttribute("rowSpan", value.ToString()); }
 		}
 
 		/// <summary>
@@ -135,8 +138,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public string Scope
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("scope", string.Empty); }
+			set { SetAttribute("scope", value); }
 		}
 
 		/// <summary>
