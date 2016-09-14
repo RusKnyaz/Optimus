@@ -112,7 +112,9 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.THead:
 				case TagsNames.TBody:
 					return new HtmlTableSectionElement(this, invariantTagName);
-				case TagsNames.Td: return new HtmlTableCellElement(this);
+				case TagsNames.Td:
+				case TagsNames.Th:
+					return new HtmlTableCellElement(this, invariantTagName);
 				case TagsNames.Caption: return new HtmlTableCaptionElement(this);
 				case TagsNames.Table: return new HtmlTableElement(this);
 				case TagsNames.Tr: return new HtmlTableRowElement(this);
@@ -133,6 +135,8 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Form:return new HtmlFormElement(this);
 				case TagsNames.IFrame:return new HtmlIFrameElement(this);
 				case TagsNames.Html:return new HtmlHtmlElement(this);
+				case TagsNames.Col:
+					return new HtmlTableColElement(this);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);

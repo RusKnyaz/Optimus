@@ -89,6 +89,7 @@
     <Compile Include="Dom\Elements\HtmlStyleElement.cs" />
     <Compile Include="Dom\Elements\HtmlTableCaptionElement.cs" />
     <Compile Include="Dom\Elements\HtmlTableCellElement.cs" />
+    <Compile Include="Dom\Elements\HtmlTableColElement.cs" />
     <Compile Include="Dom\Elements\HtmlTableElement.cs" />
     <Compile Include="Dom\Elements\HtmlTableRowElement.cs" />
     <Compile Include="Dom\Elements\HtmlTableSectionElement.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Tests\Dom\HtmlLinkElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlTableElementTests.cs" />
+    <Compile Include="Tests\Dom\HtmlTableRowElementTests.cs" />
     <Compile Include="Tests\Dom\NodeTests.cs" />
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />

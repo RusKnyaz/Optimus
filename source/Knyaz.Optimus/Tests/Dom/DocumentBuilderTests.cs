@@ -42,6 +42,16 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
+		public void CreateColGroupForCol()
+		{
+			var document = Build("<html><body><table><colgroup></colgroup><col></col></table></body></html>");
+			document.Assert(doc => 
+				doc.Body.ChildNodes[0].ChildNodes.Count == 2 &&
+				((HtmlElement)doc.Body.ChildNodes[0].ChildNodes[0]).TagName == "COLGROUP" &&
+				((HtmlElement)doc.Body.ChildNodes[0].ChildNodes[1]).TagName == "COLGROUP");
+		}
+
+		[Test]
 		public void TableInnerHtml()
 		{
 			var document = Build("<html></html>");

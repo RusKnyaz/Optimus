@@ -10,8 +10,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public string Align
 		{
-			get { throw new NotImplementedException();}
-			set { throw new NotImplementedException(); }
+			get { return GetAttribute("align", string.Empty); }
+			set { SetAttribute("align", value); }
 		}
 	}
 }

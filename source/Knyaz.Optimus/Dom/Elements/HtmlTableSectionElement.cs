@@ -1,5 +1,5 @@
 using System;
-using HtmlCollection = System.Collections.Generic.IReadOnlyList<Knyaz.Optimus.Dom.Elements.HtmlElement>;
+using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -10,6 +10,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		public HtmlTableSectionElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
 		{
+			Rows = new HtmlCollection(() => ChildNodes.OfType<HtmlTableRowElement>());
 		}
 
 		/// <summary>
@@ -17,7 +18,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public void DeleteRow(int index)
 		{
-			throw new NotImplementedException();
+			var row = Rows[index];
+			row.ParentNode.RemoveChild(row);
 		}
 
 		/// <summary>
@@ -50,10 +52,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// The collection of rows in this table section.
 		/// </summary>
-		public HtmlCollection Rows
-		{
-			get { throw new NotImplementedException();}
-		}
+		public HtmlCollection Rows { get; private set; }
 
 		/// <summary>
 		/// Vertical alignment of data in cells.
@@ -69,9 +68,22 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		public HtmlElement InsertRow(int index)
+		public HtmlElement InsertRow(int index = -1)
 		{
-			throw new NotImplementedException();
+			var row = (HtmlElement)OwnerDocument.CreateElement(TagsNames.Tr);
+
+			var rows = Rows;
+
+			if (rows.Count == 0 || index == -1)
+			{
+				AppendChild(row);
+			}
+			else
+			{
+				InsertBefore(row, rows[index]);
+			}
+
+			return row;
 		}
 	}
 }

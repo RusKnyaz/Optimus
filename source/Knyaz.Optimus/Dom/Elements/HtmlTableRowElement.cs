@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -20,7 +19,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="index"></param>
 		public void DeleteCell(int index)
 		{
-			throw new NotImplementedException();
+			var cell = Cells[index];
+			cell.ParentNode.RemoveChild(cell);
 		}
 
 		/// <summary>
@@ -103,9 +103,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		public HtmlElement InsertCell(int index)
+		public HtmlElement InsertCell(int index = -1)
 		{
-			throw new NotImplementedException();
+			var newCell = (HtmlElement)OwnerDocument.CreateElement("td");
+
+			var cells = Cells;
+			if (cells.Count == 0 || index == -1)
+				AppendChild(newCell);
+
+			var cell = Cells[index];
+			InsertBefore(newCell, cell);
+
+			return newCell;
 		}
 	}
 }

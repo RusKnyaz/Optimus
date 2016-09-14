@@ -1,4 +1,5 @@
 ﻿using System;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -7,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public class HtmlTableCellElement : HtmlElement
 	{
-		public HtmlTableCellElement(Document ownerDocument) : base(ownerDocument, TagsNames.Td)
+		public HtmlTableCellElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
 		{
 		}
 
@@ -54,10 +55,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// The index of this cell in the row, starting from 0.
 		/// </summary>
 		/// <returns></returns>
-		public int CellIndex
-		{
-			get { throw new NotImplementedException();}
-		}
+		public int CellIndex => ((HtmlTableRowElement) ParentNode).Cells.IndexOf(this);
 
 		/// <summary>
 		/// Alignment character for cells in a column.
@@ -118,8 +116,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public bool NoWrap
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return HasAttribute("nowrap"); }
+			set
+			{
+				if (value)
+					SetAttribute("nowrap", "nowrap");
+				else
+					RemoveAttribute("nowrap");
+			}
 		}
 
 		/// <summary>
