@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		public AttributesCollection()
 		{
-			Properties = new OrderedDictionary();
+			Properties = new OrderedDictionary(StringComparer.InvariantCultureIgnoreCase);
 		}
 
 		public OrderedDictionary Properties { get; private set; }

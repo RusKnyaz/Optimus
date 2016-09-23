@@ -119,7 +119,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 			else
 			{
-				var attr = new Attr(this, name, value) {OwnerDocument = OwnerDocument};
+				var attr = new Attr(this, invariantName, value) {OwnerDocument = OwnerDocument};
 				Attributes.Add(invariantName, attr);
 				OwnerDocument.HandleNodeAdded(attr);
 			}

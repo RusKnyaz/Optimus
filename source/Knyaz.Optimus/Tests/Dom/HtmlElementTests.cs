@@ -2,6 +2,7 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
@@ -81,6 +82,21 @@ namespace Knyaz.Optimus.Tests.Dom
 			document.Write("<html><body><ul id=\"myList\"><li id=\"item1\">Coffee</li><li id=\"item2\">Tea</li></ul></body></html>");
 			var ul = document.GetElementById("myList");
 			Assert.AreEqual("Coffee Tea", ul.TextContent);
+		}
+
+		[Test]
+		public void AttributesCaseInsensitive()
+		{
+			var document = new Document();
+			document.Write("<html><div id=a CustomAttr=abc></div></html>");
+			var a = document.GetElementById("a");
+			a.SetAttribute("ABC", "1");
+
+			a.Assert(div =>
+				div.GetAttribute("customattr") == "abc" &&
+				div.GetAttribute("CustomAttr") == "abc" &&
+				div.Attributes[1].Name == "customattr" &&
+				div.Attributes[2].Name == "abc");
 		}
 	}
 }
