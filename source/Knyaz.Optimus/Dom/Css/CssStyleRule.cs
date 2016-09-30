@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Knyaz.Optimus.Dom.Elements;
 
@@ -6,6 +7,8 @@ namespace Knyaz.Optimus.Dom.Css
 	[DebuggerDisplay("CssStyleRule, Selector: {SelectorText}")]
 	public class CssStyleRule : CssRule
 	{
+		internal event Action SelectorChanged;
+
 		private string _selectorText;
 
 		public string SelectorText
@@ -16,6 +19,8 @@ namespace Knyaz.Optimus.Dom.Css
 				if (_selectorText != null)
 					_selector = null;
 				_selectorText = value;
+				if (SelectorChanged != null)
+					SelectorChanged();
 			}
 		}
 

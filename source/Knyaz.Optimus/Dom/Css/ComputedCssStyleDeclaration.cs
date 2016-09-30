@@ -2,20 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Css
 {
 	internal class ComputedCssStyleDeclaration : ICssStyleDeclaration
 	{
-		private readonly IElement _elt;
-
-		IEnumerable<ICssStyleDeclaration> _styles
-		{
-			get
-			{
-				return GetStylesFor(_elt);
-			}
-		}
+		private readonly Func<int> _getVersion;
+		private CachedEnumerable<ICssStyleDeclaration> _styles;
 
 		private IEnumerable<ICssStyleDeclaration> GetStylesFor(IElement elt)
 		{
@@ -32,9 +26,13 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
-		public ComputedCssStyleDeclaration(IElement elt)
+		private int _cachedVersion;
+
+		public ComputedCssStyleDeclaration(IElement elt, Func<int> getVersion)
 		{
-			_elt = elt;
+			_getVersion = getVersion;
+			_styles = new CachedEnumerable<ICssStyleDeclaration>(GetStylesFor(elt));
+			_cachedVersion = getVersion();
 		}
 
 		public object this[string name]
@@ -53,6 +51,13 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public string GetPropertyValue(string propertyName)
 		{
+			var curVer = _getVersion();
+			if (curVer != _cachedVersion)
+			{
+				_cachedVersion = curVer;
+				_styles.Reset();
+			}
+
 			foreach (var style in _styles)
 			{
 				var val = style.GetPropertyValue(propertyName);

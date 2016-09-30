@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Properties;
@@ -14,16 +15,25 @@ namespace Knyaz.Optimus.Dom.Css
 		private readonly Document _document;
 		private readonly IResourceProvider _resourceProvider;
 
+		public int Version = 0;
+
 		public DocumentStyling(Document document, IResourceProvider resourceProvider)
 		{
 			_document = document;
 			_resourceProvider = resourceProvider;
 			document.NodeInserted += OnNodeInserted;
+			_document.StyleSheets.Changed += OnStyleChanged;
+		}
+
+		private void OnStyleChanged()
+		{
+			Version++;
 		}
 
 		public void Dispose()
 		{
 			_document.NodeInserted -= OnNodeInserted;
+			_document.StyleSheets.Changed -= OnStyleChanged;
 		}
 
 		private void OnNodeInserted(Node obj)
@@ -73,9 +83,14 @@ namespace Knyaz.Optimus.Dom.Css
 			_document.StyleSheets.Add(styleSheet);
 		}
 
+		private Dictionary<IElement, ICssStyleDeclaration> _cache = new Dictionary<IElement, ICssStyleDeclaration>();
+
 		public ICssStyleDeclaration GetComputedStyle(IElement elt)
 		{
-			return new ComputedCssStyleDeclaration(elt);
+			if (_cache.ContainsKey(elt))
+				return _cache[elt];
+
+			return _cache[elt] = new ComputedCssStyleDeclaration(elt, () => Version);
 		}
 	}
 }

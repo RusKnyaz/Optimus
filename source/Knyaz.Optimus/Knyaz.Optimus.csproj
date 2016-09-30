@@ -170,11 +170,14 @@
     <Compile Include="Tests\Dom\ScriptTests.cs" />
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlStyleElementTests.cs" />
+    <Compile Include="Tests\Dom\StyleSheetsList.cs" />
     <Compile Include="Tests\Html\CssReaderTest.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
     <Compile Include="Tests\TestingTools\SelectorTests.cs" />
+    <Compile Include="Tests\Tools\CachedEnumerableTests.cs" />
+    <Compile Include="Tools\CachedEnumerable.cs" />
     <Compile Include="Tools\Disposable.cs" />
     <Compile Include="Tools\IEnumerableExtension.cs" />
     <Compile Include="Tools\ListExtension.cs" />

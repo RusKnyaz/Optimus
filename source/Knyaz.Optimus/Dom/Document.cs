@@ -8,6 +8,7 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tests.Dom;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -32,7 +33,7 @@ namespace Knyaz.Optimus.Dom
 
 		public Document(IWindow window):base(null)
 		{
-			StyleSheets = new List<CssStyleSheet>();
+			StyleSheets = new StyleSheetsList();
 			NodeType = DOCUMENT_NODE;
 
 			DocumentElement = CreateElement(TagsNames.Html);
@@ -69,7 +70,7 @@ namespace Knyaz.Optimus.Dom
 
 		public event Action<IDocument> DomContentLoaded;
 
-		public IList<CssStyleSheet> StyleSheets { get; private set; }
+		public StyleSheetsList StyleSheets { get; private set; }
 
 		internal void Complete()
 		{

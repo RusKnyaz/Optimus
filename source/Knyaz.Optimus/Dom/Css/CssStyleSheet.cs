@@ -12,11 +12,28 @@ namespace Knyaz.Optimus.Dom.Css
 			CssRules = new List<CssRule>();
 		}
 
+		internal event Action Changed;
+
+		//todo: readonly list
 		public IList<CssRule> CssRules { get; private set; }
 
-		public void DeleterRule(int idx)
+		public void DeleteRule(int idx)
 		{
+			var r = CssRules[idx] as CssStyleRule;
 			CssRules.RemoveAt(idx);
+
+			if (r != null)
+			{
+				r.SelectorChanged -= OnChanged;
+			}
+			
+			OnChanged();
+		}
+
+		private void OnChanged()
+		{
+			if (Changed != null)
+				Changed();
 		}
 
 		public void InsertRule(string rule, int idx)
@@ -27,7 +44,9 @@ namespace Knyaz.Optimus.Dom.Css
 				CssStyleRule r;
 				StyleSheetBuilder.CreateRule(this, enumerator, out r);
 				CssRules.Add(r);
+				r.SelectorChanged += OnChanged;
 			}
+			OnChanged();
 		}
 	}
 }
