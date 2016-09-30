@@ -65,7 +65,14 @@ namespace Knyaz.Optimus.Dom.Css
 						property = cssChunk.Data;
 						break;
 					case CssChunkTypes.Value:
-						style.SetProperty(property, cssChunk.Data, "");
+						var data = cssChunk.Data;
+						var important = "";
+						if (data.EndsWith("!important"))
+						{
+							data = data.Substring(0, data.Length - 10).TrimEnd();
+							important = "important";
+						}
+						style.SetProperty(property, data, important);
 						property = null;
 						break;
 				}
