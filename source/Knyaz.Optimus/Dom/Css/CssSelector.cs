@@ -8,24 +8,45 @@ namespace Knyaz.Optimus.Dom.Css
 {
 	class CssSelector
 	{
+		public CssSelector(string text)
+		{
+			foreach (var chunk in NormalizeSelector(text).Split(' ').Where(x => !string.IsNullOrEmpty(x)))
+			{
+				switch (chunk[0])
+				{
+					case '#':
+						_chain = new Node { Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Id };
+						break;
+					case '.':
+						_chain = new Node { Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Class };
+						break;
+					case '*':
+						_chain = new Node { Value = null, Next = _chain, Type = ChunkTypes.All };
+						break;
+					case '>':
+						_chain = new Node { Value = null, Next = _chain, Type = ChunkTypes.Parent };
+						break;
+					default:
+						_chain = new Node { Values = chunk.ToUpper().Split(','), Next = _chain, Type = ChunkTypes.Tags };
+						break;
+				}
+			}
+		}
+		
+		enum ChunkTypes
+		{
+			Raw, Id, Class, Tags, All, Parent
+		}
+
 		class Node
 		{
+			public ChunkTypes Type;
 			public string Value;
+			public string[] Values;
 			public Node Next;
 		}
 
-		private readonly string _text;
-
-		private Node _chain;
-
-		public CssSelector(string text)
-		{
-			_text = text;
-			foreach (var chunk in NormalizeSelector(_text).Split(' ').Where(x => !string.IsNullOrEmpty(x)))
-			{
-				_chain = new Node {Value = chunk, Next=_chain};
-			}
-		}
+		private readonly Node _chain;
 
 		public bool IsMatches(IElement elt)
 		{
@@ -35,45 +56,43 @@ namespace Knyaz.Optimus.Dom.Css
 		private bool IsMatches(IElement elt, Node chain)
 		{
 			var chunk = chain.Value;
-
-			if (chunk == "*")
-				return true;
-
-			if (chunk[0] == '#')
+			
+			if (chain.Type == ChunkTypes.Id)
 			{
-				if (elt.Id != chunk.Substring(1))
+				if (elt.Id != chunk)
 					return false;
 			}
-			else if (chunk[0] == '.')
+			else if (chain.Type == ChunkTypes.Class)
 			{
 				var htmlElt = elt as HtmlElement;
-				if (htmlElt == null || !htmlElt.ClassName.Split(' ').Contains(chunk.Substring(1)))
+				if (htmlElt == null || !htmlElt.ClassName.Split(' ').Contains(chunk))
 					return false;
 			}
-			else
+			else if (chain.Type == ChunkTypes.Tags)
 			{
-				if (chunk.ToUpper().Split(',').All(x => elt.TagName != x))
+				if (chain.Values.All(x => elt.TagName != x))
 					return false;
 			}
 
 			if (chain.Next != null)
 			{
-				if (chain.Next.Value == ">")
+				if (chain.Next.Type == ChunkTypes.Parent)
 				{
 					return IsMatches((IElement) elt.ParentNode, chain.Next.Next);
 				}
-				else
-				{
-					return elt.ParentNode.GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
-				}
+
+				return 
+						chain.Type == ChunkTypes.All
+						? ((INode)elt).GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next))
+						: elt.ParentNode.GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
 			}
 
 			return true;
 		}
 
-		private static Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
+		private static readonly Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
 
-		private string NormalizeSelector(string selector)
+		private static string NormalizeSelector(string selector)
 		{
 			selector = selector.Replace('\n', ' ').Replace('\r', ' ');
 			return _normalizeCommas.Replace(selector, ",");

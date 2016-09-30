@@ -27,10 +27,10 @@ namespace Knyaz.Optimus.Tests.Performance
 			return engine;
 		}
 
-		[TestCase("", "<div id=test></div>")]
-		[TestCase(@".a span > strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")]
-		[TestCase(@"strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")]
-		[TestCase(@"strong {font-family:""Arial""} .a string {font-family:""Curier New""}", "<div class a><span><strong id=test></strong><span></div>")]
+		[TestCase("", "<div id=test></div>")] //94
+		[TestCase(@".a span > strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")] //112
+		[TestCase(@"strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")] //15
+		[TestCase(@"strong {font-family:""Arial""} .a string {font-family:""Curier New""}", "<div class a><span><strong id=test></strong><span></div>")] //9
 		public void GetComputedStyleTest(string styles, string html)
 		{
 			var engine = Load("<head><style>" + styles + "</style></head><body>" + html + "</body>");
