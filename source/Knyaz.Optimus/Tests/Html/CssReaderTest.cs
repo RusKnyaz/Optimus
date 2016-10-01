@@ -9,6 +9,7 @@ namespace Knyaz.Optimus.Tests.Html
 	[TestFixture]
 	public class CssReaderTest
 	{
+		[TestCase("@import url(\"/styles/a.css\") screen;", "Directive:import url(\"/styles/a.css\") screen")]
 		[TestCase("a {b:1}", "Selector:a Property:b Value:1")]
 		[TestCase("a {b:1;c:2}", "Selector:a Property:b Value:1 Property:c Value:2")]
 		[TestCase("a {b:1;}", "Selector:a Property:b Value:1")]

@@ -71,7 +71,17 @@ namespace Knyaz.Optimus.Dom.Css
             }
         }
 
-	    public void LoadDefaultStyles()
+		//Get imported css
+		private TextReader GetImport(string url)
+		{
+			var req = _resourceProvider.CreateRequest(url);
+			var task = _resourceProvider.GetResourceAsync(req);
+			task.Wait();
+			var stream = task.Result.Stream;
+			return new StreamReader(stream);
+		}
+
+		public void LoadDefaultStyles()
 		{
 			using (var reader = new StringReader(Resources.moz_default))
 				AddStyleToDocument(reader);
@@ -79,7 +89,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private void AddStyleToDocument(TextReader content)
 		{
-			var styleSheet = StyleSheetBuilder.CreateStyleSheet(content);
+			var styleSheet = StyleSheetBuilder.CreateStyleSheet(content, GetImport);
 			_document.StyleSheets.Add(styleSheet);
 		}
 

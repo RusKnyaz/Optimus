@@ -14,7 +14,8 @@ namespace Knyaz.Optimus.Html
 	{
 		Selector,
 		Property,
-		Value
+		Value,
+		Directive
 	}
 
 	class CssReader
@@ -55,6 +56,8 @@ namespace Knyaz.Optimus.Html
 					case CssChunkTypes.Selector:
 						if (c == '{')
 							newType = CssChunkTypes.Property;
+						else if(c == '@')
+							newType = CssChunkTypes.Directive;
 						break;
 					case CssChunkTypes.Property:
 						if (c == ':')
@@ -66,6 +69,10 @@ namespace Knyaz.Optimus.Html
 						if (c == ';')
 							newType = CssChunkTypes.Property;
 						else if (c == '}')
+							newType = CssChunkTypes.Selector;
+						break;
+					case CssChunkTypes.Directive:
+						if(c == ';' || c == '\n')
 							newType = CssChunkTypes.Selector;
 						break;
 				}

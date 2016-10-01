@@ -8,19 +8,46 @@ namespace Knyaz.Optimus.Dom.Css
 {
 	class StyleSheetBuilder
 	{
-		public static CssStyleSheet CreateStyleSheet(TextReader reader)
+		public static CssStyleSheet CreateStyleSheet(TextReader reader, Func<string, TextReader> getImport)
 		{
 			var styleSheet = new CssStyleSheet();
-			var enumerator = CssReader.Read(reader).GetEnumerator();
-			if(!enumerator.MoveNext())
-				throw new Exception("Unable to parse rule");
-			CssStyleRule rule;
-			while (CreateRule(styleSheet, enumerator, out rule))
+			FillStyleSheet(reader, styleSheet, getImport);
+			return styleSheet;
+		}
+
+		private static void FillStyleSheet(TextReader reader, CssStyleSheet styleSheet, Func<string, TextReader> getImport)
+		{
+			using (var enumerator = CssReader.Read(reader).GetEnumerator())
 			{
+				if (!enumerator.MoveNext())
+					throw new Exception("Unable to parse rule");
+				CssStyleRule rule;
+				while (enumerator.Current.Type == CssChunkTypes.Directive)
+				{
+					var dirrective = enumerator.Current.Data;
+					if (dirrective.StartsWith("import "))
+					{
+						var import = dirrective.Substring(7);
+						Import(styleSheet, import, getImport);
+					}
+					enumerator.MoveNext();
+				}
+
+				while (CreateRule(styleSheet, enumerator, out rule))
+				{
+					styleSheet.CssRules.Add(rule);
+				}
 				styleSheet.CssRules.Add(rule);
 			}
-			styleSheet.CssRules.Add(rule);
-			return styleSheet;
+		}
+
+		private static void Import(CssStyleSheet styleSheet, string import, Func<string, TextReader> getImport)
+		{
+			var url = import.Trim();
+			url = url.Substring(url.IndexOf('"')+1);
+			url = url.Substring(0, url.IndexOf('"'));
+			var reader = getImport(url);
+			FillStyleSheet(reader, styleSheet, getImport);
 		}
 
 		public static bool CreateRule(CssStyleSheet styleSheet, IEnumerator<CssChunk> enumerator, out CssStyleRule rule)
