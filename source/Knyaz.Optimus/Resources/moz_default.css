@@ -35,6 +35,7 @@ bdi:dir(rtl), [dir="auto"]:dir(rtl) { direction: rtl; }
     font-family:"Times New Roman";
     font-size:16px;
     font-style:normal;
+    display: inline;
 }
 
 address,
@@ -762,35 +763,9 @@ audio:not([controls]) {
   display: none;
 }
 
-*|*::-moz-html-canvas-content {
-  display: block !important;
-  /* we want to be an absolute and fixed container */
-  transform: translate(0) !important;
-}
-
 video > .caption-box {
   position: relative;
   overflow: hidden;
-}
-
-/* details & summary */
-/* Need to revert Bug 1259889 Part 2 when removing details preference. */
-@supports -moz-bool-pref("dom.details_element.enabled") {
-  details > summary:first-of-type,
-  details > summary:-moz-native-anonymous {
-    display: list-item;
-    list-style: disclosure-closed inside;
-  }
-
-  details[open] > summary:first-of-type,
-  details[open] > summary:-moz-native-anonymous {
-    list-style-type: disclosure-open;
-  }
-
-  details > summary:first-of-type > *|* {
-    /* Cancel "list-style-position: inside" inherited from summary. */
-    list-style-position: initial;
-  }
 }
 
 /* emulation of non-standard HTML <marquee> tag */

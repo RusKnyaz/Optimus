@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Css;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
@@ -52,6 +54,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			var doc = engine.Document;
 			var elt = doc.GetElementById("test");
 			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "3.8em");
+		}
+
+		[Test]
+		public void GetDisplayDefaultStyle()
+		{
+			var engine = Load("<body><div id=d><span id=s>ABC</span><span>123</span></div></body>");
+			var spanDisplay = engine.Document.GetElementById("s").GetComputedStyle().GetPropertyValue("display");
+			Assert.AreEqual(spanDisplay, "inline");
+			var divDislpay = engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("display");
+			Assert.AreEqual(divDislpay, "block");
 		}
 	}
 }
