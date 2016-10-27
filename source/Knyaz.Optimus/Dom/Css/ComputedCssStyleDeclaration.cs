@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Css
 {
 	internal class ComputedCssStyleDeclaration : ICssStyleDeclaration
 	{
+		private readonly IElement _elt;
 		private readonly Func<int> _getVersion;
 		private CachedEnumerable<ICssStyleDeclaration> _styles;
 
-		private IEnumerable<ICssStyleDeclaration> GetStylesFor(IElement elt)
+		private static IEnumerable<ICssStyleDeclaration> GetStylesFor(IElement elt)
 		{
 			var htmlElt = elt as HtmlElement;
 			if (htmlElt != null)
@@ -30,6 +32,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public ComputedCssStyleDeclaration(IElement elt, Func<int> getVersion)
 		{
+			_elt = elt;
 			_getVersion = getVersion;
 			_styles = new CachedEnumerable<ICssStyleDeclaration>(GetStylesFor(elt));
 			_cachedVersion = getVersion();
@@ -62,7 +65,16 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				var val = style.GetPropertyValue(propertyName);
 				if (val != null)
+				{
+					if (val == "inherit")
+					{
+						var parentElt = _elt.ParentNode as IElement;
+						if (parentElt != null)
+							return parentElt.GetComputedStyle().GetPropertyValue(propertyName);
+					}
+
 					return val;
+				}
 			}
 			return null;
 		}

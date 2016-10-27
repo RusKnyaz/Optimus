@@ -2,8 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using Knyaz.Optimus.Dom.Css;
-using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
@@ -64,6 +62,15 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.AreEqual(spanDisplay, "inline");
 			var divDislpay = engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("display");
 			Assert.AreEqual(divDislpay, "block");
+		}
+
+		[Test]
+		public void InheritTest()
+		{
+			var engine = Load("<body style='color:red'><div id=d style='color:inherit'></div></body>");
+			var div = engine.Document.GetElementById("d");
+			var color = div.GetComputedStyle().GetPropertyValue("color");
+			Assert.AreEqual("red", color);
 		}
 	}
 }
