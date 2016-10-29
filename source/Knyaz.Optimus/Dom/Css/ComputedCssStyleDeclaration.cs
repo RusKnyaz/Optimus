@@ -99,7 +99,7 @@ namespace Knyaz.Optimus.Dom.Css
 								float parentVal;
 								if (float.TryParse(parentValStr, out parentVal))
 								{
-									return parentVal*val + unit;
+									return (parentVal*val).ToString(CultureInfo.InvariantCulture) + unit;
 								}
 							}
 						}

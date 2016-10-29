@@ -51,7 +51,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}</style></head><body><div class=""pointsPanel""><h2><strong id=test></strong></h2></div></body>");
 			var doc = engine.Document;
 			var elt = doc.GetElementById("test");
-			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "3.8em");
+			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "60.8px");
 		}
 
 		[Test]
