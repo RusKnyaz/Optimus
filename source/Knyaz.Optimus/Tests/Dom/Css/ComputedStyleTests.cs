@@ -82,6 +82,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			var div = engine.Document.GetElementById("d");
 			Assert.AreEqual(expectedColor, div.GetComputedStyle().GetPropertyValue("color"));
 		}
+
+		[Test]
+		public void EmFontSize()
+		{
+			var engine = Load("<div id=d1 style='font-size:10px'><div id=d2 style='font-size:2em'><div id=d3 style='font-size:1.5em'></div></div></div>");
+
+			Assert.AreEqual("10px", engine.Document.GetElementById("d1").GetComputedStyle().GetPropertyValue("font-size"));
+			Assert.AreEqual("20px", engine.Document.GetElementById("d2").GetComputedStyle().GetPropertyValue("font-size"));
+			Assert.AreEqual("30px", engine.Document.GetElementById("d3").GetComputedStyle().GetPropertyValue("font-size"));
+		}
 	}
 }
 #endif

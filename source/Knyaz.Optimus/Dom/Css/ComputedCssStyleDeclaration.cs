@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
@@ -72,7 +73,38 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				var parentElt = _elt.ParentNode as IElement;
 				if (parentElt != null)
-					return parentElt.GetComputedStyle().GetPropertyValue(propertyName);
+					res = parentElt.GetComputedStyle().GetPropertyValue(propertyName);
+			}
+
+			if (propertyName == "font-size" && res != null && res.Length > 2 && res.Substring(res.Length - 2) == "em")
+			{
+				var parentElt = _elt.ParentNode as IElement;
+				if (parentElt != null)
+				{
+					var valStr = res.Substring(0, res.Length - 2).Trim();
+					float val;
+					if (float.TryParse(valStr, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out val))
+					{
+						var parentFontSize = parentElt.GetComputedStyle().GetPropertyValue("font-size");
+
+						var unitIdx = parentFontSize.IndexOf(c => !char.IsDigit(c) && c != '.');
+						if (unitIdx != 0)
+						{
+							var unit = string.Empty;
+							var parentValStr = parentFontSize;
+							if (unitIdx != -1)
+							{
+								unit = parentFontSize.Substring(unitIdx);
+								parentValStr = parentFontSize.Substring(0, unitIdx);
+								float parentVal;
+								if (float.TryParse(parentValStr, out parentVal))
+								{
+									return parentVal*val + unit;
+								}
+							}
+						}
+					}
+				}
 			}
 
 			return res;

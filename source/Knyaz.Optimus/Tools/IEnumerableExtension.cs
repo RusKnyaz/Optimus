@@ -38,5 +38,17 @@ namespace Knyaz.Optimus.Tools
 			}
 			return -1;
 		}
+
+		public static int IndexOf<T>(this IEnumerable<T> e, Func<T, bool> condition)
+		{
+			var idx = 0;
+			foreach (var currentItem in e)
+			{
+				if (condition(currentItem))
+					return idx;
+				idx++;
+			}
+			return -1;
+		}
 	}
 }
