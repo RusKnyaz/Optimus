@@ -94,12 +94,13 @@ namespace Knyaz.Optimus.Dom.Css
 						}
 					}
 				}
-				else
-				{
-					var parentElt = _elt.ParentNode as IElement;
+			}
 
-					return parentElt != null ? parentElt.GetComputedStyle().GetPropertyValue("font-size") : string.Empty;
-				}
+			if((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style")&& string.IsNullOrEmpty(res))
+			{
+				var parentElt = _elt.ParentNode as IElement;
+
+				return parentElt != null ? parentElt.GetComputedStyle().GetPropertyValue(propertyName) : string.Empty;
 			}
 
 			return res;

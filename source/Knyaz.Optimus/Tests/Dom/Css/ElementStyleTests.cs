@@ -2,6 +2,8 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Environment;
+using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom.Css
@@ -9,13 +11,15 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	[TestFixture]
 	public class ElementStyleTests
 	{
+		private IWindow _window;
 		private Document _document;
 		HtmlDivElement _div;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_window = Mock.Of<IWindow>();
+			_document = new Document(_window);
 			_div = (HtmlDivElement) _document.CreateElement("DIV");
 		}
 
@@ -43,6 +47,9 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			_document.Body.AppendChild(_div);
 			var styling = new DocumentStyling(_document, null);
 			styling.LoadDefaultStyles();
+
+			Mock.Get(_window).Setup(x => x.GetComputedStyle(It.IsAny<IElement>()))
+				.Returns<IElement>(elt => styling.GetComputedStyle(elt));
 
 			styling.GetComputedStyle(_div).Assert(style =>
 				style.GetPropertyValue("display") == "block" &&
