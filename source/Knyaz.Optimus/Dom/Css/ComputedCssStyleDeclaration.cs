@@ -54,6 +54,28 @@ namespace Knyaz.Optimus.Dom.Css
 			get { throw new NotImplementedException(); }
 		}
 
+		string GetParentPropertyValue(string propertyName)
+		{
+			var doc = _elt.ParentNode as Document;
+			if (doc != null)
+			{
+				if (propertyName == "font-size" || propertyName == "font-style" || propertyName == "font-family")
+				{ 
+					if (propertyName == "font-size")
+						return "16px";
+					else if (propertyName == "font-family")
+						return "Times New Roman";
+					else return "normal";
+				}
+				return null;
+			}
+
+			var parentElt = _elt.ParentNode as Element;
+			if (parentElt != null)
+				return parentElt.GetComputedStyle().GetPropertyValue(propertyName);
+			return null;
+		}
+
 		public string GetPropertyValue(string propertyName)
 		{
 			var curVer = _getVersion();
@@ -71,9 +93,7 @@ namespace Knyaz.Optimus.Dom.Css
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit")
 			{
-				var parentElt = _elt.ParentNode as IElement;
-				if (parentElt != null)
-					res = parentElt.GetComputedStyle().GetPropertyValue(propertyName);
+				res = GetParentPropertyValue(propertyName);
 			}
 
 			if (propertyName == "font-size")
@@ -83,10 +103,10 @@ namespace Knyaz.Optimus.Dom.Css
 					var fontSize = FontSize(res);
 					if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
 					{
-						var parentElt = _elt.ParentNode as IElement;
-						if (parentElt != null)
+						var parentFontSizeStr = GetParentPropertyValue("font-size");
+						if (!string.IsNullOrEmpty(parentFontSizeStr))
 						{
-							var parentFontSize = FontSize(parentElt.GetComputedStyle().GetPropertyValue("font-size"));
+							var parentFontSize = FontSize(parentFontSizeStr);
 
 							var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
 
@@ -96,7 +116,7 @@ namespace Knyaz.Optimus.Dom.Css
 				}
 			}
 
-			if((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style")&& string.IsNullOrEmpty(res))
+			if((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style") && string.IsNullOrEmpty(res))
 			{
 				var parentElt = _elt.ParentNode as IElement;
 

@@ -91,6 +91,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("<div style='font-size:10px'><div id=d style='font-size:2em'><div style='font-size:1.5em'></div></div></div>", "20px")]
 		[TestCase("<div style='font-size:10px'><div style='font-size:2em'><div id=d style='font-size:1.5em'></div></div></div>", "30px")]
 		[TestCase("<div id=d></div>", "16px")]
+		[TestCase("<style>html{font-size:1.1em}</style><div id=d></div>", "17.6px")]
 		public void FontSize(string html, string expectedSize)
 		{
 			var engine = Load(html);
