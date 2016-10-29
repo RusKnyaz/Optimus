@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +13,7 @@ namespace Knyaz.Optimus.Dom.Css
 		object this[string name] { get; }
 		string this[int idx] { get; }
 		string GetPropertyValue(string propertyName);
+		string GetPropertyPriority(string propertyName);
 	}
 
 	/// <summary>
@@ -19,8 +21,10 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	public class CssStyleDeclaration : ICssStyleDeclaration
 	{
-		private string _cssText = string.Empty;
+		const string Important = "important";
 
+		private string _cssText = string.Empty;
+		
 		internal event Action<string> OnStyleChanged;
 
 		public CssStyleDeclaration(CssStyleRule parentRule = null)
@@ -30,6 +34,8 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 
 		public NameValueCollection Properties { get; private set; }
+
+		private HashSet<string> _importants = new HashSet<string>();
 
 		public object this[string name]
 		{
@@ -104,8 +110,13 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public void SetProperty(string name, string value, string important = null)
 		{
-			//todo: important
 			name = name.Replace(" ", "");
+
+			if (important == Important)
+				_importants.Add(name);
+			else if(_importants.Contains(name))
+				_importants.Remove(name);
+
 			Properties[name] = value;
 			HandleComplexProperty(name, value);
 			UpdateCssText();
@@ -335,7 +346,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public string GetPropertyPriority(string propertyName)
 		{
-			throw new NotImplementedException();
+			return _importants.Contains(propertyName) ? Important : string.Empty;
 		}
 
 		public int Length

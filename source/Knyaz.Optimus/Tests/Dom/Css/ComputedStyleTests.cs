@@ -72,6 +72,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			var color = div.GetComputedStyle().GetPropertyValue("color");
 			Assert.AreEqual("red", color);
 		}
+		
+		[TestCase("div{color:Red} div{color:Blue}", "Blue")]
+		[TestCase("div{color:Red !important} div{color:Blue}", "Red")]
+		[TestCase("div{color:Red !important} div{color:Blue !important}", "Blue")]
+		public void OverrrideProperty(string css, string expectedColor)
+		{
+			var engine = Load("<head><style>"+css+"</style></head><body><div id=d></div></body>");
+			var div = engine.Document.GetElementById("d");
+			Assert.AreEqual(expectedColor, div.GetComputedStyle().GetPropertyValue("color"));
+		}
 	}
 }
 #endif

@@ -21,6 +21,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 			//todo: it would be better to have reversed list, or acces it by index;
 			//todo(2): what about safe enumeration
+
 			foreach (var result in elt.OwnerDocument.StyleSheets.SelectMany(x => x.CssRules).OfType<CssStyleRule>().Reverse())
 			{
 				if (result.IsMatchesSelector(elt))
@@ -61,22 +62,25 @@ namespace Knyaz.Optimus.Dom.Css
 				_styles.Reset();
 			}
 
-			foreach (var style in _styles)
-			{
-				var val = style.GetPropertyValue(propertyName);
-				if (val != null)
-				{
-					if (val == "inherit")
-					{
-						var parentElt = _elt.ParentNode as IElement;
-						if (parentElt != null)
-							return parentElt.GetComputedStyle().GetPropertyValue(propertyName);
-					}
+			var values = 
+				_styles.Where(x => x.GetPropertyPriority(propertyName) == "important")
+				.Concat(
+				_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
 
-					return val;
-				}
+			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
+			if(res == "inherit")
+			{
+				var parentElt = _elt.ParentNode as IElement;
+				if (parentElt != null)
+					return parentElt.GetComputedStyle().GetPropertyValue(propertyName);
 			}
-			return null;
+
+			return res;
+		}
+
+		public string GetPropertyPriority(string propertyName)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
