@@ -76,7 +76,7 @@ namespace Knyaz.Optimus.Dom.Css
 					res = parentElt.GetComputedStyle().GetPropertyValue(propertyName);
 			}
 
-			if (propertyName == "font-size" && res != null && res.Length > 2 && res.Substring(res.Length - 2) == "em")
+			if (propertyName == "font-size" && res != null && res.Length > 2 && res.Substring(res.Length - 2).ToLowerInvariant() == "em")
 			{
 				var parentElt = _elt.ParentNode as IElement;
 				if (parentElt != null)
