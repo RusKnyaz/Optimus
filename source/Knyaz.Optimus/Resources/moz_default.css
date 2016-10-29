@@ -31,12 +31,17 @@ bdi:dir(rtl), [dir="auto"]:dir(rtl) { direction: rtl; }
  * and the rules in http://dev.w3.org/html5/spec/rendering.html#rendering
  */
 
-* {
+/*modified section*/
+html {
     font-family:"Times New Roman";
-    font-size:16px;
     font-style:normal;
+    font-size: 16px;
+}
+
+* {
     display: inline;
 }
+/*end of modified section*/
 
 address,
 article,

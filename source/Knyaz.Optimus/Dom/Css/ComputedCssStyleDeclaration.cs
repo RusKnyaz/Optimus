@@ -76,20 +76,29 @@ namespace Knyaz.Optimus.Dom.Css
 					res = parentElt.GetComputedStyle().GetPropertyValue(propertyName);
 			}
 
-			if (propertyName == "font-size" && res != null)
+			if (propertyName == "font-size")
 			{
-				var fontSize = FontSize(res);
-				if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
+				if (!string.IsNullOrEmpty(res))
+				{
+					var fontSize = FontSize(res);
+					if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
+					{
+						var parentElt = _elt.ParentNode as IElement;
+						if (parentElt != null)
+						{
+							var parentFontSize = FontSize(parentElt.GetComputedStyle().GetPropertyValue("font-size"));
+
+							var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
+
+							return (parentFontSize.Item1*ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
+						}
+					}
+				}
+				else
 				{
 					var parentElt = _elt.ParentNode as IElement;
-					if (parentElt != null)
-					{
-						var parentFontSize = FontSize(parentElt.GetComputedStyle().GetPropertyValue("font-size"));
 
-						var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
-
-						return (parentFontSize.Item1* ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
-					}
+					return parentElt != null ? parentElt.GetComputedStyle().GetPropertyValue("font-size") : string.Empty;
 				}
 			}
 

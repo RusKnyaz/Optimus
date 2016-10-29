@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	{
 		private Engine Load(string html)
 		{
-			var engine = new Engine() { ComputedStylesEnabled = true };
+			var engine = new Engine { ComputedStylesEnabled = true };
 			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
 			return engine;
 		}
@@ -83,24 +83,19 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.AreEqual(expectedColor, div.GetComputedStyle().GetPropertyValue("color"));
 		}
 
-		[Test]
-		public void EmFontSize()
+		[TestCase("<div id=d style='font-size:10px'><div style='font-size:200%'><div style='font-size:150%'></div></div></div>", "10px")]
+		[TestCase("<div style='font-size:10px'><div id=d style='font-size:200%'><div style='font-size:150%'></div></div></div>", "20px")]
+		[TestCase("<div style='font-size:10px'><div style='font-size:200%'><div id=d style='font-size:150%'></div></div></div>", "30px")]
+		[TestCase("<div style='font-size:10px'><div style='font-size:200%'><div id=d></div></div></div>", "20px")]
+		[TestCase("<div id=d style='font-size:10px'><div style='font-size:2em'><div id=d3 style='font-size:1.5em'></div></div></div>", "10px")]
+		[TestCase("<div style='font-size:10px'><div id=d style='font-size:2em'><div style='font-size:1.5em'></div></div></div>", "20px")]
+		[TestCase("<div style='font-size:10px'><div style='font-size:2em'><div id=d style='font-size:1.5em'></div></div></div>", "30px")]
+		[TestCase("<div id=d></div>", "16px")]
+		public void FontSize(string html, string expectedSize)
 		{
-			var engine = Load("<div id=d1 style='font-size:10px'><div id=d2 style='font-size:2em'><div id=d3 style='font-size:1.5em'></div></div></div>");
+			var engine = Load(html);
 
-			Assert.AreEqual("10px", engine.Document.GetElementById("d1").GetComputedStyle().GetPropertyValue("font-size"));
-			Assert.AreEqual("20px", engine.Document.GetElementById("d2").GetComputedStyle().GetPropertyValue("font-size"));
-			Assert.AreEqual("30px", engine.Document.GetElementById("d3").GetComputedStyle().GetPropertyValue("font-size"));
-		}
-
-		[Test]
-		public void PercentFontSize()
-		{
-			var engine = Load("<div id=d1 style='font-size:10px'><div id=d2 style='font-size:200%'><div id=d3 style='font-size:150%'></div></div></div>");
-
-			Assert.AreEqual("10px", engine.Document.GetElementById("d1").GetComputedStyle().GetPropertyValue("font-size"));
-			Assert.AreEqual("20px", engine.Document.GetElementById("d2").GetComputedStyle().GetPropertyValue("font-size"));
-			Assert.AreEqual("30px", engine.Document.GetElementById("d3").GetComputedStyle().GetPropertyValue("font-size"));
+			Assert.AreEqual(expectedSize, engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("font-size"));
 		}
 	}
 }
