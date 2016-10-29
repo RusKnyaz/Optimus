@@ -92,6 +92,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.AreEqual("20px", engine.Document.GetElementById("d2").GetComputedStyle().GetPropertyValue("font-size"));
 			Assert.AreEqual("30px", engine.Document.GetElementById("d3").GetComputedStyle().GetPropertyValue("font-size"));
 		}
+
+		[Test]
+		public void PercentFontSize()
+		{
+			var engine = Load("<div id=d1 style='font-size:10px'><div id=d2 style='font-size:200%'><div id=d3 style='font-size:150%'></div></div></div>");
+
+			Assert.AreEqual("10px", engine.Document.GetElementById("d1").GetComputedStyle().GetPropertyValue("font-size"));
+			Assert.AreEqual("20px", engine.Document.GetElementById("d2").GetComputedStyle().GetPropertyValue("font-size"));
+			Assert.AreEqual("30px", engine.Document.GetElementById("d3").GetComputedStyle().GetPropertyValue("font-size"));
+		}
 	}
 }
 #endif

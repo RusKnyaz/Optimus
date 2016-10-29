@@ -76,38 +76,40 @@ namespace Knyaz.Optimus.Dom.Css
 					res = parentElt.GetComputedStyle().GetPropertyValue(propertyName);
 			}
 
-			if (propertyName == "font-size" && res != null && res.Length > 2 && res.Substring(res.Length - 2).ToLowerInvariant() == "em")
+			if (propertyName == "font-size" && res != null)
 			{
-				var parentElt = _elt.ParentNode as IElement;
-				if (parentElt != null)
+				var fontSize = FontSize(res);
+				if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
 				{
-					var valStr = res.Substring(0, res.Length - 2).Trim();
-					float val;
-					if (float.TryParse(valStr, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out val))
+					var parentElt = _elt.ParentNode as IElement;
+					if (parentElt != null)
 					{
-						var parentFontSize = parentElt.GetComputedStyle().GetPropertyValue("font-size");
+						var parentFontSize = FontSize(parentElt.GetComputedStyle().GetPropertyValue("font-size"));
 
-						var unitIdx = parentFontSize.IndexOf(c => !char.IsDigit(c) && c != '.');
-						if (unitIdx != 0)
-						{
-							var unit = string.Empty;
-							var parentValStr = parentFontSize;
-							if (unitIdx != -1)
-							{
-								unit = parentFontSize.Substring(unitIdx);
-								parentValStr = parentFontSize.Substring(0, unitIdx);
-								float parentVal;
-								if (float.TryParse(parentValStr, out parentVal))
-								{
-									return (parentVal*val).ToString(CultureInfo.InvariantCulture) + unit;
-								}
-							}
-						}
+						var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
+
+						return (parentFontSize.Item1* ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
 					}
 				}
 			}
 
 			return res;
+		}
+
+		Tuple<float, string> FontSize(string strValue)
+		{
+			var unitIdx = strValue.IndexOf(c => !char.IsDigit(c) && c != '.');
+			if (unitIdx != 0)
+			{
+				var unit = string.Empty;
+				if (unitIdx != -1)
+				{
+					unit = strValue.Substring(unitIdx);
+					strValue = strValue.Substring(0, unitIdx);
+					return new Tuple<float, string>(float.Parse(strValue, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture), unit.ToLowerInvariant());
+				}
+			}
+			return new Tuple<float, string>(float.Parse(strValue), "");
 		}
 
 		public string GetPropertyPriority(string propertyName)
