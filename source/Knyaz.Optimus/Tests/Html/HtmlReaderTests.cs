@@ -87,6 +87,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<span name=a\\\\b></span>", "TagStart:span, AttributeName:name, AttributeValue:a\\\\b, TagEnd:span")]
 		[TestCase("<span at<tr=1>", "TagStart:span, AttributeName:at<tr, AttributeValue:1")]
 		[TestCase("<span at<tr=''>", "TagStart:span, AttributeName:at<tr, AttributeValue:")]
+		[TestCase("<span attr1='1' \r\n attr2=2>", "TagStart:span, AttributeName:attr1, AttributeValue:1, AttributeName:attr2, AttributeValue:2")]
 		public void ReadAttributes(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));	

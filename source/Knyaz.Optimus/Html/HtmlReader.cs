@@ -275,7 +275,7 @@ namespace Knyaz.Optimus.Html
 						}
 
 						//Read attribute
-						ReadWhile(reader, c => c == ' ');
+						ReadWhile(reader, c => c == ' ' || c == '\r' || c == '\n' || c == '\t');
 
 						var attrName = ReadWhile(reader, c => c != '/' && c != ' ' && c != '>' && c != '=');
 						if (!string.IsNullOrEmpty(attrName))
