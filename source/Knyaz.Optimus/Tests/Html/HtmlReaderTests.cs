@@ -72,9 +72,9 @@ namespace Knyaz.Optimus.Tests.Html
 
 		[TestCase("<span /name='a'></span>", "TagStart:span, AttributeName:name, AttributeValue:a, TagEnd:span")]
 		[TestCase("<a href=\"http://x.x\"/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
-		[TestCase("<a href=\'http://x.x\'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
+		[TestCase("<a href='http://x.x'/>", "TagStart:a, AttributeName:href, AttributeValue:http://x.x, TagEnd:a")]
 		[TestCase("<span data-bind = '\"'/>", "TagStart:span, AttributeName:data-bind, AttributeValue:\", TagEnd:span")]
-		[TestCase("<img src=\"\\\\\"></img>", "TagStart:img, AttributeName:src, AttributeValue:\\, TagEnd:img")]
+		[TestCase("<img src=\"\\\\\"></img>", "TagStart:img, AttributeName:src, AttributeValue:\\\\, TagEnd:img")]
 		[TestCase("<div data-bind=\"template:\\\"itemTemplate\\\"\"></div>", "TagStart:div, AttributeName:data-bind, AttributeValue:template:\"itemTemplate\", TagEnd:div")]
 		[TestCase("<option value='1' selected>A</option>", "TagStart:option, AttributeName:value, AttributeValue:1, AttributeName:selected, Text:A, TagEnd:option")]
 		[TestCase("<option selected>A</option>", "TagStart:option, AttributeName:selected, Text:A, TagEnd:option")]
@@ -88,6 +88,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<span at<tr=1>", "TagStart:span, AttributeName:at<tr, AttributeValue:1")]
 		[TestCase("<span at<tr=''>", "TagStart:span, AttributeName:at<tr, AttributeValue:")]
 		[TestCase("<span attr1='1' \r\n attr2=2>", "TagStart:span, AttributeName:attr1, AttributeValue:1, AttributeName:attr2, AttributeValue:2")]
+		[TestCase(@"<a id=""\'"">", @"TagStart:a, AttributeName:id, AttributeValue:\'")]
 		public void ReadAttributes(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));	

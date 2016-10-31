@@ -316,7 +316,7 @@ namespace Knyaz.Optimus.Html
 			var q = (char)reader.Read();
 			if (q == '\'' || q == '\"')
 			{
-				var res = ReadWhileWithEscapes(reader, c => c == '\'' || c == '"' || c=='\\', (c, _) => c != q);
+				var res = ReadWhileWithEscapes(reader, c => c == q, (c, _) => c != q);
 				reader.Read();
 				return res;
 			}
