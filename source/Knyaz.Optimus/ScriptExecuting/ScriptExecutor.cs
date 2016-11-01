@@ -47,6 +47,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Text", typeof(Text));
 			AddClrType("Attr", typeof(Attr));
 
+			_jsEngine.Execute("var window = this");
 			//Perf types
 			AddClrType("ArrayBuffer", typeof(ArrayBuffer));
 			AddClrType("Int8Array", typeof(Int8Array));
@@ -62,8 +63,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalGetter("screen", () => engine.Window.Screen);
 			AddGlobalGetter("innerWidth", () => engine.Window.InnerWidth);
 			AddGlobalGetter("innerHeight", () => engine.Window.InnerHeight);
-			AddGlobalGetter("window", () => engine.Window);
-			_jsEngine.Execute("function getComputedStyle(){ return window.getComputedStyle.apply(window, arguments);}");
 			
 			AddGlobalAct("alert", (_,x) => engine.Window.Alert(x[0].AsString()));
 			AddGlobalAct("clearInterval", (_,x) => engine.Window.ClearInterval(x.Length > 0 ? (int)x[0].AsNumber() : -1));
@@ -96,6 +95,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return new JsValue(res);
 			});
 
+			AddGlobalFunc("getComputedStyle", (value, values) =>
+			{
+				var elt = (ClrObject) values[0].AsObject();
+				var res = engine.Window.GetComputedStyle((IElement)elt.Target, values.Length > 1 ? values[1].AsString() : null);
+				return new JsValue(new ClrObject(_jsEngine, res));
+			});
 			
 			var jsFunc = new ClrFuncCtor(_jsEngine, (x) =>
 			{
