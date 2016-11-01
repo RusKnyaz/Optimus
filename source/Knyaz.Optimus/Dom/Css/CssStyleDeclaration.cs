@@ -105,13 +105,22 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			var val = Properties[propertyName];
 			Properties.Remove(propertyName);
+			if (_importants.Contains(propertyName))
+				_importants.Remove(propertyName);
+
 			return val;
 		}
 
 		public void SetProperty(string name, string value, string important = null)
 		{
-			name = name.Replace(" ", "");
+			if (string.IsNullOrEmpty(value))
+			{
+				RemoveProperty(name);
+				return;
+			}
 
+			name = name.Replace(" ", "");
+			
 			if (important == Important)
 				_importants.Add(name);
 			else if(_importants.Contains(name))

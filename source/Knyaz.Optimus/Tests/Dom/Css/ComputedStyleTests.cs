@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
@@ -71,6 +72,19 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			var div = engine.Document.GetElementById("d");
 			var color = div.GetComputedStyle().GetPropertyValue("color");
 			Assert.AreEqual("red", color);
+		}
+
+		[Test]
+		public void SetReset()
+		{
+			var engine = Load("<body><div id=d></div></body>");
+			var div = engine.Document.GetElementById("d") as HtmlElement;
+			var computedStyle = div.GetComputedStyle();
+			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
+			div.Style.Display = "none";
+			Assert.AreEqual("none", computedStyle.GetPropertyValue("display"));
+			div.Style.Display = "";
+			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
 		}
 		
 		[TestCase("div{color:Red} div{color:Blue}", "Blue")]
