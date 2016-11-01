@@ -86,7 +86,20 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			div.Style.Display = "";
 			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
 		}
-		
+
+		[Test]
+		public void SetResetViaIndexer()
+		{
+			var engine = Load("<body><div id=d></div></body>");
+			var div = engine.Document.GetElementById("d") as HtmlElement;
+			var computedStyle = div.GetComputedStyle();
+			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
+			div.Style["display"] = "none";
+			Assert.AreEqual("none", computedStyle.GetPropertyValue("display"));
+			div.Style["display"] = "";
+			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
+		}
+
 		[TestCase("div{color:Red} div{color:Blue}", "Blue")]
 		[TestCase("div{color:Red !important} div{color:Blue}", "Red")]
 		[TestCase("div{color:Red !important} div{color:Blue !important}", "Blue")]

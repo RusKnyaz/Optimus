@@ -29,8 +29,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			_jsEngine = new Jint.Engine(o => o.AddObjectConverter(_typeConverter));
 
-			_jsEngine.Execute("var window = this");
-
 			AddClrType("Node", typeof(Node));
 			AddClrType("Element", typeof(Element));
 			AddClrType("HTMLBodyElement", typeof(HtmlBodyElement));
@@ -64,6 +62,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalGetter("screen", () => engine.Window.Screen);
 			AddGlobalGetter("innerWidth", () => engine.Window.InnerWidth);
 			AddGlobalGetter("innerHeight", () => engine.Window.InnerHeight);
+			AddGlobalGetter("window", () => engine.Window);
+			_jsEngine.Execute("function getComputedStyle(){ return window.getComputedStyle.apply(window, arguments);}");
 			
 			AddGlobalAct("alert", (_,x) => engine.Window.Alert(x[0].AsString()));
 			AddGlobalAct("clearInterval", (_,x) => engine.Window.ClearInterval(x.Length > 0 ? (int)x[0].AsNumber() : -1));
@@ -96,6 +96,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return new JsValue(res);
 			});
 
+			
 			var jsFunc = new ClrFuncCtor(_jsEngine, (x) =>
 			{
 				JsValue res;

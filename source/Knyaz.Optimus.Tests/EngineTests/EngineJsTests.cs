@@ -752,5 +752,15 @@ dispatchEvent(evt);");
 			CreateEngine("", "console.log.apply(console, ['asd']);");
 			CollectionAssert.AreEqual(new[] { "asd" }, _log);
 		}
+
+		[Test]
+		public void GetComputedStyle()
+		{
+			_resourceProvider.Resource("test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
+												  "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
+			_engine.ComputedStylesEnabled = true;
+			_engine.Load("<html><head><script src='test.js' defer/></head><body>" + "<div id=d></div>" + "</body></html>");
+			CollectionAssert.AreEqual(new[] { "block", "block" }, _log);
+		}
 	}
 }
