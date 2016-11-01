@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Dom.Css
 			using (var enumerator = CssReader.Read(reader).GetEnumerator())
 			{
 				if (!enumerator.MoveNext())
-					throw new Exception("Unable to parse rule");
+					return;
 				CssStyleRule rule;
 				while (enumerator.Current.Type == CssChunkTypes.Directive)
 				{
