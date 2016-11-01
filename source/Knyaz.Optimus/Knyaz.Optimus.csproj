@@ -61,9 +61,11 @@
     <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
     <Compile Include="Dom\Css\CssRule.cs" />
     <Compile Include="Dom\Css\CssSelector.cs" />
+    <Compile Include="Dom\Css\CssStyleDeclaration.Css2Properties.cs" />
     <Compile Include="Dom\Css\CssStyleRule.cs" />
     <Compile Include="Dom\Css\CssStyleSheet.cs" />
     <Compile Include="Dom\Css\DocumentStyling.cs" />
+    <Compile Include="Dom\Css\ICss2Properties.cs" />
     <Compile Include="Dom\Css\StyleSheetBuilder.cs" />
     <Compile Include="Dom\DOMException.cs" />
     <Compile Include="Dom\ElementExtension.cs" />

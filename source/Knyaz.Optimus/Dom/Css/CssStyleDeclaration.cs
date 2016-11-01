@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.Dom.Css
 	/// <summary>
 	/// http://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/css/CSSStyleDeclaration.html
 	/// </summary>
-	public class CssStyleDeclaration : ICssStyleDeclaration
+	public partial class CssStyleDeclaration : ICssStyleDeclaration, ICss2Properties
 	{
 		const string Important = "important";
 
