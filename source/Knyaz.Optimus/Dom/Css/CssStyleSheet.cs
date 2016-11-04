@@ -41,10 +41,12 @@ namespace Knyaz.Optimus.Dom.Css
 			using (var enumerator = CssReader.Read(new StringReader(rule)).GetEnumerator())
 			{
 				enumerator.MoveNext();
-				CssStyleRule r;
+				CssRule r;
 				StyleSheetBuilder.CreateRule(this, enumerator, out r);
 				CssRules.Add(r);
-				r.SelectorChanged += OnChanged;
+				var styleRule = r as CssStyleRule;
+				if(styleRule != null)
+					styleRule.SelectorChanged += OnChanged;
 			}
 			OnChanged();
 		}

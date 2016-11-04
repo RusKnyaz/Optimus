@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
+    <Compile Include="Dom\Css\CssMediaRule.cs" />
     <Compile Include="Dom\Css\CssRule.cs" />
     <Compile Include="Dom\Css\CssSelector.cs" />
     <Compile Include="Dom\Css\CssStyleDeclaration.Css2Properties.cs" />

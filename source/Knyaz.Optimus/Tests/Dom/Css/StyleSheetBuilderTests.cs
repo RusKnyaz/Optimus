@@ -9,9 +9,9 @@ namespace Knyaz.Optimus.Tests.Dom.Css
     public class StyleSheetBuilderTests
     {
         [Test]
-        public void BuildStyelSheetTest()
+        public void BuildStyleSheetTest()
         {
-            StyleSheetBuilder.CreateStyleSheet(new StringReader("div{display:inline-block}.a{width:100px;height:100px}"), s => null).Assert(styleSheet =>
+            Build("div{display:inline-block}.a{width:100px;height:100px}").Assert(styleSheet =>
                 styleSheet.CssRules.Count == 2 &&
                 ((CssStyleRule)styleSheet.CssRules[0]).SelectorText == "div" &&
                 ((CssStyleRule)styleSheet.CssRules[0]).Style.Length == 1 &&
@@ -36,6 +36,29 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				((CssStyleRule)styleSheet.CssRules[1]).Style.Length == 1 &&
 				((CssStyleRule)styleSheet.CssRules[1]).Style.GetPropertyValue("background-color") == "red");
 	    }
+
+	    private CssStyleSheet Build(string css)
+	    {
+		    return StyleSheetBuilder.CreateStyleSheet(new StringReader(css), s => null);
+	    }
+
+	    [Test]
+	    public void MediaRule()
+	    {
+		    Build("@media all and (min-width:100px) { div {color:red} span {color:green }} a {color:green}")
+				.Assert(s => s.CssRules.Count == 2 &&
+				((CssMediaRule)s.CssRules[0]).CssRules.Count == 2 &&
+				((CssStyleRule)s.CssRules[1]).SelectorText == "a");
+	    }
+
+	    [Test]
+	    public void MediaRuleAfterStyle()
+	    {
+			Build("a {color:green} @media all and (min-width:100px) { div {color:red} span {color:green }}")
+				.Assert(s => s.CssRules.Count == 2 &&
+				((CssMediaRule)s.CssRules[1]).CssRules.Count == 2 &&
+				((CssStyleRule)s.CssRules[0]).SelectorText == "a");
+		}
     }
 }
 #endif

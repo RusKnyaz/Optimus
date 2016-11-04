@@ -15,7 +15,8 @@ namespace Knyaz.Optimus.Html
 		Selector,
 		Property,
 		Value,
-		Directive
+		Directive,
+		End
 	}
 
 	class CssReader
@@ -58,6 +59,8 @@ namespace Knyaz.Optimus.Html
 							newType = CssChunkTypes.Property;
 						else if(c == '@')
 							newType = CssChunkTypes.Directive;
+						else if (c == '}')
+							newType = CssChunkTypes.End;
 						break;
 					case CssChunkTypes.Property:
 						if (c == ':')
@@ -72,12 +75,17 @@ namespace Knyaz.Optimus.Html
 							newType = CssChunkTypes.Selector;
 						break;
 					case CssChunkTypes.Directive:
-						if(c == ';' || c == '\n')
+						if( ((c == ';' || c == '\n') && !data.ToString().StartsWith("media")) || c == '{')
 							newType = CssChunkTypes.Selector;
 						break;
 				}
 
-				if (type != newType)
+				if (newType == CssChunkTypes.End)
+				{
+					yield return new CssChunk { Type = CssChunkTypes.End };
+					newType = CssChunkTypes.Selector;
+				}
+				else if (type != newType)
 				{
 					var buf = data.ToString().Trim('\r', '\n', ' ', '\t');
 					if (buf != string.Empty)

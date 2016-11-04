@@ -21,12 +21,13 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				if (!enumerator.MoveNext())
 					return;
-				CssStyleRule rule;
-				while (enumerator.Current.Type == CssChunkTypes.Directive)
+				CssRule rule;
+				while (enumerator.Current.Type == CssChunkTypes.Directive 
+					&& enumerator.Current.Data != null && !enumerator.Current.Data.StartsWith("media "))
 				{
-					var dirrective = enumerator.Current.Data;
-					if (dirrective.StartsWith("import "))
+					if (enumerator.Current.Data.StartsWith("import "))
 					{
+						var dirrective = enumerator.Current.Data;
 						var import = dirrective.Substring(7);
 						Import(styleSheet, import, getImport);
 					}
@@ -50,14 +51,36 @@ namespace Knyaz.Optimus.Dom.Css
 			FillStyleSheet(reader, styleSheet, getImport);
 		}
 
-		public static bool CreateRule(CssStyleSheet styleSheet, IEnumerator<CssChunk> enumerator, out CssStyleRule rule)
+		public static bool CreateRule(CssStyleSheet styleSheet, IEnumerator<CssChunk> enumerator, out CssRule rule)
 		{
+			if (enumerator.Current.Type == CssChunkTypes.Directive && 
+				enumerator.Current.Data.StartsWith("media "))
+			{
+				var mediaRule = new CssMediaRule(enumerator.Current.Data, styleSheet);
+				rule = mediaRule;
+
+				CssRule childRule;
+				bool cont = true;
+				enumerator.MoveNext();
+				while (enumerator.Current.Type != CssChunkTypes.End &&
+					(cont = CreateRule(styleSheet, enumerator, out childRule)))
+				{
+					mediaRule.CssRules.Add(childRule);
+				}
+
+				if (enumerator.Current.Type == CssChunkTypes.End)
+					return enumerator.MoveNext();
+
+				return cont;
+			}
+
 			if (enumerator.Current.Type != CssChunkTypes.Selector)
 				throw new Exception("Unable to parse rule");
 
-			rule = new CssStyleRule(styleSheet) { SelectorText = enumerator.Current.Data };
+			var styleRule = new CssStyleRule(styleSheet) { SelectorText = enumerator.Current.Data };
+			rule = styleRule;
 			enumerator.MoveNext();
-			return FillStyle(rule.Style, enumerator);
+			return FillStyle(styleRule.Style, enumerator);
 		}
 
 		public static void FillStyle(CssStyleDeclaration style, string str)
@@ -102,6 +125,9 @@ namespace Knyaz.Optimus.Dom.Css
 						style.SetProperty(property, data, important);
 						property = null;
 						break;
+					case CssChunkTypes.End:
+					case CssChunkTypes.Directive:
+						return true;
 				}
 			} while (enumerator.MoveNext());
 			return false;
