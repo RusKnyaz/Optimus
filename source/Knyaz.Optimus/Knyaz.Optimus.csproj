@@ -67,6 +67,8 @@
     <Compile Include="Dom\Css\CssStyleSheet.cs" />
     <Compile Include="Dom\Css\DocumentStyling.cs" />
     <Compile Include="Dom\Css\ICss2Properties.cs" />
+    <Compile Include="Dom\Css\MediaList.cs" />
+    <Compile Include="Dom\Css\MediaQueryList.cs" />
     <Compile Include="Dom\Css\StyleSheetBuilder.cs" />
     <Compile Include="Dom\DOMException.cs" />
     <Compile Include="Dom\ElementExtension.cs" />
@@ -153,6 +155,7 @@
     <Compile Include="Tests\Dom\Css\CssSelectorTests.cs" />
     <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
     <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
+    <Compile Include="Tests\Dom\Css\MediaQueryListTests.cs" />
     <Compile Include="Tests\Dom\Css\StyleSheetBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
     <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />

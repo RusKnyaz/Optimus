@@ -41,12 +41,4 @@ namespace Knyaz.Optimus.Dom.Css
 			throw new NotImplementedException();
 		}
 	}
-
-	public class MediaList
-	{
-		public MediaList(string query)
-		{
-
-		}
-	}
 }

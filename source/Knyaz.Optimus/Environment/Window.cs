@@ -122,6 +122,11 @@ namespace Knyaz.Optimus.Environment
 			
 			return new CssStyleDeclaration();
 		}
+
+		public MediaQueryList MatchMedia(string media)
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	public interface IWindow : IEventTarget
@@ -141,5 +146,6 @@ namespace Knyaz.Optimus.Environment
 
 		ICssStyleDeclaration GetComputedStyle(IElement element);
 		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
+		MediaQueryList MatchMedia(string query);
 	}
 }

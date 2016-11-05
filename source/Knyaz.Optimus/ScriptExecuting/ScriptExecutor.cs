@@ -68,7 +68,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalAct("clearInterval", (_,x) => engine.Window.ClearInterval(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
-			
+
 			AddGlobalAct("addEventListener", (_, x) => engine.Window.AddEventListener(
 				x.Length > 0 ? x[0].AsString() : null,
 				_typeConverter.ConvertDelegate<Event>(x[1]),
@@ -78,6 +78,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 				x.Length > 0 ? x[0].AsString() : null,
 				_typeConverter.ConvertDelegate<Event>(x[1]),
 				x.Length > 2 && ToBoolean(x[2])));
+
+			AddGlobalFunc("matchMedia", (value, values) =>
+			{
+				var res = engine.Window.MatchMedia(values[0].AsString());
+				return new JsValue(new ClrObject(_jsEngine, res));
+			});
 
 			AddGlobalFunc("setTimeout", (_, x) =>
 			{
