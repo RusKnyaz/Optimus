@@ -36,7 +36,10 @@ namespace Knyaz.Optimus.Dom.Css
 
 				while (CreateRule(styleSheet, enumerator, out rule))
 				{
-					styleSheet.CssRules.Add(rule);
+					if (rule != null)
+					{
+						styleSheet.CssRules.Add(rule);
+					}
 				}
 				styleSheet.CssRules.Add(rule);
 			}
@@ -53,25 +56,34 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public static bool CreateRule(CssStyleSheet styleSheet, IEnumerator<CssChunk> enumerator, out CssRule rule)
 		{
-			if (enumerator.Current.Type == CssChunkTypes.Directive && 
-				enumerator.Current.Data.StartsWith("media "))
+			if (enumerator.Current.Type == CssChunkTypes.Directive)
 			{
-				var mediaRule = new CssMediaRule(enumerator.Current.Data, styleSheet);
-				rule = mediaRule;
-
-				CssRule childRule;
-				bool cont = true;
-				enumerator.MoveNext();
-				while (enumerator.Current.Type != CssChunkTypes.End &&
-					(cont = CreateRule(styleSheet, enumerator, out childRule)))
+				if (enumerator.Current.Data.StartsWith("media "))
 				{
-					mediaRule.CssRules.Add(childRule);
+					var mediaRule = new CssMediaRule(enumerator.Current.Data, styleSheet);
+					rule = mediaRule;
+
+					CssRule childRule;
+					bool cont = true;
+					enumerator.MoveNext();
+					while (enumerator.Current.Type != CssChunkTypes.End &&
+					       (cont = CreateRule(styleSheet, enumerator, out childRule)))
+					{
+						mediaRule.CssRules.Add(childRule);
+					}
+
+					return enumerator.Current.Type == CssChunkTypes.End ? enumerator.MoveNext() : cont;
 				}
-
-				if (enumerator.Current.Type == CssChunkTypes.End)
+				else //skip other directives
+				{
+					rule = null;
+					while (enumerator.Current.Type != CssChunkTypes.End)
+					{
+						if (!enumerator.MoveNext())
+							return false;
+					}
 					return enumerator.MoveNext();
-
-				return cont;
+				}
 			}
 
 			if (enumerator.Current.Type != CssChunkTypes.Selector)

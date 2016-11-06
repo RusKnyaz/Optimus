@@ -153,9 +153,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void LogonToKwinto()
 		{
-			var engine = new Engine();
+			var engine = new Engine() {ComputedStylesEnabled = true};
 			engine.AttachConsole();
-			engine.OpenUrl("http://localhost:2930");
+			engine.OpenUrl("http://chi.todosoft.org");
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
 			
