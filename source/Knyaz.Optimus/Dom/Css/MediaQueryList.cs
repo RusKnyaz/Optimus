@@ -65,7 +65,7 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 	}
 
-	internal class MediaSettings
+	public class MediaSettings
 	{
 		public string Device = "Screen";
 		public int Width;
