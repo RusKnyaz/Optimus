@@ -60,9 +60,9 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		{
 			var engine = Load("<body><div id=d><span id=s>ABC</span><span>123</span></div></body>");
 			var spanDisplay = engine.Document.GetElementById("s").GetComputedStyle().GetPropertyValue("display");
-			Assert.AreEqual(spanDisplay, "inline");
+			Assert.AreEqual("inline", spanDisplay);
 			var divDislpay = engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("display");
-			Assert.AreEqual(divDislpay, "block");
+			Assert.AreEqual("block", divDislpay);
 		}
 
 		[Test]

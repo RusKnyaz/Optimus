@@ -59,6 +59,13 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				((CssMediaRule)s.CssRules[1]).CssRules.Count == 2 &&
 				((CssStyleRule)s.CssRules[0]).SelectorText == "a");
 		}
+
+	    [TestCase("@namespace url(http://www.w3.org/1999/xhtml); div {color:green}")]
+		[TestCase("@font-face {} div {color:green}")]
+		public void Smoke(string css)
+	    {
+		    var ss = Build(css);
+	    }
     }
 }
 #endif

@@ -75,7 +75,8 @@ namespace Knyaz.Optimus.Html
 							newType = CssChunkTypes.Selector;
 						break;
 					case CssChunkTypes.Directive:
-						if( ((c == ';' || c == '\n') && data.ToString().StartsWith("import")) || c == '{')
+						if( ((c == ';' || c == '\n') && (data.ToString().StartsWith("import") || data.ToString().StartsWith("namespace")))
+							|| c == '{')
 							newType = CssChunkTypes.Selector;
 						break;
 				}

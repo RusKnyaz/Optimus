@@ -23,14 +23,11 @@ namespace Knyaz.Optimus.Dom.Css
 					return;
 				CssRule rule;
 				while (enumerator.Current.Type == CssChunkTypes.Directive 
-					&& enumerator.Current.Data != null && !enumerator.Current.Data.StartsWith("media "))
+					&& enumerator.Current.Data != null && enumerator.Current.Data.StartsWith("import "))
 				{
-					if (enumerator.Current.Data.StartsWith("import "))
-					{
-						var dirrective = enumerator.Current.Data;
-						var import = dirrective.Substring(7);
-						Import(styleSheet, import, getImport);
-					}
+					var dirrective = enumerator.Current.Data;
+					var import = dirrective.Substring(7);
+					Import(styleSheet, import, getImport);
 					enumerator.MoveNext();
 				}
 
@@ -41,7 +38,8 @@ namespace Knyaz.Optimus.Dom.Css
 						styleSheet.CssRules.Add(rule);
 					}
 				}
-				styleSheet.CssRules.Add(rule);
+				if(rule != null)
+					styleSheet.CssRules.Add(rule);
 			}
 		}
 
@@ -73,6 +71,11 @@ namespace Knyaz.Optimus.Dom.Css
 					}
 
 					return enumerator.Current.Type == CssChunkTypes.End ? enumerator.MoveNext() : cont;
+				}
+				else if (enumerator.Current.Data.StartsWith("namespace "))
+				{
+					rule = null;
+					return enumerator.MoveNext();
 				}
 				else //skip other directives
 				{

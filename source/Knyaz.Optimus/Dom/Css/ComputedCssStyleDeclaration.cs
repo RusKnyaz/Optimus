@@ -107,7 +107,8 @@ namespace Knyaz.Optimus.Dom.Css
 				_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
 
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
-			if(res == "inherit")
+			if(res == "inherit" ||
+				((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style") && string.IsNullOrEmpty(res)))
 			{
 				res = GetParentPropertyValue(propertyName);
 			}
@@ -130,13 +131,6 @@ namespace Knyaz.Optimus.Dom.Css
 						}
 					}
 				}
-			}
-
-			if((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style") && string.IsNullOrEmpty(res))
-			{
-				var parentElt = _elt.ParentNode as IElement;
-
-				return parentElt != null ? parentElt.GetComputedStyle().GetPropertyValue(propertyName) : string.Empty;
 			}
 
 			return res;
