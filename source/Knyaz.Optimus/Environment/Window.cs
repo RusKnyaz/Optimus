@@ -125,7 +125,7 @@ namespace Knyaz.Optimus.Environment
 
 		public MediaQueryList MatchMedia(string media)
 		{
-			throw new NotImplementedException();
+			return new MediaQueryList(media, () => _engine.CurrentMedia);
 		}
 	}
 

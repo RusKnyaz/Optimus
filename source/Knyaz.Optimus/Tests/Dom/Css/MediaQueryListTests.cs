@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom.Css
 {
-	[TestFixture, Ignore]
+	[TestFixture]
 	public class MediaQueryListTests
 	{
 		[TestCase("Screen", 1000, false, "Screen", true)]

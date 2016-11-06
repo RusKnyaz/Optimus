@@ -276,5 +276,7 @@ namespace Knyaz.Optimus
 			Styling = new DocumentStyling(_document, ResourceProvider);
 			Styling.LoadDefaultStyles();
 		}
+
+		internal readonly MediaSettings CurrentMedia  = new MediaSettings();
 	}
 }
