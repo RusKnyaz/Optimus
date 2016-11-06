@@ -125,6 +125,15 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 
 			Assert.AreEqual(expectedSize, engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("font-size"));
 		}
+
+		[TestCase("<style>@media screen{div{color:red}}</style><div id=d></div>", "red")]
+		public void Media(string html, string expectedColor)
+		{
+			var engine = Load(html);
+			var div = engine.Document.GetElementById("d");
+			var style = engine.Window.GetComputedStyle(div);
+			Assert.AreEqual(expectedColor, style.GetPropertyValue("color"));
+		}
 	}
 }
 #endif

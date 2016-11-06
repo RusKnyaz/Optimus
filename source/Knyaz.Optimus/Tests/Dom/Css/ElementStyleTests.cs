@@ -44,6 +44,8 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[Test]
 		public void DefaultComputedStyle()
 		{
+			Mock.Get(_window).Setup(x => x.MatchMedia(It.IsAny<string>())).Returns<string>(s => new MediaQueryList(s, () => new MediaSettings()));
+
 			_document.Body.AppendChild(_div);
 			var styling = new DocumentStyling(_document, null);
 			styling.LoadDefaultStyles();

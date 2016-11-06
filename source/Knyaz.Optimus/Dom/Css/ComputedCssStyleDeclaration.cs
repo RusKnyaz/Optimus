@@ -23,10 +23,26 @@ namespace Knyaz.Optimus.Dom.Css
 			//todo: it would be better to have reversed list, or acces it by index;
 			//todo(2): what about safe enumeration
 
-			foreach (var result in elt.OwnerDocument.StyleSheets.SelectMany(x => x.CssRules).OfType<CssStyleRule>().Reverse())
+			foreach (var cssRule in elt.OwnerDocument.StyleSheets.SelectMany(x => x.CssRules).Reverse())
 			{
-				if (result.IsMatchesSelector(elt))
-					yield return result.Style;
+				var mediaRule = cssRule as CssMediaRule;
+				if (mediaRule != null)
+				{
+					var mediaQuery = mediaRule.Media.MediaText.Substring("media ".Length).Trim();
+					if (elt.OwnerDocument.DefaultView.MatchMedia(mediaQuery).Matches)
+					{
+						foreach (var result in mediaRule.CssRules.OfType<CssStyleRule>().Reverse())
+						{
+							if (result.IsMatchesSelector(elt))
+								yield return result.Style;
+						}
+					}
+				}
+
+				var styleRule = cssRule as CssStyleRule;
+
+				if (styleRule != null && styleRule.IsMatchesSelector(elt))
+					yield return styleRule.Style;
 			}
 		}
 

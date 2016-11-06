@@ -277,6 +277,6 @@ namespace Knyaz.Optimus
 			Styling.LoadDefaultStyles();
 		}
 
-		internal readonly MediaSettings CurrentMedia  = new MediaSettings();
+		internal readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
 	}
 }
