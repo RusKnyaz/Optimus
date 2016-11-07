@@ -17,16 +17,18 @@ namespace Knyaz.Optimus.Environment
 		string Search { get; set; }
 		void Assign(string uri);
 		void Replace(string uri);
-		void Reload(string uri);
+		void Reload(bool force);
 	}
 
 	public class Location : ILocation
 	{
 		private readonly IEngine _engine;
+		private readonly IHistory _history;
 
-		public Location(IEngine engine)
+		public Location(IEngine engine, IHistory history)
 		{
 			_engine = engine;
+			_history = history;
 		}
 
 		public string Href
@@ -133,17 +135,17 @@ namespace Knyaz.Optimus.Environment
 		}
 		public void Assign(string uri)
 		{
-			throw new NotImplementedException();
+			_history.PushState(null, null, uri );
 		}
 
 		public void Replace(string uri)
 		{
-			throw new NotImplementedException();
+			_history.ReplaceState(null, null, uri );
 		}
 
-		public void Reload(string uri)
+		public void Reload(bool force)
 		{
-			throw new NotImplementedException();
+			_engine.OpenUrl(_engine.Uri.ToString());
 		}
 	}
 }

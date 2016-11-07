@@ -31,9 +31,9 @@ namespace Knyaz.Optimus.Environment
 
 			InnerWidth = 1024;
 			InnerHeight = 768;
-			Location = new Location(engine);//todo: remove the stub href value
 			Navigator = new Navigator();
 			History = new History(engine);
+			Location = new Location(engine, History);
 
 			_timers = new WindowTimers(getSyncObj);
 			_timers.OnException += exception =>

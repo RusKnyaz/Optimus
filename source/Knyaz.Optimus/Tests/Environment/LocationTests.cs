@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.Tests.Environment
 			var engine = new Mock<IEngine>();
 			engine.SetupGet(x => x.Uri).Returns(() => uri);
 			engine.Setup(x => x.OpenUrl(It.IsAny<string>())).Callback<string>(x => uri = new Uri(x));
-			return new Location(engine.Object);
+			return new Location(engine.Object, null);
 		}
 
 		[TestCase("#part1", "#part1", "http://localhost#part1")]
