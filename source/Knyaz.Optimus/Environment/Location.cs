@@ -16,80 +16,88 @@ namespace Knyaz.Optimus.Environment
 		string Protocol { get; }
 		string Search { get; set; }
 		void Assign(string uri);
-		void Replace();
+		void Replace(string uri);
 		void Reload(string uri);
 	}
 
 	public class Location : ILocation
 	{
-		private readonly Engine _engine;
+		private readonly IEngine _engine;
 
-		public Location(Engine engine)
+		public Location(IEngine engine)
 		{
 			_engine = engine;
 		}
 
 		public string Href
 		{
-			get
-			{
-				return _engine.Uri.OriginalString;
-			} 
-			set
-			{
-				_engine.OpenUrl(value);	
-			}
+			get { return _engine.Uri.OriginalString; } 
+			set { _engine.OpenUrl(value);	}
 		}
 
+		/// <summary>
+		/// Anchor part of a URL (text which follows '#')
+		/// </summary>
 		public string Hash
 		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+			get { return _engine.Uri.Fragment;}
 			set
 			{
-				throw new NotImplementedException();
+				var hash = string.IsNullOrEmpty(value)
+					? string.Empty
+					: value.StartsWith("#") ? value : "#" + value;
+
+				var splt = _engine.Uri.OriginalString.Split('#');
+				//todo: do not reopen page, modify history
+				_engine.OpenUrl(splt[0] + hash);
 			}
 		}
 
 		public string Host
 		{
-			get { return _engine.Uri.GetComponents(UriComponents.Host, UriFormat.Unescaped); }
+			get
+			{
+				return _engine.Uri.Authority;
+			}
 			set
 			{
-				throw new NotImplementedException();
+				var parts = value.Split(':');
+				var builder = new UriBuilder(_engine.Uri){ Host = parts[0], Port = parts.Length > 1 ? int.Parse(parts[1]) : 80};
+				_engine.OpenUrl(builder.Uri.ToString());
 			}
 		}
 		public string Hostname
 		{
-			get { return _engine.Uri.Host; //todo: check it
-			}
+			get { return _engine.Uri.Host;}
 			set
 			{
-				throw new NotImplementedException();
+				_engine.OpenUrl(new UriBuilder(_engine.Uri) {Host = value}.Uri.ToString());
 			}
 		}
 		public string Origin
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return _engine.Uri.GetLeftPart(UriPartial.Authority);
 			}
 			set
 			{
-				throw new NotImplementedException();
+				var b = new UriBuilder(new Uri(value)){Path = _engine.Uri.PathAndQuery,Fragment = _engine.Uri.Fragment.TrimStart('#')};
+				_engine.OpenUrl(b.ToString());
 			}
 		}
+
+		//The relative path with query but without the hash
 		public string Pathname
 		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+			get { return _engine.Uri.PathAndQuery; }
 			set
 			{
-				throw new NotImplementedException();
+				var u = new Uri(new Uri(Origin), value);
+				var ub = new UriBuilder(u.ToString()) {Fragment = _engine.Uri.Fragment.TrimStart('#')};
+				if (ub.Uri.IsDefaultPort)
+					ub.Port = -1;
+				_engine.OpenUrl(ub.ToString());
 			}
 		}
 
@@ -98,7 +106,7 @@ namespace Knyaz.Optimus.Environment
 			get { return _engine.Uri.Port; }
 			set
 			{
-				throw new NotImplementedException();
+				_engine.OpenUrl(new UriBuilder(_engine.Uri) {Port = value}.Uri.ToString());
 			}
 		}
 
@@ -107,7 +115,7 @@ namespace Knyaz.Optimus.Environment
 			get { return _engine.Uri.Scheme + ":"; }
 			set
 			{
-				throw new NotImplementedException();
+				_engine.OpenUrl(new UriBuilder(_engine.Uri) { Scheme = value }.Uri.ToString());
 			}
 		}
 
@@ -115,11 +123,12 @@ namespace Knyaz.Optimus.Environment
 		{
 			get
 			{
-				return _engine.Uri.GetComponents(UriComponents.Scheme, UriFormat.Unescaped);
+				return _engine.Uri.Query;
 			}
 			set
 			{
-				throw new NotImplementedException();
+				var b = new UriBuilder(_engine.Uri) {Query = value};
+				_engine.OpenUrl(b.Uri.ToString());
 			}
 		}
 		public void Assign(string uri)
@@ -127,7 +136,7 @@ namespace Knyaz.Optimus.Environment
 			throw new NotImplementedException();
 		}
 
-		public void Replace()
+		public void Replace(string uri)
 		{
 			throw new NotImplementedException();
 		}

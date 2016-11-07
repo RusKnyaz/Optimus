@@ -13,7 +13,7 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus
 {
-	public class Engine: IDisposable
+	public class Engine: IEngine, IDisposable
 	{
 		private Document _document;
 		private Uri _uri;
@@ -278,5 +278,11 @@ namespace Knyaz.Optimus
 		}
 
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
+	}
+
+	public interface IEngine
+	{
+		Uri Uri {get;}
+		void OpenUrl(string url);
 	}
 }

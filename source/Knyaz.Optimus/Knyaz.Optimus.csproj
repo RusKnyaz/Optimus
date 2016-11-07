@@ -177,6 +177,7 @@
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlStyleElementTests.cs" />
     <Compile Include="Tests\Dom\StyleSheetsList.cs" />
+    <Compile Include="Tests\Environment\LocationTests.cs" />
     <Compile Include="Tests\Html\CssReaderTest.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
