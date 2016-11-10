@@ -17,6 +17,19 @@ namespace Knyaz.Optimus.Tests.Environment
 			return new Location(engine.Object, null);
 		}
 
+		[TestCase("http://localhost:8080/sub/index.html?a=b#part", "http:")]
+		[TestCase("file://c:\\temp\\index.html", "file:")]
+		public void GetProtocol(string href, string expectedProtocol)
+		{
+			Assert.AreEqual(expectedProtocol, CreateLocation(href).Protocol);
+		}
+
+		[TestCase("http://localhost:8080/sub/index.html?a=b#part", "http://localhost:8080/sub/index.html?a=b#part")]
+		public void GetHref(string original, string expected)
+		{
+			Assert.AreEqual(expected, CreateLocation(original).Href);
+		}
+
 		[TestCase("#part1", "#part1", "http://localhost#part1")]
 		[TestCase("part1", "#part1", "http://localhost#part1")]
 		public void Hash(string hash, string expectedHash, string expectedHref)
@@ -57,6 +70,7 @@ namespace Knyaz.Optimus.Tests.Environment
 
 		[TestCase("http://localhost/index.html", "localhost")]
 		[TestCase("http://localhost:1001/index.html", "localhost")]
+		[TestCase("http://localhost:1234", "localhost")]
 		public void GetHostname(string href, string expectedHostname)
 		{
 			Assert.AreEqual(expectedHostname, CreateLocation(href).Hostname);
