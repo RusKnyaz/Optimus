@@ -29,5 +29,6 @@
 		public const string Colgroup = "COLGROUP";
 		public const string Col = "COL";
 		public const string Th = "TH";
+		public const string Br = "BR";
 	}
 }

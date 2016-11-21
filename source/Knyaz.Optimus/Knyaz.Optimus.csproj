@@ -82,6 +82,7 @@
     <Compile Include="Dom\Document.cs" />
     <Compile Include="Dom\DocumentBuilder.cs" />
     <Compile Include="Dom\Css\CssStyleDeclaration.cs" />
+    <Compile Include="Dom\Elements\HtmlBrElement.cs" />
     <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
     <Compile Include="Dom\Elements\HtmlCollection.cs" />
     <Compile Include="Dom\Elements\HtmlDivElement.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Tests\Dom\EventsTests.cs" />
     <Compile Include="Tests\Dom\EventTargetTests.cs" />
     <Compile Include="Tests\Dom\HistoryTests.cs" />
+    <Compile Include="Tests\Dom\HtmlBrElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />

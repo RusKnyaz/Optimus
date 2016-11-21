@@ -109,6 +109,7 @@ namespace Knyaz.Optimus.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
+				case TagsNames.Br: return new HtmlBrElement(this);
 				case TagsNames.TFoot:
 				case TagsNames.THead:
 				case TagsNames.TBody:
@@ -136,8 +137,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Form:return new HtmlFormElement(this);
 				case TagsNames.IFrame:return new HtmlIFrameElement(this);
 				case TagsNames.Html:return new HtmlHtmlElement(this);
-				case TagsNames.Col:
-					return new HtmlTableColElement(this);
+				case TagsNames.Col: return new HtmlTableColElement(this);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);
