@@ -134,6 +134,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			var style = engine.Window.GetComputedStyle(div);
 			Assert.AreEqual(expectedColor, style.GetPropertyValue("color"));
 		}
+
+		[Test]
+		public void EmSize()
+		{
+			var engine = Load("<style>div{font-size:12px; height:2em; border:0.5em}</style><div id=d></div>");
+			var div = engine.Document.GetElementById("d");
+			engine.Window.GetComputedStyle(div).Assert(style => 
+				style.GetPropertyValue("height") == "24px" &&
+				style.GetPropertyValue("border-left-width") == "6px");
+		}
 	}
 }
 #endif

@@ -113,14 +113,29 @@ namespace Knyaz.Optimus.Dom.Css
 				res = GetParentPropertyValue(propertyName);
 			}
 
-			if (propertyName == "font-size")
+			// 'em' size
+			if (propertyName == "font-size" || propertyName == "height" || propertyName == "width"
+				|| propertyName == "min-height" || propertyName == "min-width"
+				|| propertyName == "max-height" || propertyName == "max-width"
+				|| propertyName == "padding-top"
+				|| propertyName == "padding-right"
+				|| propertyName == "padding-bottom"
+				|| propertyName == "padding-left"
+				|| propertyName == "margin-top"
+				|| propertyName == "margin-right"
+				|| propertyName == "margin-bottom"
+				|| propertyName == "margin-left"
+				|| propertyName == "border-top-width"
+				|| propertyName == "border-right-width"
+				|| propertyName == "border-bottom-width"
+				|| propertyName == "border-left-width")
 			{
 				if (!string.IsNullOrEmpty(res))
 				{
 					var fontSize = FontSize(res);
 					if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
 					{
-						var parentFontSizeStr = GetParentPropertyValue("font-size");
+						var parentFontSizeStr = propertyName == "font-size" ? GetParentPropertyValue("font-size") : GetPropertyValue("font-size");
 						if (!string.IsNullOrEmpty(parentFontSizeStr))
 						{
 							var parentFontSize = FontSize(parentFontSizeStr);
