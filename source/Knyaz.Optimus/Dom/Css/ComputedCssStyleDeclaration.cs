@@ -132,18 +132,27 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				if (!string.IsNullOrEmpty(res) && res != "auto")
 				{
-					var fontSize = GetValueUnitPair(res);
-					if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
+					try
 					{
-						var parentFontSizeStr = propertyName == "font-size" ? GetParentPropertyValue("font-size") : GetPropertyValue("font-size");
-						if (!string.IsNullOrEmpty(parentFontSizeStr))
+						var fontSize = GetValueUnitPair(res);
+						if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
 						{
-							var parentFontSize = GetValueUnitPair(parentFontSizeStr);
+							var parentFontSizeStr = propertyName == "font-size"
+								? GetParentPropertyValue("font-size")
+								: GetPropertyValue("font-size");
+							if (!string.IsNullOrEmpty(parentFontSizeStr))
+							{
+								var parentFontSize = GetValueUnitPair(parentFontSizeStr);
 
-							var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
+								var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
 
-							return (parentFontSize.Item1*ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
+								return (parentFontSize.Item1*ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
+							}
 						}
+					}
+					catch (FormatException)
+					{
+						return res;
 					}
 				}
 			}
