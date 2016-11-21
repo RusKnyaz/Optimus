@@ -130,15 +130,15 @@ namespace Knyaz.Optimus.Dom.Css
 				|| propertyName == "border-bottom-width"
 				|| propertyName == "border-left-width")
 			{
-				if (!string.IsNullOrEmpty(res))
+				if (!string.IsNullOrEmpty(res) && res != "auto")
 				{
-					var fontSize = FontSize(res);
+					var fontSize = GetValueUnitPair(res);
 					if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
 					{
 						var parentFontSizeStr = propertyName == "font-size" ? GetParentPropertyValue("font-size") : GetPropertyValue("font-size");
 						if (!string.IsNullOrEmpty(parentFontSizeStr))
 						{
-							var parentFontSize = FontSize(parentFontSizeStr);
+							var parentFontSize = GetValueUnitPair(parentFontSizeStr);
 
 							var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
 
@@ -151,7 +151,7 @@ namespace Knyaz.Optimus.Dom.Css
 			return res;
 		}
 
-		Tuple<float, string> FontSize(string strValue)
+		Tuple<float, string> GetValueUnitPair(string strValue)
 		{
 			var unitIdx = strValue.IndexOf(c => !char.IsDigit(c) && c != '.');
 			if (unitIdx != 0)

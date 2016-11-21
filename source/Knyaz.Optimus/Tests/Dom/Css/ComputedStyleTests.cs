@@ -144,6 +144,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("height") == "24px" &&
 				style.GetPropertyValue("border-left-width") == "6px");
 		}
+
+		[Test]
+		public void GetAutoWidth()
+		{
+			var engine = Load("<style>div{margin:0px auto}</style><div id=d></div>");
+			var div = engine.Document.GetElementById("d");
+			engine.Window.GetComputedStyle(div).Assert(style =>
+				style.GetPropertyValue("margin-left") == "auto" &&
+				style.GetPropertyValue("margin-right") == "auto");
+		}
 	}
 }
 #endif
