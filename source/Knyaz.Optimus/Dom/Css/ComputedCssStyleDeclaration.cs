@@ -114,23 +114,9 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 
 			// 'em' size
-			if (propertyName == "font-size" || propertyName == "height" || propertyName == "width"
-				|| propertyName == "min-height" || propertyName == "min-width"
-				|| propertyName == "max-height" || propertyName == "max-width"
-				|| propertyName == "padding-top"
-				|| propertyName == "padding-right"
-				|| propertyName == "padding-bottom"
-				|| propertyName == "padding-left"
-				|| propertyName == "margin-top"
-				|| propertyName == "margin-right"
-				|| propertyName == "margin-bottom"
-				|| propertyName == "margin-left"
-				|| propertyName == "border-top-width"
-				|| propertyName == "border-right-width"
-				|| propertyName == "border-bottom-width"
-				|| propertyName == "border-left-width")
+			if (propertyName == "font-size")
 			{
-				if (!string.IsNullOrEmpty(res) && res != "auto")
+				if (!string.IsNullOrEmpty(res))
 				{
 					try
 					{
@@ -147,6 +133,46 @@ namespace Knyaz.Optimus.Dom.Css
 								var ratio = fontSize.Item2.Length == 1 ? fontSize.Item1/100 : fontSize.Item1;
 
 								return (parentFontSize.Item1*ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
+							}
+						}
+					}
+					catch (FormatException)
+					{
+						return res;
+					}
+				}
+			}
+			else if (propertyName == "height" || propertyName == "width"
+			         || propertyName == "min-height" || propertyName == "min-width"
+			         || propertyName == "max-height" || propertyName == "max-width"
+			         || propertyName == "padding-top"
+			         || propertyName == "padding-right"
+			         || propertyName == "padding-bottom"
+			         || propertyName == "padding-left"
+			         || propertyName == "margin-top"
+			         || propertyName == "margin-right"
+			         || propertyName == "margin-bottom"
+			         || propertyName == "margin-left"
+			         || propertyName == "border-top-width"
+			         || propertyName == "border-right-width"
+			         || propertyName == "border-bottom-width"
+			         || propertyName == "border-left-width")
+			{
+				if (!string.IsNullOrEmpty(res) && res.EndsWith("em"))
+				{
+					try
+					{
+						var size = GetValueUnitPair(res);
+						if (size.Item2 == "em")
+						{
+							var fontSize = GetPropertyValue("font-size");
+							if (!string.IsNullOrEmpty(fontSize))
+							{
+								var parentFontSize = GetValueUnitPair(fontSize);
+
+								var ratio = size.Item2.Length == 1 ? size.Item1 / 100 : size.Item1;
+
+								return (parentFontSize.Item1 * ratio).ToString(CultureInfo.InvariantCulture) + parentFontSize.Item2;
 							}
 						}
 					}
