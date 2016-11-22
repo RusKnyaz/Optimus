@@ -146,13 +146,21 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 
 		[Test]
-		public void GetAutoWidth()
+		public void GetAutoMargin()
 		{
 			var engine = Load("<style>div{margin:0px auto}</style><div id=d></div>");
 			var div = engine.Document.GetElementById("d");
 			engine.Window.GetComputedStyle(div).Assert(style =>
 				style.GetPropertyValue("margin-left") == "auto" &&
 				style.GetPropertyValue("margin-right") == "auto");
+		}
+
+		[Test]
+		public void GetRelativeWidth()
+		{
+			var engine = Load("<style>div{width:100%}</style><div id=d></div>");
+			var div = engine.Document.GetElementById("d");
+			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "100%");
 		}
 	}
 }
