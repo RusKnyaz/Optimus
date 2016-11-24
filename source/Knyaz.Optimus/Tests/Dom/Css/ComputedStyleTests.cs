@@ -44,15 +44,15 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.AreEqual("green", divStyle.GetPropertyValue("color"));
 		}
 
-		[Test]
+		[Test]//Verified in Chrome
 		public void SpecificHtml5TestCom()
 		{
 			var engine = Load(@"<head><style>.pointsPanel h2 > strong {
-			font - size: 3.8em;
+			font-size: 3.8em;
 		}</style></head><body><div class=""pointsPanel""><h2><strong id=test></strong></h2></div></body>");
 			var doc = engine.Document;
 			var elt = doc.GetElementById("test");
-			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "60.8px");
+			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "91.2px");
 		}
 
 		[Test]
@@ -158,9 +158,19 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[Test]
 		public void GetRelativeWidth()
 		{
-			var engine = Load("<style>div{width:100%}</style><div id=d></div>");
+			var engine = Load("<div  style='padding:10px;margin:10px;border:10px solid red;width:100px;box-sizing:content-box'><div style='padding:10px;margin:10px;border:10px solid blue;width:100%;box-sizing:content-box' id=d></div></div>");
 			var div = engine.Document.GetElementById("d");
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "100%");
+		}
+
+		[Test]
+		public void ComplexSelector()
+		{
+			var engine = Load(@"<style>.page > .column .left,
+.page > .column.right {	width: 50%;}</style><div class='page'><div class='column'><div class='left' id=d></div></div></div>");
+			var div = engine.Document.GetElementById("d");
+			Assert.IsNotNull(div);
+			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "50%");
 		}
 	}
 }

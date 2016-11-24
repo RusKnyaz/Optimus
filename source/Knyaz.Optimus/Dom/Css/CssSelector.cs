@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
@@ -8,28 +9,37 @@ namespace Knyaz.Optimus.Dom.Css
 {
 	class CssSelector
 	{
+		private List<Node> _chains = new List<Node>();
+
 		public CssSelector(string text)
 		{
-			foreach (var chunk in NormalizeSelector(text).Split(' ').Where(x => !string.IsNullOrEmpty(x)))
+			var orParts = text.Split(',');
+			foreach (var part in orParts)
 			{
-				switch (chunk[0])
+				Node _chain = null;
+				foreach (var chunk in NormalizeSelector(part.Trim()).Split(' ').Where(x => !string.IsNullOrEmpty(x)))
 				{
-					case '#':
-						_chain = new Node { Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Id };
-						break;
-					case '.':
-						_chain = new Node { Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Class };
-						break;
-					case '*':
-						_chain = new Node { Value = null, Next = _chain, Type = ChunkTypes.All };
-						break;
-					case '>':
-						_chain = new Node { Value = null, Next = _chain, Type = ChunkTypes.Parent };
-						break;
-					default:
-						_chain = new Node { Values = chunk.ToUpper().Split(','), Next = _chain, Type = ChunkTypes.Tags };
-						break;
+					switch (chunk[0])
+					{
+						case '#':
+							_chain = new Node {Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Id};
+							break;
+						case '.':
+							_chain = new Node {Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Class};
+							break;
+						case '*':
+							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.All};
+							break;
+						case '>':
+							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.Parent};
+							break;
+						default:
+							_chain = new Node {Values = chunk.ToUpper().Split(','), Next = _chain, Type = ChunkTypes.Tags};
+							break;
+					}
 				}
+				if(_chain != null)
+					_chains.Add(_chain);
 			}
 		}
 		
@@ -46,11 +56,10 @@ namespace Knyaz.Optimus.Dom.Css
 			public Node Next;
 		}
 
-		private readonly Node _chain;
-
+		
 		public bool IsMatches(IElement elt)
 		{
-			return IsMatches(elt, _chain);
+			return _chains.Any(chain => IsMatches(elt, chain));
 		}
 
 		private bool IsMatches(IElement elt, Node chain)
