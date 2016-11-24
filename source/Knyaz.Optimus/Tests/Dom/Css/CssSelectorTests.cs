@@ -22,6 +22,10 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase(".pointsPanel h2 > strong", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
 		[TestCase(".pointsPanel *", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
 		[TestCase("div *", "<body name=notmatch><div name=match><strong name=match><h2 name=match>a</h2></strong></div></body>")]
+		[TestCase(".button.save", "<body><div class='button save' name=match></div></body>")]
+		[TestCase(".button.save", "<body><div class='button' name=nomatch></div></body>")]
+		[TestCase(".button.save", "<body><div class='save' name=nomatch></div></body>")]
+		[TestCase(".button .save", "<body><div class='button save' name=notmatch></div></body>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);

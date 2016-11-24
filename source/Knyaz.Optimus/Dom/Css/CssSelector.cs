@@ -74,7 +74,10 @@ namespace Knyaz.Optimus.Dom.Css
 			else if (chain.Type == ChunkTypes.Class)
 			{
 				var htmlElt = elt as HtmlElement;
-				if (htmlElt == null || !htmlElt.ClassName.Split(' ').Contains(chunk))
+				if (htmlElt == null)
+					return false;
+
+				if (chunk.Split('.').Any(x => !htmlElt.ClassName.Split(' ').Contains(x)))
 					return false;
 			}
 			else if (chain.Type == ChunkTypes.Tags)

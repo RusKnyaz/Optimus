@@ -163,11 +163,12 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "100%");
 		}
 
-		[Test]
-		public void ComplexSelector()
+		[TestCase("<style>.button.save { width:50% }</style><div class='button save' id=d></div>")]
+		[TestCase(@"<style>.page > .column .left,
+.page > .column.right {	width: 50%;}</style><div class='page'><div class='column'><div class='left' id=d></div></div></div>")]
+		public void ComplexSelector(string html)
 		{
-			var engine = Load(@"<style>.page > .column .left,
-.page > .column.right {	width: 50%;}</style><div class='page'><div class='column'><div class='left' id=d></div></div></div>");
+			var engine = Load(html);
 			var div = engine.Document.GetElementById("d");
 			Assert.IsNotNull(div);
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "50%");
