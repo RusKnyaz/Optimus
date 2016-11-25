@@ -34,6 +34,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			set { SetAttribute("id", value); }
 		}
 
+		public string OuterHTML
+		{
+			get { return ToString();}
+		}
+
 		public virtual string InnerHTML
 		{
 			get

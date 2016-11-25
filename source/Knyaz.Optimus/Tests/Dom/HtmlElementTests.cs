@@ -1,8 +1,8 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
@@ -97,6 +97,15 @@ namespace Knyaz.Optimus.Tests.Dom
 				div.GetAttribute("CustomAttr") == "abc" &&
 				div.Attributes[1].Name == "customattr" &&
 				div.Attributes[2].Name == "abc");
+		}
+
+		[Test]
+		public void OuterHtml()
+		{
+			var document = new Document();
+			document.Write("<html><div id=a CustomAttr=abc><span>123</span></div></html>");
+			var div = document.GetElementById("a");
+			Assert.AreEqual("<DIV id=\"a\" customattr=\"abc\"><SPAN>123</SPAN></DIV>", div.OuterHTML);
 		}
 	}
 }
