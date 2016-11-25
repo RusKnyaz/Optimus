@@ -37,6 +37,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string OuterHTML
 		{
 			get { return ToString();}
+			set
+			{
+				if (ParentNode == null)
+					throw new DOMException(DOMException.Codes.NoModificationAllowedError);
+
+				var tempNode = OwnerDocument.CreateElement("div");
+				DocumentBuilder.Build(tempNode, value, NodeSources.Script);
+				foreach (var childNode in tempNode.ChildNodes.ToArray())
+				{
+					ParentNode.InsertBefore(childNode, this);
+				}
+				ParentNode.RemoveChild(this);
+			}
 		}
 
 		public virtual string InnerHTML
