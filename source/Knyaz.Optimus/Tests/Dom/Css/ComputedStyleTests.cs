@@ -173,6 +173,19 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.IsNotNull(div);
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "50%");
 		}
+
+		[Test]
+		public void ColorFromParent()
+		{
+			var engine = Load(@"<style>.resultsTable table thead tr {
+	color: #fff;
+	background: #0092bf;
+}</style><div class='resultsTable'><table><thead><tr><td id=d></td></tr></thead></table></div>
+");
+			var div = engine.Document.GetElementById("d");
+			Assert.IsNotNull(div);
+			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("color") == "#fff");
+		}
 	}
 }
 #endif

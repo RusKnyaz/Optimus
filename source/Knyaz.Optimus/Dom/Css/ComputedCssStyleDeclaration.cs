@@ -108,7 +108,8 @@ namespace Knyaz.Optimus.Dom.Css
 
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit" ||
-				((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style") && string.IsNullOrEmpty(res)))
+				((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style"
+				|| propertyName == "color") && string.IsNullOrEmpty(res)))
 			{
 				res = GetParentPropertyValue(propertyName);
 			}

@@ -26,6 +26,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase(".button.save", "<body><div class='button' name=nomatch></div></body>")]
 		[TestCase(".button.save", "<body><div class='save' name=nomatch></div></body>")]
 		[TestCase(".button .save", "<body><div class='button save' name=notmatch></div></body>")]
+		[TestCase(".resultsTable table thead tr","<div class='resultsTable'><table><thead><tr name=match><td name=nomatch></td></tr></thead></table></div>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);
