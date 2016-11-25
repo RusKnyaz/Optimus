@@ -32,7 +32,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var document = new Document();
 			var div = document.CreateElement("div");
 			div.InnerHTML = "ABC";
-			Assert.AreEqual("<DIV>ABC</DIV", div.OuterHTML);
+			Assert.AreEqual("<DIV>ABC</DIV>", div.OuterHTML);
 			Assert.Throws<DOMException>(() => div.OuterHTML = "<SPAN>123</SPAN>");
 		}
 
