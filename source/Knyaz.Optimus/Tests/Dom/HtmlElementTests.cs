@@ -98,35 +98,6 @@ namespace Knyaz.Optimus.Tests.Dom
 				div.Attributes[1].Name == "customattr" &&
 				div.Attributes[2].Name == "abc");
 		}
-
-		[Test]
-		public void GetOuterHtml()
-		{
-			var document = new Document();
-			document.Write("<html><div id=a CustomAttr=abc><span>123</span></div></html>");
-			var div = document.GetElementById("a");
-			Assert.AreEqual("<DIV id=\"a\" customattr=\"abc\"><SPAN>123</SPAN></DIV>", div.OuterHTML);
-		}
-
-		[Test]
-		public void SetOuterHtml()
-		{
-			var document = new Document();
-			document.Write("<html><body><div id=a CustomAttr=abc><span>123</span></div></body></html>");
-			var div = document.GetElementById("a");
-			div.OuterHTML = "<span>123</span><span>qwe</span>";
-			Assert.AreEqual("<SPAN>123</SPAN><SPAN>qwe</SPAN>", document.Body.InnerHTML);
-		}
-
-		[Test]
-		public void SetOuterHtmlWithoutParent()
-		{
-			var document = new Document();
-			var div = document.CreateElement("div");
-			div.InnerHTML = "ABC";
-			Assert.AreEqual("<DIV>ABC</DIV", div.OuterHTML);
-			Assert.Throws<DOMException>(() => div.OuterHTML = "<SPAN>123</SPAN>");
-		}
 	}
 }
 #endif

@@ -271,6 +271,62 @@ namespace Knyaz.Optimus.Dom.Elements
 				return def;
 			}
 		}
+
+		/// <summary>
+		/// Parses the given string text as HTML or XML and inserts the resulting nodes into the tree in the position given by the position argument, as follows:
+		///"beforebegin" - Before the element itself.
+		///"afterbegin" - Just inside the element, before its first child.
+		///"beforeend" - Just inside the element, after its last child.
+		///"afterend" - After the element itself.
+		/// </summary>
+		public void InsertAdjacentHTML(string position, string html)
+		{
+			var tempNode = OwnerDocument.CreateElement("div");
+			DocumentBuilder.Build(tempNode, html);
+			switch (position)
+			{
+				case "beforebegin":
+					if(ParentNode == null)
+						throw new DOMException(DOMException.Codes.NoModificationAllowedError);
+					foreach (var child in tempNode.ChildNodes.ToArray())
+					{
+						ParentNode.InsertBefore(child, this);
+					}
+					break;
+				case "afterbegin":
+					foreach (var child in tempNode.ChildNodes.Reverse().ToArray())
+					{
+						if (FirstChild == null)
+							AppendChild(child);
+						else
+							InsertBefore(child, FirstChild);
+					}
+					break;
+				case "beforeend":
+					foreach (var child in tempNode.ChildNodes.ToArray())
+					{
+						AppendChild(child);
+					}
+					break;
+				case "afterend":
+					if (NextSibling == null)
+					{
+						foreach (var child in tempNode.ChildNodes.ToArray())
+						{
+							ParentNode.AppendChild(child);
+						}
+					}
+					else
+					{
+						var sibl = NextSibling;
+						foreach (var child in tempNode.ChildNodes.ToArray())
+						{
+							ParentNode.InsertBefore(child, sibl);
+						}
+					}
+					break;
+			}
+		}
 	}
 
 	[DomItem]
