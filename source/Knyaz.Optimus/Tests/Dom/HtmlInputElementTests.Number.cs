@@ -13,6 +13,34 @@ namespace Knyaz.Optimus.Tests.Dom
 			return input;
 		}
 
+		[Test]
+		public void ValueSanizitation()
+		{
+			var input = GetInput();
+			input.SetAttribute("value", "123");
+			Assert.AreEqual("123", input.Value);
+			input.Value = "ABC";
+			Assert.AreEqual(string.Empty, input.Value);
+			Assert.AreEqual("123", input.GetAttribute("value"));
+		}
+
+		[Test]
+		public void ValueFromAttributeSanitization()
+		{
+			var input = GetInput();
+			input.SetAttribute("value", "abc");
+			Assert.AreEqual(string.Empty, input.Value);
+			Assert.AreEqual("abc", input.GetAttribute("value"));
+		}
+
+		[Test]
+		public void SetFromAttributeAndStepUp()
+		{
+			var input = GetInput();
+			input.SetAttribute("value", "123");
+			input.StepUp();
+			Assert.AreEqual("124", input.Value);
+		}
 
 		[Test]
 		public void StepUp()

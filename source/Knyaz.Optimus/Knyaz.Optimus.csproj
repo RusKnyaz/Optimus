@@ -170,7 +170,7 @@
     <Compile Include="Tests\Dom\HtmlElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlInputTests.Number.cs" />
+    <Compile Include="Tests\Dom\HtmlInputElementTests.Number.cs" />
     <Compile Include="Tests\Dom\HtmlLinkElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlTableCellElementTests.cs" />

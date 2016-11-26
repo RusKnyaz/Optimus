@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -31,21 +32,34 @@ namespace Knyaz.Optimus.Dom.Elements
 			set { SetAttribute("autocomplete", value); }
 		}
 
+		private object _value = null;
+
 		public string Value
 		{
 			get
 			{
-				if (Type == "number" && _numValue.HasValue)
-					return _numValue.Value.ToString();
+				if (Type == "number")
+				{
+					long num;
+					if (_value == null && long.TryParse(GetAttribute("value"), out num))
+					{
+						return num.ToString();
+					}
+
+					if (_value is long)
+						return _value.ToString();
+
+					return string.Empty;
+				}
 
 				return GetAttribute("value", Defaults.Value);
 			}
 			set
 			{
-				long num;
-				if (Type == "number" && long.TryParse(value, out num))
+				if (Type == "number" )
 				{
-					_numValue = num;
+					long num;
+					_value = long.TryParse(value, out num) ? (object) num : string.Empty;
 				}
 				else
 				{
@@ -99,8 +113,6 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		#region . type = number
 
-		private long? _numValue;
-
 		public string Max
 		{
 			get { return GetAttribute("max", string.Empty); }
@@ -131,18 +143,32 @@ namespace Knyaz.Optimus.Dom.Elements
 			if (!long.TryParse(Min, out min))
 				min = 0;
 
-			if (!_numValue.HasValue)
-				_numValue = 0;
+			long numValue;
+			if (_value == null)
+			{
+				if (!long.TryParse(GetAttribute("value"), out numValue))
+					numValue = min;
+			}
+			else if(_value is long)
+			{
+				numValue = (long) _value;
+			}
+			else
+			{
+				numValue = 0;
+			}
 
-			_numValue += delta;
+			numValue += delta;
 
 			long max;
-			if (long.TryParse(Max, out max) && _numValue > max)
-				_numValue = max;
+			if (long.TryParse(Max, out max) && numValue > max)
+				numValue = max;
 
 			long step;
 			if(long.TryParse(Step, out step))
-				_numValue = ((_numValue - min) / delta) * delta + min;
+				numValue = ((numValue - min) / delta) * delta + min;
+
+			_value = numValue;
 		}
 
 		public void StepDown()
@@ -157,19 +183,42 @@ namespace Knyaz.Optimus.Dom.Elements
 			if (!long.TryParse(Min, out min))
 				min = 0;
 
-			if (!_numValue.HasValue)
-				_numValue = 0;
+			long numValue;
+			if (_value == null)
+			{
+				if (!long.TryParse(GetAttribute("value"), out numValue))
+					numValue = min;
+			}
+			else if (_value is long)
+			{
+				numValue = (long)_value;
+			}
+			else
+			{
+				numValue = 0;
+			}
 
-			_numValue -= delta;
+			numValue -= delta;
 
-			if (_numValue < min)
-				_numValue = min;
+			if (numValue < min)
+				numValue = min;
 
 			long step;
 			if(long.TryParse(Step, out step))
-				_numValue = (long)Math.Ceiling(((decimal)(_numValue - min)) / step) * step + min;
+				numValue = (long)Math.Ceiling(((decimal)(numValue - min)) / step) * step + min;
+
+			_value = numValue;
 		}
+
 		#endregion
+
+		public decimal ValueAsNumber
+		{
+			get
+			{
+				return decimal.Parse(Value, CultureInfo.InvariantCulture);
+			}
+		}
 	}
 
 	[DomItem]
