@@ -196,9 +196,8 @@ namespace Knyaz.Optimus.Dom
 			if(type == "KeyboardEvent")
 				return new KeyboardEvent();
 
-			/*todo: the event have own logic of propogation. it have not type. i do not know what should i do
-			 * if(type == "ErrorEvent")
-				return new ErrorEvent();*/
+			if(type == "ErrorEvent")
+				return new ErrorEvent();
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
