@@ -1,7 +1,6 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom

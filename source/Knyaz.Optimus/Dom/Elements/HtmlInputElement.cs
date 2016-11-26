@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
+﻿using System;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -32,8 +33,25 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public string Value
 		{
-			get { return GetAttribute("value", Defaults.Value); }
-			set { SetAttribute("value", value); }
+			get
+			{
+				if (Type == "number" && _numValue.HasValue)
+					return _numValue.Value.ToString();
+
+				return GetAttribute("value", Defaults.Value);
+			}
+			set
+			{
+				long num;
+				if (Type == "number" && long.TryParse(value, out num))
+				{
+					_numValue = num;
+				}
+				else
+				{
+					SetAttribute("value", value);
+				}
+			}
 		}
 
 		public bool Disabled
@@ -78,6 +96,80 @@ namespace Knyaz.Optimus.Dom.Elements
 
 			throw new System.NotImplementedException();
 		}
+
+		#region . type = number
+
+		private long? _numValue;
+
+		public string Max
+		{
+			get { return GetAttribute("max", string.Empty); }
+			set { SetAttribute("max", value); }
+		}
+
+		public string Min
+		{
+			get { return GetAttribute("min", string.Empty); }
+			set { SetAttribute("min", value); }
+		}
+
+		public string Step
+		{
+			get { return GetAttribute("step", string.Empty); }
+			set { SetAttribute("step", value);}
+		}
+
+		public void StepUp()
+		{
+			long step;
+			StepUp(long.TryParse(Step, out step) ? step : 1);
+		}
+
+		public void StepUp(long delta)
+		{
+			long min;
+			if (!long.TryParse(Min, out min))
+				min = 0;
+
+			if (!_numValue.HasValue)
+				_numValue = 0;
+
+			_numValue += delta;
+
+			long max;
+			if (long.TryParse(Max, out max) && _numValue > max)
+				_numValue = max;
+
+			long step;
+			if(long.TryParse(Step, out step))
+				_numValue = ((_numValue - min) / delta) * delta + min;
+		}
+
+		public void StepDown()
+		{
+			long step;
+			StepDown(long.TryParse(Step, out step) ? step : 1);
+		}
+
+		public void StepDown(long delta)
+		{
+			long min;
+			if (!long.TryParse(Min, out min))
+				min = 0;
+
+			if (!_numValue.HasValue)
+				_numValue = 0;
+
+			_numValue -= delta;
+
+			if (_numValue < min)
+				_numValue = min;
+
+			long step;
+			if(long.TryParse(Step, out step))
+				_numValue = (long)Math.Ceiling(((decimal)(_numValue - min)) / step) * step + min;
+		}
+		#endregion
 	}
 
 	[DomItem]

@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
-	public class HtmlInputElementTests
+	public partial class HtmlInputElementTests
 	{
 		private Document _document;
 		private HtmlInputElement _input;
