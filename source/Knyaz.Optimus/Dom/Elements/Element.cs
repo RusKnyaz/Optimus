@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class Element : Node, IElement
+	public class Element : Node, IElement, IElementSelector
 	{
 		private readonly IAttributesCollection _attributes;
 
@@ -326,6 +328,16 @@ namespace Knyaz.Optimus.Dom.Elements
 					}
 					break;
 			}
+		}
+
+		public IElement QuerySelector(string query)
+		{
+			return this.Select(query).FirstOrDefault();
+		}
+
+		public IReadOnlyList<IElement> QuerySelectorAll(string query)
+		{
+			return this.Select(query).ToList().AsReadOnly();
 		}
 	}
 

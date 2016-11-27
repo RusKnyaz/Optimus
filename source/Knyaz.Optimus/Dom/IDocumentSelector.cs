@@ -3,7 +3,7 @@ using Knyaz.Optimus.Dom.Elements;
 
 namespace Knyaz.Optimus.Dom
 {
-	interface IDocumentSelector
+	interface IElementSelector
 	{
 		IElement QuerySelector(string query);
 		IReadOnlyList<IElement> QuerySelectorAll(string query);

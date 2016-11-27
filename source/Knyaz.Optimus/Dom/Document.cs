@@ -24,7 +24,7 @@ namespace Knyaz.Optimus.Dom
 	/// http://dev.w3.org/html5/spec-preview/dom.html
 	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
-	public class Document : DocumentFragment, IDocument, IDocumentSelector
+	public class Document : DocumentFragment, IDocument, IElementSelector
 	{
 		internal Document() :this(null)
 		{
