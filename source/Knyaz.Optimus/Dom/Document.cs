@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Dom;
 
 namespace Knyaz.Optimus.Dom
@@ -24,7 +24,7 @@ namespace Knyaz.Optimus.Dom
 	/// http://dev.w3.org/html5/spec-preview/dom.html
 	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
-	public class Document : DocumentFragment, IDocument
+	public class Document : DocumentFragment, IDocument, IDocumentSelector
 	{
 		internal Document() :this(null)
 		{
@@ -267,6 +267,16 @@ namespace Knyaz.Optimus.Dom
 		public string Title { get; set; }
 
 		public object ActiveElement { get; set; }
+
+		public IElement QuerySelector(string query)
+		{
+			return this.Select(query).FirstOrDefault();
+		}
+
+		public IReadOnlyList<IElement> QuerySelectorAll(string query)
+		{
+			return this.Select(query).ToList().AsReadOnly();
+		}
 	}
 
 	[DomItem]

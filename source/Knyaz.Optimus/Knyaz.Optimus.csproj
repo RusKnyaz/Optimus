@@ -118,6 +118,7 @@
     <Compile Include="Dom\Elements\Node.cs" />
     <Compile Include="Dom\Events\UIEvent.cs" />
     <Compile Include="Dom\Elements\WindowTimers.cs" />
+    <Compile Include="Dom\IDocumentSelector.cs" />
     <Compile Include="Dom\Perf\TypedArray.cs" />
     <Compile Include="Dom\TagsNames.cs" />
     <Compile Include="Dom\XmlHttpRequest.cs" />
