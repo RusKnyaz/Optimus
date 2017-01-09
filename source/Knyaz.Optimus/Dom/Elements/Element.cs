@@ -88,9 +88,12 @@ namespace Knyaz.Optimus.Dom.Elements
 			set { InnerHTML = value; }
 		}
 
-		public Element[] GetElementsByTagName(string tagName)
+		public Element[] GetElementsByTagName(string tagNameSelector)
 		{
-			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.TagName == tagName.ToUpperInvariant()).ToArray();
+			var parts = tagNameSelector.Split('.');
+			var tagName = parts[0].ToUpperInvariant();
+
+			return ChildNodes.SelectMany(x => x.Flatten()).OfType<HtmlElement>().Where(x => x.TagName == tagName && parts.Skip(1).All(c => x.ClassName.Split(' ').Contains(c))).ToArray();
 		}
 
 		public HtmlElement[] GetElementsByClassName(string name)
@@ -348,7 +351,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		string Id { get; }
 		string InnerHTML { get; set; }
 		string TextContent { get; set; }
-		Element[] GetElementsByTagName(string tagName);
+		Element[] GetElementsByTagName(string tagNameSelector);
 		HtmlElement[] GetElementsByClassName(string tagName);
 		Attr GetAttributeNode(string name);
 		string GetAttribute(string name);

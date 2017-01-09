@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
@@ -11,21 +12,67 @@ namespace Knyaz.Optimus.Dom.Css
 	{
 		private List<Node> _chains = new List<Node>();
 
+		IEnumerable<string> SplitSelector(string selector)
+		{
+			var buffer = new StringBuilder();
+
+			var readText = char.IsLetterOrDigit(selector[0]);
+
+			foreach (var c in selector)
+			{
+				if(c == '\r' || c == '\n')
+					continue;
+
+				if (char.IsLetterOrDigit(c) != readText)
+				{
+					if (!readText)
+					{
+						foreach (var d in buffer.ToString())
+						{
+							yield return d.ToString();
+						}
+					}
+					else
+						yield return buffer.ToString();
+					buffer.Clear();
+					readText = !readText;
+				}
+
+				buffer.Append(c);
+			}
+			if (buffer.Length > 0)
+			{
+				if (!readText)
+				{
+					foreach (var d in buffer.ToString())
+					{
+						yield return d.ToString();
+					}
+				}
+				else
+					yield return buffer.ToString();
+			}
+		}
+
+
 		public CssSelector(string text)
 		{
 			var orParts = text.Split(',');
 			foreach (var part in orParts)
 			{
 				Node _chain = null;
-				foreach (var chunk in NormalizeSelector(part.Trim()).Split(' ').Where(x => !string.IsNullOrEmpty(x)))
+				var normalized = NormalizeSelector(part.Trim());
+
+				ChunkTypes currentChunkType = ChunkTypes.Tags;
+				foreach (var chunk in SplitSelector(normalized).Where(x => !string.IsNullOrEmpty(x)))
 				{
 					switch (chunk[0])
 					{
 						case '#':
-							_chain = new Node {Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Id};
+							currentChunkType = ChunkTypes.Id;
 							break;
 						case '.':
-							_chain = new Node {Value = chunk.Substring(1), Next = _chain, Type = ChunkTypes.Class};
+							currentChunkType = ChunkTypes.Class;
 							break;
 						case '*':
 							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.All};
@@ -33,8 +80,12 @@ namespace Knyaz.Optimus.Dom.Css
 						case '>':
 							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.Parent};
 							break;
+						case ' ':
+							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.Ancestor};
+							break;
 						default:
-							_chain = new Node {Values = chunk.ToUpper().Split(','), Next = _chain, Type = ChunkTypes.Tags};
+							_chain = new Node {Value = chunk, Next = _chain, Type = currentChunkType};
+							currentChunkType = ChunkTypes.Tags;
 							break;
 					}
 				}
@@ -45,7 +96,7 @@ namespace Knyaz.Optimus.Dom.Css
 		
 		enum ChunkTypes
 		{
-			Raw, Id, Class, Tags, All, Parent
+			Raw, Id, Class, Tags, All, Parent, Ancestor
 		}
 
 		class Node
@@ -65,7 +116,7 @@ namespace Knyaz.Optimus.Dom.Css
 		private bool IsMatches(IElement elt, Node chain)
 		{
 			var chunk = chain.Value;
-			
+
 			if (chain.Type == ChunkTypes.Id)
 			{
 				if (elt.Id != chunk)
@@ -82,8 +133,11 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			else if (chain.Type == ChunkTypes.Tags)
 			{
-				if (chain.Values.All(x => elt.TagName != x))
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
 					return false;
+
+				return elt.TagName == chain.Value.ToUpperInvariant();
 			}
 
 			if (chain.Next != null)
@@ -92,22 +146,30 @@ namespace Knyaz.Optimus.Dom.Css
 				{
 					return IsMatches((IElement) elt.ParentNode, chain.Next.Next);
 				}
-
-				return 
-						chain.Type == ChunkTypes.All
-						? ((INode)elt).GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next))
-						: elt.ParentNode.GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
+				else if (chain.Next.Type == ChunkTypes.Ancestor)
+				{
+					return elt.ParentNode.GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next.Next));
+				}
+				else if (chain.Type == ChunkTypes.All)
+				{
+					return ((INode) elt).GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
+				}
 			}
 
 			return true;
 		}
 
 		private static readonly Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
+		private static readonly Regex _normalizeGt = new Regex("\\s*\\>\\s*", RegexOptions.Compiled);
+		private static readonly Regex _normalizeSpaces = new Regex("\\s+", RegexOptions.Compiled);
 
 		private static string NormalizeSelector(string selector)
 		{
 			selector = selector.Replace('\n', ' ').Replace('\r', ' ');
-			return _normalizeCommas.Replace(selector, ",");
+			selector = _normalizeCommas.Replace(selector, ",");
+			selector = _normalizeGt.Replace(selector, ">");
+			selector = _normalizeSpaces.Replace(selector, " ");
+			return selector;
 		}
 	}
 }

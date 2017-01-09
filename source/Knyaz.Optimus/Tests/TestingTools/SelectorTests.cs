@@ -1,7 +1,6 @@
 ﻿#if NUNIT
 using System.Linq;
 using Knyaz.Optimus.Dom;
-using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.TestingTools
@@ -19,11 +18,12 @@ namespace Knyaz.Optimus.Tests.TestingTools
 		[TestCase("<div id=a></div><div id=b></div>", "[id=b]","<DIV id=\"b\"></DIV>")]
 		[TestCase("<div><div><label for='OrganizationId'></label></div></div>", "label[for=OrganizationId]", "<LABEL for=\"OrganizationId\"></LABEL>")]
 		[TestCase("<div a=ab></div><div a=ac></div><div a=bc></div>", "[a^=a]", "<DIV a=\"ab\"></DIV>,<DIV a=\"ac\"></DIV>")]
+		[TestCase("<ul class='left'></ul>", "ul.left", "<UL class=\"left\"></UL>")]
 		public void DocumentSelectorTests(string html, string selector, string expectedResult)
 		{
 			var doc = new Document();
 			doc.Write(html);
-			Assert.AreEqual(expectedResult, string.Join(",", doc.Select(selector).Select(x => x.ToString())));
+			Assert.AreEqual(expectedResult, string.Join(",", doc.QuerySelectorAll(selector).Select(x => x.ToString())));
 		}
 	}
 }
