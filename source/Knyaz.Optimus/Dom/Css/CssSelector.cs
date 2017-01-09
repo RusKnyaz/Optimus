@@ -84,7 +84,7 @@ namespace Knyaz.Optimus.Dom.Css
 							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.Ancestor};
 							break;
 						default:
-							_chain = new Node {Value = chunk, Next = _chain, Type = currentChunkType};
+							_chain = new Node {Value = currentChunkType == ChunkTypes.Tags ? chunk.ToUpperInvariant(): chunk, Next = _chain, Type = currentChunkType};
 							currentChunkType = ChunkTypes.Tags;
 							break;
 					}
@@ -137,7 +137,8 @@ namespace Knyaz.Optimus.Dom.Css
 				if (htmlElt == null)
 					return false;
 
-				return elt.TagName == chain.Value.ToUpperInvariant();
+				if(elt.TagName != chain.Value)
+					return false;
 			}
 
 			if (chain.Next != null)
@@ -154,6 +155,7 @@ namespace Knyaz.Optimus.Dom.Css
 				{
 					return ((INode) elt).GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
 				}
+				else return IsMatches(elt, chain.Next);
 			}
 
 			return true;
