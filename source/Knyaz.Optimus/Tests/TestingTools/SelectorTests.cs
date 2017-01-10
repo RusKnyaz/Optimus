@@ -19,6 +19,7 @@ namespace Knyaz.Optimus.Tests.TestingTools
 		[TestCase("<div><div><label for='OrganizationId'></label></div></div>", "label[for=OrganizationId]", "<LABEL for=\"OrganizationId\"></LABEL>")]
 		[TestCase("<div a=ab></div><div a=ac></div><div a=bc></div>", "[a^=a]", "<DIV a=\"ab\"></DIV>,<DIV a=\"ac\"></DIV>")]
 		[TestCase("<ul class='left'></ul>", "ul.left", "<UL class=\"left\"></UL>")]
+		[TestCase("<select id=d><option selected></option></select>","#d[selected]", "<OPTION selected=\"\"></OPTION>")]
 		public void DocumentSelectorTests(string html, string selector, string expectedResult)
 		{
 			var doc = new Document();
