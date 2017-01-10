@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,18 +13,23 @@ namespace Knyaz.Optimus.Dom.Css
 	{
 		private List<Node> _chains = new List<Node>();
 
+		static bool IsClassNameChar(char c)
+		{
+			return char.IsLetterOrDigit(c) || c == '-' || c == '_';
+		}
+
 		IEnumerable<string> SplitSelector(string selector)
 		{
 			var buffer = new StringBuilder();
 
-			var readText = char.IsLetterOrDigit(selector[0]);
+			var readText = IsClassNameChar(selector[0]) ;
 
 			foreach (var c in selector)
 			{
 				if(c == '\r' || c == '\n')
 					continue;
 
-				if (char.IsLetterOrDigit(c) != readText)
+				if (IsClassNameChar(c) != readText)
 				{
 					if (!readText)
 					{

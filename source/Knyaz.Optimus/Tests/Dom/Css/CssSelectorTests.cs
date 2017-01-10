@@ -35,6 +35,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("#m > div", "<div name=nomatch></div><div id=m name=nomatch><div name=match><div name=nomatch></div></div></div>")]
 		[TestCase("#m > div a", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a></div></div>")]
 		[TestCase("#m > div a,\r\n#m > div span", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a><span name=match></span><div name=nomatch</div></div></div>")]
+		[TestCase(".form-signin", "<div class='form' name=nomatch></div><div class='form-signin'name=match></div>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);
