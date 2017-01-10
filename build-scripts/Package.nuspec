@@ -15,7 +15,7 @@
 	<tags>headless web browser</tags>
 	<dependencies>
 		<group targetFramework="net45">
-          <dependency id="Jint" version="2.9.1"/>
+          <dependency id="Jint" version="2.10.3"/>
 		</group>
 	</dependencies>
   </metadata>
