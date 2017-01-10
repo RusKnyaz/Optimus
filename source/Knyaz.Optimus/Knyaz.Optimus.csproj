@@ -103,6 +103,7 @@
     <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
     <Compile Include="Dom\Elements\IFormElement.cs" />
     <Compile Include="Dom\Elements\IResettableElement.cs" />
+    <Compile Include="Dom\Elements\TokenList.cs" />
     <Compile Include="Dom\Events\CustomEvent.cs" />
     <Compile Include="Dom\Elements\DocumentFragment.cs" />
     <Compile Include="Dom\Elements\Element.cs" />
@@ -182,6 +183,7 @@
     <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
     <Compile Include="Tests\Dom\HtmlStyleElementTests.cs" />
     <Compile Include="Tests\Dom\StyleSheetsList.cs" />
+    <Compile Include="Tests\Dom\TokenListTests.cs" />
     <Compile Include="Tests\Environment\LocationTests.cs" />
     <Compile Include="Tests\Html\CssReaderTest.cs" />
     <Compile Include="Tests\Mocks.cs" />

@@ -128,7 +128,7 @@ namespace Knyaz.Optimus.Dom.Css
 				if (htmlElt == null)
 					return false;
 
-				if (chunk.Split('.').Any(x => !htmlElt.ClassName.Split(' ').Contains(x)))
+				if (chunk.Split('.').Any(x => !htmlElt.ClassList.Contains(x)))
 					return false;
 			}
 			else if (chain.Type == ChunkTypes.Tags)

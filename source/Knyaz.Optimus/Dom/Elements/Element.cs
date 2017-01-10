@@ -11,12 +11,20 @@ namespace Knyaz.Optimus.Dom.Elements
 	public class Element : Node, IElement, IElementSelector
 	{
 		private readonly IAttributesCollection _attributes;
+		private TokenList _classList = null;
+		private bool _isClassListDirty = true;
 
 		public Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
 			_attributes = new AttributesCollection();
+			_classList = new TokenList();
+			_classList.Changed += () => {
+				ClassName = string.Join(" ", _classList);
+				_isClassListDirty = false;
+			};
 		}
+
 
 		public IAttributesCollection Attributes
 		{
@@ -29,6 +37,30 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		public string TagName { get; private set; }
+
+		public string ClassName
+		{
+			get { return GetAttribute("class", ""); }
+			set
+			{
+				SetAttribute("class", value);
+				_isClassListDirty = true;
+			}
+		}
+
+		public ITokenList ClassList
+		{
+			get
+			{
+				if (_isClassListDirty)
+				{
+					_classList.Init(ClassName.Split(' ').Where(x => !string.IsNullOrEmpty(x)));
+					_isClassListDirty = false;
+				}
+
+				return _classList;
+			}
+		}
 
 		public string Id
 		{
@@ -92,13 +124,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			var parts = tagNameSelector.Split('.');
 			var tagName = parts[0].ToUpperInvariant();
+			//todo: revise this strange code (i mean handling 'classes' selector)
 
-			return ChildNodes.SelectMany(x => x.Flatten()).OfType<HtmlElement>().Where(x => x.TagName == tagName && parts.Skip(1).All(c => x.ClassName.Split(' ').Contains(c))).ToArray();
+			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.TagName == tagName && parts.Skip(1).All(c => x.ClassList.Contains(c))).ToArray();
 		}
 
-		public HtmlElement[] GetElementsByClassName(string name)
+		public Element[] GetElementsByClassName(string name)
 		{
-			return ChildNodes.SelectMany(x => x.Flatten()).OfType<HtmlElement>().Where(x => x.ClassName.Split(' ').Contains(name)).ToArray();
+			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.ClassList.Contains(name)).ToArray();
 		}
 
 		public string GetAttribute(string name)
@@ -349,10 +382,11 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		string TagName { get; }
 		string Id { get; }
+		string ClassName { get; set; }
 		string InnerHTML { get; set; }
 		string TextContent { get; set; }
 		Element[] GetElementsByTagName(string tagNameSelector);
-		HtmlElement[] GetElementsByClassName(string tagName);
+		Element[] GetElementsByClassName(string tagName);
 		Attr GetAttributeNode(string name);
 		string GetAttribute(string name);
 		void RemoveAttribute(string name);

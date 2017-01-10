@@ -48,6 +48,17 @@ namespace Knyaz.Optimus.Tests.Dom
 			div.InsertAdjacentHTML(position, "A<div>B</div>C");
 			Assert.AreEqual(expectedHtml, document.Body.InnerHTML);
 		}
+
+		[Test]
+		public void ClassListAdd()
+		{
+			var document = new Document();
+			var div = document.CreateElement("DIV");
+			div.ClassName = "a b c";
+			div.ClassList.Add("f");
+			Assert.AreEqual("a b c f", div.ClassName);
+			Assert.AreEqual("a b c f", div.GetAttribute("class"));
+		}
 	}
 }
 #endif
