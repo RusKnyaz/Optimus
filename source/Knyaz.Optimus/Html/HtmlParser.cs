@@ -9,60 +9,86 @@ namespace Knyaz.Optimus.Html
 		{
 			using(var enumerator = HtmlReader.Read(stream).GetEnumerator())
 			{
+				//todo: try to get rid of fake element
 				var rootElem = new HtmlElement();
 
-				var moreExist = true;
-				do
-				{
-					moreExist = ParseElement(rootElem, enumerator);
-				} while (moreExist);
+				while (ParseElement(rootElem, enumerator) == ParseResult.Ok){}
 
 				return rootElem.Children;
 			}
 		}
 
-		private static bool ParseElement(HtmlElement elem, IEnumerator<HtmlChunk> enumerator)
+		enum ParseResult
+		{
+			End,
+			BackToParent,
+			Ok
+		}
+
+		private static ParseResult ParseElement(HtmlElement elem, IEnumerator<HtmlChunk> enumerator)
 		{
 			string attributeName = null;
-
-			while(enumerator.MoveNext())
+			var reread = false;
+			while (reread || enumerator.MoveNext())
 			{
+				reread = false;
 				var htmlChunk = enumerator.Current;
-				switch(htmlChunk.Type)
+				switch (htmlChunk.Type)
 				{
 					case HtmlChunk.Types.AttributeName:
-						if(attributeName!=null)
+						if (attributeName != null)
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), null);
 						attributeName = htmlChunk.Value.ToLower();
 						break;
 					case HtmlChunk.Types.AttributeValue:
 						if (string.IsNullOrEmpty(attributeName))
 							throw new HtmlParseException("Unexpected attribute value.");
-						if(!elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))//todo:
+						if (!elem.Attributes.ContainsKey(attributeName.ToLowerInvariant())) //todo:
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
 						attributeName = null;
 						break;
 					case HtmlChunk.Types.TagStart:
-						var childElem = new HtmlElement() {Name = htmlChunk.Value.ToLower()};
-						ParseElement(childElem, enumerator);
+						var tagName = htmlChunk.Value.ToLower();
+						if (ClosePrevTag(elem.Name, tagName))
+							return ParseResult.BackToParent;
+
+						var childElem = new HtmlElement() {Name = tagName};
+						if (ParseElement(childElem, enumerator) == ParseResult.BackToParent)
+							reread = true;
 						elem.Children.Add(childElem);
 						break;
 					case HtmlChunk.Types.TagEnd:
 						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
-						return true;
+
+						return elem.Name == htmlChunk.Value ? ParseResult.Ok : ParseResult.BackToParent;
 					case HtmlChunk.Types.Text:
-						elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
+						elem.Children.Add(new HtmlText {Value = htmlChunk.Value});
 						break;
 					case HtmlChunk.Types.Comment:
-						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });
+						elem.Children.Add(new HtmlComment {Text = htmlChunk.Value});
 						break;
 					case HtmlChunk.Types.DocType:
 						elem.Children.Add(new HtmlDocType());
 						break;
 				}
-			}
-			return false;
+			} 
+			return ParseResult.End;
+		}
+
+		private static bool ClosePrevTag(string prevName, string name)
+		{
+			return (prevName == "li" && name == "li") 
+				|| (prevName == "dl" && (name == "dt" || name == "dl"))
+				|| (prevName == "dt" && (name == "dt" || name == "dl"))
+
+				|| (prevName == "th" && (name == "td" || name == "th" || name == "tr" || name == "tbody" || name=="tfoot"))
+				|| (prevName == "td" && (name == "td" || name == "th" || name == "tr" || name == "tbody" || name == "tfoot"))
+				|| (prevName == "tr" && (name == "tr" || name=="tbody" || name=="tfoot"))
+				
+				|| (prevName == "option" && name == "option")
+				
+				|| (prevName == "thead" && (name == "tbody" || name == "tfoot"));
 		}
 	}
 

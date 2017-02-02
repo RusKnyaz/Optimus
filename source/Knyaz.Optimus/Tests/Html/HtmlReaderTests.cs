@@ -111,6 +111,12 @@ namespace Knyaz.Optimus.Tests.Html
 			Assert.AreEqual(expectedChunks, Read(source));
 		}
 
+		[TestCase("<div><li></div>", "TagStart:div, TagStart:li, TagEnd:div")]
+		[TestCase("<select><option>1</select>", "TagStart:select, TagStart:option, Text:1, TagEnd:select")]
+		public void OptionalClosedTags(string source, string expected)
+		{
+			Assert.AreEqual(expected, Read(source));
+		}
 
 		private string Read(string html)
 		{

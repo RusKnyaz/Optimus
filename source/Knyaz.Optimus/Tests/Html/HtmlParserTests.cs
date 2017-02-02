@@ -102,6 +102,72 @@ namespace Knyaz.Optimus.Tests.Html
 			Assert.IsNotNull(e);
 			Assert.AreEqual(1, e.Attributes.Count);
 		}
+
+		[TestCase("<html>", "<html></html>")]
+		[TestCase("<li><li>", "<li></li><li></li>")]
+		[TestCase("<li>A<li>B", "<li>A</li><li>B</li>")]
+		[TestCase("<div><li>A</div><li>B", "<div><li>A</li></div><li>B</li>")]
+		[TestCase("<div><li></div>", "<div><li></li></div>")]
+		[TestCase("<div><li></div><li>", "<div><li></li></div><li></li>")]
+		[TestCase("<li><a>A</a><li>B", "<li><a>A</a></li><li>B</li>")]
+
+		[TestCase("<dl>A<dl>B", "<dl>A</dl><dl>B</dl>")]
+		[TestCase("<dl>A<dt>B<dl>C", "<dl>A</dl><dt>B</dt><dl>C</dl>")]
+
+		[TestCase("<tr><tr>", "<tr></tr><tr></tr>")]
+		[TestCase("<table><tr><td><tr></table>", "<table><tr><td></td></tr><tr></tr></table>")]
+		[TestCase("<td><td><th><th><td>", "<td></td><td></td><th></th><th></th><td></td>")]
+
+		[TestCase("<table><thead><tr><td><tbody><tr><td></table>", "<table><thead><tr><td></td></tr></thead><tbody><tr><td></td></tr></tbody></table>")]
+		[TestCase("<table><thead><tr><td>asd<tr><tbody><tr><td>qqq</table>", "<table><thead><tr><td>asd</td></tr><tr></tr></thead><tbody><tr><td>qqq</td></tr></tbody></table>")]//checked with Chrome
+		[TestCase("<table><thead><tr><td>asd<tr><tfoot><tr><td>qqq</table>", "<table><thead><tr><td>asd</td></tr><tr></tr></thead><tfoot><tr><td>qqq</td></tr></tfoot></table>")]
+		[TestCase("<table><thead><tr><tbody></table>", "<table><thead><tr></tr></thead><tbody></tbody></table>")]
+
+		[TestCase("<select><option>1<option>2</select>", "<select><option>1</option><option>2</option></select>")]
+		public void OptionalEndTagTests(string sourceHtml, string expectedHtml)
+		{
+			var elems = Parse(sourceHtml);
+			var result = string.Join("", elems.OfType<IHtmlElement>().Select(ElemToString));
+			Assert.AreEqual(expectedHtml, result);
+		}
+
+		static string ElemToString(IHtmlElement arg)
+		{
+			var sb = new StringBuilder();
+			BuildElemString(arg, sb);
+			return sb.ToString();
+		}
+
+		static void BuildElemString(IHtmlNode node, StringBuilder sb)
+		{
+			var txtNode = node as IHtmlText;
+			if (txtNode != null)
+			{
+				sb.Append(txtNode.Value);
+				return;
+			}
+
+			var elem = node as IHtmlElement;
+
+			if (elem != null)
+			{
+				sb.Append('<');
+				sb.Append(elem.Name);
+				sb.Append('>');
+
+				if (elem.Children != null)
+				{
+					foreach (var child in elem.Children)
+					{
+						BuildElemString(child, sb);
+					}
+				}
+
+				sb.Append("</");
+				sb.Append(elem.Name);
+				sb.Append('>');
+			}
+		}
 	}
 }
 #endif

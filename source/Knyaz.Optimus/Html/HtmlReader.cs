@@ -202,28 +202,22 @@ namespace Knyaz.Optimus.Html
 				reader.Read();
 				var next = (char) reader.Peek();
 
+				//todo: check if we still needed for the stack of tags names
 				if (tagsStack.Count > 0 && next == '/') //probably end of tag
 				{
-					var endTag = tagsStack.Peek();
 					reader.Read();
 					var closedTagName = ReadWhile(reader, x => x != '>');
-					if (closedTagName.Equals(endTag, StringComparison.InvariantCultureIgnoreCase))
+					if (text.Length > 0)
 					{
-						if (text.Length > 0)
-						{
-							yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
-							text.Clear();
-						}
-
-						yield return new HtmlChunk {Type = HtmlChunk.Types.TagEnd, Value = closedTagName};
-
-						reader.Read();
-						tagsStack.Pop();
-						continue;
+						yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(text.ToString()) };
+						text.Clear();
 					}
 
-					text.Append("</");
-					text.Append(closedTagName);
+					yield return new HtmlChunk { Type = HtmlChunk.Types.TagEnd, Value = closedTagName };
+
+					reader.Read();
+					tagsStack.Pop();
+					continue;
 				}
 				else if (char.IsLetter(next)) //start of tag
 				{
