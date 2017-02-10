@@ -186,6 +186,32 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.IsNotNull(div);
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("color") == "#fff");
 		}
+
+		[TestCase("#d2 {color:green} * {color:red}", "green")]
+		[TestCase("#d2 {color:green} div {color:red}", "green")]
+		[TestCase("#d2 {color:green} #d2 {color:red}", "red")]
+		[TestCase("#d1 div {color:green} div #d2 {color:red}", "red")]
+		[TestCase("div #d2 {color:red} #d1 div {color:green} ", "green")]
+		[TestCase("#d1 #d2 {color:red} #d1 div {color:green} ", "red")]
+
+		[TestCase("#d2 {color:green}</style><style> * {color:red}", "green")]
+		[TestCase(" * {color:red}</style><style>#d2 {color:green}", "green")]
+		public void Priority(string css, string expectedColor)
+		{
+			var engine = Load("<style>"+css+"</style><body><div id=d1 class=c1><div id=d2 class=c2></div></div></body>");
+			var div = engine.Document.GetElementById("d2");
+			Assert.IsNotNull(div);
+			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == expectedColor);
+		}
+
+		[Test]
+		public void StyleIsHightPriority()
+		{
+			var engine = Load("<style>#d2{color:green}</style><body><div id=d1 class=c1><div id=d2 class=c2 style='color:red'></div></div></body>");
+			var div = engine.Document.GetElementById("d2");
+			Assert.IsNotNull(div);
+			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == "red");
+		}
 	}
 }
 #endif

@@ -60,6 +60,11 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// Priority of the selector.
+		/// </summary>
+		public readonly int Specifity;
+
 
 		public CssSelector(string text)
 		{
@@ -76,9 +81,15 @@ namespace Knyaz.Optimus.Dom.Css
 					{
 						case '#':
 							currentChunkType = ChunkTypes.Id;
+							Specifity += 65536;
 							break;
 						case '.':
+							Specifity += 256;
 							currentChunkType = ChunkTypes.Class;
+							break;
+						case ':':
+							Specifity++;	
+							currentChunkType = ChunkTypes.State;
 							break;
 						case '*':
 							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.All};
@@ -91,6 +102,8 @@ namespace Knyaz.Optimus.Dom.Css
 							break;
 						default:
 							_chain = new Node {Value = currentChunkType == ChunkTypes.Tags ? chunk.ToUpperInvariant(): chunk, Next = _chain, Type = currentChunkType};
+							if (currentChunkType == ChunkTypes.Tags)
+								Specifity++;
 							currentChunkType = ChunkTypes.Tags;
 							break;
 					}
@@ -102,14 +115,13 @@ namespace Knyaz.Optimus.Dom.Css
 		
 		enum ChunkTypes
 		{
-			Raw, Id, Class, Tags, All, Parent, Ancestor
+			Raw, Id, Class, Tags, All, Parent, Ancestor, State
 		}
 
 		class Node
 		{
 			public ChunkTypes Type;
 			public string Value;
-			public string[] Values;
 			public Node Next;
 		}
 

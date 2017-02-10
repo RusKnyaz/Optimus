@@ -33,6 +33,8 @@ namespace Knyaz.Optimus.Dom.Css
 			Style = new CssStyleDeclaration(this);
 		}
 
+		internal CssSelector Selector { get { return _selector ?? (_selector = new CssSelector(SelectorText));}}
+
 		/// <summary>
 		/// Check if the specified elt matched by selector
 		/// </summary>
@@ -40,8 +42,7 @@ namespace Knyaz.Optimus.Dom.Css
 		/// <returns></returns>
 		internal bool IsMatchesSelector(IElement elt)
 		{
-			var selector = _selector ?? (_selector = new CssSelector(SelectorText));
-			return selector.IsMatches(elt);
+			return Selector.IsMatches(elt);
 		}
 	}
 }

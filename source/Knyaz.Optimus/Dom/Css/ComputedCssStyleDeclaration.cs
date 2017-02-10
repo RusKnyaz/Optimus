@@ -20,6 +20,12 @@ namespace Knyaz.Optimus.Dom.Css
 			if (htmlElt != null)
 				yield return htmlElt.Style;
 
+			foreach (var rule in GetStyleRulesFor(elt).OrderByDescending(x => x.Selector.Specifity))
+				yield return rule.Style;
+		}
+
+		private static IEnumerable<CssStyleRule> GetStyleRulesFor(IElement elt)
+		{
 			//todo: it would be better to have reversed list, or acces it by index;
 			//todo(2): what about safe enumeration
 
@@ -34,7 +40,7 @@ namespace Knyaz.Optimus.Dom.Css
 						foreach (var result in mediaRule.CssRules.OfType<CssStyleRule>().Reverse())
 						{
 							if (result.IsMatchesSelector(elt))
-								yield return result.Style;
+								yield return result;
 						}
 					}
 				}
@@ -42,7 +48,7 @@ namespace Knyaz.Optimus.Dom.Css
 				var styleRule = cssRule as CssStyleRule;
 
 				if (styleRule != null && styleRule.IsMatchesSelector(elt))
-					yield return styleRule.Style;
+					yield return styleRule;
 			}
 		}
 

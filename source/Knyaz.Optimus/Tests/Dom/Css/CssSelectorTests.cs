@@ -53,6 +53,20 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				Assert.IsFalse(selector.IsMatches(elt), elt.ToString());
 			}
 		}
+
+		[TestCase("*", 0)]
+		[TestCase("li", 1)]
+		[TestCase("li:first-line", 2)]
+		[TestCase("ul li", 2)]
+		//todo: uncomment when + selector implemented [TestCase("ul ol+li", 3)]
+		//todo: uncomment when attribtues selector implemented [TestCase("h1 + *[rel=up]", 0x0101)]  /* a=0 b=0 c=1 d=1 -> specificity = 0,0,1,1 */
+		[TestCase("ul ol li.red", 0x0103)]  /* a=0 b=0 c=1 d=3 -> specificity = 0,0,1,3 */
+		[TestCase("li.red.level", 0x0201)]  /* a=0 b=0 c=2 d=1 -> specificity = 0,0,2,1 */
+		[TestCase("#x34y", 0x010000)]           /* a=0 b=1 c=0 d=0 -> specificity = 0,1,0,0 */
+ 		public void SpecifityTests(string selectorText, int expectedSpecifity)
+		{
+			Assert.AreEqual(expectedSpecifity, new CssSelector(selectorText).Specifity);
+		}
 	}
 }
 #endif
