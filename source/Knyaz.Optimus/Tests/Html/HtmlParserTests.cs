@@ -124,6 +124,8 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<table><thead><tr><tbody></table>", "<table><thead><tr></tr></thead><tbody></tbody></table>")]
 
 		[TestCase("<select><option>1<option>2</select>", "<select><option>1</option><option>2</option></select>")]
+		[TestCase("<select><optgroup><option>1<option>2<optgroup><option>3</select", 
+		          "<select><optgroup><option>1</option><option>2</option></optgroup><optgroup><option>3</option></optgroup></select>")]
 		public void OptionalEndTagTests(string sourceHtml, string expectedHtml)
 		{
 			var elems = Parse(sourceHtml);

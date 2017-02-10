@@ -86,7 +86,8 @@ namespace Knyaz.Optimus.Html
 				|| (prevName == "td" && (name == "td" || name == "th" || name == "tr" || name == "tbody" || name == "tfoot"))
 				|| (prevName == "tr" && (name == "tr" || name=="tbody" || name=="tfoot"))
 				
-				|| (prevName == "option" && name == "option")
+				|| (prevName == "option" && (name == "option" || name == "optgroup"))
+			    || (prevName == "optgroup" && name == "optgroup")
 				
 				|| (prevName == "thead" && (name == "tbody" || name == "tfoot"));
 		}
