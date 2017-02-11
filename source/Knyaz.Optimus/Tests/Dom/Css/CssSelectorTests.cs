@@ -36,6 +36,12 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("#m > div a", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a></div></div>")]
 		[TestCase("#m > div a,\r\n#m > div span", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a><span name=match></span><div name=nomatch</div></div></div>")]
 		[TestCase(".form-signin", "<div class='form' name=nomatch></div><div class='form-signin'name=match></div>")]
+		[TestCase("[custom]", "<div name=nomatch></div><div custom name=match></div><div custom=123 name=match></div>")]
+		[TestCase("[custom=\"123\"]", "<div name=nomatch custom></div><div name=match custom=123></div>")]
+		[TestCase("[custom~=\"123\"]", "<div name=nomatch custom></div><div name=match custom=123></div><div name=match custom='123 456'></div>")]
+		[TestCase("[custom~=\"123 456\"]", "<div name=nomatch custom=123></div><div name=nomatch custom=\"123 456\"></div>")]
+		[TestCase("[custom~=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div>")]
+		[TestCase("[custom|=\"123\"]", "<div name=nomatch custom=1234></div><div name=match custom=123></div><div name=match custom=\"123-456\"></div>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);
@@ -59,7 +65,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("li:first-line", 2)]
 		[TestCase("ul li", 2)]
 		//todo: uncomment when + selector implemented [TestCase("ul ol+li", 3)]
-		//todo: uncomment when attribtues selector implemented [TestCase("h1 + *[rel=up]", 0x0101)]  /* a=0 b=0 c=1 d=1 -> specificity = 0,0,1,1 */
+		[TestCase("h1 + *[rel=up]", 0x0101)]  /* a=0 b=0 c=1 d=1 -> specificity = 0,0,1,1 */
 		[TestCase("ul ol li.red", 0x0103)]  /* a=0 b=0 c=1 d=3 -> specificity = 0,0,1,3 */
 		[TestCase("li.red.level", 0x0201)]  /* a=0 b=0 c=2 d=1 -> specificity = 0,0,2,1 */
 		[TestCase("#x34y", 0x010000)]           /* a=0 b=1 c=0 d=0 -> specificity = 0,1,0,0 */

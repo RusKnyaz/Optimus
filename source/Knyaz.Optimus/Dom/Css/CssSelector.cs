@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
@@ -13,23 +13,23 @@ namespace Knyaz.Optimus.Dom.Css
 	{
 		private List<Node> _chains = new List<Node>();
 
-		static bool IsClassNameChar(char c)
+		static bool IsChunkChar(char c)
 		{
-			return char.IsLetterOrDigit(c) || c == '-' || c == '_';
+			return char.IsLetterOrDigit(c) || c == '-' || c == '_' || c=='\"' || c=='=' || c=='~' || c=='|';
 		}
 
 		IEnumerable<string> SplitSelector(string selector)
 		{
 			var buffer = new StringBuilder();
 
-			var readText = IsClassNameChar(selector[0]) ;
+			var readText = IsChunkChar(selector[0]) ;
 
 			foreach (var c in selector)
 			{
 				if(c == '\r' || c == '\n')
 					continue;
 
-				if (IsClassNameChar(c) != readText)
+				if (IsChunkChar(c) != readText)
 				{
 					if (!readText)
 					{
@@ -71,10 +71,10 @@ namespace Knyaz.Optimus.Dom.Css
 			var orParts = text.Split(',');
 			foreach (var part in orParts)
 			{
-				Node _chain = null;
+				Node chain = null;
 				var normalized = NormalizeSelector(part.Trim());
 
-				ChunkTypes currentChunkType = ChunkTypes.Tags;
+				var currentChunkType = ChunkTypes.Tags;
 				foreach (var chunk in SplitSelector(normalized).Where(x => !string.IsNullOrEmpty(x)))
 				{
 					switch (chunk[0])
@@ -91,37 +91,87 @@ namespace Knyaz.Optimus.Dom.Css
 							Specifity++;	
 							currentChunkType = ChunkTypes.State;
 							break;
+						case '[':
+							Specifity += 256;
+							currentChunkType = ChunkTypes.Attribute;
+							break;
+						case ']':
+							currentChunkType = ChunkTypes.Tags;
+							break;
 						case '*':
-							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.All};
+							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.All};
 							break;
 						case '>':
-							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.Parent};
+							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.Parent};
 							break;
 						case ' ':
-							_chain = new Node {Value = null, Next = _chain, Type = ChunkTypes.Ancestor};
+							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.Ancestor};
 							break;
 						default:
-							_chain = new Node {Value = currentChunkType == ChunkTypes.Tags ? chunk.ToUpperInvariant(): chunk, Next = _chain, Type = currentChunkType};
+							if (currentChunkType == ChunkTypes.Attribute)
+							{
+								var parts = chunk.Split('=');
+								if (parts.Length == 1)
+								{
+									chain = new Node {Value = chunk, Next = chain, Type = currentChunkType};
+									break;
+								}
+
+								var attr = parts[0];
+
+								parts[1] = parts[1].Trim('\"');
+
+								if(attr.Last() == '~')
+								{
+									chain = new Node { Value = attr.Substring(0, attr.Length -1),
+										AttrValue = parts[1], Next = chain, Type = ChunkTypes.AttributeContains};
+								}
+								else if (attr.Last() == '|')
+								{
+									chain = new Node
+									{
+										Value = attr.Substring(0, attr.Length - 1),
+										AttrValue = parts[1],
+										Next = chain,
+										Type = ChunkTypes.AttributeStartWith
+									};
+								}
+								else
+								{
+									chain = new Node
+									{
+										Value = attr,
+										AttrValue = parts[1],
+										Next = chain,
+										Type = ChunkTypes.Attribute
+									};
+								}
+								break;
+							}
+
+							chain = new Node {Value = currentChunkType == ChunkTypes.Tags ? chunk.ToUpperInvariant(): chunk, Next = chain, Type = currentChunkType};
 							if (currentChunkType == ChunkTypes.Tags)
 								Specifity++;
 							currentChunkType = ChunkTypes.Tags;
 							break;
 					}
 				}
-				if(_chain != null)
-					_chains.Add(_chain);
+				if(chain != null)
+					_chains.Add(chain);
 			}
 		}
 		
 		enum ChunkTypes
 		{
-			Raw, Id, Class, Tags, All, Parent, Ancestor, State
+			Raw, Id, Class, Tags, All, Parent, Ancestor, State,
+			Attribute, AttributeContains, AttributeStartWith
 		}
 
 		class Node
 		{
 			public ChunkTypes Type;
 			public string Value;
+			public string AttrValue;
 			public Node Next;
 		}
 
@@ -156,6 +206,48 @@ namespace Knyaz.Optimus.Dom.Css
 					return false;
 
 				if(elt.TagName != chain.Value)
+					return false;
+			} else if (chain.Type == ChunkTypes.Attribute)
+			{
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
+					return false;
+
+				if (chain.AttrValue == null)
+				{
+					if (htmlElt.GetAttributeNode(chain.Value) == null)
+						return false;
+				}
+				else
+				{
+					if (htmlElt.GetAttribute(chain.Value) != chain.AttrValue)
+						return false;
+				}
+			}else if (chain.Type == ChunkTypes.AttributeContains)
+			{
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
+					return false;
+
+				if (chain.AttrValue == string.Empty)
+					return false;
+
+				var attr = htmlElt.GetAttribute(chain.Value);
+				if (attr == null)
+					return false;
+
+				if (!attr.Split(' ').Contains(chain.AttrValue))
+					return false;
+			}else if (chain.Type == ChunkTypes.AttributeStartWith)
+			{
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
+					return false;
+				var attr = htmlElt.GetAttribute(chain.Value);
+				if (attr == null)
+					return false;
+
+				if (!attr.StartsWith(chain.AttrValue+"-") && attr != chain.AttrValue)
 					return false;
 			}
 
