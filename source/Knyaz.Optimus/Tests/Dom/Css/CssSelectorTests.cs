@@ -42,6 +42,8 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("[custom~=\"123 456\"]", "<div name=nomatch custom=123></div><div name=nomatch custom=\"123 456\"></div>")]
 		[TestCase("[custom~=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div>")]
 		[TestCase("[custom|=\"123\"]", "<div name=nomatch custom=1234></div><div name=match custom=123></div><div name=match custom=\"123-456\"></div>")]
+		[TestCase("[=\"asd\"]", "<div name=nomatch></div>")]
+		[TestCase("[=]", "<div name=nomatch></div>")]
 		[TestCase("p+p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
 		[TestCase("p + p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
 		[TestCase("div+p", "<p name=nomatch></p><p name=nomatch></p><div></div><p name=match></p>")]

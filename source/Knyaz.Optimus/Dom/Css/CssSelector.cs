@@ -115,9 +115,16 @@ namespace Knyaz.Optimus.Dom.Css
 							if (currentChunkType == ChunkTypes.Attribute)
 							{
 								var parts = chunk.Split('=');
+
 								if (parts.Length == 1)
 								{
 									chain = new Node {Value = chunk, Next = chain, Type = currentChunkType};
+									break;
+								}
+
+								if (parts.Length == 0 || parts[0].Length == 0)
+								{
+									currentChunkType = ChunkTypes.Tags;
 									break;
 								}
 
