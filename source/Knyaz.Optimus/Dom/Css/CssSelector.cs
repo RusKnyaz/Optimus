@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
@@ -15,7 +14,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		static bool IsChunkChar(char c)
 		{
-			return char.IsLetterOrDigit(c) || c == '-' || c == '_' || c=='\"' || c=='=' || c=='~' || c=='|';
+			return char.IsLetterOrDigit(c) || c == '-' || c == '_' || c=='\"' || c=='=' || c=='~' || c=='|' || c=='$' || c=='^';
 		}
 
 		IEnumerable<string> SplitSelector(string selector)
@@ -24,12 +23,23 @@ namespace Knyaz.Optimus.Dom.Css
 
 			var readText = IsChunkChar(selector[0]) ;
 
+			var attr = false;
+
 			foreach (var c in selector)
 			{
 				if(c == '\r' || c == '\n')
 					continue;
 
-				if (IsChunkChar(c) != readText)
+				if (c == '[')
+				{
+					readText = attr = true;
+					yield return "[";
+					continue;
+				}
+				else if (c == ']')
+					attr = false;
+
+				if (!attr && IsChunkChar(c) != readText)
 				{
 					if (!readText)
 					{
@@ -132,19 +142,24 @@ namespace Knyaz.Optimus.Dom.Css
 
 								parts[1] = parts[1].Trim('\"');
 
-								if(attr.Last() == '~')
+								if (!char.IsLetterOrDigit(attr.Last()))
 								{
-									chain = new Node { Value = attr.Substring(0, attr.Length -1),
-										AttrValue = parts[1], Next = chain, Type = ChunkTypes.AttributeContains};
-								}
-								else if (attr.Last() == '|')
-								{
-									chain = new Node
+									var sel = attr.Last();
+									var type = sel == '~' ? ChunkTypes.AttributeDelimitedContains
+										: sel == '|' ? ChunkTypes.AttributeDelimitedStartWith
+										: sel == '^' ? ChunkTypes.AttributeStartWith
+										: sel == '$' ? ChunkTypes.AttributeEndWith
+										: sel == '*' ? ChunkTypes.AttributeContains
+											 : ChunkTypes.Attribute;
+
+									if (type == ChunkTypes.Attribute)
 									{
-										Value = attr.Substring(0, attr.Length - 1),
-										AttrValue = parts[1],
-										Next = chain,
-										Type = ChunkTypes.AttributeStartWith
+										currentChunkType = ChunkTypes.Tags;
+										break;
+									}
+
+									chain = new Node { 
+										Value = attr.Substring(0, attr.Length - 1),AttrValue = parts[1],Next = chain,Type = type
 									};
 								}
 								else
@@ -175,8 +190,11 @@ namespace Knyaz.Optimus.Dom.Css
 		enum ChunkTypes
 		{
 			Raw, Id, Class, Tags, All, Parent, Ancestor, State,
-			Attribute, AttributeContains, AttributeStartWith,
-			PrevSibling
+			Attribute, AttributeDelimitedContains, AttributeDelimitedStartWith,
+			PrevSibling,
+			AttributeStartWith,
+			AttributeEndWith,
+			AttributeContains
 		}
 
 		class Node
@@ -235,7 +253,7 @@ namespace Knyaz.Optimus.Dom.Css
 					if (htmlElt.GetAttribute(chain.Value) != chain.AttrValue)
 						return false;
 				}
-			}else if (chain.Type == ChunkTypes.AttributeContains)
+			}else if (chain.Type == ChunkTypes.AttributeDelimitedContains)
 			{
 				var htmlElt = elt as HtmlElement;
 				if (htmlElt == null)
@@ -250,7 +268,32 @@ namespace Knyaz.Optimus.Dom.Css
 
 				if (!attr.Split(' ').Contains(chain.AttrValue))
 					return false;
-			}else if (chain.Type == ChunkTypes.AttributeStartWith)
+			}
+			else if (chain.Type == ChunkTypes.AttributeStartWith)
+			{
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
+					return false;
+				var attr = htmlElt.GetAttribute(chain.Value);
+				if (attr == null)
+					return false;
+
+				if (!attr.StartsWith(chain.AttrValue))
+					return false;
+			}
+			else if (chain.Type == ChunkTypes.AttributeEndWith)
+			{
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
+					return false;
+				var attr = htmlElt.GetAttribute(chain.Value);
+				if (attr == null)
+					return false;
+
+				if (!attr.EndsWith(chain.AttrValue))
+					return false;
+			}
+			else if (chain.Type == ChunkTypes.AttributeDelimitedStartWith)
 			{
 				var htmlElt = elt as HtmlElement;
 				if (htmlElt == null)
@@ -260,6 +303,18 @@ namespace Knyaz.Optimus.Dom.Css
 					return false;
 
 				if (!attr.StartsWith(chain.AttrValue+"-") && attr != chain.AttrValue)
+					return false;
+			}
+			else if (chain.Type == ChunkTypes.AttributeContains)
+			{
+				var htmlElt = elt as HtmlElement;
+				if (htmlElt == null)
+					return false;
+				var attr = htmlElt.GetAttribute(chain.Value);
+				if (attr == null)
+					return false;
+
+				if (!attr.Contains(chain.AttrValue))
 					return false;
 			}
 
