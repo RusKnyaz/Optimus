@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -75,32 +76,38 @@ namespace Knyaz.Optimus.Dom
 				return;
 			}
 
+			var htmlElement = htmlNode as IHtmlElement;
+
+			var htmlHtmlElt = node as HtmlHtmlElement;
+			if (htmlHtmlElt != null && (htmlElement == null || (
+				!htmlElement.Name.Equals(TagsNames.Body, StringComparison.InvariantCultureIgnoreCase) && 
+				!htmlElement.Name.Equals(TagsNames.Head, StringComparison.InvariantCultureIgnoreCase))))
+			{
+				node = node.OwnerDocument.Body;
+			}
+
 			var txt = htmlNode as IHtmlText;
 			if (txt != null)
 			{
-				//todo: the more intelligent logic should be implemented. text nodes (except whitespaces) of html should falls into body.
-				if (node.NodeName == "HTML")
-					return;
-
 				var c = node.OwnerDocument.CreateTextNode(txt.Value);
 				c.Source = source;
+
 				node.AppendChild(c);
 				return;
 			}
 
-			var htmlElement = htmlNode as IHtmlElement;
+			
 			if (htmlElement == null)
 				return;
 
 			Element elem = null;
 			var append = false;
 
-			var html = node as HtmlHtmlElement;
-			if (html != null)
+			if (htmlHtmlElt != null)
 			{
 				var invariantName = htmlElement.Name.ToUpperInvariant();
 				if (invariantName == "HEAD" || invariantName == "BODY")
-					elem = html.GetElementsByTagName(invariantName).FirstOrDefault();
+					elem = htmlHtmlElt.GetElementsByTagName(invariantName).FirstOrDefault();
 			}
 
 			//if parent is table

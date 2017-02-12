@@ -52,7 +52,7 @@ namespace Knyaz.Optimus.Html
 						if (ClosePrevTag(elem.Name, tagName))
 							return ParseResult.BackToParent;
 
-						var childElem = new HtmlElement() {Name = tagName};
+						var childElem = new HtmlElement() {Name = htmlChunk.Value };
 						if (ParseElement(childElem, enumerator) == ParseResult.BackToParent)
 							reread = true;
 						elem.Children.Add(childElem);

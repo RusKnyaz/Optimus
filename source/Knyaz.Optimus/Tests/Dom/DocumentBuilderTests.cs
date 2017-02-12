@@ -61,6 +61,13 @@ namespace Knyaz.Optimus.Tests.Dom
 				((HtmlElement)tbl.FirstChild).TagName == "DIV");
 		}
 
+		[Test]
+		public void NoMainTags()
+		{
+			Build("Text<p>para</p>").Assert(doc => 
+				doc.InnerHTML == "<HTML><HEAD></HEAD><BODY>Text<P>para</P></BODY></HTML>");
+		}
+
 		private Document Build(string txt)
 		{
 			var d = new Document();
