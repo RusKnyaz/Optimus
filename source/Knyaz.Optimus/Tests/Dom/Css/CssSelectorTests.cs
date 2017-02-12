@@ -45,6 +45,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("p+p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
 		[TestCase("p + p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
 		[TestCase("div+p", "<p name=nomatch></p><p name=nomatch></p><div></div><p name=match></p>")]
+		[TestCase("p+p", "TEXT<p name=nomatch></p>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);

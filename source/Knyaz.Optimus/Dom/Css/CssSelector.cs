@@ -109,7 +109,7 @@ namespace Knyaz.Optimus.Dom.Css
 							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.Ancestor};
 							break;
 						case '+':
-							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.Follow};
+							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.PrevSibling};
 							break;
 						default:
 							if (currentChunkType == ChunkTypes.Attribute)
@@ -169,7 +169,7 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			Raw, Id, Class, Tags, All, Parent, Ancestor, State,
 			Attribute, AttributeContains, AttributeStartWith,
-			Follow
+			PrevSibling
 		}
 
 		class Node
@@ -269,13 +269,16 @@ namespace Knyaz.Optimus.Dom.Css
 				else if (chain.Type == ChunkTypes.All)
 				{
 					return ((INode) elt).GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
-				} else if (chain.Type == ChunkTypes.Follow)
+				} else if (chain.Type == ChunkTypes.PrevSibling)
 				{
-					var prev = elt.PreviousSibling;
+					if (elt.PreviousSibling == null)
+						return false;
+
+					var prev = elt.PreviousSibling.GetRecursive(x => x.PreviousSibling).FirstOrDefault(x => !(x is Text)) as IElement;
 					if(prev == null)
 						return false;
 
-					return IsMatches((IElement)prev, chain.Next);
+					return IsMatches(prev, chain.Next);
 				}
 				else return IsMatches(elt, chain.Next);
 			}
