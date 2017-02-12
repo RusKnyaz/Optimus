@@ -320,6 +320,9 @@ namespace Knyaz.Optimus.Dom.Css
 
 				if (!attr.Contains(chain.AttrValue))
 					return false;
+			}else if (chain.Type == ChunkTypes.State)
+			{
+				return false;//not implemented
 			}
 
 			if (chain.Next != null)

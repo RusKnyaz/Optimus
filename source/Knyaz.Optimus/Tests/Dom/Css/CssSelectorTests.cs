@@ -52,6 +52,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("div+p", "<p name=nomatch></p><p name=nomatch></p><div></div><p name=match></p>")]
 		[TestCase("p+p", "TEXT<p name=nomatch></p>")]
 		[TestCase("p~p", "<p name=nomatch></p><div name=nomatch></div><p name=match></p>")]
+		[TestCase("input:-moz-suppressed", "<input type=text class='form-control' name=nomatch></input>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);
