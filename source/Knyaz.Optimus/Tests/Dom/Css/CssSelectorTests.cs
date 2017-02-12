@@ -42,6 +42,9 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("[custom~=\"123 456\"]", "<div name=nomatch custom=123></div><div name=nomatch custom=\"123 456\"></div>")]
 		[TestCase("[custom~=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div>")]
 		[TestCase("[custom|=\"123\"]", "<div name=nomatch custom=1234></div><div name=match custom=123></div><div name=match custom=\"123-456\"></div>")]
+		[TestCase("p+p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
+		[TestCase("p + p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
+		[TestCase("div+p", "<p name=nomatch></p><p name=nomatch></p><div></div><p name=match></p>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);
@@ -64,7 +67,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("li", 1)]
 		[TestCase("li:first-line", 2)]
 		[TestCase("ul li", 2)]
-		//todo: uncomment when + selector implemented [TestCase("ul ol+li", 3)]
+		[TestCase("ul ol+li", 3)]
 		[TestCase("h1 + *[rel=up]", 0x0101)]  /* a=0 b=0 c=1 d=1 -> specificity = 0,0,1,1 */
 		[TestCase("ul ol li.red", 0x0103)]  /* a=0 b=0 c=1 d=3 -> specificity = 0,0,1,3 */
 		[TestCase("li.red.level", 0x0201)]  /* a=0 b=0 c=2 d=1 -> specificity = 0,0,2,1 */

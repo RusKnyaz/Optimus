@@ -98,6 +98,7 @@ namespace Knyaz.Optimus.Dom.Css
 						case ']':
 							currentChunkType = ChunkTypes.Tags;
 							break;
+
 						case '*':
 							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.All};
 							break;
@@ -106,6 +107,9 @@ namespace Knyaz.Optimus.Dom.Css
 							break;
 						case ' ':
 							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.Ancestor};
+							break;
+						case '+':
+							chain = new Node {Value = null, Next = chain, Type = ChunkTypes.Follow};
 							break;
 						default:
 							if (currentChunkType == ChunkTypes.Attribute)
@@ -164,7 +168,8 @@ namespace Knyaz.Optimus.Dom.Css
 		enum ChunkTypes
 		{
 			Raw, Id, Class, Tags, All, Parent, Ancestor, State,
-			Attribute, AttributeContains, AttributeStartWith
+			Attribute, AttributeContains, AttributeStartWith,
+			Follow
 		}
 
 		class Node
@@ -264,6 +269,13 @@ namespace Knyaz.Optimus.Dom.Css
 				else if (chain.Type == ChunkTypes.All)
 				{
 					return ((INode) elt).GetRecursive(x => x.ParentNode).OfType<IElement>().Any(x => IsMatches(x, chain.Next));
+				} else if (chain.Type == ChunkTypes.Follow)
+				{
+					var prev = elt.PreviousSibling;
+					if(prev == null)
+						return false;
+
+					return IsMatches((IElement)prev, chain.Next);
 				}
 				else return IsMatches(elt, chain.Next);
 			}
@@ -273,6 +285,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private static readonly Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
 		private static readonly Regex _normalizeGt = new Regex("\\s*\\>\\s*", RegexOptions.Compiled);
+		private static readonly Regex _normalizePlus = new Regex("\\s*\\+\\s*", RegexOptions.Compiled);
 		private static readonly Regex _normalizeSpaces = new Regex("\\s+", RegexOptions.Compiled);
 
 		private static string NormalizeSelector(string selector)
@@ -280,6 +293,7 @@ namespace Knyaz.Optimus.Dom.Css
 			selector = selector.Replace('\n', ' ').Replace('\r', ' ');
 			selector = _normalizeCommas.Replace(selector, ",");
 			selector = _normalizeGt.Replace(selector, ">");
+			selector = _normalizePlus.Replace(selector, "+");
 			selector = _normalizeSpaces.Replace(selector, " ");
 			return selector;
 		}
