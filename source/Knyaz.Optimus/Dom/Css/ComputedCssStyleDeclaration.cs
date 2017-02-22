@@ -115,8 +115,6 @@ namespace Knyaz.Optimus.Dom.Css
 				.Concat(
 				_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
 
-			var tmp = values.Select(x => x.GetPropertyValue(propertyName)).ToArray();
-
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit" ||
 				((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style"
