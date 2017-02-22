@@ -20,7 +20,10 @@ namespace Knyaz.Optimus.Dom.Css
 			if (htmlElt != null)
 				yield return htmlElt.Style;
 
-			foreach (var rule in GetStyleRulesFor(elt).OrderByDescending(x => x.Selector.Specifity))
+			foreach (var rule in GetStyleRulesFor(elt)
+			         .SelectMany(x => x.Selectors.Select(sel => Tuple.Create(sel, x)))
+					 .OrderByDescending(tuple => tuple.Item1.Specifity)
+					 .Select(tuple => tuple.Item2))
 				yield return rule.Style;
 		}
 
@@ -111,6 +114,8 @@ namespace Knyaz.Optimus.Dom.Css
 				_styles.Where(x => x.GetPropertyPriority(propertyName) == "important")
 				.Concat(
 				_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
+
+			var tmp = values.Select(x => x.GetPropertyValue(propertyName)).ToArray();
 
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit" ||

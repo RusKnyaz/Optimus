@@ -196,12 +196,14 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 
 		[TestCase("#d2 {color:green}</style><style> * {color:red}", "green")]
 		[TestCase(" * {color:red}</style><style>#d2 {color:green}", "green")]
-		public void Priority(string css, string expectedColor)
+		[TestCase("div{color:green} div {color:red}","red")]
+		[TestCase("div,span{color:red} div{color:green}", "green")]
+		public void Priority(string css, string expectedValue)
 		{
 			var engine = Load("<style>"+css+"</style><body><div id=d1 class=c1><div id=d2 class=c2></div></div></body>");
 			var div = engine.Document.GetElementById("d2");
 			Assert.IsNotNull(div);
-			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == expectedColor);
+			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == expectedValue);
 		}
 
 		[Test]
