@@ -1,8 +1,8 @@
-﻿using Knyaz.Optimus.Dom;
+﻿#if NUNIT
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
-#if NUNIT
 namespace Knyaz.Optimus.Tests.Dom
 {
 	[TestFixture]
