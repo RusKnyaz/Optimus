@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Dom.Css
 	[DomItem]
 	public interface ICssStyleDeclaration
 	{
-		object this[string name] { get; }
+		string this[string name] { get; }
 		string this[int idx] { get; }
 		string GetPropertyValue(string propertyName);
 		string GetPropertyPriority(string propertyName);
@@ -37,7 +37,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private HashSet<string> _importants = new HashSet<string>();
 
-		public object this[string name]
+		public string this[string name]
 		{
 			get
 			{
