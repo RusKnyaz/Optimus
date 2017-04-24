@@ -48,6 +48,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Attr", typeof(Attr));
 
 			_jsEngine.Execute("var window = this");
+			_jsEngine.Execute("var self = window");
+
 			//Perf types
 			AddClrType("ArrayBuffer", typeof(ArrayBuffer));
 			AddClrType("Int8Array", typeof(Int8Array));

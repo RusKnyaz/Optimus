@@ -754,6 +754,20 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
+		public void Self()
+		{
+			CreateEngine("", "console.log(self == window);");
+			CollectionAssert.AreEqual(new[] { true }, _log);
+		}
+
+		[Test]
+		public void OverrideSelf()
+		{
+			CreateEngine("", "self = 'a'; console.log(self);");
+			CollectionAssert.AreEqual(new[] { "a" }, _log);
+		}
+
+		[Test]
 		public void GetComputedStyle()
 		{
 			_resourceProvider.Resource("test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
