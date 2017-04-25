@@ -65,7 +65,7 @@ namespace Knyaz.Optimus.Dom.Css
 			_cachedVersion = getVersion();
 		}
 
-		public string this[string name]
+		public object this[string name]
 		{
 			get
 			{

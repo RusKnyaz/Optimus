@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.ScriptExecuting;
@@ -10,7 +11,7 @@ namespace Knyaz.Optimus.Dom.Css
 	[DomItem]
 	public interface ICssStyleDeclaration
 	{
-		string this[string name] { get; }
+		object this[string name] { get; }
 		string this[int idx] { get; }
 		string GetPropertyValue(string propertyName);
 		string GetPropertyPriority(string propertyName);
@@ -37,7 +38,8 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private HashSet<string> _importants = new HashSet<string>();
 
-		public string this[string name]
+		//todo: it's not better idea to use 'object' but sometimes js code tries to set the value of 'double' type.
+		public object this[string name]
 		{
 			get
 			{
@@ -53,7 +55,17 @@ namespace Knyaz.Optimus.Dom.Css
 				if (int.TryParse(name, out number))
 					return;
 
-				SetProperty(name, value == null ? null : value.ToString());
+				if (value == null)
+				{
+					SetProperty(name, null);
+				}
+				else
+				{
+					if (value is double)
+						SetProperty(name, ((double)value).ToString(CultureInfo.InvariantCulture));
+					else
+						SetProperty(name, value.ToString());
+				}
 			}
 		}
 

@@ -776,5 +776,17 @@ dispatchEvent(evt);");
 			_engine.Load("<html><head><script src='test.js' defer/></head><body>" + "<div id=d></div>" + "</body></html>");
 			CollectionAssert.AreEqual(new[] { "block", "block" }, _log);
 		}
+
+		[Test]
+		public void SetStyleNumericValue()
+		{
+			CreateEngine("<div id=d></div>", 
+				"var d = document.getElementById('d');" +
+				"d.style['zoom'] = 1;" +
+				"console.log(d.style['zoom'] == 1);" +
+				"console.log(d.style['zoom'] === 1);" + 
+				"console.log(typeof d.style['zoom']);");
+			CollectionAssert.AreEqual(new object[] { true, false, "string" }, _log);
+		}
 	}
 }
