@@ -85,7 +85,7 @@
     <exec program="${build.exe}" commandline="${args}"/>
     <copy todir="${bin.d}">
       <fileset>
-        <include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/Knyaz.Optimus.Tests.dll"/>
+        <include name="${sources.d}/Knyaz.Optimus.Tests/bin/${msconfig}/Knyaz.Optimus.Tests.dll"/>
       </fileset>
     </copy>
   </target>
