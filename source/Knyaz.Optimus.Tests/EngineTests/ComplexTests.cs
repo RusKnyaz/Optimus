@@ -39,37 +39,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 				.Resource("./stringTemplateEngine.js", Resources.stringTemplateEngine);
 		}
 
-		[Test]
-		public void StringTemplateEngine()
-		{
-			_resourceProvider.Resource("/templ.htm",
-				"<script id='t1'><div id='templateDiv'></div></script><script id='t2'></script>");
-
-			_resourceProvider.Resource("http://localhost/index.html",
-@"<html>
-<head>
-<script src='knockout.js'/>
-<script src='require.js'/>
-<script>require(['template!/templ.htm'], function(){ console('loaded');});</script>
-</head>
-<body></body></html>");
-
-			var engine = CreateEngine();
-			engine.OpenUrl("http://localhost/index.html");
-
-			Thread.Sleep(15000);
-
-			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("http://localhost/index.html"), Times.Once());
-			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("require.js"), Times.Once());
-			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("template.js"), Times.Once());
-			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("./text.js"), Times.Once());
-			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("./stringTemplateEngine.js"), Times.Once());
-			//Mock.Get(_resourceProvider).Verify(x => x.GetResourceAsync("template.htm"), Times.Once());
-
-			engine.Document.Assert(doc =>
-				doc.GetElementById("t1") != null &&
-				doc.GetElementById("t2") != null);
-		}
 
 		[Test]
 		public void KnockoutWithRequiredTemplate()

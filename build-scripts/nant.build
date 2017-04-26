@@ -60,7 +60,6 @@
 
 	<target name="build" description="Compiles the source code.">
 		<echo message="Target started at: ${datetime::now()}."/>
-		<property name="nant.settings.currentframework" value="${net-4.0}" />
 		
 		<call target="set-props" />
 		
@@ -78,6 +77,18 @@
 		</copy>
 		<echo message="Build finished at: ${datetime::now()}"/>
 	</target>
+
+  <target name="build-tests" description="Compiles the source code of the Knyaz.Optimus.Tests">
+    <call target="set-props" />
+    <property name="args" value="&quot;${solution}&quot;"/>
+    <property name="args" value="${args} /t:Knyaz_Optimus_Tests:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
+    <exec program="${build.exe}" commandline="${args}"/>
+    <copy todir="${bin.d}">
+      <fileset>
+        <include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/Knyaz.Optimus.Tests.dll"/>
+      </fileset>
+    </copy>
+  </target>
 
 	<target name="nuget-restore">
 		<exec if="${iswin}"
@@ -113,6 +124,13 @@
 		<exec program="nunit-console" commandline="&quot;${bin.optimus.dll}&quot; -xml=&quot;${test.res.d}/${optimus.dll}-results.xml&quot; -noshadow"/>
 		<echo message="Target completed at: ${datetime::now()}." />
 	</target>
+
+  <target name="nunit-a-run" description="Run acceptance tests">
+    <echo message="Launch NUnit." />
+    <mkdir dir="${test.res.d}" />
+    <exec program="nunit-console" commandline="&quot;${bin.d}/Knyaz.Optimus.Tests.dll&quot; -xml=&quot;${test.res.d}/Knyaz.Optimus.Tests.dll-results.xml&quot; -noshadow"/>
+    <echo message="Target completed at: ${datetime::now()}." />
+  </target>
 	
 	<target name="config-nunit">
 		<property name = "config.environment" value="nunit"/>
@@ -121,7 +139,9 @@
 	<target name="build-nunit" >
 		<call target="config-nunit"/>
 		<call target="build" />
+    <call target="build-tests"/>
 	</target>
+  
 	<target name="build-release" >
 		<property name = "config.environment" value="release"/>
 		<call target="build" />
@@ -140,6 +160,7 @@
 		<call target="nuget-restore"/>
 		<call target="build-nunit"/>
 		<call target="nunit-run"/>
+    <call target="nunit-a-run"/>
 		<call target="build-release"/>
 		<call target="artifacts-nuget"/>
 	</target>
