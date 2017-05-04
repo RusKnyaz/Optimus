@@ -66,7 +66,7 @@
 		<property name="args" value="&quot;${solution}&quot;"/>
 		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
 		
-		<property name="args" value="${args} /p:GenerateDocumentation=true;DocumentationFile=${optimus.dll}.xml" if="${config.environment == 'release'}"/>
+		<property name="args" value="${args} &quot;/p:GenerateDocumentation=true;DocumentationFile=${sources.d}/Knyaz.Optimus/bin/${msconfig}/${optimus.dll}.xml&quot;" if="${config.environment == 'release'}"/>
 				
 		<echo message="exec: ${build.exe} ${args}"/>
 		
