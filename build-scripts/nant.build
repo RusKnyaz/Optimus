@@ -66,6 +66,8 @@
 		<property name="args" value="&quot;${solution}&quot;"/>
 		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
 		
+		<property name="args" value="${args} /p:GenerateDocumentation=true;DocumentationFile=${optimus.dll}.xml" if="${config.environment == 'release'}"/>
+				
 		<echo message="exec: ${build.exe} ${args}"/>
 		
 		<exec program="${build.exe}" commandline="${args}"/>
@@ -73,6 +75,7 @@
 		<copy todir="${bin.d}">
 			<fileset>
 				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/*.dll"/>
+				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/${optimus.dll}.xml"/>
 			</fileset>
 		</copy>
 		<echo message="Build finished at: ${datetime::now()}"/>
@@ -97,15 +100,6 @@
 		      program="mono" workingdir = "${sources.d}" commandline="&quot;${nuget.exe}&quot; install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
 	</target>
 		
-	<target name="artifacts-zip" description="Create zip archive from 'publish' directory">
-		<mkdir dir="${artifacts.d}" />
-		<zip zipfile="${artifacts.d}/optimus.zip">
-			<fileset basedir="${publish.d}">
-			        <include name="**/*" />
-			</fileset>
-		</zip>
-	</target>
-
 	<target name="artifacts-nuget" description="Create nuget package from 'bin' directory">
 		<mkdir dir="${artifacts.d}" />
 		<copy todir="${bin.d}">
