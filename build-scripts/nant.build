@@ -66,8 +66,6 @@
 		<property name="args" value="&quot;${solution}&quot;"/>
 		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
 		
-		<property name="args" value="${args} &quot;/p:GenerateDocumentation=true;DocumentationFile=${sources.d}/Knyaz.Optimus/bin/${msconfig}/${optimus.dll}.xml&quot;" if="${config.environment == 'release'}"/>
-				
 		<echo message="exec: ${build.exe} ${args}"/>
 		
 		<exec program="${build.exe}" commandline="${args}"/>
@@ -75,7 +73,7 @@
 		<copy todir="${bin.d}">
 			<fileset>
 				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/*.dll"/>
-				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/${optimus.dll}.xml"/>
+				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/Knyaz.Optimus.xml"/>
 			</fileset>
 		</copy>
 		<echo message="Build finished at: ${datetime::now()}"/>
