@@ -77,7 +77,7 @@ namespace Knyaz.Optimus.TestingTools
 				if (arr[0].Last() == '^')
 				{
 					var attrVal = child.GetAttribute(arr[0].TrimEnd('^'));
-					if (attrVal != null && attrVal.StartsWith(arr[1]))
+					if (attrVal != null && attrVal.StartsWith(arr[1].Trim('\'')))
 						yield return child;
 				}
 				else

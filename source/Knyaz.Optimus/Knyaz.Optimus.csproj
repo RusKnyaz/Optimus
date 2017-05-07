@@ -190,6 +190,7 @@
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
+    <Compile Include="Tests\TestingTools\ElementExtensionTests.cs" />
     <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tests\Tools\CachedEnumerableTests.cs" />
     <Compile Include="Tools\CachedEnumerable.cs" />
