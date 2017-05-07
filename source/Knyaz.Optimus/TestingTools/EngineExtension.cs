@@ -59,6 +59,31 @@ namespace Knyaz.Optimus.TestingTools
 		}
 
 		/// <summary>
+		/// Locks the current thread until the element with specified id disappears.
+		/// </summary>
+		/// <param name="engine">Document owner.</param>
+		/// <param name="id">Identifier of the item to be disappeared.</param>
+		/// <param name="timeout">The timeout</param>
+		/// <returns>Element if found, <c>null</c> othervise.</returns>
+		public static Element WaitDesappearingOfId(this Engine engine, string id, int timeout = DefaultTimeout)
+		{
+			var timespan = 100;
+			for (int i = 0; i < timeout / timespan; i++)
+			{
+				var doc = engine.Document;
+				lock (doc)
+				{
+					var elt = doc.GetElementById(id);
+					if (elt == null)
+						return null;
+				}
+
+				Thread.Sleep(timespan);
+			}
+			return engine.Document.GetElementById(id);
+		}
+
+		/// <summary>
 		/// Wait while element with specified id appears in document.
 		/// </summary>
 		public static Element WaitId(this Document document, string id, int timeout = DefaultTimeout)
