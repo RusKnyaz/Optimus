@@ -87,7 +87,7 @@ namespace Knyaz.Optimus.TestingTools
 						if (child.GetAttributeNode(arr[0]) != null)
 							yield return child;
 					}
-					else if (child.GetAttribute(arr[0]) == arr[1])
+					else if (child.GetAttribute(arr[0]) == arr[1].Trim('\''))
 						yield return child;	
 				}
 			}

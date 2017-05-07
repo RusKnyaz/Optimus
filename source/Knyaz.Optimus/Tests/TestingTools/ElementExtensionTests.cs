@@ -9,15 +9,16 @@ namespace Knyaz.Optimus.Tests.TestingTools
 	[TestFixture]
 	public class ElementExtensionTests
 	{
-		[Test]
-		public void Select()
+		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^='row_']", "row_0,row_1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "[column-name='Name']", "c1")]
+		public void Select(string html, string selector, string expectedIds)
 		{
 			var doc = new Document();
-			doc.Write("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>");
+			doc.Write(html);
 
-			var items = doc.Select("tr[id^='row_']").Select(x => x.Id).ToArray();
+			var items = doc.Select(selector).Select(x => x.Id).ToArray();
 
-			CollectionAssert.AreEqual(new[] {"row_0","row_1"}, items);
+			CollectionAssert.AreEqual(expectedIds.Split(','), items);
 		}
 	}
 }
