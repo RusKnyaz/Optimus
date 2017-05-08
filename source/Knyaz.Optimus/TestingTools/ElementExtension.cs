@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -31,9 +33,11 @@ namespace Knyaz.Optimus.TestingTools
 			input.DispatchEvent(evt);
 		}
 
+		static Regex _gtNormalize = new Regex("\\s*>\\s*", RegexOptions.Compiled);
+
 		public static IEnumerable<IElement> Select(this IElement doc, string selector)
 		{
-			var selectors = selector.Split(' ', '[').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+			var selectors = _gtNormalize.Replace(selector, " >").Split(' ', '[').Where(x => !string.IsNullOrEmpty(x)).ToArray();
 			if (selectors.Length == 0)
 				return Enumerable.Empty<IElement>();
 
@@ -47,20 +51,25 @@ namespace Knyaz.Optimus.TestingTools
 			{
 				case '#':
 				{
+					var id = selector.Substring(1);
+
 					var doc = elt as IDocument;
 					if (doc != null)
 					{
-						var res = doc.GetElementById(selector.Substring(1));
+						var res = doc.GetElementById(id);
 						if (res != null)
 							return new[] {res};
 						
 						return new IElement[0];
 					}
-						
-					throw new InvalidOperationException("Id search can be performed only on document");
+
+					return elt.ChildNodes.OfType<IElement>().Flat(x => x.ChildNodes.OfType<IElement>()).Where(x => x.Id == id);
 				}
 				case '.':
 					return elt.GetElementsByClassName(selector.Substring(1));
+				case '>':
+					var sel = new CssSelector(selector.Substring(1));
+					return elt.ChildNodes.OfType<IElement>().Where(x => sel.IsMatches(x));
 				default:
 					if (selector[selector.Length - 1] == ']')
 						return elt.GetElementsByAttributes(selector.Substring(0, selector.Length-1));

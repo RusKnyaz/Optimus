@@ -36,9 +36,19 @@ namespace Knyaz.Optimus.Dom.Elements
 			return _capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
 		}
 
+		public void AddEventListener(string type, Action<Event> listener)
+		{
+			AddEventListener(type, listener, false);
+		}
+
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
 		{
 			(useCapture ? GetCapturingListeners(type) : GetListeners(type)).Add(listener);
+		}
+
+		public void RemoveEventListener(string type, Action<Event> listener)
+		{
+			RemoveEventListener(type, listener, false);
 		}
 
 		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)

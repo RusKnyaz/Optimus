@@ -157,9 +157,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		public const ushort DOCUMENT_FRAGMENT_NODE = 11;
 		public const ushort NOTATION_NODE = 12;
 
+		public void AddEventListener(string type, Action<Event> listener)
+		{
+			EventTarget.AddEventListener(type,  listener);
+		}
+
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
 		{
 			EventTarget.AddEventListener(type, listener, useCapture);
+		}
+
+		public void RemoveEventListener(string type, Action<Event> listener)
+		{
+			EventTarget.RemoveEventListener(type, listener);
 		}
 
 		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
