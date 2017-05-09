@@ -118,6 +118,7 @@
     <Compile Include="Dom\Events\MutationEvent.cs" />
     <Compile Include="Dom\Elements\Script.cs" />
     <Compile Include="Dom\Elements\Node.cs" />
+    <Compile Include="Dom\Events\ProgressEvent.cs" />
     <Compile Include="Dom\Events\UIEvent.cs" />
     <Compile Include="Dom\Elements\WindowTimers.cs" />
     <Compile Include="Dom\IDocumentSelector.cs" />
@@ -190,8 +191,6 @@
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
-    <Compile Include="Tests\TestingTools\ElementExtensionTests.cs" />
-    <Compile Include="Tests\TestingTools\SelectorTests.cs" />
     <Compile Include="Tests\Tools\CachedEnumerableTests.cs" />
     <Compile Include="Tools\CachedEnumerable.cs" />
     <Compile Include="Tools\Disposable.cs" />

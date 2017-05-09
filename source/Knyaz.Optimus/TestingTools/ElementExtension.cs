@@ -50,21 +50,8 @@ namespace Knyaz.Optimus.TestingTools
 			switch (firstSymbol)
 			{
 				case '#':
-				{
 					var id = selector.Substring(1);
-
-					var doc = elt as IDocument;
-					if (doc != null)
-					{
-						var res = doc.GetElementById(id);
-						if (res != null)
-							return new[] {res};
-						
-						return new IElement[0];
-					}
-
 					return elt.ChildNodes.OfType<IElement>().Flat(x => x.ChildNodes.OfType<IElement>()).Where(x => x.Id == id);
-				}
 				case '.':
 					return elt.GetElementsByClassName(selector.Substring(1));
 				case '>':

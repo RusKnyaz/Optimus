@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 
@@ -16,12 +17,12 @@ namespace Knyaz.Optimus.Dom
 		Document ResponseXML { get; }
 		string ResponseText { get; }
 		string StatusText { get; }
-		string ResponseType { get; }
+		string ResponseType { get; set; }
 		int Status { get; }
 		void SetRequestHeader(string name, string value);
 		string GetAllResponseHeaders();
 		event Action OnReadyStateChange;
-		event Action OnLoad;
+		event Action<Event> OnLoad;
 		event Action OnError;
 	}
 
@@ -125,21 +126,12 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 		
-		public string ResponseType
-		{
-			get
-			{
-				if(ReadyState != DONE || _response == null)
-					return null;
-					//throw new DOMException(DOMException.Codes.InvalidStateError);
-				return _response.Type;
-			}
-		}
+		public string ResponseType { get; set; }
 
 		public int Status { get { return _response == null ? UNSENT : (int)_response.StatusCode; } }
 
 		public event Action OnReadyStateChange;
-		public event Action OnLoad;
+		public event Action<Event> OnLoad;
 		public event Action OnError;
 
 		public async void Send(object data)
@@ -157,6 +149,7 @@ namespace Knyaz.Optimus.Dom
 				try
 				{
 					_response = (HttpResponse) await _resourceProvider.GetResourceAsync(_request);
+					//todo: convert response according to specified responseType.
 					_data = _response.Stream.ReadToEnd();
 				}
 				catch (AggregateException a)
@@ -181,7 +174,7 @@ namespace Knyaz.Optimus.Dom
 					return;
 				}
 				ReadyState = DONE;
-				CallInContext(OnLoad);
+				FireOnLoad();
 			}
 			else
 			{
@@ -198,7 +191,18 @@ namespace Knyaz.Optimus.Dom
 					CallInContext(OnError);
 				}
 				ReadyState = DONE;
-				CallInContext(OnLoad);
+				FireOnLoad();
+			}
+		}
+
+		private void FireOnLoad()
+		{
+			if (OnLoad != null)
+			{
+				var evt = new ProgressEvent("load");
+				evt.InitProgressEvent(true, (ulong) _data.Length, (ulong) _data.Length);
+				lock (_syncObj())
+					OnLoad(evt);
 			}
 		}
 

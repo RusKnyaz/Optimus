@@ -141,8 +141,13 @@ namespace Knyaz.Optimus.ScriptExecuting
 				if (eventInfo.Name.ToLower() != propertyName)
 					continue;
 
+				var pars = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
+
+				//todo: optimize with expressions
 				var settedHandler = new JsValue[1] { JsValue.Null };
-				var listener = (Action)(() => settedHandler[0].Invoke(this, new JsValue[0]));
+				var listener0 = (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
+				var listener1 = (Action<object>)(p1 => settedHandler[0].Invoke(this, new JsValue[] {JsValue.FromObject(Engine, p1)}));
+				var listener = pars.Length == 1 ? (Delegate)listener1 : listener0;
 
 				var getter = new ClrFunctionInstance(Engine, (value, values) => settedHandler[0]);
 				var info = eventInfo;

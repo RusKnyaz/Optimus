@@ -22,6 +22,11 @@ namespace Knyaz.Optimus.Dom.Events
 			TimeStamp = DateTime.Now;
 		}
 
+		public Event(string type):this()
+		{
+			Type = type;
+		}
+
 		public void StopPropagation()
 		{
 			_stopped = true;

@@ -1,4 +1,5 @@
 ﻿#if NUNIT
+using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
@@ -267,6 +268,45 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			var tags = Document(html).GetElementsByTagName("span");
 			Assert.AreEqual(expectedCount, tags.Length);
+		}
+
+		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^='row_']", "row_0,row_1")]
+		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^=row_]", "row_0,row_1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "[column-name='Name']", "c1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "[column-name=Name]", "c1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "#c2", "c2")]
+		[TestCase("<div id=sizzle1><div id=in class=blockUI></div></div>", "#sizzle1 >.blockUI", "in")]
+		[TestCase("<div id=sizzle1><div id=in class=blockUI></div></div>", "#sizzle1 > .blockUI", "in")]
+		[TestCase("<div id=sizzle1><div id=in class=blockUI></div></div>", "#sizzle1>.blockUI", "in")]
+		[TestCase("<div id=sizzle1><a><div id=in class=blockUI></div></a></div>", "#sizzle1 >.blockUI", "")]
+		[TestCase("<div id=s></div><div id=s></div>", "#s", "s,s")]
+		public void QuerySelectorAll(string html, string selector, string expectedIds)
+		{
+			var doc = new Document();
+			doc.Write(html);
+
+			var items = doc.QuerySelectorAll(selector).Select(x => x.Id).ToArray();
+
+			CollectionAssert.AreEqual(string.IsNullOrEmpty(expectedIds) ? new string[0] : expectedIds.Split(','), items);
+		}
+
+		[TestCase("<span id=span1></span>", "#span1", "<SPAN id=\"span1\"></SPAN>", Description = "Root by id")]
+		[TestCase("<div><span id=span1></span></div>", "#span1", "<SPAN id=\"span1\"></SPAN>", Description = "Nested by id")]
+		[TestCase("<div><span id=span1></span></div>", "span", "<SPAN id=\"span1\"></SPAN>", Description = "Nested by tag name")]
+		[TestCase("<div id=div1><span>1</span></div><DIV id=div2><SPAN>2</SPAN></DIV>", "#div2 span", "<SPAN>2</SPAN>", Description = "By id, than by tag name")]
+		[TestCase("<span class='A'></span>", ".A", "<SPAN class=\"A\"></SPAN>", Description = "Simple class selector")]
+		[TestCase("<span class='B A'></span>", ".A", "<SPAN class=\"B A\"></SPAN>", Description = "Simple class selector from multiclass defenition")]
+		[TestCase("<div class=A><span>1</span></div><DIV><SPAN>2</SPAN></DIV>", ".A span", "<SPAN>1</SPAN>", Description = "By class than by tag name")]
+		[TestCase("<div id=a></div><div id=b></div>", "[id=b]", "<DIV id=\"b\"></DIV>")]
+		[TestCase("<div><div><label for='OrganizationId'></label></div></div>", "label[for=OrganizationId]", "<LABEL for=\"OrganizationId\"></LABEL>")]
+		[TestCase("<div a=ab></div><div a=ac></div><div a=bc></div>", "[a^=a]", "<DIV a=\"ab\"></DIV>,<DIV a=\"ac\"></DIV>")]
+		[TestCase("<ul class='left'></ul>", "ul.left", "<UL class=\"left\"></UL>")]
+		[TestCase("<select id=d><option selected></option></select>", "#d[selected]", "<OPTION selected=\"\"></OPTION>")]
+		public void QuerySelectorAll2(string html, string selector, string expectedResult)
+		{
+			var doc = new Document();
+			doc.Write(html);
+			Assert.AreEqual(expectedResult, string.Join(",", doc.QuerySelectorAll(selector).Select(x => x.ToString())));
 		}
 	}
 }
