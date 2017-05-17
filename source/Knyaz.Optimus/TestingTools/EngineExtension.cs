@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -125,8 +126,8 @@ namespace Knyaz.Optimus.TestingTools
 				var doc = engine.Document;
 				lock (doc)
 				{
-					var elt = doc.Select(query).ToList();
-					if (elt.Any())
+					var elt = doc.Select(query).ToListOrNull();
+					if (elt != null)
 						return elt;
 				}
 

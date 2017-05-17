@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
+    <Compile Include="Dom\Css\Css.cs" />
     <Compile Include="Dom\Css\CssMediaRule.cs" />
     <Compile Include="Dom\Css\CssRule.cs" />
     <Compile Include="Dom\Css\CssSelector.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Tests\Dom\TokenListTests.cs" />
     <Compile Include="Tests\Environment\LocationTests.cs" />
     <Compile Include="Tests\Html\CssReaderTest.cs" />
+    <Compile Include="Tests\IEnumerableExtensionTests.cs" />
     <Compile Include="Tests\Mocks.cs" />
     <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
     <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />

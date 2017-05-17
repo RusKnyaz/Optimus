@@ -22,8 +22,6 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	public partial class CssStyleDeclaration : ICssStyleDeclaration, ICss2Properties
 	{
-		const string Important = "important";
-
 		private string _cssText = string.Empty;
 		
 		internal event Action<string> OnStyleChanged;
@@ -133,7 +131,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 			name = name.Replace(" ", "");
 			
-			if (important == Important)
+			if (important == Css.ImportantValue)
 				_importants.Add(name);
 			else if(_importants.Contains(name))
 				_importants.Remove(name);
@@ -147,43 +145,43 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			switch (name)
 			{
-				case "padding":
+				case Css.Padding:
 					SetPadding(value);
 					break;
-				case "margin":
+				case Css.Margin:
 					SetClockwise(MarginNames, value);
 					break;
-				case "background":
+				case Css.Background:
 					SetBackground(value);
 					break;
-				case "border":
+				case Css.Border:
 					SetBorder(value);
 					break;
-				case "border-top":
+				case Css.BorderTop:
 					SetBorder("top", value);
 					break;
-				case "border-right":
+				case Css.BorderRight:
 					SetBorder("right", value);
 					break;
-				case "border-bottom":
+				case Css.BorderBottom:
 					SetBorder("bottom", value);
 					break;
-				case "border-left":
+				case Css.BorderLeft:
 					SetBorder("left", value);
 					break;
-				case "border-width":
+				case Css.BorderWidth:
 					SetClockwise(BorderWidthNames, value);
 					break;
-				case "border-style":
+				case Css.BorderStyle:
 					SetClockwise(BorderStyleNames, value);
 					break;
-				case "border-color":
+				case Css.BorderColor:
 					SetClockwise(BorderColorNames, value);
 					break;
-				case "font":
+				case Css.Font:
 					SetFont(value);
 					break;
-				case "border-radius":
+				case Css.BorderRadius:
 					SetClockwise(BorderRadiusNames, value);
 					break;
 			}
@@ -214,10 +212,10 @@ namespace Knyaz.Optimus.Dom.Css
 				return;
 			}
 
-			Properties["font-family"] = args[0];
+			Properties[Css.FontFamily] = args[0];
 
 			var sz = args[1].Split('/');
-			Properties["font-size"] = sz[0];
+			Properties[Css.FontSize] = sz[0];
 			if (sz.Length > 1)
 				Properties["line-height"] = sz[1];
 
@@ -225,14 +223,14 @@ namespace Knyaz.Optimus.Dom.Css
 
 			if (args.Length == i)
 			{
-				Properties["font-weight"] = Properties["font-style"] = Properties["font-variant"] = "normal";
+				Properties[Css.FontWeight] = Properties[Css.FontStyle] = Properties[Css.FontVariant] = "normal";
 				return;
 			}
 
 			var val = args[i];
 			if (FontWeights.Contains(val))
 			{
-				Properties["font-weight"] = val;
+				Properties[Css.FontWeight] = val;
 				i++;
 				if (args.Length == i)
 					return;
@@ -240,12 +238,12 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			else
 			{
-				Properties["font-weight"] = "normal";
+				Properties[Css.FontWeight] = "normal";
 			}
 
 			if (FontVariants.Contains(val))
 			{
-				Properties["font-variant"] = val;
+				Properties[Css.FontVariant] = val;
 				i++;
 				if (args.Length == i)
 					return;
@@ -253,21 +251,16 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			else
 			{
-				Properties["font-variant"] = "normal";
+				Properties[Css.FontVariant] = "normal";
 			}
 
-			if(FontStyles.Contains(val))
-				Properties["font-style"] = val;
-			else
-			{
-				Properties["font-style"] = "normal";
-			}
+			Properties[Css.FontStyle] = FontStyles.Contains(val) ? val : "normal";
 		}
 
 
 		private void SetBackground(string value)
 		{
-			Properties["background-color"] = value;
+			Properties[Css.BackgroundColor] = value;
 		}
 
 		private void SetBorder(string value)
@@ -367,7 +360,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public string GetPropertyPriority(string propertyName)
 		{
-			return _importants.Contains(propertyName) ? Important : string.Empty;
+			return _importants.Contains(propertyName) ? Css.ImportantValue : string.Empty;
 		}
 
 		public int Length

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Knyaz.Optimus.Tools
 {
@@ -49,6 +50,22 @@ namespace Knyaz.Optimus.Tools
 				idx++;
 			}
 			return -1;
+		}
+
+		public static IList<T> ToListOrNull<T>(this IEnumerable<T> t)
+		{
+			using (var enumerator = t.GetEnumerator())
+			{
+				if(!enumerator.MoveNext())
+					return null;
+
+				var result = new List<T>();
+				do
+				{
+					result.Add(enumerator.Current);
+				} while (enumerator.MoveNext());
+				return result;
+			}
 		}
 	}
 }

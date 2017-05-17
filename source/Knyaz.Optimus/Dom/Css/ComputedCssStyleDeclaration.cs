@@ -84,11 +84,11 @@ namespace Knyaz.Optimus.Dom.Css
 			var doc = _elt.ParentNode as Document;
 			if (doc != null)
 			{
-				if (propertyName == "font-size" || propertyName == "font-style" || propertyName == "font-family")
+				if (propertyName == Css.FontSize|| propertyName == Css.FontStyle || propertyName == Css.FontFamily)
 				{ 
-					if (propertyName == "font-size")
+					if (propertyName == Css.FontSize)
 						return "16px";
-					else if (propertyName == "font-family")
+					else if (propertyName == Css.FontFamily)
 						return "Times New Roman";
 					else return "normal";
 				}
@@ -117,14 +117,14 @@ namespace Knyaz.Optimus.Dom.Css
 
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit" ||
-				((propertyName == "font-size" || propertyName == "font-family" || propertyName == "font-style"
+				((propertyName == Css.FontSize || propertyName == Css.FontFamily || propertyName == Css.FontStyle
 				|| propertyName == "color") && string.IsNullOrEmpty(res)))
 			{
 				res = GetParentPropertyValue(propertyName);
 			}
 
 			// 'em' size
-			if (propertyName == "font-size")
+			if (propertyName == Css.FontSize)
 			{
 				if (!string.IsNullOrEmpty(res))
 				{
@@ -133,9 +133,9 @@ namespace Knyaz.Optimus.Dom.Css
 						var fontSize = GetValueUnitPair(res);
 						if (fontSize.Item2 == "em" || fontSize.Item2 == "%")
 						{
-							var parentFontSizeStr = propertyName == "font-size"
-								? GetParentPropertyValue("font-size")
-								: GetPropertyValue("font-size");
+							var parentFontSizeStr = propertyName == Css.FontSize
+								? GetParentPropertyValue(Css.FontSize)
+								: GetPropertyValue(Css.FontSize);
 							if (!string.IsNullOrEmpty(parentFontSizeStr))
 							{
 								var parentFontSize = GetValueUnitPair(parentFontSizeStr);
@@ -175,7 +175,7 @@ namespace Knyaz.Optimus.Dom.Css
 						var size = GetValueUnitPair(res);
 						if (size.Item2 == "em")
 						{
-							var fontSize = GetPropertyValue("font-size");
+							var fontSize = GetPropertyValue(Css.FontSize);
 							if (!string.IsNullOrEmpty(fontSize))
 							{
 								var parentFontSize = GetValueUnitPair(fontSize);
