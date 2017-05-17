@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
@@ -270,12 +271,12 @@ namespace Knyaz.Optimus.Dom
 
 		public IElement QuerySelector(string query)
 		{
-			return this.Select(query).FirstOrDefault();
+			return new CssSelector(query).Select(this).FirstOrDefault();
 		}
 
 		public IReadOnlyList<IElement> QuerySelectorAll(string query)
 		{
-			return this.Select(query).ToList().AsReadOnly();
+			return new CssSelector(query).Select(this).ToList().AsReadOnly();
 		}
 	}
 

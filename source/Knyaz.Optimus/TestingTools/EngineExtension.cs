@@ -103,19 +103,14 @@ namespace Knyaz.Optimus.TestingTools
 		}
 
 
-		public static IEnumerable<IElement> Select(this Engine engine, string query)
-		{
-			return engine.Document.Select(query);
-		}
-
 		public static IElement First(this Engine engine, string query)
 		{
-			return engine.Select(query).First();
+			return engine.Document.QuerySelectorAll(query).First();
 		}
 
 		public static HtmlElement FirstElement(this Engine engine, string query)
 		{
-			return engine.Select(query).OfType<HtmlElement>().First();
+			return engine.Document.QuerySelectorAll(query).OfType<HtmlElement>().First();
 		}
 
 		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout = DefaultTimeout)
@@ -123,9 +118,10 @@ namespace Knyaz.Optimus.TestingTools
 			engine.WaitDocumentLoad();
 			var selector = new CssSelector(query);
             var timespan = 100;
+			var doc = engine.Document;
+
 			for (int i = 0; i < timeout / timespan; i++)
 			{
-				var doc = engine.Document;
 				lock (doc)
 				{
 					var elt = selector.Select(doc).ToListOrNull();
@@ -135,7 +131,7 @@ namespace Knyaz.Optimus.TestingTools
 
 				Thread.Sleep(timespan);
 			}
-			return engine.Select(query);
+			return selector.Select(doc);
 		}
 
 		public static void DumpToFile(this Engine engine, string fileName)

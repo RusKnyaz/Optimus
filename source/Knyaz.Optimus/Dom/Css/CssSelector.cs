@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -394,6 +393,11 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			//todo: remove the stub
 			return root.Flatten().OfType<IElement>().Where(IsMatches);
+		}
+
+		public static implicit operator CssSelector(string query)
+		{
+			return new CssSelector(query);
 		}
 	}
 }

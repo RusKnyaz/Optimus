@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
@@ -368,12 +369,12 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public IElement QuerySelector(string query)
 		{
-			return this.Select(query).FirstOrDefault();
+			return ((CssSelector) query).Select(this).FirstOrDefault();
 		}
 
 		public IReadOnlyList<IElement> QuerySelectorAll(string query)
 		{
-			return this.Select(query).ToList().AsReadOnly();
+			return ((CssSelector)query).Select(this).ToList().AsReadOnly();
 		}
 
 		public DomRect GetBoundingClientRect()
