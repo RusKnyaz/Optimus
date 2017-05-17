@@ -271,12 +271,12 @@ namespace Knyaz.Optimus.Dom
 
 		public IElement QuerySelector(string query)
 		{
-			return new CssSelector(query).Select(this).FirstOrDefault();
+			return new CssSelector(query).Select(DocumentElement).FirstOrDefault();
 		}
 
 		public IReadOnlyList<IElement> QuerySelectorAll(string query)
 		{
-			return new CssSelector(query).Select(this).ToList().AsReadOnly();
+			return new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
 		}
 	}
 

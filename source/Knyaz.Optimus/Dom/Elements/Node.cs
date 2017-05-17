@@ -127,6 +127,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			get
 			{
+				if (ParentNode == null)
+					return null;
+
 				var idx = ParentNode.ChildNodes.IndexOf(this);
 				if (idx == 0)
 					return null;
