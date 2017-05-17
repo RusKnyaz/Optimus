@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
 
@@ -120,13 +121,14 @@ namespace Knyaz.Optimus.TestingTools
 		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout = DefaultTimeout)
 		{
 			engine.WaitDocumentLoad();
+			var selector = new CssSelector(query);
             var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
 			{
 				var doc = engine.Document;
 				lock (doc)
 				{
-					var elt = doc.Select(query).ToListOrNull();
+					var elt = selector.Select(doc).ToListOrNull();
 					if (elt != null)
 						return elt;
 				}

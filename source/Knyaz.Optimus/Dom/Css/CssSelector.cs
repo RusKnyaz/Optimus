@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,6 +33,11 @@ namespace Knyaz.Optimus.Dom.Css
 
 				if (c == '[')
 				{
+					if (buffer.Length > 0)
+					{
+						yield return buffer.ToString();
+						buffer.Clear();
+					}
 					readText = attr = true;
 					yield return "[";
 					continue;
@@ -74,7 +80,6 @@ namespace Knyaz.Optimus.Dom.Css
 		/// Priority of the selector.
 		/// </summary>
 		public readonly int Specifity;
-
 
 		public CssSelector(string text)
 		{
@@ -143,7 +148,8 @@ namespace Knyaz.Optimus.Dom.Css
 
 								var attr = parts[0];
 
-								parts[1] = parts[1].Trim('\"');
+								parts[1] = 
+									parts[1][0] == '\"' ? parts[1].Trim('\"') : parts[1].Trim('\'');
 
 								if (!char.IsLetterOrDigit(attr.Last()))
 								{
@@ -208,14 +214,18 @@ namespace Knyaz.Optimus.Dom.Css
 			public string AttrValue;
 			public Node Next;
 		}
-
 		
+		/// <summary>
+		/// Check if the element matched by given selector.
+		/// </summary>
+		/// <param name="elt">The element to be checked.</param>
+		/// <returns></returns>
 		public bool IsMatches(IElement elt)
 		{
 			return _chains.Any(chain => IsMatches(elt, chain));
 		}
 
-		private bool IsMatches(IElement elt, Node chain)
+		private static bool IsMatches(IElement elt, Node chain)
 		{
 			var chunk = chain.Value;
 
@@ -378,6 +388,12 @@ namespace Knyaz.Optimus.Dom.Css
 			selector = _normalizeTilda.Replace(selector, "~");
 			selector = _normalizeSpaces.Replace(selector, " ");
 			return selector;
+		}
+
+		public IEnumerable<IElement> Select(IElement root)
+		{
+			//todo: remove the stub
+			return root.Flatten().OfType<IElement>().Where(IsMatches);
 		}
 	}
 }

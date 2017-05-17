@@ -1,6 +1,8 @@
 ﻿#if NUNIT
 using System.IO;
+using System.Linq;
 using System.Text;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using NUnit.Framework;
 
@@ -11,7 +13,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	{
 		private Engine Load(string html)
 		{
-			var engine = new Engine() { ComputedStylesEnabled = true };
+			var engine = new Engine { ComputedStylesEnabled = true };
 			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
 			return engine;
 		}
@@ -37,6 +39,11 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("#m > div a,\r\n#m > div span", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a><span name=match></span><div name=nomatch</div></div></div>")]
 		[TestCase(".form-signin", "<div class='form' name=nomatch></div><div class='form-signin'name=match></div>")]
 		[TestCase("[custom]", "<div name=nomatch></div><div custom name=match></div><div custom=123 name=match></div>")]
+		[TestCase("#d[custom]", "<div custom name=nomatch></div><div custom name=match id=d></div>")]
+		[TestCase("#d [custom]", "<div custom name=nomatch></div><div custom name=nomatch id=d><div custom name=match></div></div>")]
+		[TestCase("[custom='123']", "<div name=nomatch custom></div><div name=match custom=123></div>")]
+		[TestCase("[custom='\"123']", "<div name=nomatch custom></div><div name=match custom='\"123'></div>")]
+		[TestCase("[custom=\"'123\"]", "<div name=nomatch custom></div><div name=match custom=\"'123\"></div>")]
 		[TestCase("[custom=\"123\"]", "<div name=nomatch custom></div><div name=match custom=123></div>")]
 		[TestCase("[custom~=\"123\"]", "<div name=nomatch custom></div><div name=match custom=123></div><div name=match custom='123 456'></div>")]
 		[TestCase("[custom~=\"123 456\"]", "<div name=nomatch custom=123></div><div name=nomatch custom=\"123 456\"></div>")]
@@ -63,7 +70,6 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				Assert.IsTrue(selector.IsMatches(matchElt), "Have to match: " + matchElt.ToString());
 			}
 
-
 			var notMatchElt = engine.Document.GetElementsByName("nomatch");
 			foreach (var elt in notMatchElt)
 			{
@@ -83,6 +89,35 @@ namespace Knyaz.Optimus.Tests.Dom.Css
  		public void SpecifityTests(string selectorText, int expectedSpecifity)
 		{
 			Assert.AreEqual(expectedSpecifity, new CssSelector(selectorText).Specifity);
+		}
+
+		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^='row_']", "row_0,row_1")]
+		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^=row_]", "row_0,row_1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "[column-name='Name']", "c1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "[column-name=Name]", "c1")]
+		[TestCase("<tr id=row_0><td column-name=Name id=c1></td><td  columne-name=Id id=c2></td></tr>", "#c2", "c2")]
+		[TestCase("<div id=sizzle1><div id=in class=blockUI></div></div>", "#sizzle1 >.blockUI", "in")]
+		[TestCase("<div id=sizzle1><div id=in class=blockUI></div></div>", "#sizzle1 > .blockUI", "in")]
+		[TestCase("<div id=sizzle1><div id=in class=blockUI></div></div>", "#sizzle1>.blockUI", "in")]
+		[TestCase("<div id=sizzle1><a><div id=in class=blockUI></div></a></div>", "#sizzle1 >.blockUI", "")]
+		[TestCase("<div id=s></div><div id=s></div>", "#s", "s,s")]
+		[TestCase("<span id=span1></span>", "#span1", "span1", Description = "Root by id")]
+		[TestCase("<div><span id=span1></span></div>", "#span1", "span1", Description = "Nested by id")]
+		[TestCase("<div id=div1><span id=s>1</span></div><DIV id=div2><SPAN id=s2>2</SPAN></DIV>", "#div2 span", "s2", Description = "By id, than by tag name")]
+		[TestCase("<span class='A' id=s></span>", ".A", "s", Description = "Simple class selector")]
+		[TestCase("<div class=A><span id=s1>1</span></div><DIV><SPAN id=s2>2</SPAN></DIV>", ".A span", "s1", Description = "By class than by tag name")]
+		[TestCase("<div id=a></div><div id=b></div>", "[id=b]", "b")]
+		[TestCase("<div id=d1><div id=d2><label for='OrganizationId' id=l></label></div></div>", "label[for=OrganizationId]", "l")]
+		[TestCase("<div a=ab id=d1></div><div a=ac id=d2></div><div a=bc id=d3></div>", "[a^=a]", "d1,d2")]
+		[TestCase("<ul class='left' id=u></ul>", "ul.left", "u")]
+		[TestCase("<select id=d><option selected id=o></option></select>", "#d [selected]", "o")]
+		public void Select(string html, string selector, string expectedIds)
+		{
+			var doc = new Document();
+			doc.Write(html);
+			var cssSelector = new CssSelector(selector);
+			var items = cssSelector.Select(doc.DocumentElement).Select(x => x.Id).ToArray();
+			CollectionAssert.AreEqual(string.IsNullOrEmpty(expectedIds) ? new string[0] : expectedIds.Split(','), items);
 		}
 	}
 }
