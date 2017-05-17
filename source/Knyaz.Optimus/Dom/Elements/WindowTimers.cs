@@ -90,6 +90,8 @@ namespace Knyaz.Optimus.Dom.Elements
 					}
 					catch (Exception e)
 					{
+						if(OnException != null)
+							OnException(e);
 					}
 				}
 			}, null, 0, timeout);
