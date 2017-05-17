@@ -76,14 +76,20 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				lock (_getSyncObj())
 				{
-					if (!stopped)
+					try
 					{
-						handler();
+						if (!stopped)
+						{
+							handler();
+						}
+						else if (container[0] != null)
+						{
+							container[0].Dispose();
+							container[0] = null;
+						}
 					}
-					else if(container[0] != null)
+					catch (Exception e)
 					{
-						container[0].Dispose();
-						container[0] = null;
 					}
 				}
 			}, null, 0, timeout);

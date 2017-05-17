@@ -375,6 +375,56 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			return this.Select(query).ToList().AsReadOnly();
 		}
+
+		public DomRect GetBoundingClientRect()
+		{
+			//stub
+			//todo: implement something
+			return new DomRect();
+		}
+	}
+
+	public class DomRect
+	{
+		/// <summary>
+		/// Y-coordinate, relative to the viewport origin, of the bottom of the rectangle box.
+		/// </summary>
+		public float Bottom { get; private set; }
+
+		/// <summary>
+		/// Height of the rectangle box (This is identical to bottom minus top).
+		/// </summary>
+		public float Height { get; private set; }
+
+		/// <summary>
+		/// X-coordinate, relative to the viewport origin, of the left of the rectangle box.
+		/// </summary>
+		public float Left { get; private set; }
+
+		/// <summary>
+		/// X-coordinate, relative to the viewport origin, of the right of the rectangle box.
+		/// </summary>
+		public float Right { get; private set; }
+
+		/// <summary>
+		/// Y-coordinate, relative to the viewport origin, of the top of the rectangle box.
+		/// </summary>
+		public float Top { get; private set; }
+
+		/// <summary>
+		/// Width of the rectangle box (This is identical to right minus left).
+		/// </summary>
+		public float Width { get; private set; }
+
+		/// <summary>
+		/// X-coordinate, relative to the viewport origin, of the left of the rectangle box.
+		/// </summary>
+		public float X { get; private set; }
+
+		/// <summary>
+		/// Y-coordinate, relative to the viewport origin, of the top of the rectangle box.
+		/// </summary>
+		public float Y { get; private set; }
 	}
 
 	[DomItem]

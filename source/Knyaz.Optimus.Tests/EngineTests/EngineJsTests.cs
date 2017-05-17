@@ -788,5 +788,12 @@ dispatchEvent(evt);");
 				"console.log(typeof d.style['zoom']);");
 			CollectionAssert.AreEqual(new object[] { true, false, "string" }, _log);
 		}
+
+		[Test]
+		public void UndefinedTest()
+		{
+			CreateEngine("", "var data; if(data !== undefined) {console.log('a');}else{console.log('b');}");
+			CollectionAssert.AreEqual(new object[] { "b" }, _log);
+		}
 	}
 }
