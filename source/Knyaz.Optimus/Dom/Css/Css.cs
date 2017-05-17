@@ -14,7 +14,7 @@
 		public const string BorderRight = "border-right";
 		public const string BorderStyle = "border-style";
 		public const string BorderWidth = "border-width";
-		public const string Font = "Font";
+		public const string Font = "font";
 		public const string FontFamily = "font-family";
 		public const string FontStyle = "font-style";
 		public const string FontVariant = "font-variant";
