@@ -1,6 +1,6 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class DocType : Node
+	public sealed class DocType : Node
 	{
 		public DocType()
 		{

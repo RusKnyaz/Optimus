@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/html5/scripting-1.html#the-script-element
 	/// </summary>
-	public class Script : HtmlElement, IDelayedResource, IHtmlScriptElement
+	public sealed class Script : HtmlElement, IDelayedResource, IHtmlScriptElement
 	{
 		private readonly AttributeMappedValue<string> _type;
 		private readonly AttributeMappedValue<string> _charset;

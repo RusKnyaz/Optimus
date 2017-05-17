@@ -7,7 +7,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
-	public class HtmlInputElement : HtmlElement, IHtmlInputElement, IResettableElement
+	public sealed class HtmlInputElement : HtmlElement, IHtmlInputElement, IResettableElement
 	{
 		static class Defaults
 		{

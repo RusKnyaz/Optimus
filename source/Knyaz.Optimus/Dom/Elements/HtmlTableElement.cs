@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlTableElement : HtmlElement
+	public sealed class HtmlTableElement : HtmlElement
 	{
 		public HtmlTableElement(Document ownerDocument) : base(ownerDocument, TagsNames.Table)
 		{

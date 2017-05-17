@@ -2,7 +2,7 @@ using System;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlTableCaptionElement : HtmlElement
+	public sealed class HtmlTableCaptionElement : HtmlElement
 	{
 		public HtmlTableCaptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Caption)
 		{

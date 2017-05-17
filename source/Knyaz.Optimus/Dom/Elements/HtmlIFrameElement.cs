@@ -1,6 +1,6 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlIFrameElement : HtmlElement
+	public sealed class HtmlIFrameElement : HtmlElement
 	{
 		public static class Defaults
 		{

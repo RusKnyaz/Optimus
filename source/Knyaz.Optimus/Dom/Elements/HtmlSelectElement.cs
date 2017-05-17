@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlSelectElement : HtmlElement
+	public sealed class HtmlSelectElement : HtmlElement
 	{
 		public HtmlSelectElement(Document ownerDocument) : base(ownerDocument, TagsNames.Select)
 		{

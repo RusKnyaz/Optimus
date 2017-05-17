@@ -2,7 +2,7 @@
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlButtonElement : HtmlElement, IFormElement
+	public sealed class HtmlButtonElement : HtmlElement, IFormElement
 	{
 		private static class Defaults
 		{

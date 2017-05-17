@@ -1,6 +1,6 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlHtmlElement : HtmlElement
+	public sealed class HtmlHtmlElement : HtmlElement
 	{
 		public HtmlHtmlElement(Document ownerDocument) : base(ownerDocument, TagsNames.Html)
 		{

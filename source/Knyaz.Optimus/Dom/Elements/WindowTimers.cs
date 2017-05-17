@@ -6,7 +6,7 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class WindowTimers
+	public sealed class WindowTimers
 	{
 		readonly List<IDisposable> _activeTimers = new List<IDisposable>();
 
@@ -159,18 +159,16 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		protected virtual void RaiseOnExecuting()
+		private void RaiseOnExecuting()
 		{
 			var handler = OnExecuting;
 			if (handler != null) handler();
 		}
 
-		protected virtual void RaiseOnExecuted()
+		private void RaiseOnExecuted()
 		{
 			var handler = OnExecuted;
 			if (handler != null) handler();
 		}
 	}
-
-
 }

@@ -6,7 +6,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// The HTMLLinkElement interface represents reference information for external resources and the relationship of those resources to a document and vice-versa. This object inherits all of the properties and methods of the HTMLElement interface.
 	/// https://www.w3.org/TR/html5/document-metadata.html#the-link-element
 	/// </summary>
-	public class HtmlLinkElement : HtmlElement
+	public sealed class HtmlLinkElement : HtmlElement
 	{
 		private class Defaults
 		{

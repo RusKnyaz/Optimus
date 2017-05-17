@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/html5/forms.html
 	/// </summary>
-	public class HtmlFormElement : HtmlElement
+	public sealed class HtmlFormElement : HtmlElement
 	{
 		static class Defaults
 		{

@@ -6,7 +6,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// The THEAD, TFOOT, and TBODY elements.
 	/// </summary>
-	public class HtmlTableSectionElement : HtmlElement
+	public sealed class HtmlTableSectionElement : HtmlElement
 	{
 		public HtmlTableSectionElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
 		{

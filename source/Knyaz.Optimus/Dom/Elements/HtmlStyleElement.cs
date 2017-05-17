@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Represents DOM node for STYLE element. https://www.w3.org/TR/html5/document-metadata.html
 	/// </summary>
-	public class HtmlStyleElement : HtmlElement
+	public sealed class HtmlStyleElement : HtmlElement
 	{
 		class Defaults
 		{

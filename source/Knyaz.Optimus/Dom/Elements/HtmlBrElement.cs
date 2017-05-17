@@ -3,7 +3,7 @@
 	/// <summary>
 	/// https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLBRElement.html
 	/// </summary>
-	public class HtmlBrElement : HtmlElement
+	public sealed class HtmlBrElement : HtmlElement
 	{
 		public HtmlBrElement(Document ownerDocument) : base(ownerDocument, TagsNames.Br)
 		{

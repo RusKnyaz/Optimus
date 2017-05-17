@@ -4,7 +4,7 @@
 	/// Represents textarea html element (see http://www.w3.org/TR/html5/forms.html#the-textarea-element).
 	/// Todo: complete implementation
 	/// </summary>
-	public class HtmlTextAreaElement : HtmlElement, IResettableElement, IFormElement
+	public sealed class HtmlTextAreaElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults
 		{

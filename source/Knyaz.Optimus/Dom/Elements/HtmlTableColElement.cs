@@ -3,7 +3,7 @@
 	/// <summary>
 	/// https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLTableColElement.html
 	/// </summary>
-	public class HtmlTableColElement : HtmlElement
+	public sealed class HtmlTableColElement : HtmlElement
 	{
 		public HtmlTableColElement(Document ownerDocument) : base(ownerDocument, TagsNames.Col)
 		{

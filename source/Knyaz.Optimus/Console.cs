@@ -4,7 +4,7 @@ using Knyaz.Optimus.ScriptExecuting;
 namespace Knyaz.Optimus
 {
 	[DomItem]
-	public class Console
+	public sealed class Console
 	{
 		public void Log(object obj)
 		{
