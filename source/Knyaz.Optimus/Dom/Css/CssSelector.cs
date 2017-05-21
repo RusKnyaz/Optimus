@@ -391,7 +391,6 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public IEnumerable<IElement> Select(IElement root)
 		{
-			//todo: remove the stub
 			return root.Flatten().OfType<IElement>().Where(IsMatches);
 		}
 

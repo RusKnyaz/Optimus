@@ -122,11 +122,15 @@ namespace Knyaz.Optimus.TestingTools
 
 			for (int i = 0; i < timeout / timespan; i++)
 			{
-				lock (doc)
+				try
 				{
 					var elt = selector.Select(doc).ToListOrNull();
 					if (elt != null)
 						return elt;
+				}
+				catch
+				{
+
 				}
 
 				Thread.Sleep(timespan);
