@@ -59,6 +59,17 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual("a b c f", div.ClassName);
 			Assert.AreEqual("a b c f", div.GetAttribute("class"));
 		}
+
+		[TestCase("<div><div id=start name=target></div></div>", "div")]
+		[TestCase("<div name=target><span id=start></span></div>", "div")]
+		[TestCase("<div id=d1 name=target><div id=start></div></div>", "#d1")]
+		public void Closest(string html, string query)
+		{
+			var document = new Document();
+			document.Write(html);
+			var start = document.GetElementById("start");
+			start.Closest(query).Assert(elt => elt.GetAttribute("name") == "target");
+		}
 	}
 }
 #endif

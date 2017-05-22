@@ -377,6 +377,17 @@ namespace Knyaz.Optimus.Dom.Elements
 			return ((CssSelector)query).Select(this).ToList().AsReadOnly();
 		}
 
+		/// <summary>
+		/// Returns nearest ancestor or itself which satisfies to specified selector.
+		/// </summary>
+		/// <param name="query"></param>
+		/// <returns></returns>
+		public IElement Closest(string query)
+		{
+			var selector = new CssSelector(query);
+			return ((IElement) this).GetRecursive(x => (IElement) x.ParentNode).FirstOrDefault(selector.IsMatches);
+		}
+
 		public DomRect GetBoundingClientRect()
 		{
 			//stub
