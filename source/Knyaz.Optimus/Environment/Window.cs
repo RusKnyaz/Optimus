@@ -127,6 +127,11 @@ namespace Knyaz.Optimus.Environment
 		{
 			return new MediaQueryList(media, () => _engine.CurrentMedia);
 		}
+
+		public void Dispose()
+		{
+			_timers.Dispose();
+		}
 	}
 
 	public interface IWindow : IEventTarget

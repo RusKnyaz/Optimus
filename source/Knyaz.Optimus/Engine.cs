@@ -243,6 +243,7 @@ namespace Knyaz.Optimus
 		public event Action DocumentChanged;
 		public void Dispose()
 		{
+			Window.Dispose();
 		}
 
 		private bool _computedStylesEnabled;

@@ -6,7 +6,7 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public sealed class WindowTimers
+	public sealed class WindowTimers : IDisposable
 	{
 		readonly List<IDisposable> _activeTimers = new List<IDisposable>();
 
@@ -63,12 +63,27 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public int SetInterval(Action handler, int timeout)
 		{
+			ManualResetEvent stoppedSignal = new ManualResetEvent(false);
 			bool stopped = false;
 			var container = new Timer[1];
 			Disposable disp;
 			lock (_activeTimers)
 			{
-				disp = new Disposable(() => stopped = true);
+				disp = new Disposable(() =>
+				{
+					stopped = true;
+					if (!stoppedSignal.WaitOne(10000))
+					{
+						lock (container)
+						{
+							if (container[0] != null)
+							{
+								container[0].Dispose();
+								container[0] = null;
+							}
+						}
+					}
+				});
 				_activeTimers.Add(disp);
 			}
 
@@ -82,10 +97,17 @@ namespace Knyaz.Optimus.Dom.Elements
 						{
 							handler();
 						}
-						else if (container[0] != null)
+						else
 						{
-							container[0].Dispose();
-							container[0] = null;
+							lock (container)
+							{
+								if (container[0] != null)
+								{
+									container[0].Dispose();
+									container[0] = null;
+									stoppedSignal.Set();
+								}
+							}
 						}
 					}
 					catch (Exception e)
@@ -171,6 +193,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			var handler = OnExecuted;
 			if (handler != null) handler();
+		}
+
+		public void Dispose()
+		{
+			lock (_activeTimers)
+			{
+				foreach (var activeTimer in _activeTimers)
+				{
+					activeTimer.Dispose();
+				}
+				_activeTimers.Clear();
+			}
 		}
 	}
 }
