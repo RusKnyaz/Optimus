@@ -113,7 +113,7 @@
 	<target name="nunit-run" description="Run unit-tests">
 		<echo message="Launch NUnit." />
 		<mkdir dir="${test.res.d}" />
-		<exec program="nunit-console" commandline="&quot;${bin.optimus.dll}&quot; -xml=&quot;${test.res.d}/${optimus.dll}-results.xml&quot; -noshadow"/>
+		<exec program="nunit-console" commandline="&quot;${bin.optimus.dll}&quot; -xml=&quot;${test.res.d}/${optimus.dll}-results.xml&quot; -noshadow -exclude:manual"/>
 		<echo message="Target completed at: ${datetime::now()}." />
 	</target>
 

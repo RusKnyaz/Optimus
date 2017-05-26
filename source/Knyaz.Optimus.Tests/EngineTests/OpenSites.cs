@@ -8,6 +8,7 @@ using NUnit.Framework;
 namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture, Ignore]
+	[Category("manual")]
 	public class OpenSites
 	{
 		private int timeout = 20000;
