@@ -13,11 +13,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	{
 		private int timeout = 20000;
 
-		public OpenSites(int timeout)
-		{
-			this.timeout = timeout;
-		}
-
 		[TestCase("http://okkamtech.com")]
 		[TestCase("http://ya.ru")]
 		[TestCase("http://redmine.todosoft.org")]
