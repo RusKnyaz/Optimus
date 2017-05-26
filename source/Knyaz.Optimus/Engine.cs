@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
@@ -164,7 +166,7 @@ namespace Knyaz.Optimus
 
 		public event Action OnUriChanged;
 
-		public async void OpenUrl(string path)
+		public async Task OpenUrl(string path)
 		{
 			//todo: clear timers!!!!
 			ScriptExecutor.Clear();
@@ -172,8 +174,9 @@ namespace Knyaz.Optimus
 			var uri = Tools.UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
-			var resource = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
-			LoadFromResponse(resource);
+
+			var response = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
+			LoadFromResponse(response);
 		}
 
 		private void LoadFromResponse(IResource resource)
@@ -284,6 +287,6 @@ namespace Knyaz.Optimus
 	public interface IEngine
 	{
 		Uri Uri {get;}
-		void OpenUrl(string url);
+		Task OpenUrl(string url);
 	}
 }

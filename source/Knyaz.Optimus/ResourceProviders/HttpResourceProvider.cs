@@ -31,11 +31,11 @@ namespace Knyaz.Optimus.ResourceProviders
 			var httpRequest = request as HttpRequest;
 
 			var req = MakeWebRequest(httpRequest);
-			
-			using (var client = new HttpClient(new HttpClientHandler { CookieContainer = _cookies })
-			{
-				Timeout = httpRequest != null && httpRequest.Timeout > 0 ? TimeSpan.FromMilliseconds(httpRequest.Timeout) : Timeout.InfiniteTimeSpan
-			})
+			var timeout = httpRequest != null && httpRequest.Timeout > 0
+				? TimeSpan.FromMilliseconds(httpRequest.Timeout)
+				: Timeout.InfiniteTimeSpan;
+
+			using (var client = new HttpClient(new HttpClientHandler {CookieContainer = _cookies}) {Timeout = timeout})
 			using (var response = await client.SendAsync(req))
 			using (var content = response.Content)
 			{

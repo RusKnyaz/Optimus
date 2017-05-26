@@ -10,6 +10,13 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	[TestFixture, Ignore]
 	public class OpenSites
 	{
+		private int timeout = 20000;
+
+		public OpenSites(int timeout)
+		{
+			this.timeout = timeout;
+		}
+
 		[TestCase("http://okkamtech.com")]
 		[TestCase("http://ya.ru")]
 		[TestCase("http://redmine.todosoft.org")]
@@ -25,8 +32,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Octane()
 		{
 			var engine = new Engine();
-			engine.OpenUrl("http://chromium.github.io/octane");
-			engine.WaitDocumentLoad();
+			engine.OpenUrl("http://chromium.github.io/octane").Wait(timeout);
 			var startButton = engine.WaitId("main-banner") /*as HtmlElement*/;
 			Assert.IsNotNull(startButton);
 
@@ -41,8 +47,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Css3test()
 		{
 			var engine = new Engine();
-			engine.OpenUrl("http://css3test.com");
-			engine.WaitDocumentLoad();
+			engine.OpenUrl("http://css3test.com").Wait(timeout);
 			var score = engine.WaitId("score");
 			Assert.IsNotNull("score");
 			System.Console.WriteLine("Score: " + score.InnerHTML);
@@ -52,8 +57,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Html5Score()
 		{
 			var engine = new Engine();
-			engine.OpenUrl("https://html5test.com");
-			engine.WaitDocumentLoad();
+			engine.OpenUrl("https://html5test.com").Wait(timeout);
 
 			var tagWithValue = engine.WaitSelector("#score strong").FirstOrDefault();
 			Assert.IsNotNull(tagWithValue, "strong");
@@ -82,21 +86,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
-			engine.OpenUrl("http://okkamtech.com");
-			Thread.Sleep(10000);
-			var userName = engine.Document.GetElementById("UserName");
-			Assert.IsNotNull(userName);
-		}
-
-		[Test]
-		public void BrowseKwinto()
-		{
-			var engine = new Engine();
-			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
-			engine.OpenUrl("http://192.168.1.36:8891");
-			Thread.Sleep(10000);
-			var userName = engine.Document.GetElementById("UserName");
-
+			engine.OpenUrl("http://okkamtech.com").Wait(timeout);
+			var userName = engine.WaitId("UserName");
 			Assert.IsNotNull(userName);
 		}
 
@@ -105,7 +96,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.AttachConsole();
-			engine.OpenUrl("http://okkamtech.com");
+			engine.OpenUrl("http://okkamtech.com").Wait(timeout);
 			//engine.OpenUrl("http://localhost:2930");
 			
 			var logonButton = engine.WaitId("logon") as HtmlElement;
@@ -130,7 +121,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.AttachConsole();
-			engine.OpenUrl("http://localhost:2930");
+			engine.OpenUrl("http://localhost:2930").Wait(timeout);
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
 			Thread.Sleep(5000);
@@ -155,7 +146,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine() {ComputedStylesEnabled = true};
 			engine.AttachConsole();
-			engine.OpenUrl("http://chi.todosoft.org");
+			engine.OpenUrl("http://chi.todosoft.org").Wait(timeout);
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
 			
@@ -171,6 +162,13 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var error = engine.WaitId("logout");
 			Assert.IsNotNull(error, "logout");
+		}
+
+		[Test]
+		public void Open404()
+		{
+			var engine = new Engine();
+			Assert.Throws<AggregateException>(() => engine.OpenUrl("http://asd.okkamtech.com/").Wait());
 		}
 	}
 }
