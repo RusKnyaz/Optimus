@@ -107,7 +107,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// </summary>
 		public static Element WaitId(this Document document, string id)
 		{
-			return WaitId(document, id, 0);
+			return WaitId(document, id, DefaultTimeout);
 		}
 
 		/// <summary>
@@ -140,7 +140,7 @@ namespace Knyaz.Optimus.TestingTools
 
 		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query)
 		{
-			return WaitSelector(engine, query, 0);
+			return WaitSelector(engine, query, DefaultTimeout);
 		}
 
 		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout)
