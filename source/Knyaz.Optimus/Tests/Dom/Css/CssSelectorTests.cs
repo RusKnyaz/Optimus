@@ -112,6 +112,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("<div a=ab id=d1></div><div a=ac id=d2></div><div a=bc id=d3></div>", "[a^=a]", "d1,d2")]
 		[TestCase("<ul class='left' id=u></ul>", "ul.left", "u")]
 		[TestCase("<select id=d><option selected id=o></option></select>", "#d [selected]", "o")]
+		[TestCase("<div id=sysInfoElem><div id=d1></div><div id=d2></div></div>", "#sysInfoElem div", "d1,d2")]
 		public void Select(string html, string selector, string expectedIds)
 		{
 			var doc = new Document();

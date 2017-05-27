@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.TestingTools
 {
 	public static class EngineExtension
 	{
-		private const int DefaultTimeout = 20000;
+		public static int DefaultTimeout = 20000;
 
 		public static void WaitDocumentLoad(this Engine engine)
 		{
@@ -36,12 +36,17 @@ namespace Knyaz.Optimus.TestingTools
 			engine.Document.DomContentLoaded -= handler;
 		}
 
+		public static Element WaitId(this Engine engine , string id)
+		{
+			return WaitId(engine, id, DefaultTimeout);
+		}
+
 		/// <summary>
 		/// Wait while element with specified id appears in document.
 		/// </summary>
 		/// <param name="id">Id of element waiting for.</param>
 		/// <returns>Found elemnt if exists</returns>
-		public static Element WaitId(this Engine engine, string id, int timeout = DefaultTimeout)
+		public static Element WaitId(this Engine engine, string id, int timeout)
 		{
 			engine.WaitDocumentLoad();
 			var timespan = 100;
@@ -67,7 +72,19 @@ namespace Knyaz.Optimus.TestingTools
 		/// <param name="id">Identifier of the item to be disappeared.</param>
 		/// <param name="timeout">The timeout</param>
 		/// <returns>Element if found, <c>null</c> othervise.</returns>
-		public static Element WaitDesappearingOfId(this Engine engine, string id, int timeout = DefaultTimeout)
+		public static Element WaitDesappearingOfId(this Engine engine, string id)
+		{
+			return WaitDesappearingOfId(engine, id, DefaultTimeout);
+		}
+
+		/// <summary>
+		/// Locks the current thread until the element with specified id disappears.
+		/// </summary>
+		/// <param name="engine">Document owner.</param>
+		/// <param name="id">Identifier of the item to be disappeared.</param>
+		/// <param name="timeout">The timeout</param>
+		/// <returns>Element if found, <c>null</c> othervise.</returns>
+		public static Element WaitDesappearingOfId(this Engine engine, string id, int timeout)
 		{
 			var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
@@ -88,7 +105,15 @@ namespace Knyaz.Optimus.TestingTools
 		/// <summary>
 		/// Wait while element with specified id appears in document.
 		/// </summary>
-		public static Element WaitId(this Document document, string id, int timeout = DefaultTimeout)
+		public static Element WaitId(this Document document, string id)
+		{
+			return WaitId(document, id, 0);
+		}
+
+		/// <summary>
+		/// Wait while element with specified id appears in document.
+		/// </summary>
+		public static Element WaitId(this Document document, string id, int timeout)
 		{
 			var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
@@ -113,7 +138,12 @@ namespace Knyaz.Optimus.TestingTools
 			return engine.Document.QuerySelectorAll(query).OfType<HtmlElement>().First();
 		}
 
-		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout = DefaultTimeout)
+		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query)
+		{
+			return WaitSelector(engine, query, 0);
+		}
+
+		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout)
 		{
 			engine.WaitDocumentLoad();
 			var selector = new CssSelector(query);

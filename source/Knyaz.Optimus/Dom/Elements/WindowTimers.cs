@@ -197,6 +197,11 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public void Dispose()
 		{
+			ClearAll();
+		}
+
+		internal void ClearAll()
+		{
 			lock (_activeTimers)
 			{
 				foreach (var activeTimer in _activeTimers)

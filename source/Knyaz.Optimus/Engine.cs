@@ -168,10 +168,11 @@ namespace Knyaz.Optimus
 
 		public async Task OpenUrl(string path)
 		{
-			//todo: clear timers!!!!
+			//todo: stop unfinished ajax requests or drop their results
+			Window.Timers.ClearAll();
 			ScriptExecutor.Clear();
 			Document = new Document(Window);
-			var uri = Tools.UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
+			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
 
