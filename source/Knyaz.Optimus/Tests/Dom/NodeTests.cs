@@ -34,16 +34,16 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual("", element.Style[0]);
 		}
 
-		[TestCase("<div id='n1'></div><div id='n2'></div>", Result = 4)]
-		[TestCase("<div id='n2'></div><div id='n1'></div>", Result = 2)]
-		[TestCase("<div id='n2'><div id='n1'></div></div>", Result = 10)]
-		[TestCase("<div id='n1'><div id='n2'></div></div>", Result = 20)]
-		[TestCase("<div id='n2'><div><div id='n1'></div></div></div>", Result = 10)]
-		[TestCase("<div id='n1'><div><div id='n2'></div></div></div>", Result = 20)]
-		[TestCase("<div id='n2'></div><div><div id='n1'></div></div>", Result = 4)]
-		[TestCase("<div id='n1'></div><div><div id='n2'></div></div>", Result = 2)]
-		[TestCase("<div><div id='n2'></div></div><div><div id='n1'></div></div>", Result = 4)]
-		[TestCase("<div><div id='n1'></div></div><div><div id='n2'></div></div>", Result = 2)]
+		[TestCase("<div id='n1'></div><div id='n2'></div>", ExpectedResult = 4)]
+		[TestCase("<div id='n2'></div><div id='n1'></div>", ExpectedResult = 2)]
+		[TestCase("<div id='n2'><div id='n1'></div></div>", ExpectedResult = 10)]
+		[TestCase("<div id='n1'><div id='n2'></div></div>", ExpectedResult = 20)]
+		[TestCase("<div id='n2'><div><div id='n1'></div></div></div>", ExpectedResult = 10)]
+		[TestCase("<div id='n1'><div><div id='n2'></div></div></div>", ExpectedResult = 20)]
+		[TestCase("<div id='n2'></div><div><div id='n1'></div></div>", ExpectedResult = 4)]
+		[TestCase("<div id='n1'></div><div><div id='n2'></div></div>", ExpectedResult = 2)]
+		[TestCase("<div><div id='n2'></div></div><div><div id='n1'></div></div>", ExpectedResult = 4)]
+		[TestCase("<div><div id='n1'></div></div><div><div id='n2'></div></div>", ExpectedResult = 2)]
 		public int CompareDocumentPosition_NodeNode(string html)
 		{
 			var doc = new Document();
@@ -51,11 +51,11 @@ namespace Knyaz.Optimus.Tests.Dom
 			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById("n2"));
 		}
 
-		[TestCase("<div id='n1'></div>", "n1", Result = 20)]
-		[TestCase("<div id='n1'><div id='n2'></div></div>", "n2", Result = 20)]
-		[TestCase("<div id='n2'><div id='n1'></div></div>", "n2", Result = 2)]
-		[TestCase("<div id='n2'></div><div id='n1'></div>", "n2", Result = 2)]
-		[TestCase("<div id='n1'></div><div id='n2'></div>", "n2", Result = 4)]
+		[TestCase("<div id='n1'></div>", "n1", ExpectedResult = 20)]
+		[TestCase("<div id='n1'><div id='n2'></div></div>", "n2", ExpectedResult = 20)]
+		[TestCase("<div id='n2'><div id='n1'></div></div>", "n2", ExpectedResult = 2)]
+		[TestCase("<div id='n2'></div><div id='n1'></div>", "n2", ExpectedResult = 2)]
+		[TestCase("<div id='n1'></div><div id='n2'></div>", "n2", ExpectedResult = 4)]
 		public int CompareDocumentPosition_NodeAttr(string html, string attrElemId)
 		{
 			var doc = new Document();
@@ -142,10 +142,10 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(null, attr.OwnerElement);
 		}
 
-		[TestCase("<div id='a'></div>", Result = 0)]
-		[TestCase("<div id='a'><strong></strong></div>", Result = 1)]
-		[TestCase("<div id='a'><strong><strong></strong></strong></div>", Result = 2)]
-		[TestCase("<div id='a'><div><strong></strong></div></div>", Result = 1)]
+		[TestCase("<div id='a'></div>", ExpectedResult = 0)]
+		[TestCase("<div id='a'><strong></strong></div>", ExpectedResult = 1)]
+		[TestCase("<div id='a'><strong><strong></strong></strong></div>", ExpectedResult = 2)]
+		[TestCase("<div id='a'><div><strong></strong></div></div>", ExpectedResult = 1)]
 		public int GetElementsByTagName(string html)
 		{
 			var doc = new Document();
