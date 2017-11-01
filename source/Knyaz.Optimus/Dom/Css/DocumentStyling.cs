@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Properties;
 using Knyaz.Optimus.ResourceProviders;
+
+#if !NETCOREAPP2_0
+using Knyaz.Optimus.Properties;
+#else
+using Resources = Knyaz.Optimus.net.Resources.Resource;
+#endif
 
 namespace Knyaz.Optimus.Dom.Css
 {
