@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
-	[TestFixture, Ignore]
+	[TestFixture, Ignore("For manual run")]
 	[Category("manual")]
 	public class OpenSites
 	{

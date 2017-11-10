@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
-
-#if !NETCOREAPP2_0
-using Knyaz.Optimus.Properties;
-#else
-using Resources = Knyaz.Optimus.net.Resources.Resource;
-#endif
+using Knyaz.Optimus.Resources;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -88,7 +83,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public void LoadDefaultStyles()
 		{
-			using (var reader = new StringReader(Resources.moz_default))
+			using (var reader = new StringReader(Resource.moz_default))
 				AddStyleToDocument(reader);
 		}
 
