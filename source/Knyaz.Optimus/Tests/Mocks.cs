@@ -8,7 +8,7 @@ using Moq;
 
 namespace Knyaz.Optimus.Tests
 {
-	public static class Mocks
+	internal static class Mocks
 	{
 		public static IResourceProvider ResourceProvider(string url, string data)
 		{

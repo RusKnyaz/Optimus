@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Knyaz.Optimus.Tests
 {
-	public static class AssertObjectExtension
+	internal static class AssertObjectExtension
 	{
 		public static void Assert<T>(this T obj, Expression<Func<T, bool>> predicate)
 		{

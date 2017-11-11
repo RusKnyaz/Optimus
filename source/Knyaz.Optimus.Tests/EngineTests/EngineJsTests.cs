@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;

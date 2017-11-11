@@ -16,6 +16,10 @@
     <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;NUNIT</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
+    <DefineConstants>TRACE;RELEASE;NET452S</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
