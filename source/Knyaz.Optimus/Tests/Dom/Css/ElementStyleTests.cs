@@ -66,7 +66,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 
 			_div.Style.Assert(style =>
 				style.Properties.Count == 1 &&
-				style["width"] == "100pt" &&
+				(string)style["width"] == "100pt" &&
 				style.GetPropertyValue("width") == "100pt" &&
 				style[0] == "width");
 		}
@@ -82,7 +82,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 
 			_div.Style.Assert(style =>
 				style.Properties.Count == 1 &&
-				style["width"] == "100pt" &&
+                (string)style["width"] == "100pt" &&
 				style.GetPropertyValue("width") == "100pt" &&
 				style[0] == "width");
 		}

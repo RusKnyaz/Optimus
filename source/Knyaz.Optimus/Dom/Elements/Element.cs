@@ -112,7 +112,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			} 
 		}
 
-		public string TextContent
+		public virtual string TextContent
 		{
 			get
 			{
@@ -367,12 +367,12 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public IElement QuerySelector(string query)
+		public virtual IElement QuerySelector(string query)
 		{
 			return ((CssSelector) query).Select(this).FirstOrDefault();
 		}
 
-		public IReadOnlyList<IElement> QuerySelectorAll(string query)
+		public virtual IReadOnlyList<IElement> QuerySelectorAll(string query)
 		{
 			return ((CssSelector)query).Select(this).ToList().AsReadOnly();
 		}

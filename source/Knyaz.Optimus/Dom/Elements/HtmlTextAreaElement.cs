@@ -118,7 +118,7 @@
 		}
 
 		//todo: Check implementation
-		public string TextContent { get {return DefaultValue;} set { DefaultValue = value; } }
+		override public string TextContent { get {return DefaultValue;} set { DefaultValue = value; } }
 
 //  readonly attribute HTMLFormElement? form;
 //
