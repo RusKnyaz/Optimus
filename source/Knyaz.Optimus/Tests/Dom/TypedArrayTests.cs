@@ -1,6 +1,7 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom.Perf;
 using NUnit.Framework;
+using System;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
@@ -64,6 +65,25 @@ namespace Knyaz.Optimus.Tests.Dom
 			arr1.Set(arr2, 1);
 			CollectionAssert.AreEqual(new[] { 0, 0, 1, 0 }, buffer.Data);
 		}
+
+        [TestCase(1)]
+        [TestCase(3)]
+        public void Int16ArrayCreationError(int size)
+        {
+            var buf = new ArrayBuffer(size);
+            Assert.Throws<ArgumentOutOfRangeException>(() => new Int16Array(buf));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new UInt16Array(buf));
+        }
+
+        [Test]
+        public void OutOfRangeIndex()
+        {
+            var buf = new ArrayBuffer(2);
+            var i16 = new Int16Array(buf);
+            i16[2] = 12; //Setting value by index out of range does not lead to exception.
+            var x = i16[2];
+            Assert.AreEqual(0, i16[2]);//Indeed it should return 'undefined' in JS.
+        }
 	}
 }
 #endif

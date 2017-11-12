@@ -7,28 +7,31 @@ namespace Knyaz.Optimus.Dom.Perf
 	{
 		public TypedArray(ArrayBuffer buffer)
 		{
+			if (buffer.Data.Length % _bytesPerElement != 0)
+				throw new ArgumentOutOfRangeException("byte length of "+GetType().Name+" should be a multiple of " + _bytesPerElement);
+
 			_data = buffer.Data;
 		}
 
 		protected TypedArray(T[] data)
 		{
-			_data = new byte[data.Length * BytesPerElement];
+			_data = new byte[data.Length * _bytesPerElement];
 			Buffer.BlockCopy(data,0, _data, 0, _data.Length);
 		} 
 
 		protected byte[] _data;
 
-		private int BytesPerElement {get { return Marshal.SizeOf(typeof(T)); }}
+		private int _bytesPerElement = Marshal.SizeOf(typeof(T));
 
-		public ulong Length {get { return (ulong) (_data.Length/BytesPerElement); }}
+		public ulong Length {get { return (ulong) (_data.Length/ _bytesPerElement); }}
 
 		public void Set(TypedArray<T> array, int offset)
 		{
-			Buffer.BlockCopy(array._data, 0, _data, offset * BytesPerElement, array._data.Length);
+			Buffer.BlockCopy(array._data, 0, _data, offset * _bytesPerElement, array._data.Length);
 		}
 		public void Set(T[] array, int offset)
 		{
-			Buffer.BlockCopy(array, 0, _data, offset * BytesPerElement, array.Length * BytesPerElement);
+			Buffer.BlockCopy(array, 0, _data, offset * _bytesPerElement, array.Length * _bytesPerElement);
 		}
 
 		protected T[] GetSub(long begin, long? end)
@@ -103,7 +106,9 @@ namespace Knyaz.Optimus.Dom.Perf
 		{
 			get
 			{
-				//todo: check the limits
+				if (index < 0 || index > Length)
+					return 0;
+
 				fixed (byte* pBuffer = _data)
 				{
 					return ((short*)pBuffer)[index];
@@ -111,7 +116,9 @@ namespace Knyaz.Optimus.Dom.Perf
 			}
 			set
 			{
-				//todo: check the limits
+				if (index < 0 || index > Length)
+					return;
+
 				fixed (byte* pBuffer = _data)
 				{
 					((short*)pBuffer)[index] = value;

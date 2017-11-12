@@ -563,7 +563,7 @@ console.log(arr[0]);");
 		{
 			_engine.Load(
 				"<html><head><script>var x = setTimeout(function(){ console.log('called');});</script></head><body></body></html>");
-			Thread.Sleep(100);
+			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "called" }, _log);
 		}
 		[Test]
