@@ -76,7 +76,7 @@ namespace Knyaz.Optimus.Tests.Dom
         }
 
         [Test]
-        public void OutOfRangeIndex()
+        public void OutOfRangeIndexInt16()
         {
             var buf = new ArrayBuffer(2);
             var i16 = new Int16Array(buf);
@@ -84,6 +84,16 @@ namespace Knyaz.Optimus.Tests.Dom
             var x = i16[2];
             Assert.AreEqual(0, i16[2]);//Indeed it should return 'undefined' in JS.
         }
+
+		[Test]
+		public void OutOfRangeIndexUInt16()
+		{
+			var buf = new ArrayBuffer(2);
+			var i16 = new UInt16Array(buf);
+			i16[2] = 12; //Setting value by index out of range does not lead to exception.
+			var x = i16[2];
+			Assert.AreEqual(0, i16[2]);//Indeed it should return 'undefined' in JS.
+		}
 	}
 }
 #endif

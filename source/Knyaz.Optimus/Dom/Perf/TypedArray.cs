@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Dom.Perf
 
 		protected byte[] _data;
 
-		private int _bytesPerElement = Marshal.SizeOf(typeof(T));
+		protected int _bytesPerElement = Marshal.SizeOf(typeof(T));
 
 		public ulong Length {get { return (ulong) (_data.Length/ _bytesPerElement); }}
 
@@ -102,27 +102,22 @@ namespace Knyaz.Optimus.Dom.Perf
 			return new Int16Array(GetSub(begin, end));
 		}
 
-		public unsafe short this[ulong index]
+		public short this[ulong index]
 		{
 			get
 			{
-				if (index < 0 || index > Length)
+				if (index < 0 || index >= Length)
 					return 0;
-
-				fixed (byte* pBuffer = _data)
-				{
-					return ((short*)pBuffer)[index];
-				}
+				
+				return BitConverter.ToInt16(_data, (int)index * _bytesPerElement);
 			}
 			set
 			{
-				if (index < 0 || index > Length)
+				if (index < 0 || index >= Length)
 					return;
-
-				fixed (byte* pBuffer = _data)
-				{
-					((short*)pBuffer)[index] = value;
-				}
+				
+				var bytes = BitConverter.GetBytes(value);
+				Array.Copy(bytes, 0, _data, (int)index * _bytesPerElement, bytes.Length);
 			}
 		}
 	}
@@ -137,23 +132,22 @@ namespace Knyaz.Optimus.Dom.Perf
 			return new UInt16Array(GetSub(begin, end));
 		}
 
-		public unsafe ushort this[ulong index]
+		public ushort this[ulong index]
 		{
 			get
 			{
-				//todo: check the limits
-				fixed (byte* pBuffer = _data)
-				{
-					return ((ushort*)pBuffer)[index];
-				}
+				if (index < 0 || index >= Length)
+					return 0;
+				
+				return BitConverter.ToUInt16(_data, (int)index * _bytesPerElement);
 			}
 			set
 			{
-				//todo: check the limits
-				fixed (byte* pBuffer = _data)
-				{
-					((ushort*)pBuffer)[index] = value;
-				}
+				if (index < 0 || index >= Length)
+					return;
+				
+				var bytes = BitConverter.GetBytes(value);
+				Array.Copy(bytes, 0, _data, (int)index*_bytesPerElement, bytes.Length);
 			}
 		}
 	}
