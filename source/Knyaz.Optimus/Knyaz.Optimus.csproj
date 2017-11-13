@@ -7,7 +7,9 @@
     <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
   </PropertyGroup>
 
+  
   <PropertyGroup>
+    <IsPackable>true</IsPackable>
     <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
     <Authors>Knyaz</Authors>
     <Company>Knyaz</Company>
