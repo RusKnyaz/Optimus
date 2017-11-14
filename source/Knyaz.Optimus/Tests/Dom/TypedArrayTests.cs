@@ -94,7 +94,6 @@ namespace Knyaz.Optimus.Tests.Dom
 			var x = i16[2];
 			Assert.AreEqual(0, i16[2]);//Indeed it should return 'undefined' in JS.
 		}
-
 	}
 }
 #endif
