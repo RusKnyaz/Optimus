@@ -83,7 +83,8 @@ namespace Knyaz.Optimus.Dom.Css
 
 		public void LoadDefaultStyles()
 		{
-			using (var reader = new StringReader(Resource.moz_default))
+			using (var stream = GetType().Assembly.GetManifestResourceStream("Knyaz.Optimus.Resources.moz_default.css"))
+			using (var reader = new StreamReader(stream))
 				AddStyleToDocument(reader);
 		}
 

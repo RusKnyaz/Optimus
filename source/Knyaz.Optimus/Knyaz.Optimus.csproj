@@ -43,6 +43,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\moz_default.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\moz_default.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Jint" Version="2.11.23" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="Moq" Version="4.7.142" />
