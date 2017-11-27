@@ -8,6 +8,9 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Css
 {
+	/// <summary>
+	/// Interface for css style declaration instances.
+	/// </summary>
 	[DomItem]
 	public interface ICssStyleDeclaration
 	{
@@ -18,6 +21,7 @@ namespace Knyaz.Optimus.Dom.Css
 	}
 
 	/// <summary>
+	/// Represents a single CSS declaration block.
 	/// http://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/css/CSSStyleDeclaration.html
 	/// </summary>
 	public partial class CssStyleDeclaration : ICssStyleDeclaration, ICss2Properties
@@ -80,16 +84,29 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// Retrieve the properties anmes that have been explicitly set in this declaration block.
+		/// </summary>
+		/// <param name="idx"></param>
+		/// <returns></returns>
 		public string this[int idx]
 		{
 			get { return idx < 0 || idx >= Properties.Count ? string.Empty : Properties.AllKeys[idx]; }
 		}
 
+		/// <summary>
+		/// Retrieves the value of a CSS property if it has been explicitly set within this declaration block.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
 		public string GetPropertyValue(string propertyName)
 		{
 			return Properties[propertyName];
 		}
 
+		/// <summary>
+		/// The parsable textual representation of the declaration block (excluding the surrounding curly braces).
+		/// </summary>
 		public string CssText
 		{
 			get { return _cssText; }
@@ -109,8 +126,16 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// The CSS rule that contains this declaration block or null if this CssStyleDeclaration is not attached to a CssRule.
+		/// </summary>
 		public CssStyleRule ParentRule { get; private set; }
 
+		/// <summary>
+		/// Removes a CSS property if it has been explicitly set within this declaration block.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
 		public string RemoveProperty(string propertyName)
 		{
 			var val = Properties[propertyName];
@@ -121,6 +146,12 @@ namespace Knyaz.Optimus.Dom.Css
 			return val;
 		}
 
+		/// <summary>
+		/// Sets a property value and priority within this declaration block.
+		/// </summary>
+		/// <param name="name">The name of the property to be set.</param>
+		/// <param name="value">The value of the property.</param>
+		/// <param name="important">The priority of the property.</param>
 		public void SetProperty(string name, string value, string important = null)
 		{
 			if (string.IsNullOrEmpty(value))
@@ -358,11 +389,19 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// Used to retrieve the priority of a CSS property.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
 		public string GetPropertyPriority(string propertyName)
 		{
 			return _importants.Contains(propertyName) ? Css.ImportantValue : string.Empty;
 		}
 
+		/// <summary>
+		/// The number of properties that have been explicitly set in this declaration block.
+		/// </summary>
 		public int Length
 		{
 			get { return Properties.Count; }

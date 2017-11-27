@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Dom.Css
 {
+	/// <summary>
+	/// Provides access to the media rules styles definitions.
+	/// </summary>
 	public class CssMediaRule : CssRule
 	{
 		public CssMediaRule(string query, CssStyleSheet parentStyleSheet) : base(parentStyleSheet)

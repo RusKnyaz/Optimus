@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.ScriptExecuting;
-using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -37,8 +36,14 @@ namespace Knyaz.Optimus.Dom.Elements
 			TagName = tagName;
 		}
 
+		/// <summary>
+		/// Get the tag name of an element.
+		/// </summary>
 		public string TagName { get; private set; }
 
+		/// <summary>
+		/// Sets or gets the value of the 'class' attribute.
+		/// </summary>
 		public string ClassName
 		{
 			get { return GetAttribute("class", ""); }
@@ -49,6 +54,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		/// <summary>
+		/// Returns a live DOMTokenList collection of the class attributes of the element.
+		/// </summary>
 		public ITokenList ClassList
 		{
 			get
@@ -63,12 +71,19 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		/// <summary>
+		/// Represents the element's identifier, reflecting the id global attribute.
+		/// </summary>
 		public string Id
 		{
 			get { return GetAttribute("id", string.Empty); }
 			set { SetAttribute("id", value); }
 		}
 
+		/// <summary>
+		/// Gets the serialized HTML fragment describing the element including its descendants. 
+		/// It can be set to replace the element with nodes parsed from the given string.
+		/// </summary>
 		public string OuterHTML
 		{
 			get { return ToString();}
@@ -87,6 +102,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		/// <summary>
+		/// Sets or gets the serialized HTML describing the element's descendants.
+		/// </summary>
 		public virtual string InnerHTML
 		{
 			get
@@ -112,6 +130,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			} 
 		}
 
+		/// <summary>
+		///  Represents the text content of a node and its descendants.
+		/// </summary>
 		public virtual string TextContent
 		{
 			get
@@ -121,6 +142,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			set { InnerHTML = value; }
 		}
 
+		/// <summary>
+		/// Returns a collection containing all elements with the specified tag name.
+		/// </summary>
+		/// <param name="tagNameSelector"></param>
+		/// <returns></returns>
 		public Element[] GetElementsByTagName(string tagNameSelector)
 		{
 			var parts = tagNameSelector.Split('.');
@@ -130,6 +156,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.TagName == tagName && parts.Skip(1).All(c => x.ClassList.Contains(c))).ToArray();
 		}
 
+		/// <summary>
+		/// Returns a collection containing all descendant elements with the specified class name.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		public Element[] GetElementsByClassName(string name)
 		{
 			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.ClassList.Contains(name)).ToArray();
@@ -141,6 +172,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			return node == null ? null : node.Value;
 		}
 
+		/// <summary>
+		/// Returns the top-level document object for this node.
+		/// </summary>
 		public override Document OwnerDocument
 		{
 			get
@@ -227,11 +261,19 @@ namespace Knyaz.Optimus.Dom.Elements
 			return Attributes.Count > 0;
 		}
 
+		/// <summary>
+		/// Checks whether a node is a descendant of a given Element or not.
+		/// </summary>
+		/// <param name="element">The node to search.</param>
+		/// <returns><c>True</c> if node found, <c>False</c> otherwise.</returns>
 		public bool Contains(INode element)
 		{
 			return ChildNodes.Flat(x => x.ChildNodes).Contains(element);
 		}
 
+		/// <summary>
+		/// For an Element the NodeName is tag name.
+		/// </summary>
 		public override string NodeName { get { return TagName;} }
 
 		public override string ToString()
@@ -447,7 +489,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		string ClassName { get; set; }
 		string InnerHTML { get; set; }
 		string TextContent { get; set; }
+
+		/// <summary>
+		/// Returns a collection containing all elements with the specified tag name
+		/// </summary>
+		/// <param name="tagNameSelector"></param>
+		/// <returns></returns>
 		Element[] GetElementsByTagName(string tagNameSelector);
+
+		/// <summary>
+		/// Returns a collection containing all descendant elements with the specified class name.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		Element[] GetElementsByClassName(string tagName);
 		Attr GetAttributeNode(string name);
 		string GetAttribute(string name);

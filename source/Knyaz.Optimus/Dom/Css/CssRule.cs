@@ -1,5 +1,10 @@
 ﻿namespace Knyaz.Optimus.Dom.Css
 {
+	/// <summary>
+	/// The CssRule is the abstract base interface for any type of CSS statement. This includes both rule sets and at-rules. 
+	/// An implementation is expected to preserve all rules specified in a CSS style sheet, even if the rule is not recognized by the parser.
+	/// Unrecognized rules are represented using the CSSUnknownRule interface.
+	/// </summary>
 	public class CssRule
 	{
 		public CssRule(CssStyleSheet parentStyleSheet)

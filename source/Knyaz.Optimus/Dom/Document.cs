@@ -8,7 +8,6 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ScriptExecuting;
-using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Dom;
 
 namespace Knyaz.Optimus.Dom
@@ -27,12 +26,12 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	public class Document : DocumentFragment, IDocument, IElementSelector
 	{
-		internal Document() :this(null)
+		internal Document() : this(null)
 		{
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		public Document(IWindow window):base(null)
+		public Document(IWindow window) : base(null)
 		{
 			StyleSheets = new StyleSheetsList();
 			NodeType = DOCUMENT_NODE;
@@ -51,22 +50,59 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		public IWindow DefaultView { get; private set; }
+
+		/// <summary>
+		/// Gets the Document Element of the document (the <html> element)
+		/// </summary>
 		public Element DocumentElement { get; private set; }
+
+		/// <summary>
+		/// Gets the (loading) status of the document.
+		/// </summary>
 		public string ReadyState { get; private set; }
-		public override string NodeName { get { return "#document"; }}
+
+		/// <summary>
+		/// This is always #document.
+		/// </summary>
+		public override string NodeName { get { return "#document"; } }
+
 		[Obsolete("Use window.location")]
 		//todo: check is it true for frames
 		public Location Location { get { return DefaultView.Location; } }
-		public string DocumentURI {get { return DefaultView.Location.Href; }  set { DefaultView.Location.Href = value; }}
+
+		/// <summary>
+		/// Sets or gets the location of the document
+		/// </summary>
+		public string DocumentURI { get { return DefaultView.Location.Href; } set { DefaultView.Location.Href = value; } }
+
+		/// <summary>
+		/// Returns a collection of all <form> elements in the document.
+		/// </summary>
 		public IEnumerable<HtmlFormElement> Forms { get { return GetElementsByTagName("form").Cast<HtmlFormElement>(); } }
+
+		/// <summary>
+		/// Returns a collection of <script> elements in the document.
+		/// </summary>
 		public IEnumerable<IHtmlScriptElement> Scripts { get { return GetElementsByTagName("script").Cast<IHtmlScriptElement>(); } }
 
+		/// <summary>
+		/// Writes HTML expressions or JavaScript code to a document.
+		/// </summary>
+		/// <param name="text"></param>
 		public void Write(string text)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(text)))
 			{
 				DocumentBuilder.Build(this, stream);
 			}
+		}
+
+		/// <summary>
+		/// Same as write(), but adds a newline character after each statement
+		/// </summary>
+		public void WriteLn(string text)
+		{
+			throw new NotImplementedException("Please use write insted.");
 		}
 
 		public event Action<IDocument> DomContentLoaded;
@@ -99,6 +135,10 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
+		/// <summary>
+		/// Creates an Element node.
+		/// </summary>
+		/// <param name="tagName">The tag name of element to be created.</param>
 		public Element CreateElement(string tagName)
 		{
 			if(tagName == null)
@@ -149,31 +189,51 @@ namespace Knyaz.Optimus.Dom
 			return new Attr(name){OwnerDocument = this};
 		}
 
+		/// <summary>
+		/// Returns the first element of the document that has the ID attribute with the specified value.
+		/// </summary>
 		public Element GetElementById(string id)
 		{
 			return DocumentElement.Flatten().OfType<Element>().FirstOrDefault(x => x.Id == id);
 		}
 
+		/// <summary>
+		/// Returns a collection containing all elements of the document with a specified name.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		public IReadOnlyCollection<Element> GetElementsByName(string name)
 		{
 			return DocumentElement.Flatten().OfType<Element>().Where(x => x.GetAttribute("name") == name).ToList().AsReadOnly();
 		}
-		
+
+		/// <summary>
+		/// Creates an empty DocumentFragment node.
+		/// </summary>
 		public DocumentFragment CreateDocumentFragment()
 		{
 			return new DocumentFragment(this);
 		}
 
+		/// <summary>
+		/// Creates a Text node.
+		/// </summary>
 		public Text CreateTextNode(string data)
 		{
 			return new Text{Data = data, OwnerDocument = this};	
 		}
 
+		/// <summary>
+		/// Creates a Comment node with the specified text.
+		/// </summary>
 		public Comment CreateComment(string data)
 		{
 			return new Comment { Data = data, OwnerDocument = this };
 		}
 
+		/// <summary>
+		/// Sets or gets the document's body (the <body> element)
+		/// </summary>
 		public HtmlBodyElement Body { get; private set; }
 
 		public Head Head { get; private set; }
@@ -206,6 +266,8 @@ namespace Knyaz.Optimus.Dom
 		public event Action<Node> DomNodeInserted;
 		public event Action<Node> NodeInserted;
 		public event Action<Node, Node> NodeRemoved;
+		public event Action<Node, Exception> OnNodeException;
+		internal event Action<HtmlFormElement> OnFormSubmit;
 
 		internal void HandleNodeRemoved(Node parent, Node node)
 		{
@@ -243,15 +305,13 @@ namespace Knyaz.Optimus.Dom
 				OnNodeException(node, exception);
 		}
 
-		public event Action<Node, Exception> OnNodeException;
-
 		internal void HandleFormSubmit(HtmlFormElement htmlFormElement)
 		{
 			if (OnFormSubmit != null)
 				OnFormSubmit(htmlFormElement);
 		}
 
-		internal event Action<HtmlFormElement> OnFormSubmit;
+		
 
 		protected override void RegisterNode(Node node)
 		{
@@ -265,15 +325,31 @@ namespace Knyaz.Optimus.Dom
 			get { return ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat"; }
 		}
 
+		/// <summary>
+		/// Sets or gets the title of the document.
+		/// </summary>
 		public string Title { get; set; }
 
+		/// <summary>
+		/// Gets the currently focused element in the document.
+		/// </summary>
 		public object ActiveElement { get; set; }
 
+		/// <summary>
+		/// Gets the first element that matches a specified CSS selector(s) in the document.
+		/// </summary>
+		/// <param name="query">The CSS selector.</param>
+		/// <returns>Found element or <c>null</c>.</returns>
 		override public IElement QuerySelector(string query)
 		{
 			return new CssSelector(query).Select(DocumentElement).FirstOrDefault();
 		}
 
+		/// <summary>
+		/// Gets a collection containing all elements that matches a specified CSS selector(s) in the document
+		/// </summary>
+		/// <param name="query">The CSS selector.</param>
+		/// <returns>The Readonly collection of found elements.</returns>
 		override public IReadOnlyList<IElement> QuerySelectorAll(string query)
 		{
 			return new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
