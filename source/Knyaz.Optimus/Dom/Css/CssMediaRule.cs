@@ -8,10 +8,11 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	public class CssMediaRule : CssRule
 	{
-		public CssMediaRule(string query, CssStyleSheet parentStyleSheet) : base(parentStyleSheet)
+		public CssMediaRule(string cssText, CssStyleSheet parentStyleSheet) : base(parentStyleSheet)
 		{
-			Media = new MediaList(query);
+			Media = new MediaList(cssText);
 			CssRules = new List<CssRule>();
+			CssText = cssText;
 		}
 
 		/// <summary>

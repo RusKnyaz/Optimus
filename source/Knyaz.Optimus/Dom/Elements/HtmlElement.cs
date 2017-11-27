@@ -51,6 +51,14 @@ namespace Knyaz.Optimus.Dom.Elements
 			return base.DispatchEvent(evt);
 		}
 
+		/// <summary>
+		/// Gets a CssStyleDeclaration whose value represents the declarations specified in the attribute, if present. 
+		/// </summary>
+		/// <remarks>
+		/// Mutating the CssStyleDeclaration object must create a style attribute on the element (if there isn't one 
+		/// already) and then change its value to be a value representing the serialized form of the CSSStyleDeclaration
+		///  object. The same object must be returned each time.
+		/// </remarks>
 		public CssStyleDeclaration Style
 		{
 			get

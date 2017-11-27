@@ -36,6 +36,11 @@ namespace Knyaz.Optimus.Dom.Css
 			ParentRule = parentRule;
 		}
 
+		/// <summary>
+		/// The number of properties that have been explicitly set in this declaration block.
+		/// </summary>
+		public int Length => Properties.Count;
+
 		public NameValueCollection Properties { get; private set; }
 
 		private HashSet<string> _importants = new HashSet<string>();

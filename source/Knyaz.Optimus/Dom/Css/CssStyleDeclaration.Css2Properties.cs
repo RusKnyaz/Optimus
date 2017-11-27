@@ -32,12 +32,29 @@
 			set { SetProperty("backgroundImage", value); }
 		}
 
+		/// <summary>
+		/// If a background image has been specified, this property specifies its initial position. Values have the following meanings:
+		/// </summary>
+		/// <remarks>
+		/// [ [&lt;percentage&gt; | &lt;length&gt; ]{1,2} | [ [top | center | bottom] || [left | center | right] ] ] | inherit
+		/// <seealso cref="http://www.w3.org/TR/1998/REC-CSS2-19980512/colors.html#propdef-background-position"/>
+		/// </remarks>
 		public string BackgroundPosition
 		{
 			get { return GetPropertyValue("backgroundPosition"); }
 			set { SetProperty("backgroundPosition", value); }
 		}
 
+		/// <summary>
+		/// If a background image is specified, this property specifies whether the image is repeated (tiled), 
+		/// and how. All tiling covers the content and padding areas of a box. 
+		/// </summary>
+		/// <remarks>Values have the following meanings:
+		/// repeat - The image is repeated both horizontally and vertically.
+		/// repeat-x - The image is repeated horizontally only.
+		/// repeat-y - The image is repeated vertically only.
+		/// no-repeat - The image is not repeated: only one copy of the image is drawn.
+		/// </remarks>
 		public string BackgroundRepeat
 		{
 			get { return GetPropertyValue("backgroundRepeat"); }
