@@ -61,7 +61,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void ClassListLive()
+		public void ClassListReflectsClassNameChanges()
 		{
 			var document = new Document();
 			var div = document.CreateElement("DIV");
@@ -71,6 +71,38 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.IsFalse(classList.Contains("d"));
 			//change class
 			div.ClassName = "d e f";
+			classList.Assert(x =>
+				x.Contains("a") == false &&
+				x.Contains("d") == true);
+		}
+
+		[Test]
+		public void ClassListReflectsClassAttributeChanges()
+		{
+			var document = new Document();
+			var div = document.CreateElement("DIV");
+			div.ClassName = "a b c";
+			var classList = div.ClassList;
+			Assert.IsTrue(classList.Contains("a"));
+			Assert.IsFalse(classList.Contains("d"));
+			//change class
+			div.SetAttribute("class", "d e f");
+			classList.Assert(x =>
+				x.Contains("a") == false &&
+				x.Contains("d") == true);
+		}
+
+		[Test]
+		public void ClassListReflectsClassAttributeChanges2()
+		{
+			var document = new Document();
+			var div = document.CreateElement("DIV");
+			div.ClassName = "a b c";
+			var classList = div.ClassList;
+			Assert.IsTrue(classList.Contains("a"));
+			Assert.IsFalse(classList.Contains("d"));
+			//change class
+			div.Attributes["class"].Value = "d e f";
 			classList.Assert(x =>
 				x.Contains("a") == false &&
 				x.Contains("d") == true);
@@ -109,8 +141,8 @@ namespace Knyaz.Optimus.Tests.Dom
 			start.Closest(query).Assert(elt => elt.GetAttribute("name") == "target");
 		}
 
-		[TestCase("<div id=parent><dif id=ref></div><div id=new></div></div>", "<DIV id=\"new\"></DIV><DIV id=\"ref\"></DIV>", TestName = "InsertBefore_BothChildOfOne")]
-		[TestCase("<div id=parent><dif id=ref></div></div><div id=new></div>", "<DIV id=\"new\"></DIV><DIV id=\"ref\"></DIV>", TestName = "InsertBefore_DifferentParents")]
+		[TestCase("<div id=parent><div id=ref></div><div id=new></div></div>", "<DIV id=\"new\"></DIV><DIV id=\"ref\"></DIV>", TestName = "InsertBefore_BothChildOfOne")]
+		[TestCase("<div id=parent><div id=ref></div></div><div id=new></div>", "<DIV id=\"new\"></DIV><DIV id=\"ref\"></DIV>", TestName = "InsertBefore_DifferentParents")]
 		[TestCase("<div id=parent></div><div id=new></div>", "<DIV id=\"new\"></DIV>", TestName = "InsertBefore_ParentIsEmpty")]
 		[TestCase("<div id=parent><div>child</div></div><div id=new></div>", "<DIV>child</DIV><DIV id=\"new\"></DIV>", TestName = "InsertBefore_RefIsNull_AddsToEnd")]
 		public void InsertBefore(string sourceHtml, string resultHtml)
@@ -121,7 +153,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var dref = doc.GetElementById("ref");
 			var parent = doc.GetElementById("parent");
 			parent.InsertBefore(dnew, dref);
-			Assert.AreEqual(parent.InnerHTML, resultHtml);
+			Assert.AreEqual(resultHtml, parent.InnerHTML);
 		}
 
 		[TestCase("<DIV id=parent><DIV id=ref></DIV><DIV id=new></DIV></DIV>", "<DIV id=\"parent\"><DIV id=\"new\"></DIV></DIV>")]

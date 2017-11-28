@@ -2,53 +2,62 @@
 
 namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Represents an HTML attribute of an element.
+	/// </summary>
 	public class Attr : Node, IAttr
 	{
 		private string _name;
 		private Element _ownerElement;
 
-		public Attr(Element owner, string name, string value)
+		internal Attr(Element owner, string name, string value)
 		{
 			_name = name;
 			_ownerElement = owner;
+			SetOwner(owner.OwnerDocument);
 			Value = value;
 		}
 
-		public Attr(string name)
+		internal Attr(string name, Document ownerDoc)
 		{
 			_name = name;
+			SetOwner(ownerDoc);
 		}
 
-		public override Node CloneNode(bool deep)
-		{
-			return new Attr(null, Name, Value);
-		}
+		public override Node CloneNode(bool deep) => new Attr(Name, OwnerDocument) { Value = Value };
 
-		public override string NodeName
-		{
-			get { return _name; }
-		}
+		/// <summary>
+		/// Equals this.Name.
+		/// </summary>
+		public override string NodeName => _name;
 
-		public string Name
-		{
-			get { return _name; }
-		}
+		/// <summary>
+		/// The name of an attribute.
+		/// </summary>
+		public string Name => _name;
 
-		public Element OwnerElement
-		{
-			get { return _ownerElement; }
-		}
+		/// <summary>
+		/// The element useded to access the attribute.
+		/// </summary>
+		public Element OwnerElement => _ownerElement;
 
-		internal void SetOwnerElement(Element element)
-		{
-			_ownerElement = element;
-		}
+		internal void SetOwnerElement(Element element) => _ownerElement = element;
 
+		/// <summary>
+		/// Sets or gets the value of the attribute.
+		/// </summary>
 		public string Value { get; set; }
 
 		//todo: is it right?
+		/// <summary>
+		/// <c>true</c> if the attribute is of type Id, otherwise it returns <c>false</c>.
+		/// </summary>
 		public bool IsId { get { return _name == "id"; } }
+		
 		//todo: is it right?
+		/// <summary>
+		/// <c>true</c> if the attribute has been specified, otherwise it returns <c>false</c>.
+		/// </summary>
 		public bool Specified { get { return true; } }
 		//todo: TypeInfo SchemaTypeInfo {get{}}
 	}

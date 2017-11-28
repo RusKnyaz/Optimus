@@ -41,7 +41,7 @@ namespace Knyaz.Optimus.Dom
 			DocumentElement.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
 			ChildNodes.Add(DocumentElement);
 			DocumentElement.ParentNode = this;
-			DocumentElement.OwnerDocument = this;
+			DocumentElement.SetOwner(this);
 
 			EventTarget = new EventTarget(this, () => window, () => this);
 			DefaultView = window;
@@ -184,9 +184,14 @@ namespace Knyaz.Optimus.Dom
 			return new HtmlUnknownElement(this, invariantTagName);
 		}
 
+		/// <summary>
+		/// Creates an attribute with the specified name, and returns the attribute as an <see cref="Attr"/> object.
+		/// </summary>
+		/// <param name="name">The name of attribute.</param>
+		/// <returns>Created attribute.</returns>
 		public Attr CreateAttribute(string name)
 		{
-			return new Attr(name){OwnerDocument = this};
+			return new Attr(name, this);
 		}
 
 		/// <summary>
@@ -220,7 +225,7 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public Text CreateTextNode(string data)
 		{
-			return new Text{Data = data, OwnerDocument = this};	
+			return new Text(this) {Data = data};	
 		}
 
 		/// <summary>
@@ -228,7 +233,7 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public Comment CreateComment(string data)
 		{
-			return new Comment { Data = data, OwnerDocument = this };
+			return new Comment(this) { Data = data };
 		}
 
 		/// <summary>
@@ -316,7 +321,7 @@ namespace Knyaz.Optimus.Dom
 		protected override void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
-			node.OwnerDocument = this;
+			node.SetOwner(this);
 			HandleNodeAdded(node);
 		}
 

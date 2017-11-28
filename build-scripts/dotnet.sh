@@ -3,7 +3,8 @@ fileversion="2.0.$BUILD_NUMBER.1";
 echo "Step 1. Clean"
 /bin/rm -f source/Knyaz.Optimus/test-results/*
 /bin/rm -f source/Knyaz.Optimus.Tests/test-results/*
-/bin/rm -f source/Knyaz.Optimus/bin/Release/*.nupkg
+/bin/rm -f source/Knyaz.Optimus/bin/Release/*
+/bin/rm -f source/Knyaz.Optimus/bin/Debug/*
 echo "Step 2. Build debug version"
 /usr/bin/dotnet build source/Knyaz.Optimus.sln /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Debug -v n
 echo "Step 3. Run tests"

@@ -41,7 +41,7 @@ namespace Knyaz.Optimus.Dom.Css
 		/// </summary>
 		public int Length => Properties.Count;
 
-		public NameValueCollection Properties { get; private set; }
+		private NameValueCollection Properties { get; set; }
 
 		private HashSet<string> _importants = new HashSet<string>();
 
@@ -402,14 +402,6 @@ namespace Knyaz.Optimus.Dom.Css
 		public string GetPropertyPriority(string propertyName)
 		{
 			return _importants.Contains(propertyName) ? Css.ImportantValue : string.Empty;
-		}
-
-		/// <summary>
-		/// The number of properties that have been explicitly set in this declaration block.
-		/// </summary>
-		public int Length
-		{
-			get { return Properties.Count; }
 		}
 	}
 }

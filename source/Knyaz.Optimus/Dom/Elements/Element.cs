@@ -12,19 +12,16 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		private readonly IAttributesCollection _attributes;
 		private TokenList _classList = null;
-		private bool _isClassListDirty = true;
 
 		public Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
 			_attributes = new AttributesCollection();
-			_classList = new TokenList();
+			_classList = new TokenList(() => ClassName);
 			_classList.Changed += () => {
 				ClassName = string.Join(" ", _classList);
-				_isClassListDirty = false;
 			};
 		}
-
 
 		public IAttributesCollection Attributes
 		{
@@ -47,29 +44,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string ClassName
 		{
 			get { return GetAttribute("class", ""); }
-			set
-			{
-				SetAttribute("class", value);
-				_isClassListDirty = true;
-			}
+			set { SetAttribute("class", value); }
 		}
 
 		/// <summary>
 		/// Returns a live DOMTokenList collection of the class attributes of the element.
 		/// </summary>
-		public ITokenList ClassList
-		{
-			get
-			{
-				if (_isClassListDirty)
-				{
-					_classList.Init(ClassName.Split(' ').Where(x => !string.IsNullOrEmpty(x)));
-					_isClassListDirty = false;
-				}
-
-				return _classList;
-			}
-		}
+		public ITokenList ClassList => _classList;
 
 		/// <summary>
 		/// Represents the element's identifier, reflecting the id global attribute.
@@ -181,13 +162,15 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				return base.OwnerDocument;
 			}
-			set
+			set	{}
+		}
+
+		internal override void SetOwner(Document doc)
+		{
+			base.SetOwner(doc);
+			foreach (var attribute in Attributes)
 			{
-				base.OwnerDocument = value;
-				foreach (var attribute in Attributes)
-				{
-					attribute.OwnerDocument = value;
-				}
+				attribute.SetOwner(doc);
 			}
 		}
 
@@ -210,7 +193,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 			else
 			{
-				var attr = new Attr(this, invariantName, value) {OwnerDocument = OwnerDocument};
+				var attr = new Attr(this, invariantName, value);
 				Attributes.Add(invariantName, attr);
 				OwnerDocument.HandleNodeAdded(attr);
 			}

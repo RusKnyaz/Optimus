@@ -6,6 +6,8 @@
 	/// </summary>
 	public abstract class CharacterData : Node
 	{
+		internal CharacterData(Document owner) => SetOwner(owner);
+
 		public string Data { get; set; }
 
 		public string NodeValue { get { return Data; } set { Data = value; } }
@@ -30,9 +32,9 @@
 
 	public class Text : CharacterData
 	{
-		public Text() => NodeType = TEXT_NODE;
+		public Text(Document owner) : base(owner) => NodeType = TEXT_NODE;
 
-		public override Node CloneNode(bool deep) => new Text() { Data = Data };
+		public override Node CloneNode(bool deep) => new Text(OwnerDocument) { Data = Data };
 
 		public override string ToString() => Data;
 
@@ -46,9 +48,9 @@
 
 	public class Comment : CharacterData
 	{
-		public Comment() => NodeType = COMMENT_NODE;
+		internal Comment(Document owner) : base(owner) => NodeType = COMMENT_NODE;
 
-		public override Node CloneNode(bool deep) => new Comment { Data = Data };
+		public override Node CloneNode(bool deep) => new Comment(OwnerDocument) { Data = Data };
 
 		public override string NodeName => "#comment";
 	}

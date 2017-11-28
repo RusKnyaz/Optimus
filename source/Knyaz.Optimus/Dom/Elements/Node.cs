@@ -33,14 +33,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		public virtual Document OwnerDocument
 		{
 			get { return _ownerDocument; }
-			set
-			{
-				_ownerDocument = value;
-				foreach (var childNode in ChildNodes)
-				{
-					childNode.OwnerDocument = value;
-				}
-			}
+			set { }
+		}
+
+		internal virtual void SetOwner(Document doc)
+		{
+			_ownerDocument = doc;
+			foreach (var childNode in ChildNodes)
+				childNode.SetOwner(doc);
 		}
 
 		public virtual Node AppendChild(Node node)
@@ -67,7 +67,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected virtual void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
-			node.OwnerDocument = OwnerDocument;
+			node.SetOwner(OwnerDocument);
 			OwnerDocument.HandleNodeAdded(node);
 		}
 
@@ -112,7 +112,10 @@ namespace Knyaz.Optimus.Dom.Elements
 		public Node InsertBefore(Node newChild, Node refNode)
 		{
 			UnattachFromParent(newChild);
-			ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
+			if (refNode == null)
+				ChildNodes.Add(newChild);
+			else
+				ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
 			RegisterNode(newChild);
 			return newChild;
 		}

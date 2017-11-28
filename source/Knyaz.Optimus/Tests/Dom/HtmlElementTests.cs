@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Tests.Dom
 
 		[TestCase(true, 1)]
 		[TestCase(false, 0)]
-		public void CloneNode(bool deep, int expectedChildCount)
+		public void CloneSpan(bool deep, int expectedChildCount)
 		{
 			var document = new Document();
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
@@ -45,6 +45,20 @@ namespace Knyaz.Optimus.Tests.Dom
 				c.OwnerDocument == document &&
 				c.ParentNode == null &&
 				c.Id == "s");
+		}
+
+		[Test]
+		public void CloneNode()
+		{
+			var document = new Document();
+			var comment = document.CreateComment("text");
+			comment.CloneNode().Assert(clone => clone.OwnerDocument == document);
+
+			var text = document.CreateTextNode("text");
+			text.CloneNode().Assert(clone => clone.OwnerDocument == document);
+
+			var attr = document.CreateAttribute("attr");
+			attr.CloneNode().Assert(clone => clone.OwnerDocument == document);
 		}
 
 		[Test]

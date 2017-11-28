@@ -121,18 +121,21 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void CreateComment()
 		{
 			var document = new Document();
-			var com = document.CreateComment("Com");
-			Assert.AreEqual("Com", com.Data);
-			Assert.AreEqual(document, com.OwnerDocument);
+			document.CreateComment("Com").Assert(com => com.Data == "Com" && com.OwnerDocument == document);
 		}
 
 		[Test]
 		public void CreateTextNode()
 		{
 			var document = new Document();
-			var x = document.CreateTextNode("X");
-			Assert.AreEqual("X", x.Data);
-			Assert.AreEqual(document, x.OwnerDocument);
+			document.CreateTextNode("X").Assert(text => text.Data == "X" && text.OwnerDocument == document);
+		}
+
+		[Test]
+		public void CreateAttribute()
+		{
+			var document = new Document();
+			document.CreateAttribute("a").Assert(attr => attr.Name == "a" && attr.OwnerDocument == document);
 		}
 
 		[Test]
