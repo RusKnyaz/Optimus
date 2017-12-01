@@ -1,25 +1,8 @@
-﻿using System;
-using Knyaz.Optimus.ScriptExecuting;
+﻿using Knyaz.Optimus.Dom.Interfaces;
+using System;
 
 namespace Knyaz.Optimus.Environment
 {
-	[DomItem]
-	public interface ILocation
-	{
-		string Href { get; set; }
-		string Hash { get; set; }
-		string Host { get; set; }
-		string Hostname { get; set; }
-		string Origin { get; }
-		string Pathname { get; set; }
-		int Port { get; set; }
-		string Protocol { get; }
-		string Search { get; set; }
-		void Assign(string uri);
-		void Replace(string uri);
-		void Reload(bool force);
-	}
-
 	public class Location : ILocation
 	{
 		private readonly IEngine _engine;

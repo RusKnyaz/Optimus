@@ -1,5 +1,6 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
@@ -15,9 +16,9 @@ namespace Knyaz.Optimus.Tests.Dom
 	{
 		private IResourceProvider _resourceProvider;
 		private Engine _engine;
-		Window Window{get { return _engine.Window; }}
-		private Document Document { get { return _engine.Document; } }
-		History History{get { return Window.History; }}
+		Window Window => _engine.Window;
+		private Document Document => _engine.Document;
+		IHistory History => Window.History;
 
 		[SetUp]
 		public void SetUp()

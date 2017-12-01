@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Environment
 {
@@ -73,16 +73,5 @@ namespace Knyaz.Optimus.Environment
 			if (item.Title != null)
 				_engine.Document.Title = item.Title;
 		}
-	}
-
-	[DomItem]
-	public interface IHistory
-	{
-		long Lenght { get; }
-		void Go(long delta = 0);
-		void Back();
-		void Forward();
-		void ReplaceState(object data, string title, string url);
-		void PushState(object data, string title, string url);
 	}
 }

@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom.Css;
-using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class Element : Node, IElement, IElementSelector
+	/// <summary>
+	/// Represents the element of the DOM.
+	/// https://www.w3.org/TR/2004/REC-DOM-Level-3-Core-2004040
+	/// </summary>
+	public abstract class Element : Node, IElement, IElementSelector
 	{
 		private readonly IAttributesCollection _attributes;
 		private TokenList _classList = null;
 
-		public Element(Document ownerDocument) : base(ownerDocument)
+		internal Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
 			_attributes = new AttributesCollection();
@@ -23,15 +27,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			};
 		}
 
-		public IAttributesCollection Attributes
-		{
-			get { return _attributes; }
-		}
+		public IAttributesCollection Attributes => _attributes;
 
-		public Element(Document ownerDocument, string tagName) :this(ownerDocument)
-		{
-			TagName = tagName;
-		}
+		internal Element(Document ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
 
 		/// <summary>
 		/// Get the tag name of an element.
@@ -147,6 +145,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.ClassList.Contains(name)).ToArray();
 		}
 
+		/// <summary>
+		/// Retrieves an attribute value by name.
+		/// </summary>
+		/// <param name="name">The name of the attribute to retrieve.</param>
+		/// <returns>The <see cref="Attr"/> value as a string, or the string.Empty if that attribute does not have a specified or default value.</returns>
 		public string GetAttribute(string name)
 		{
 			var node = GetAttributeNode(name);
@@ -158,10 +161,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public override Document OwnerDocument
 		{
-			get
-			{
-				return base.OwnerDocument;
-			}
+			get => base.OwnerDocument;
 			set	{}
 		}
 
@@ -174,6 +174,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		/// <summary>
+		/// Removes the specified attribute node.
+		/// </summary>
+		/// <param name="attr">The <see cref="Attr"/> node to remove from the attribute list.</param>
 		public void RemoveAttributeNode(Attr attr)
 		{
 			if (attr.OwnerElement != this)
@@ -183,6 +187,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			attr.SetOwnerElement(null);
 		}
 
+		/// <summary>
+		/// Adds a new attribute. If an attribute with that name is already present in the element, its value is changed to be that of the value parameter.
+		/// </summary>
+		/// <param name="name">The name of the attribute to create or alter.</param>
+		/// <param name="value">Value to set in string form.</param>
 		public void SetAttribute(string name, string value)
 		{
 			var invariantName = name.ToLowerInvariant();
@@ -201,16 +210,18 @@ namespace Knyaz.Optimus.Dom.Elements
 			UpdatePropertyFromAttribute(value, invariantName);
 		}
 
-		protected virtual string PreGetAttribute(string invariantName, string value)
-		{
-			return value;
-		}
+		protected virtual string PreGetAttribute(string invariantName, string value) => value;
 
 		protected virtual void UpdatePropertyFromAttribute(string value, string invariantName)
 		{
 			//todo: remove the stuff
 		}
 
+		/// <summary>
+		/// Adds a new attribute node. If an attribute with that name (nodeName) is already present in the element, it is replaced by the new one.
+		/// </summary>
+		/// <param name="attr">The <see cref="Attr"/> node to add to the attribute list.</param>
+		/// <returns>If the newAttr attribute replaces an existing attribute, the replaced Attr node is returned, otherwise null is returned.</returns>
 		public Attr SetAttributeNode(Attr attr)
 		{
 			attr.SetOwnerElement(this);
@@ -227,6 +238,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			return attr;
 		}
 
+		/// <summary>
+		/// Removes an attribute by name.
+		/// </summary>
+		/// <param name="name">The name of the attribute to remove.</param>
 		public void RemoveAttribute(string name)
 		{
 			var attr = GetAttributeNode(name);
@@ -234,35 +249,31 @@ namespace Knyaz.Optimus.Dom.Elements
 				RemoveAttributeNode(attr);
 		}
 
-		public bool HasAttribute(string name)
-		{
-			return Attributes.ContainsKey(name);
-		}
+		/// <summary>
+		/// Returns <c>true</c> if the specified attribute exists, otherwise it returns <c>false</c>.
+		/// </summary>
+		/// <param name="name">The name of the attribute to check.</param>
+		public bool HasAttribute(string name) => Attributes.ContainsKey(name);
 
-		public bool HasAttributes()
-		{
-			return Attributes.Count > 0;
-		}
+		/// <summary>
+		/// Indicates whether this node (if it is an element) has any attributes.
+		/// </summary>
+		/// <returns><c>true</c> if this node has any attributes, <c>false</c> otherwise.</returns>
+		public bool HasAttributes() => Attributes.Count > 0;
 
 		/// <summary>
 		/// Checks whether a node is a descendant of a given Element or not.
 		/// </summary>
 		/// <param name="element">The node to search.</param>
 		/// <returns><c>True</c> if node found, <c>False</c> otherwise.</returns>
-		public bool Contains(INode element)
-		{
-			return ChildNodes.Flat(x => x.ChildNodes).Contains(element);
-		}
+		public bool Contains(INode element) => ChildNodes.Flat(x => x.ChildNodes).Contains(element);
 
 		/// <summary>
 		/// For an Element the NodeName is tag name.
 		/// </summary>
-		public override string NodeName { get { return TagName;} }
+		public override string NodeName => TagName;
 
-		public override string ToString()
-		{
-			return ToString(true);
-		}
+		public override string ToString() => ToString(true);
 
 		private string ToString(bool deep)
 		{
@@ -309,10 +320,12 @@ namespace Knyaz.Optimus.Dom.Elements
 			return node;
 		}
 
-		public Attr GetAttributeNode(string name)
-		{
-			return Attributes.ContainsKey(name) ? Attributes[name] : null;
-		}
+		/// <summary>
+		/// Retrieves an attribute node by name.
+		/// </summary>
+		/// <param name="name">The name (nodeName) of the attribute to retrieve.</param>
+		/// <returns>The <see cref="Attr"/> node with the specified name (nodeName) or <c>null</c> if there is no such attribute.</returns>
+		public Attr GetAttributeNode(string name) => Attributes.ContainsKey(name) ? Attributes[name] : null;
 
 		protected string GetAttribute(string name, string[] availableValues, string def)
 		{
@@ -462,38 +475,5 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Y-coordinate, relative to the viewport origin, of the top of the rectangle box.
 		/// </summary>
 		public float Y { get; private set; }
-	}
-
-	[DomItem]
-	public interface IElement : INode
-	{
-		string TagName { get; }
-		string Id { get; }
-		string ClassName { get; set; }
-		string InnerHTML { get; set; }
-		string TextContent { get; set; }
-
-		/// <summary>
-		/// Returns a collection containing all elements with the specified tag name
-		/// </summary>
-		/// <param name="tagNameSelector"></param>
-		/// <returns></returns>
-		Element[] GetElementsByTagName(string tagNameSelector);
-
-		/// <summary>
-		/// Returns a collection containing all descendant elements with the specified class name.
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		Element[] GetElementsByClassName(string tagName);
-		Attr GetAttributeNode(string name);
-		string GetAttribute(string name);
-		void RemoveAttribute(string name);
-		void SetAttribute(string name, string value);
-		Attr SetAttributeNode(Attr attr);
-		void RemoveAttributeNode(Attr attr);
-		bool HasAttribute(string name);
-		bool HasAttributes();
-		bool Contains(INode element);
 	}
 }

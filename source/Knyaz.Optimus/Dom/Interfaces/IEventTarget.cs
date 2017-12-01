@@ -1,8 +1,8 @@
-﻿using System;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
+using System;
 
-namespace Knyaz.Optimus.Dom.Elements
+namespace Knyaz.Optimus.Dom.Interfaces
 {
 	[DomItem]
 	public interface IEventTarget

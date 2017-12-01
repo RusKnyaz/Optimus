@@ -37,6 +37,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;NUNIT</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
@@ -48,6 +51,11 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\moz_default.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Dom\Interfaces\IEventTarget.cs" />
+    <None Include="Dom\Interfaces\INode.cs" />
   </ItemGroup>
 
   <ItemGroup>

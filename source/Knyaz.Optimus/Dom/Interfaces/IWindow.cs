@@ -1,0 +1,25 @@
+﻿using Knyaz.Optimus.Dom.Css;
+using System;
+
+namespace Knyaz.Optimus.Dom.Interfaces
+{
+	public interface IWindow : IEventTarget
+	{
+		int InnerWidth { get; set; }
+		int InnerHeight { get; set; }
+
+		IScreen Screen { get; }
+		ILocation Location { get; }
+		INavigator Navigator { get; }
+		IHistory History { get; }
+
+		int SetTimeout(Action<object> handler, double? delay, object ctx);
+		void ClearTimeout(int handle);
+		int SetInterval(Action handler, double? delay);
+		void ClearInterval(int handle);
+
+		ICssStyleDeclaration GetComputedStyle(IElement element);
+		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
+		MediaQueryList MatchMedia(string query);
+	}
+}

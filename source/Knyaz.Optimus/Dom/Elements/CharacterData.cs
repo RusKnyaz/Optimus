@@ -30,6 +30,9 @@
 
 	}
 
+	/// <summary>
+	/// Represtents the text element in the DOM.
+	/// </summary>
 	public class Text : CharacterData
 	{
 		public Text(Document owner) : base(owner) => NodeType = TEXT_NODE;
@@ -46,6 +49,9 @@
 		*/
 	}
 
+	/// <summary>
+	/// Represtents the comment element in the DOM.
+	/// </summary>
 	public class Comment : CharacterData
 	{
 		internal Comment(Document owner) : base(owner) => NodeType = COMMENT_NODE;

@@ -7,6 +7,7 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {

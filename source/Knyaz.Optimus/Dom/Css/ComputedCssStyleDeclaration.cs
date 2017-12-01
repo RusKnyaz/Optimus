@@ -5,6 +5,7 @@ using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Css
 {

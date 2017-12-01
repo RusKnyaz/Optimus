@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {

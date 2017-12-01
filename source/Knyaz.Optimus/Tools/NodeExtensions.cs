@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Knyaz.Optimus.Dom.Interfaces;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Knyaz.Optimus.Dom.Elements
+namespace Knyaz.Optimus.Tools
 {
 	public static class DocumentElementExtension
 	{
@@ -12,6 +13,6 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				yield return documentElement;
 			}
-		} 
+		}
 	}
 }

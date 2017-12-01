@@ -2,6 +2,7 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Moq;
 using NUnit.Framework;

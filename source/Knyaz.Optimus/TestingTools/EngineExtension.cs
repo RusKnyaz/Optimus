@@ -7,6 +7,7 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.TestingTools
 {

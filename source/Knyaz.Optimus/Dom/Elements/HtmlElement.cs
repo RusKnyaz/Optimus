@@ -17,7 +17,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static bool Hidden = false;
 		}
 
-		public HtmlElement(Document ownerDocument, string tagName)
+		internal HtmlElement(Document ownerDocument, string tagName)
 			: base(ownerDocument, tagName)
 		{
 			

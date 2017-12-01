@@ -7,8 +7,9 @@ using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
-using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tests.Dom;
+using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -52,7 +53,7 @@ namespace Knyaz.Optimus.Dom
 		public IWindow DefaultView { get; private set; }
 
 		/// <summary>
-		/// Gets the Document Element of the document (the <html> element)
+		/// Gets the Document Element of the document (the &lt;html&gt; element)
 		/// </summary>
 		public Element DocumentElement { get; private set; }
 
@@ -68,7 +69,7 @@ namespace Knyaz.Optimus.Dom
 
 		[Obsolete("Use window.location")]
 		//todo: check is it true for frames
-		public Location Location { get { return DefaultView.Location; } }
+		public ILocation Location => DefaultView.Location;
 
 		/// <summary>
 		/// Sets or gets the location of the document
@@ -316,8 +317,6 @@ namespace Knyaz.Optimus.Dom
 				OnFormSubmit(htmlFormElement);
 		}
 
-		
-
 		protected override void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
@@ -345,40 +344,13 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>Found element or <c>null</c>.</returns>
-		override public IElement QuerySelector(string query)
-		{
-			return new CssSelector(query).Select(DocumentElement).FirstOrDefault();
-		}
+		override public IElement QuerySelector(string query) => new CssSelector(query).Select(DocumentElement).FirstOrDefault();
 
 		/// <summary>
 		/// Gets a collection containing all elements that matches a specified CSS selector(s) in the document
 		/// </summary>
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>The Readonly collection of found elements.</returns>
-		override public IReadOnlyList<IElement> QuerySelectorAll(string query)
-		{
-			return new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
-		}
-	}
-
-	[DomItem]
-	public interface IDocument : INode
-	{
-		Element CreateElement(string tagName);
-		Element DocumentElement { get; }
-		void Write(string text);
-		Event CreateEvent(string type);
-		Head Head { get; }
-		HtmlBodyElement Body { get; }
-		Comment CreateComment(string data);
-		Text CreateTextNode(string data);
-		DocumentFragment CreateDocumentFragment();
-		Element GetElementById(string id);
-		Attr CreateAttribute(string name);
-		//not a part of public API
-		event Action<Node> NodeInserted;
-		event Action<IDocument> DomContentLoaded;
-		string Title { get; set; }
-		object ActiveElement { get; set; }
+		override public IReadOnlyList<IElement> QuerySelectorAll(string query) => new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
 	}
 }

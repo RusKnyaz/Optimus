@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Knyaz.Optimus.Tools
 {
-	public static class IEnumerableExtension
+	/// <summary>
+	/// Contains extension method for the IEnumerable interface.
+	/// </summary>
+	internal static class IEnumerableExtension
 	{
 		public static IEnumerable<T> Flat<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> children)
 		{

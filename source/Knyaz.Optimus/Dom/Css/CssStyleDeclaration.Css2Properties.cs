@@ -289,7 +289,7 @@
 			set { SetProperty("emptyCells", value); }
 		}
 
-		public string CssFloat
+		public string Float
 		{
 			get { return GetPropertyValue("cssFloat"); }
 			set { SetProperty("cssFloat", value); }

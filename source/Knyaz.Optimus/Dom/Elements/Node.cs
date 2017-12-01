@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
-using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public enum NodeSources
+	internal enum NodeSources
 	{
 		Script,
 		DocumentBuilder
@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		protected EventTarget EventTarget;
 
-		public NodeSources Source;
+		internal NodeSources Source;
 
 		protected Node(Document ownerDocument)
 		{
@@ -348,27 +348,6 @@ namespace Knyaz.Optimus.Dom.Elements
 
 			return thisPreParent.CompareDocumentPosition(otherPreParent);
 		}
-	}
-
-	[DomItem]
-	public interface INode
-	{
-		Document OwnerDocument { get; }
-		Node AppendChild(Node node);
-		Node RemoveChild(Node node);
-		Node InsertBefore(Node newChild, Node refNode);
-		bool HasChildNodes { get; }
-		Node ReplaceChild(Node newChild, Node oldChild);
-		Node FirstChild { get; }
-		Node LastChild { get; }
-		Node NextSibling { get; }
-		Node PreviousSibling { get; }
-		Node ParentNode { get; }
-		Node CloneNode();
-		int NodeType { get; }
-		string NodeName { get; }
-		int CompareDocumentPosition(Node node);
-		IList<Node> ChildNodes { get;}
 	}
 
 	public static class NodeExtension
