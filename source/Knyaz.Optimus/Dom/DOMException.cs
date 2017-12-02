@@ -173,7 +173,15 @@ namespace Knyaz.Optimus.Dom
 			Name = Enum.GetName(typeof(Codes), code);
 		}
 
+		/// <summary>
+		/// Error code.
+		/// </summary>
+		[Obsolete("Use Name property instead.")]
 		public int Code => (int)_code;
+		
+		/// <summary>
+		/// Error name.
+		/// </summary>
 		public string Name { get; }
 	}
 }
