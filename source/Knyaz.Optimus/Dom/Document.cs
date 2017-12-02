@@ -79,12 +79,12 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Returns a collection of all <form> elements in the document.
 		/// </summary>
-		public IEnumerable<HtmlFormElement> Forms { get { return GetElementsByTagName("form").Cast<HtmlFormElement>(); } }
+		public IEnumerable<HtmlFormElement> Forms => GetElementsByTagName("form").Cast<HtmlFormElement>();
 
 		/// <summary>
 		/// Returns a collection of <script> elements in the document.
 		/// </summary>
-		public IEnumerable<IHtmlScriptElement> Scripts { get { return GetElementsByTagName("script").Cast<IHtmlScriptElement>(); } }
+		public IEnumerable<IHtmlScriptElement> Scripts => GetElementsByTagName("script").Cast<IHtmlScriptElement>();
 
 		/// <summary>
 		/// Writes HTML expressions or JavaScript code to a document.
@@ -324,10 +324,7 @@ namespace Knyaz.Optimus.Dom
 			HandleNodeAdded(node);
 		}
 
-		public string CompatMode
-		{
-			get { return ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat"; }
-		}
+		public string CompatMode => ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat";
 
 		/// <summary>
 		/// Sets or gets the title of the document.
@@ -344,13 +341,13 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>Found element or <c>null</c>.</returns>
-		override public IElement QuerySelector(string query) => new CssSelector(query).Select(DocumentElement).FirstOrDefault();
+		public override IElement QuerySelector(string query) => new CssSelector(query).Select(DocumentElement).FirstOrDefault();
 
 		/// <summary>
 		/// Gets a collection containing all elements that matches a specified CSS selector(s) in the document
 		/// </summary>
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>The Readonly collection of found elements.</returns>
-		override public IReadOnlyList<IElement> QuerySelectorAll(string query) => new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
+		public override IReadOnlyList<IElement> QuerySelectorAll(string query) => new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
 	}
 }

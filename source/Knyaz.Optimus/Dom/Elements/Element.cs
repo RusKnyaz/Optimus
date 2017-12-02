@@ -15,7 +15,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	public abstract class Element : Node, IElement, IElementSelector
 	{
 		private readonly IAttributesCollection _attributes;
-		private TokenList _classList = null;
+		private readonly TokenList _classList = null;
 
 		internal Element(Document ownerDocument) : base(ownerDocument)
 		{
@@ -55,8 +55,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Id
 		{
-			get { return GetAttribute("id", string.Empty); }
-			set { SetAttribute("id", value); }
+			get => GetAttribute("id", string.Empty);
+			set => SetAttribute("id", value);
 		}
 
 		/// <summary>
@@ -91,13 +91,11 @@ namespace Knyaz.Optimus.Dom.Elements
 				var sb = new StringBuilder();
 				foreach (var child in ChildNodes)
 				{
-					var text = child as Text;
-					if (text != null)
-						sb.Append(text.Data);
-
-					var elem = child as Element;
-					if (elem != null)
-						sb.Append(elem);
+					switch (child)
+					{
+						case Text text:sb.Append(text.Data);break;
+						case Element elem:sb.Append(elem);break;
+					}
 				}
 
 				return sb.ToString();
@@ -114,25 +112,24 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public virtual string TextContent
 		{
-			get
-			{
-				return string.Join(" ", ChildNodes.Flat(x => x.ChildNodes).OfType<CharacterData>().Select(x => x.Data));
-			}
-			set { InnerHTML = value; }
+			get => string.Join(" ", ChildNodes.Flat(x => x.ChildNodes).OfType<CharacterData>().Select(x => x.Data));
+			set => InnerHTML = value;
 		}
 
 		/// <summary>
 		/// Returns a collection containing all descendant elements with the specified tag name.
 		/// </summary>
-		/// <param name="tagNameSelector">A string that specifies the tagname to search for. The value "*" matches all tags</param>
-		public Element[] GetElementsByTagName(string tagNameSelector)
+		/// <param name="tagName">A string that specifies the tagname to search for. The value "*" matches all tags</param>
+		public Element[] GetElementsByTagName(string tagName)
 		{
-			var parts = tagNameSelector.Split('.');
-			var tagName = parts[0].ToUpperInvariant();
-			//todo: revise this strange code (i mean handling 'classes' selector)
-
-			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.TagName == tagName && parts.Skip(1).All(c => x.ClassList.Contains(c))).ToArray();
+			var invariantName = tagName.ToUpperInvariant();
+			
+			return tagName == "*" 
+				? Descendants.ToArray() 
+				: Descendants.Where(x => x.TagName == invariantName).ToArray();
 		}
+
+		private IEnumerable<Element> Descendants => ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>();
 
 		/// <summary>
 		/// Returns a collection containing all descendant elements with the specified class name.
@@ -148,9 +145,9 @@ namespace Knyaz.Optimus.Dom.Elements
 				case 0:
 					return new Element[0];
 				case 1:
-					return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.ClassList.Contains(name)).ToArray();
+					return Descendants.Where(x => x.ClassList.Contains(name)).ToArray();
 				default:
-					return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => classes.All(c => x.ClassList.Contains(c))).ToArray();
+					return Descendants.Where(x => classes.All(c => x.ClassList.Contains(c))).ToArray();
 			}
 		}
 

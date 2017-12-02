@@ -142,18 +142,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(null, attr.OwnerElement);
 		}
 
-		[TestCase("<div id='a'></div>", ExpectedResult = 0)]
-		[TestCase("<div id='a'><strong></strong></div>", ExpectedResult = 1)]
-		[TestCase("<div id='a'><strong><strong></strong></strong></div>", ExpectedResult = 2)]
-		[TestCase("<div id='a'><div><strong></strong></div></div>", ExpectedResult = 1)]
-		public int GetElementsByTagName(string html)
-		{
-			var doc = new Document();
-			doc.Write("<html><body>" + html + "</body></html>");
-
-			return doc.GetElementById("a").GetElementsByTagName("strong").Length;
-		}
-
+		
 		[Test]
 		public void SetInnerHtml()
 		{

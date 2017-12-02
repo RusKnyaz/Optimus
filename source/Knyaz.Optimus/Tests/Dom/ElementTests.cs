@@ -238,6 +238,28 @@ namespace Knyaz.Optimus.Tests.Dom
 			var res = doc.GetElementsByClassName(selector);
 			return res.Length;
 		}
+
+		[TestCase("span", ExpectedResult = 1)]
+		[TestCase("div", ExpectedResult = 2)]
+		[TestCase("*", ExpectedResult = 3)]
+		public int GetElementsByTagName(string tagName)
+		{
+			var doc = new Document();
+			doc.Write("<div><div><span></span></div></div>");
+			return doc.Body.GetElementsByTagName(tagName).Length;
+		}
+		
+		[TestCase("<div id='a'></div>", ExpectedResult = 0)]
+		[TestCase("<div id='a'><strong></strong></div>", ExpectedResult = 1)]
+		[TestCase("<div id='a'><strong><strong></strong></strong></div>", ExpectedResult = 2)]
+		[TestCase("<div id='a'><div><strong></strong></div></div>", ExpectedResult = 1)]
+		public int GetElementsByTagNameStrong(string html)
+		{
+			var doc = new Document();
+			doc.Write("<html><body>" + html + "</body></html>");
+
+			return doc.GetElementById("a").GetElementsByTagName("strong").Length;
+		}
 	}
 }
 #endif
