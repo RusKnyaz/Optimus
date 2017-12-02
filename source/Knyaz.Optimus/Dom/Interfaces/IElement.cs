@@ -19,18 +19,17 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		string TextContent { get; set; }
 
 		/// <summary>
-		/// Returns a collection containing all elements with the specified tag name
+		/// Returns a collection containing all descendant elements with the specified tag name.
 		/// </summary>
-		/// <param name="tagNameSelector"></param>
-		/// <returns></returns>
+		/// <param name="tagNameSelector">A string that specifies the tagname to search for. The value "*" matches all tags</param>
 		Element[] GetElementsByTagName(string tagNameSelector);
 
 		/// <summary>
 		/// Returns a collection containing all descendant elements with the specified class name.
 		/// </summary>
-		/// <param name="name"></param>
+		/// <param name="name">The class name (or multiple names divided by spaces) of the elements to get.</param>
 		/// <returns></returns>
-		Element[] GetElementsByClassName(string tagName);
+		Element[] GetElementsByClassName(string name);
 
 		/// <summary>
 		/// Retrieves an attribute value by name.

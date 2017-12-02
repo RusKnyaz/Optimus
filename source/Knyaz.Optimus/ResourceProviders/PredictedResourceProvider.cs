@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	public class PredictedResourceProvider : IResourceProvider
+	internal class PredictedResourceProvider : IResourceProvider
 	{
 		private readonly ConcurrentDictionary<IRequest, Task<IResource>> _preloadedResources
         			= new ConcurrentDictionary<IRequest, Task<IResource>>();

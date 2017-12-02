@@ -4,8 +4,15 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Tools
 {
-	public static class DocumentElementExtension
+	/// <summary>
+	/// Helper class for work with Element
+	/// </summary>
+	static class DocumentElementExtension
 	{
+		/// <summary>
+		/// Gets all descendants of a given node with the node itself.
+		/// </summary>
+		/// <returns>The original node and all of its descendants.</returns>
 		public static IEnumerable<INode> Flatten(this INode elem)
 		{
 			yield return elem;

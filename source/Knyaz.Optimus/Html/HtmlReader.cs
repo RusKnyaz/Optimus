@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Html
 	/// <summary>
 	/// Represents the minimal piece of html document.
 	/// </summary>
-	public struct HtmlChunk
+	internal struct HtmlChunk
 	{
 		public Types Type;
 		public string Value;
@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Html
 	/// <summary>
 	/// Contains methods to parse HTML document.
 	/// </summary>
-	public static class HtmlReader
+	internal static class HtmlReader
 	{
 		/// <summary>
 		/// Reads the sequence of html chunks from HTML document.
@@ -388,7 +388,7 @@ namespace Knyaz.Optimus.Html
 	}
 
 	
-	public static class StreamReaderExtension
+	internal static class StreamReaderExtension
 	{
 		public static string ReadLineWithEndings(this StreamReader streamReader)
 		{

@@ -122,10 +122,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary>
-		/// Returns a collection containing all elements with the specified tag name.
+		/// Returns a collection containing all descendant elements with the specified tag name.
 		/// </summary>
-		/// <param name="tagNameSelector"></param>
-		/// <returns></returns>
+		/// <param name="tagNameSelector">A string that specifies the tagname to search for. The value "*" matches all tags</param>
 		public Element[] GetElementsByTagName(string tagNameSelector)
 		{
 			var parts = tagNameSelector.Split('.');
