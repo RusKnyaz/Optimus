@@ -141,7 +141,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public Element[] GetElementsByClassName(string name)
 		{
-			return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.ClassList.Contains(name)).ToArray();
+			var classes = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			
+			switch (classes.Length)
+			{
+				case 0:
+					return new Element[0];
+				case 1:
+					return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => x.ClassList.Contains(name)).ToArray();
+				default:
+					return ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>().Where(x => classes.All(c => x.ClassList.Contains(c))).ToArray();
+			}
 		}
 
 		/// <summary>

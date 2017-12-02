@@ -225,6 +225,19 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(div, attr1.OwnerElement, "attr1.OwnerElement");
 			Assert.AreEqual("1", div.GetAttribute("attr"));
 		}
+
+		[TestCase("a c", ExpectedResult = 1)]
+		[TestCase("a   c  ", ExpectedResult = 1)]
+		[TestCase("a b c", ExpectedResult = 1)]
+		[TestCase("a b c d", ExpectedResult = 0)]
+		[TestCase("", ExpectedResult = 0)]
+		public int GetElementsByClassName(string selector)
+		{
+			var doc = new Document();
+			doc.Write("<div class='a b c'></div>");
+			var res = doc.GetElementsByClassName(selector);
+			return res.Length;
+		}
 	}
 }
 #endif
