@@ -77,12 +77,12 @@ namespace Knyaz.Optimus.Dom
 		public string DocumentURI { get { return DefaultView.Location.Href; } set { DefaultView.Location.Href = value; } }
 
 		/// <summary>
-		/// Returns a collection of all <form> elements in the document.
+		/// Returns a collection of all &lt;form&gt; elements in the document.
 		/// </summary>
 		public IEnumerable<HtmlFormElement> Forms => GetElementsByTagName("form").Cast<HtmlFormElement>();
 
 		/// <summary>
-		/// Returns a collection of <script> elements in the document.
+		/// Returns a collection of &lt;script&gt; elements in the document.
 		/// </summary>
 		public IEnumerable<IHtmlScriptElement> Scripts => GetElementsByTagName("script").Cast<IHtmlScriptElement>();
 

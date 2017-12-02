@@ -258,7 +258,7 @@
 		/// This property is used with the :before and :after pseudo-elements to generate content in a document.
 		/// </summary>
 		/// <remarks>
-		/// Value: [ <string> | <uri> | <counter> | attr(X) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit 
+		/// Value: [ &lt;string&gt; | &lt;uri&gt; | &lt;counter&gt; | attr(X) | open-quote | close-quote | no-open-quote | no-close-quote ]+ | inherit 
 		/// </remarks>
 		string Content { get; set; }
 
@@ -447,7 +447,8 @@
 		/// The shorthand property for setting 'margin-top', 'margin-right', 'margin-bottom', and 'margin-left' at the same place in the style sheet.
 		/// </summary>
 		/// <remarks>
-		/// Value: <margin-width>{1,4} | inherit </remarks>
+		/// Value: &lt;margin-width&gt;{1,4} | inherit 
+		/// </remarks>
 		string Margin { get; set; }
 
 		/// <summary>
@@ -610,7 +611,7 @@
 		string Pitch { get; set; }
 
 		/// <summary>
-		/// Specifies variation in average pitch. Value: &ltnumber&gt; | inherit
+		/// Specifies variation in average pitch. Value: &lt;number&gt; | inherit
 		/// </summary>
 		string PitchRange { get; set; }
 

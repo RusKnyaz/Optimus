@@ -15,6 +15,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
+	/// <inheritdoc cref="INode"/>
 	public abstract class Node : INode, IEventTarget
 	{
 		protected EventTarget EventTarget;
@@ -347,40 +348,6 @@ namespace Knyaz.Optimus.Dom.Elements
 			var otherPreParent = otherAncestors[sharedParentIndex - 1];
 
 			return thisPreParent.CompareDocumentPosition(otherPreParent);
-		}
-	}
-
-	public static class NodeExtension
-	{
-		public static bool RaiseEvent(this Node node, string eventType, bool bubblable, bool cancellable)
-		{
-			var e = node.OwnerDocument.CreateEvent("Event");
-			e.InitEvent(eventType, bubblable, cancellable);
-			return node.DispatchEvent(e);
-		}
-
-		/// <summary>
-		/// Determines if the node lies to document hierarhcy.
-		/// </summary>
-		/// <returns><c>true</c> if is in document the specified node; otherwise, <c>false</c>.</returns>
-		/// <param name="node">Node.</param>
-		public static bool IsInDocument(this Node node)
-		{
-			var praParent = node;
-			while (praParent.ParentNode != null)
-				praParent = praParent.ParentNode;
-
-			return praParent == node.OwnerDocument;
-		}
-
-		public static IEnumerable<Node> Ancestors(this Node node)
-		{
-			var parent = node.ParentNode;
-			while (parent != null)
-			{
-				yield return parent;
-				parent = parent.ParentNode;
-			}
 		}
 	}
 }

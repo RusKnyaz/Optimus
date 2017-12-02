@@ -54,8 +54,7 @@ namespace Knyaz.Optimus.Dom
 					RegisterAttr(attribute);
 				}
 
-				var script = elt as Script;
-				if (script != null)
+				if (elt is Script script)
 				{
 					var remote = script.HasDelayedContent;
 					var async = script.Async && remote || script.Source == NodeSources.Script;
@@ -93,8 +92,7 @@ namespace Knyaz.Optimus.Dom
 
 		private void RegisterAttr(Attr attr)
 		{
-			string eventName;
-			if (_eventAttr.TryGetValue(attr.Name.ToLowerInvariant(), out eventName))
+			if (_eventAttr.TryGetValue(attr.Name.ToLowerInvariant(), out var eventName))
 			{
 				var parentElement = attr.OwnerElement;
 
@@ -153,8 +151,7 @@ namespace Knyaz.Optimus.Dom
 
 		private void RaiseScriptExecutionError(Script script, Exception ex)
 		{
-			if (ScriptExecutionError != null)
-				ScriptExecutionError(script, ex);
+			ScriptExecutionError?.Invoke(script, ex);
 
 			var evt = (ErrorEvent)script.OwnerDocument.CreateEvent("ErrorEvent");
 			evt.ErrorEventInit(ex.Message, script.Src ?? "...", 0, 0, ex);
@@ -164,8 +161,7 @@ namespace Knyaz.Optimus.Dom
 
 		private void RaiseAfterScriptExecute(Script script)
 		{
-			if (AfterScriptExecute != null)
-				AfterScriptExecute(script);
+			AfterScriptExecute?.Invoke(script);
 
 			var evt = script.OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("AfterScriptExecute",false, false);
@@ -175,8 +171,7 @@ namespace Knyaz.Optimus.Dom
 
 		private void RaiseBeforeScriptExecute(Script script)
 		{
-			if (BeforeScriptExecute != null)
-				BeforeScriptExecute(script);
+			BeforeScriptExecute?.Invoke(script);
 
 			var evt = script.OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("BeforeScriptExecute", false, false);
