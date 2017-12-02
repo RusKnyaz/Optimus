@@ -224,18 +224,30 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns>If the newAttr attribute replaces an existing attribute, the replaced Attr node is returned, otherwise null is returned.</returns>
 		public Attr SetAttributeNode(Attr attr)
 		{
+			Attr result = null;
+			
 			attr.SetOwnerElement(this);
 
 			var invariantName = attr.Name.ToLowerInvariant();
 
 			if (Attributes.ContainsKey(invariantName))
-				Attributes[invariantName] = attr;
+			{
+				result = Attributes[invariantName];
+
+				if (!ReferenceEquals(result, attr))
+				{
+					result.SetOwnerElement(null);
+					Attributes[invariantName] = attr;	
+				}
+			}
 			else
+			{
 				Attributes.Add(invariantName, attr);
+			}
 
 			UpdatePropertyFromAttribute(attr.Value, invariantName);
 
-			return attr;
+			return result;
 		}
 
 		/// <summary>

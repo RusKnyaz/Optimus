@@ -178,6 +178,53 @@ namespace Knyaz.Optimus.Tests.Dom
 			doc.Body.InnerHTML = "<div></div><span></span>";
 			Assert.AreEqual(2, childNodes.Count);
 		}
+
+		[Test]
+		public void SetAttributeNodeNew()
+		{
+			var doc = new Document();
+			var div = doc.CreateElement("div");
+			var attr1 = doc.CreateAttribute("attr1");
+			attr1.Value = "1";
+			
+			var result = div.SetAttributeNode(attr1);
+			Assert.IsNull(result);
+			Assert.AreEqual("1", div.GetAttribute("attr1"));
+		}
+
+		[Test]
+		public void SetAttributeNodeExists()
+		{
+			var doc = new Document();
+			var div = doc.CreateElement("div");
+			var attr1 = doc.CreateAttribute("attr");
+			attr1.Value = "1";
+			var attr2 = doc.CreateAttribute("attr");
+			attr2.Value = "2";
+			
+			div.SetAttributeNode(attr1);
+			var result = div.SetAttributeNode(attr2);
+			
+			Assert.AreEqual(attr1, result);
+			Assert.IsNull(attr1.OwnerElement, "attr1.OwnerElement");
+			Assert.AreEqual("2", div.GetAttribute("attr"));
+		}
+		
+		[Test]
+		public void SetAttributeNodeTwice()
+		{
+			var doc = new Document();
+			var div = doc.CreateElement("div");
+			var attr1 = doc.CreateAttribute("attr");
+			attr1.Value = "1";
+			
+			div.SetAttributeNode(attr1);
+			var result = div.SetAttributeNode(attr1);
+			
+			Assert.AreEqual(attr1, result);
+			Assert.AreEqual(div, attr1.OwnerElement, "attr1.OwnerElement");
+			Assert.AreEqual("1", div.GetAttribute("attr"));
+		}
 	}
 }
 #endif
