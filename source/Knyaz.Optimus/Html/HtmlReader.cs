@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Html
 	/// <summary>
 	/// Represents the minimal piece of html document.
 	/// </summary>
-	internal struct HtmlChunk
+	public struct HtmlChunk
 	{
 		public Types Type;
 		public string Value;
@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Html
 	/// <summary>
 	/// Contains methods to parse HTML document.
 	/// </summary>
-	internal static class HtmlReader
+	public static class HtmlReader
 	{
 		/// <summary>
 		/// Reads the sequence of html chunks from HTML document.

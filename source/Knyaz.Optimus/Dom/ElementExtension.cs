@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom
 {
