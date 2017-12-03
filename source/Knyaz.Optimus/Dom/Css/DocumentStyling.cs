@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
-using Knyaz.Optimus.Resources;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Tools;
 

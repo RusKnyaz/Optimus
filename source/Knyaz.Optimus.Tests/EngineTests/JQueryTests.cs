@@ -7,19 +7,21 @@ using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
-using R = Knyaz.Optimus.Tests.Resources.Resources;
+using Knyaz.Optimus.Tests.Resources;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class JQueryTests
 	{
+		
+
 		[Test]
 		public void Smoke()
 		{
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script></head><body></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body></body></html>");
 		}
 
 		[TestCase(true, ExpectedResult = "zaza")]
@@ -29,7 +31,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var resourceProvider = Mock.Of<IResourceProvider>().Resource("test.js", "$('#uca').html('zaza');");
 			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog +=o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script><script src='test.js' "+ (defer?"defer":"") + "/></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script src='test.js' "+ (defer?"defer":"") + "/></head><body><div id='uca'></div></body></html>");
 			var ucaDiv = engine.Document.GetElementById("uca");
 			return ucaDiv.InnerHTML;
 		}
@@ -40,7 +42,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var resourceProvider = Mock.Of<IResourceProvider>().Resource("test.js", "$('#uca').html('zaza');");
 			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script><script src='test.js'/></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script src='test.js'/></head><body><div id='uca'></div></body></html>");
 			var ucaDiv = engine.Document.GetElementById("uca");
 			Assert.AreEqual("", ucaDiv.InnerHTML);
 		}
@@ -60,7 +62,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 				log.Add(o.ToString());
 			};
 
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[]{"OK"}, log);
 		}
@@ -76,7 +78,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			Assert.AreEqual("ok", result);
 		}
 
@@ -95,7 +97,7 @@ document.body.appendChild(e);";
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
 			var loaded = engine.WaitId("loaded");
 			Assert.IsNotNull(loaded);
 			
@@ -121,7 +123,7 @@ document.body.appendChild(e);";
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
 			var loaded = engine.WaitId("loaded");
 			Assert.IsNotNull(loaded);
 
@@ -138,7 +140,7 @@ document.body.appendChild(e);";
 			var engine = new Engine();
 			object result = null;
 			engine.Console.OnLog += o =>{result = o;};
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script><script>" + script + "</script></head><body><div id='b'></div></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script>" + script + "</script></head><body><div id='b'></div></body></html>");
 			Thread.Sleep(1000);
 
 			Assert.IsNotNull(result);
@@ -153,7 +155,7 @@ document.body.appendChild(e);";
 			var engine = new Engine();
 			object result = null;
 			engine.Console.OnLog += o => {System.Console.WriteLine((o ??"null").ToString()); result = o; };
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script></head><body><div class = 'u' id='a'></div><script>" + script + "</script></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div class = 'u' id='a'></div><script>" + script + "</script></body></html>");
 			
 			Assert.AreEqual(exptectedCount, result);
 		}
@@ -165,7 +167,7 @@ document.body.appendChild(e);";
 			var engine = new Engine();
 			object result = null;
 			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script + "</script></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script + "</script></body></html>");
 
 			var u = engine.Document.GetElementById("u") as HtmlElement;
 			u.Click();
@@ -180,7 +182,7 @@ document.body.appendChild(e);";
 			object result = null;
 			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
 
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
 
 			engine.DumpToFile("c:\\temp\\c.html");
 			Assert.AreEqual(1, result);

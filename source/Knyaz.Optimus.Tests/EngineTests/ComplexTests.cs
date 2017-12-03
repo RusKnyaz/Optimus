@@ -1,6 +1,6 @@
 ﻿using Knyaz.Optimus.ResourceProviders;
 using NUnit.Framework;
-using R = Knyaz.Optimus.Tests.Resources.Resources;
+using Knyaz.Optimus.Tests.Resources;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -30,12 +30,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[SetUp]
 		public void SetUp()
 		{
-			_resourceProvider = Mocks.ResourceProvider("jquery.js", R.jquery_2_1_3)
-				.Resource("knockout.js", R.knockout)
-				.Resource("require.js", R.requirejs)
-				.Resource("./template.js", R.template)
-				.Resource("./text.js", R.text)
-				.Resource("./stringTemplateEngine.js", R.stringTemplateEngine);
+			_resourceProvider = Mocks.ResourceProvider("jquery.js", R.JQueryJs)
+				.Resource("knockout.js", R.KnockoutJs)
+				.Resource("require.js", R.RequireJs)
+				.Resource("./template.js", R.Template)
+				.Resource("./text.js", R.Text)
+				.Resource("./stringTemplateEngine.js", R.StringTemplateEngine);
 		}
 
 

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using R = Knyaz.Optimus.Tests.Resources.Resources;
+using Knyaz.Optimus.Tests.Resources;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -11,8 +11,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
-			engine.Load("<html><head><script> " + R.jquery_2_1_3 + " </script>" +
-				"<script>" + R.jQuery_Form + "</script></head><body></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script>" +
+				"<script>" + R.JQueryFormJs + "</script></head><body></body></html>");
 		}
 	}
 }
