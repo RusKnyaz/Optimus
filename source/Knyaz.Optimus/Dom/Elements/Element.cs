@@ -131,6 +131,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		private IEnumerable<Element> Descendants => ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>();
 
+
+		private static char[] _spaceSplitter = new[] {' '};
 		/// <summary>
 		/// Returns a collection containing all descendant elements with the specified class name.
 		/// </summary>
@@ -138,7 +140,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public Element[] GetElementsByClassName(string name)
 		{
-			var classes = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			var classes = name.Split(_spaceSplitter, StringSplitOptions.RemoveEmptyEntries);
 			
 			switch (classes.Length)
 			{
