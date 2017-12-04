@@ -794,5 +794,14 @@ dispatchEvent(evt);");
 			CreateEngine("", "var data; if(data !== undefined) {console.log('a');}else{console.log('b');}");
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
+
+		[Test]
+		public void SetNegativeIntoUnsigned()
+		{
+			_engine.Load(
+				"<html><head><script>var arr = new Uint16Array(new[1, 2, -3]);console.log(arr[2]);</script></head><body></body></html>");
+			Thread.Sleep(500);
+			CollectionAssert.AreEqual(new[] { 65533 }, _log);
+		}
 	}
 }
