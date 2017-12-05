@@ -14,20 +14,18 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// Creates new instance of <see cref="ArrayBuffer"/>
 		/// </summary>
 		/// <param name="size">The size, in bytes, of the array buffer to create.</param>
-		public ArrayBuffer(int size)
-		{
-			Data = new byte[size];
-		}
+		public ArrayBuffer(int size) => Data = new byte[size];
+
+		/// <summary>
+		/// JS compatible constructor.
+		/// </summary>
+		/// <param name="size">The size, in bytes, of the array buffer to create.</param>
+		public ArrayBuffer(double size) : this((int)size) { }
 
 		/// <summary>
 		/// Returns <c>true</c> if arg is one of the ArrayBuffer views, such as typed array objects or a DataView. Returns <c>false</c> otherwise.
 		/// </summary>
 		public static bool IsView(object data)
-		{
-			if (data == null)
-				return false;
-
-			return data.GetType().IsSubclassOf(typeof(TypedArray<>)) /*|| data is DataView*/;
-		}
+			=> data != null && data.GetType().IsSubclassOf(typeof(TypedArray<>)) /*|| data is DataView*/;
 	}
 }

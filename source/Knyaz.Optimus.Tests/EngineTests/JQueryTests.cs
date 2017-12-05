@@ -14,8 +14,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	[TestFixture]
 	public class JQueryTests
 	{
-		
-
 		[Test]
 		public void Smoke()
 		{

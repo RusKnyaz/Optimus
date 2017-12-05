@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Knyaz.Optimus.Dom.Perf
@@ -99,10 +100,21 @@ namespace Knyaz.Optimus.Dom.Perf
 	{
 		public Int8Array(ArrayBuffer buffer) : base(buffer) { }
 		public Int8Array(sbyte[] data) : base(data) { }
+		public Int8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Int8Array Subarray(long begin, long? end = null)	=> new Int8Array(GetSub(begin, end));
 		protected override sbyte GetData(int index)	=> (sbyte)_data[index];
-		protected override byte[] GetBytes(sbyte val) => BitConverter.GetBytes(val);
+		protected override byte[] GetBytes(sbyte val) => new byte[] { (byte)val };
 		public static string Name => "Int8Array";
+
+		static sbyte FromObject(object val)
+		{
+			if (val is double d)
+				return (sbyte)d;
+			else if (val is sbyte u)
+				return u;
+
+			return Convert.ToSByte(val);
+		}
 	}
 
 	/// <summary>
@@ -111,12 +123,24 @@ namespace Knyaz.Optimus.Dom.Perf
 	public class UInt8Array : TypedArray<byte>
 	{
 		public UInt8Array(ArrayBuffer buffer) : base(buffer) { }
-		public UInt8Array Subarray(long begin, long? end) => new UInt8Array(GetSub(begin, end));
+		public UInt8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public  UInt8Array(byte[] data) : base(data) { }
+
+		public UInt8Array Subarray(long begin, long? end) => new UInt8Array(GetSub(begin, end));
 
 		protected override byte GetData(int index) => _data[index];
 		protected override byte[] GetBytes(byte val) => new[] { val };
 		public static string Name => "Uint8Array";
+
+		static byte FromObject(object val)
+		{
+			if (val is double d)
+				return (byte)d;
+			else if (val is byte u)
+				return u;
+
+			return Convert.ToByte(val);
+		}
 	}
 
 	/// <summary>
@@ -125,11 +149,22 @@ namespace Knyaz.Optimus.Dom.Perf
 	public class Int16Array : TypedArray<short>
 	{
 		public Int16Array(ArrayBuffer buffer) : base(buffer) { }
+		public Int16Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Int16Array(short[] data) : base(data) { }
 		public Int16Array Subarray(long begin, long? end) => new Int16Array(GetSub(begin, end));
 		protected override short GetData(int index)	=> BitConverter.ToInt16(_data, index);
 		protected override byte[] GetBytes(short val) => BitConverter.GetBytes(val);
 		public static string Name => "Int8Array";
+
+		static short FromObject(object val)
+		{
+			if (val is double d)
+				return (short)d;
+			else if (val is short u)
+				return u;
+
+			return Convert.ToInt16(val);
+		}
 	}
 
 	/// <summary>
@@ -138,10 +173,21 @@ namespace Knyaz.Optimus.Dom.Perf
 	public class UInt16Array : TypedArray<ushort>
 	{
 		public UInt16Array(ArrayBuffer buffer) : base(buffer) { }
+		public UInt16Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public UInt16Array(ushort[] data) : base(data) { }
 		public UInt16Array Subarray(long begin, long? end) => new UInt16Array(GetSub(begin, end));
 		protected override ushort GetData(int index) => BitConverter.ToUInt16(_data, index);
 		protected override byte[] GetBytes(ushort val) => BitConverter.GetBytes(val);
 		public static string Name => "Uint16Array";
+
+		static ushort FromObject(object val)
+		{
+			if(val is double d)
+				return (ushort)d;
+			else if(val is ushort u)
+				return u;
+
+			return Convert.ToUInt16(val);
+		}
 	}
 }

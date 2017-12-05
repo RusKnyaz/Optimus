@@ -46,11 +46,11 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void Int8SetArrayAoutOfRange()
+		public void Int8SetArrayOutOfRange()
 		{
 			var buffer = new ArrayBuffer(4);
 			var i8 = new Int8Array(buffer);
-			Assert.Throws<Exception>(() => i8.Set(new sbyte[] { 1, 2, 3, 4 }, 1));
+			Assert.Throws<ArgumentException>(() => i8.Set(new sbyte[] { 1, 2, 3, 4 }, 1));
 		}
 
 		[Test]
