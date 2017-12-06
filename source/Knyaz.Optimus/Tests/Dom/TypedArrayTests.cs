@@ -9,11 +9,12 @@ namespace Knyaz.Optimus.Tests.Dom
 	public class TypedArrayTests
 	{
 		[Test]
-		public void InitAndGet()
-		{
-			var arr = new Int8Array(new sbyte[]{ 4, 3, 2});
-			arr.Assert(array => array [0] == 4 && array [1] == 3 && array [2] == 2 && array.Length == 3);
-		}
+		public void ArrayBufferLength() => Assert.AreEqual(2, new ArrayBuffer(2).ByteLength);
+
+		[Test]
+		public void InitAndGet() =>
+			new Int8Array(new sbyte[] { 4, 3, 2 })
+			.Assert(array => array [0] == 4 && array [1] == 3 && array [2] == 2 && array.Length == 3);
 
 		[Test]
 		public void Sharing()
@@ -26,15 +27,13 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void InitByZero()
-		{
+		public void InitByZero() =>
 			new ArrayBuffer(16).Assert(buf =>
 					new Int8Array(buf)[0] == 0 &&
 					new UInt8Array(buf)[0] == 0 &&
 					new Int16Array(buf)[0] == 0 &&
 					new UInt16Array(buf)[0] == 0
 				);
-		}
 
 		[Test]
 		public void Int8SetArray()

@@ -57,6 +57,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Uint8Array", typeof(UInt8Array));
 			AddClrType("Int16Array", typeof(Int16Array));
 			AddClrType("Uint16Array", typeof(UInt16Array));
+			AddClrType("DataView", typeof(DataView));
 
 			AddGlobalGetter("console", () => engine.Console);
 			AddGlobalGetter("document", () => engine.Document);

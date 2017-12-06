@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Knyaz.Optimus.Tests.JsTests
 {
 	[TestFixture]
-    class TypedArraysJsTests
-    {
+	class TypedArraysJsTests
+	{
 		private object[] Execute(string script)
 		{
 			var log = new List<object>();
@@ -18,8 +18,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[Test]
 		public void NewArrayBuffer()
 		{
-			var result = Execute("var buffer= new ArrayBuffer(2);");
-			CollectionAssert.AreEqual(new object[] { }, result);
+			var result = Execute("var buffer= new ArrayBuffer(2);out(buffer.byteLength);");
+			CollectionAssert.AreEqual(new object[] { 2 }, result);
 		}
 
 		[Test]

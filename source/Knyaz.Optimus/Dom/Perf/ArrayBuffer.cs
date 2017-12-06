@@ -27,5 +27,10 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// </summary>
 		public static bool IsView(object data)
 			=> data != null && data.GetType().IsSubclassOf(typeof(TypedArray<>)) /*|| data is DataView*/;
+
+		/// <summary>
+		/// Gets length of buffer in bytes.
+		/// </summary>
+		public int ByteLength => Data.Length;
 	}
 }
