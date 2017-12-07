@@ -2,9 +2,11 @@
 using System.Linq;
 using System.Reflection;
 using Jint.Native;
+using Jint.Native.Function;
 using Jint.Native.Object;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
+using Jint.Runtime.Environments;
 using Jint.Runtime.Interop;
 
 namespace Knyaz.Optimus.ScriptExecuting
@@ -182,7 +184,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		private PropertyDescriptor MethodDescriptor(string propertyName, MethodInfo[] methods)
 		{
-			var func = new MethodInfoFunctionInstance(Engine, methods);
+			var func = new ClrMethodInfoFunc(Engine, methods);
 			func.FastAddProperty("toString",
 				new JsValue(new ClrFunctionInstance(Engine,
 					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
@@ -195,6 +197,45 @@ namespace Knyaz.Optimus.ScriptExecuting
 			var descriptor = new PropertyDescriptor(func, false, true, false);
 			Properties.Add(propertyName, descriptor);
 			return descriptor;
+		}
+	}
+
+	class ClrMethodInfoFunc : FunctionInstance
+	{
+		private MethodInfoFunctionInstance _internalFunc;
+		private MethodInfo[] _methods;
+
+		public ClrMethodInfoFunc(Jint.Engine engine, MethodInfo[] methods) : base(engine, (string[]) null, (LexicalEnvironment) null, false)
+		{
+			_internalFunc = new MethodInfoFunctionInstance(engine, methods);
+			_methods = methods;
+		}
+
+		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
+		{
+			//todo: it should be done for any count of such methods.
+			
+			//handle default parameters
+			if (_methods.Length == 1)
+			{
+				var methodParameters = _methods[0].GetParameters();
+				if (methodParameters.Length > arguments.Length &&
+				    methodParameters.Any(x => x.HasDefaultValue))
+				{
+					var oldArguments = arguments;
+					arguments = new JsValue[methodParameters.Length];
+					Array.Copy(oldArguments, arguments, oldArguments.Length);
+
+					for (var i = oldArguments.Length; i < arguments.Length; i++)
+					{
+						var par = methodParameters[i];
+						if(par.HasDefaultValue)
+							arguments[i] = JsValue.FromObject(Engine, par.DefaultValue);
+					}
+				}
+			}
+			
+			return _internalFunc.Call(thisObject, arguments);
 		}
 	}
 }

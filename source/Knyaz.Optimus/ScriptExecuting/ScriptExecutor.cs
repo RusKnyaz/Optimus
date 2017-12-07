@@ -193,6 +193,23 @@ namespace Knyaz.Optimus.ScriptExecuting
 			}
 		}
 
+		public object Evaluate(string type, string code)
+		{
+			if (string.IsNullOrEmpty(type) || type.ToLowerInvariant() == "text/javascript")
+			{
+				try
+				{
+					return _jsEngine.Execute(code).GetCompletionValue().ToObject();
+				}
+				catch (JavaScriptException e)
+				{
+					return new ScriptExecutingException(e.Error.ToString(), e, code);
+				}
+			}
+
+			throw new Exception("Unsupported script type: " + type);
+		}
+
 		public event Action<Exception> OnException;
 		public void Clear()
 		{

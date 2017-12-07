@@ -27,6 +27,8 @@
   <ItemGroup>
     <None Remove="Resources\jquery-2.1.3.js" />
     <None Remove="Resources\jQuery.Form.js" />
+    <None Remove="Resources\JsTests\base.js" />
+    <None Remove="Resources\JsTests\DataViewTests.js" />
     <None Remove="Resources\knockout.js" />
     <None Remove="Resources\requirejs.js" />
     <None Remove="Resources\stringTemplateEngine.js" />
@@ -38,6 +40,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\jquery-2.1.3.js" />
     <EmbeddedResource Include="Resources\jQuery.Form.js" />
+    <EmbeddedResource Include="Resources\JsTests\base.js" />
+    <EmbeddedResource Include="Resources\JsTests\DataViewTests.js" />
     <EmbeddedResource Include="Resources\knockout.js" />
     <EmbeddedResource Include="Resources\requirejs.js" />
     <EmbeddedResource Include="Resources\stringTemplateEngine.js" />

@@ -47,6 +47,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// </summary>
 		public int ByteLength { get; }
 
+	
 		/// <summary>
 		/// Gets a signed 32-bit float (float) at the specified byte offset from the start of the DataView
 		/// </summary>
@@ -68,6 +69,7 @@ namespace Knyaz.Optimus.Dom.Perf
 				? BitConverter.ToDouble(Buffer.Data, byteOffset)
 				: BitConverter.ToDouble(GetReversed(byteOffset, sizeof(double)), 0);
 
+		
 		/// <summary>
 		/// Gets a signed 32-bit integer (int) at the specified byte offset from the start of the DataView
 		/// </summary>
@@ -78,6 +80,7 @@ namespace Knyaz.Optimus.Dom.Perf
 				? BitConverter.ToInt32(Buffer.Data, byteOffset)
 				: BitConverter.ToInt32(GetReversed(byteOffset, sizeof(int)), 0);
 
+		
 		/// <summary>
 		/// Gets a unsigned 32-bit integer (uint) at the specified byte offset from the start of the DataView
 		/// </summary>
@@ -88,6 +91,7 @@ namespace Knyaz.Optimus.Dom.Perf
 				? BitConverter.ToUInt32(Buffer.Data, byteOffset)
 				: BitConverter.ToUInt32(GetReversed(byteOffset, sizeof(uint)), 0);
 
+		
 		/// <summary>
 		/// Gets a signed 16-bit integer (short) at the specified byte offset from the start of the DataView
 		/// </summary>
