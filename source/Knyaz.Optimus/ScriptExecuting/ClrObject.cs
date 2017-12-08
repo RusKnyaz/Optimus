@@ -190,10 +190,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
 				false, false, false);
 
-			/*func.FastAddProperty("apply",
-					new JsValue(new ClrFunctionInstance(Engine, (value, values) => Undefined.Instance)),
-					false, false, false);*/
-
 			var descriptor = new PropertyDescriptor(func, false, true, false);
 			Properties.Add(propertyName, descriptor);
 			return descriptor;
@@ -209,6 +205,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 		{
 			_internalFunc = new MethodInfoFunctionInstance(engine, methods);
 			_methods = methods;
+			Prototype = engine.Function.PrototypeObject;
 		}
 
 		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
