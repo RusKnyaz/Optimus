@@ -13,10 +13,22 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom
 {
+	/// <summary>
+	/// Available values of the <see cref="Document.ReadyState"/> property.
+	/// </summary>
 	public static class DocumentReadyStates
 	{
+		/// <summary>
+		/// The document is still loading.
+		/// </summary>
 		public const string Loading = "loading";
+		/// <summary>
+		/// The document has finished loading and the document has been parsed but sub-resources such as images, stylesheets and frames are still loading.
+		/// </summary>
 		public const string Interactive = "interactive";
+		/// <summary>
+		/// The document and all sub-resources have finished loading. The state indicates that the load event is about to fire.
+		/// </summary>
 		public const string Complete = "complete";
 	}
 
@@ -32,6 +44,10 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
+		/// <summary>
+		/// Creates new <sse cref="Document"/> instance.
+		/// </summary>
+		/// <param name="window">The Window object ot be associated with the document. Can be null.</param>
 		public Document(IWindow window) : base(null)
 		{
 			StyleSheets = new StyleSheetsList();
@@ -50,6 +66,9 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
+		/// <summary>
+		/// Returns the window object associated with a document, or null if none is available.
+		/// </summary>
 		public IWindow DefaultView { get; private set; }
 
 		/// <summary>
@@ -106,8 +125,14 @@ namespace Knyaz.Optimus.Dom
 			throw new NotImplementedException("Please use write insted.");
 		}
 
+		/// <summary>
+		/// Fired when the initial HTML document has been completely loaded and parsed, without waiting for stylesheets, images, and subframes to finish loading.
+		/// </summary>
 		public event Action<IDocument> DomContentLoaded;
 
+		/// <summary>
+		/// Returns a StyleSheetList of CSSStyleSheet objects for stylesheets explicitly linked into or embedded in a document.
+		/// </summary>
 		public StyleSheetsList StyleSheets { get; private set; }
 
 		internal void Complete()
@@ -242,33 +267,58 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public HtmlBodyElement Body { get; private set; }
 
+		/// <summary>
+		/// Returns the &lt;head&gt; element of the current document. If there are more than one &lt;head&gt; elements, the first one is returned.
+		/// </summary>
 		public Head Head { get; private set; }
 
 		
+		/// <summary>
+		/// Creates an event of the type specified.
+		/// </summary>
+		/// <remarks>
+		/// The returned object should be first initialized and can then be passed to <see cref="Element.DispatchEvent"/>.
+		/// </remarks>
+		/// <param name="type">The string that represents the type of event to be created. 
+		/// Possible event types include: "UIEvents", "MouseEvents", 
+		/// "MutationEvents", "HTMLEvents", "KeyboardEvents".</param>
+		/// <returns>Created <see cref="Event"/> object.</returns>
 		public Event CreateEvent(string type)
 		{
 			if (type == null) throw new ArgumentNullException("type");
-			if(type == "Event")
-				return new Event();
 
-			if(type == "CustomEvent")
-				return new CustomEvent();
+			type = type.ToLowerInvariant();
+			
+			
+			switch (type)
+			{
+				case "event":
+				case "events":
+					return new Event();
+				case "customevent":
+				case "customevents":
+					return new CustomEvent();
+				case "mutationevent":
+				case "mutationevents":
+					return new MutationEvent();
+				case "uievent":
+				case "uievents":
+					return new UIEvent();
+				case "keyboardevent":
+				case "keyboardevents":
+					return new KeyboardEvent();
+				case "errorevent":
+				case "errorevents":
+					return new ErrorEvent();
+			}
 
-			if(type == "MutationEvent")
-				return new MutationEvent();
-
-			if(type == "UIEvent")
-				return new UIEvent();
-
-			if(type == "KeyboardEvent")
-				return new KeyboardEvent();
-
-			if(type == "ErrorEvent")
-				return new ErrorEvent();
 
 			throw new NotSupportedException("Specified event type is not supported: " + type);
 		}
 
+		/// <summary>
+		/// Faired when new element inserted into Document.
+		/// </summary>
 		public event Action<Node> DomNodeInserted;
 		public event Action<Node> NodeInserted;
 		public event Action<Node, Node> NodeRemoved;

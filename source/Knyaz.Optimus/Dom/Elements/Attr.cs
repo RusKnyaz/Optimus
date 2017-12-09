@@ -24,6 +24,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			SetOwner(ownerDoc);
 		}
 
+		/// <summary>
+		/// Creates new copy of this <see cref="Attr"/> object.
+		/// </summary>
+		/// <param name="deep">Makes no sense.</param>
+		/// <returns>Created <see cref="Attr"/>.</returns>
 		public override Node CloneNode(bool deep) => new Attr(Name, OwnerDocument) { Value = Value };
 
 		/// <summary>

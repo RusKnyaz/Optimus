@@ -144,8 +144,9 @@ namespace Knyaz.Optimus.Tests.Dom
 			var document = new Document();
 			var x = document.CreateDocumentFragment();
 			Assert.AreEqual(document, x.OwnerDocument);
+			Assert.IsNull(x.ParentNode);
 		}
-
+		
 		[Test]
 		public void HeadBody()
 		{
