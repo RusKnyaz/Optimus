@@ -68,8 +68,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected virtual void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
-			node.SetOwner(OwnerDocument);
-			OwnerDocument.HandleNodeAdded(node);
+			if (OwnerDocument != null)
+			{
+				node.SetOwner(OwnerDocument);
+				OwnerDocument.HandleNodeAdded(node);
+			}
 		}
 
 		private void UnattachFromParent(Node node)
@@ -186,7 +189,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Gets the parent of the specified node in the DOM tree.
 		/// </summary>
-		public Node ParentNode { get; set; }
+		public Node ParentNode { get; private set; }
 
 		/// <summary>
 		/// Creates a duplicate of the node on which this method was called.

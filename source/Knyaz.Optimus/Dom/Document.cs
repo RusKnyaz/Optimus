@@ -56,9 +56,8 @@ namespace Knyaz.Optimus.Dom
 			DocumentElement = CreateElement(TagsNames.Html);
 			DocumentElement.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
 			DocumentElement.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
-			ChildNodes.Add(DocumentElement);
-			DocumentElement.ParentNode = this;
-			DocumentElement.SetOwner(this);
+
+			AppendChild(DocumentElement);
 
 			EventTarget = new EventTarget(this, () => window, () => this);
 			DefaultView = window;
@@ -365,13 +364,6 @@ namespace Knyaz.Optimus.Dom
 		{
 			if (OnFormSubmit != null)
 				OnFormSubmit(htmlFormElement);
-		}
-
-		protected override void RegisterNode(Node node)
-		{
-			node.ParentNode = this;
-			node.SetOwner(this);
-			HandleNodeAdded(node);
 		}
 
 		public string CompatMode => ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat";

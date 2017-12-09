@@ -8,7 +8,6 @@
 		internal DocumentFragment(Document ownerDocument): base(ownerDocument)
 			=>	NodeType = DOCUMENT_FRAGMENT_NODE;
 		
-
 		public override string NodeName => "#document-fragment";
 	}
 }

@@ -22,5 +22,6 @@ namespace Knyaz.Optimus.Tests.Resources
 
 		public static string JsTestsBase => GetString("Knyaz.Optimus.Tests.Resources.JsTests.base.js");
 		public static string JsTestsDataViewTests => GetString("Knyaz.Optimus.Tests.Resources.JsTests.DataViewTests.js");
+		public static string JsTestsElementTests => GetString("Knyaz.Optimus.Tests.Resources.JsTests.ElementTests.js");
 	}
 }
