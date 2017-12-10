@@ -452,6 +452,8 @@ namespace Knyaz.Optimus.Dom.Elements
 			//todo: implement something
 			return new DomRect();
 		}
+
+		public void Remove() => ParentNode?.RemoveChild(this);
 	}
 
 	public class DomRect

@@ -8,10 +8,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 	/// This stuff runs JS tests from Resources/JsTests/ElementTetst.js file.
 	/// </summary>
 	[TestFixture]
-	class ElementJsTests
+	public class ElementJsTests
     {
 		[TestCase("SetParent")]
 		[TestCase("SetOwnerDocument")]
+		[TestCase("Remove")]
 		public void Run(string testName)
 		{
 			JsTestsRunner.Run("ElementTests", testName);

@@ -18,4 +18,13 @@
             Assert.AreEqual(document, div.ownerDocument);
         }
     },
+    "Remove":{
+        run:function () {
+            var div = document.createElement("div");
+            var childDiv = document.createElement("div");
+            div.appendChild(childDiv);
+            childDiv.remove();
+            Assert.AreEqual(0, div.childNodes.length);
+        }
+    }
 });

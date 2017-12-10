@@ -260,6 +260,16 @@ namespace Knyaz.Optimus.Tests.Dom
 
 			return doc.GetElementById("a").GetElementsByTagName("strong").Length;
 		}
+
+		[Test]
+		public void Remove()
+		{
+			var doc = new Document();
+			doc.Write("<div id='d'></div>");
+			var div = doc.GetElementById("d");
+			div.Remove();
+			Assert.IsNull(doc.GetElementById("d"));
+		}
 	}
 }
 #endif
