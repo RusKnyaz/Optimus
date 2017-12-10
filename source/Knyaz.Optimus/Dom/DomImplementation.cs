@@ -35,15 +35,15 @@ namespace Knyaz.Optimus.Dom
 
 
 		/// <summary>
-		/// Creates and returns an <see cref="XmlDocument"/>.
+		/// Creates and returns an <see cref="Document"/>.
 		/// </summary>
 		/// <param name="namespaceURI">Is a string containing the namespace URI of the document to be created, or null if the document doesn't belong to one.</param>
 		/// <param name="qualifiedNameStr">Is a string containing the qualified name, that is an optional prefix and colon plus the local root element name, of the document to be created.</param>
 		/// <param name="documentType">Is the DocumentType of the document to be created.</param>
-		public XmlDocument CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType = null)
+		public Document CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType = null)
 		{
 			//todo: we have to do something with namespaceURI and qualifiedNameStr fields.
-			var doc = new XmlDocument();
+			var doc = new Document();
 			if (documentType != null)
 				doc.AppendChild(documentType);
 			return doc;
