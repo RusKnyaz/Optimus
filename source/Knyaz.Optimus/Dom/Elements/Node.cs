@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
-using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public enum NodeSources
+	internal enum NodeSources
 	{
 		Script,
 		DocumentBuilder
@@ -15,11 +15,12 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
+	/// <inheritdoc cref="INode"/>
 	public abstract class Node : INode, IEventTarget
 	{
 		protected EventTarget EventTarget;
 
-		public NodeSources Source;
+		internal NodeSources Source;
 
 		protected Node(Document ownerDocument)
 		{
@@ -33,14 +34,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		public virtual Document OwnerDocument
 		{
 			get { return _ownerDocument; }
-			set
-			{
-				_ownerDocument = value;
-				foreach (var childNode in ChildNodes)
-				{
-					childNode.OwnerDocument = value;
-				}
-			}
+			set { }
+		}
+
+		internal virtual void SetOwner(Document doc)
+		{
+			_ownerDocument = doc;
+			foreach (var childNode in ChildNodes)
+				childNode.SetOwner(doc);
 		}
 
 		public virtual Node AppendChild(Node node)
@@ -67,8 +68,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected virtual void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
-			node.OwnerDocument = OwnerDocument;
-			OwnerDocument.HandleNodeAdded(node);
+			if (OwnerDocument != null)
+			{
+				node.SetOwner(OwnerDocument);
+				OwnerDocument.HandleNodeAdded(node);
+			}
 		}
 
 		private void UnattachFromParent(Node node)
@@ -79,31 +83,58 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		protected Node()
 		{
-			InternalId = Guid.NewGuid().ToString();
 			ChildNodes = new List<Node>();
 			NodeType = _NODE;
 		}
 
+		/// <summary>
+		/// Gets a live collection of child nodes of the given element.
+		/// </summary>
 		public IList<Node> ChildNodes { get; protected set; }
-		public string InternalId { get; private set; }
-		
+
+		/// <summary>
+		/// Removes a child node from the DOM.
+		/// </summary>
+		/// <param name="node">The node to remove.</param>
+		/// <returns>The removed node.</returns>
 		public Node RemoveChild(Node node)
 		{
 			ChildNodes.Remove(node);
-			OwnerDocument.HandleNodeRemoved(this, node);
+			OwnerDocument?.HandleNodeRemoved(this, node);
 			return node;
 		}
 
+		/// <summary>
+		/// Inserts a node before the reference node as a child of a specified parent node. 
+		/// If the given child is a reference to an existing node in the document, the method moves it from its current position to the new position.
+		/// If the reference node is null, the specified node is added to the end of the list of children of the specified parent node.
+		/// If the given child is a DocumentFragment, the entire contents of the DocumentFragment are moved into the child list of the specified parent node.
+		/// </summary>
+		/// <param name="newChild"></param>
+		/// <param name="refNode"></param>
+		/// <returns></returns>
 		public Node InsertBefore(Node newChild, Node refNode)
 		{
 			UnattachFromParent(newChild);
-			ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
+			if (refNode == null)
+				ChildNodes.Add(newChild);
+			else
+				ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
 			RegisterNode(newChild);
 			return newChild;
 		}
 
+		/// <summary>
+		/// Indicating whether the current Node has child nodes or not.
+		/// </summary>
 		public bool HasChildNodes { get { return ChildNodes.Count > 0; } }
 
+		/// <summary>
+		/// Replaces one child node of the specified node with another.
+		/// </summary>
+		/// <param name="newChild">The node to be added.</param>
+		/// <param name="oldChild">The node to be removed</param>
+		/// <returns>The removed node.</returns>
 		public Node ReplaceChild(Node newChild, Node oldChild)
 		{
 			InsertBefore(newChild, oldChild);
@@ -111,18 +142,36 @@ namespace Knyaz.Optimus.Dom.Elements
 			return newChild;
 		}
 
-		public Node FirstChild { get { return ChildNodes.FirstOrDefault(); } }
-		public Node LastChild { get { return ChildNodes.LastOrDefault(); } }
-		public Node NextSibling { get
-		{
-			if (ParentNode == null)
-				return null;
-			
-			var idx = ParentNode.ChildNodes.IndexOf(this);
-			if (idx == ParentNode.ChildNodes.Count - 1)
-				return null;
-			return ParentNode.ChildNodes[idx + 1];} }
+		/// <summary>
+		/// Gets the node's first child in the tree, or null if the node has no children. If the node is a Document, it returns the first node in the list of its direct children.
+		/// </summary>
+		public Node FirstChild => ChildNodes.FirstOrDefault();
 
+		/// <summary>
+		/// Gets the last child of the node. If its parent is an element, then the child is generally an element node, a text node, or a comment node. It returns null if there are no child elements.
+		/// </summary>
+		public Node LastChild => ChildNodes.LastOrDefault();
+
+		/// <summary>
+		/// Gets the node immediately following the specified one in its parent's childNodes list, or null if the specified node is the last node in that list.
+		/// </summary>
+		public Node NextSibling
+		{
+			get
+			{
+				if (ParentNode == null)
+					return null;
+
+				var idx = ParentNode.ChildNodes.IndexOf(this);
+				if (idx == ParentNode.ChildNodes.Count - 1)
+					return null;
+				return ParentNode.ChildNodes[idx + 1];
+			}
+		}
+
+		/// <summary>
+		/// Gets the node immediately preceding the specified one in its parent's childNodes list, or null if the specified node is the first in that list.
+		/// </summary>
 		public Node PreviousSibling
 		{
 			get
@@ -137,14 +186,48 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public Node ParentNode { get; set; }
+		/// <summary>
+		/// Gets the parent of the specified node in the DOM tree.
+		/// </summary>
+		public Node ParentNode { get; private set; }
+
+		/// <summary>
+		/// Creates a duplicate of the node on which this method was called.
+		/// </summary>
+		/// <returns></returns>
 		public Node CloneNode()
 		{
 			return CloneNode(false);
 		}
+
+		/// <summary>
+		/// Creates a duplicate of the node on which this method was called.
+		/// </summary>
+		/// <param name="deep">If <c>true</c> the children of the node will also be cloned.</param>
+		/// <returns>Newly created node.</returns>
 		public abstract Node CloneNode(bool deep);
 
+		/// <summary>
+		/// Gets the type of the node.
+		/// </summary>
 		public int NodeType { get; protected set; }
+
+		/// <summary>
+		/// Gets name of the current node as a string.
+		/// The returned values for different types of nodes are:
+		/// Attribute - The value of Attr.name
+		/// CDATASection - "#cdata-section"
+		/// Comment - "#comment"
+		/// Document - "#document"
+		/// DocumentFragment - "#document-fragment"
+		/// DocumentType - The value of DocumentType.name
+		/// Element - The value of Element.tagName
+		/// Entity - The entity name
+		/// EntityReference - The name of entity reference
+		/// Notation - The notation name
+		/// ProcessingInstruction - The value of ProcessingInstruction.target
+		/// Text - "#text"
+		/// </summary>
 		public abstract string NodeName { get; }
 
 		public const ushort ELEMENT_NODE = 1;
@@ -268,61 +351,6 @@ namespace Knyaz.Optimus.Dom.Elements
 			var otherPreParent = otherAncestors[sharedParentIndex - 1];
 
 			return thisPreParent.CompareDocumentPosition(otherPreParent);
-		}
-	}
-
-	[DomItem]
-	public interface INode
-	{
-		Document OwnerDocument { get; }
-		Node AppendChild(Node node);
-		Node RemoveChild(Node node);
-		Node InsertBefore(Node newChild, Node refNode);
-		bool HasChildNodes { get; }
-		Node ReplaceChild(Node newChild, Node oldChild);
-		Node FirstChild { get; }
-		Node LastChild { get; }
-		Node NextSibling { get; }
-		Node PreviousSibling { get; }
-		Node ParentNode { get; }
-		Node CloneNode();
-		int NodeType { get; }
-		string NodeName { get; }
-		int CompareDocumentPosition(Node node);
-		IList<Node> ChildNodes { get;}
-	}
-
-	public static class NodeExtension
-	{
-		public static bool RaiseEvent(this Node node, string eventType, bool bubblable, bool cancellable)
-		{
-			var e = node.OwnerDocument.CreateEvent("Event");
-			e.InitEvent(eventType, bubblable, cancellable);
-			return node.DispatchEvent(e);
-		}
-
-		/// <summary>
-		/// Determines if the node lies to document hierarhcy.
-		/// </summary>
-		/// <returns><c>true</c> if is in document the specified node; otherwise, <c>false</c>.</returns>
-		/// <param name="node">Node.</param>
-		public static bool IsInDocument(this Node node)
-		{
-			var praParent = node;
-			while (praParent.ParentNode != null)
-				praParent = praParent.ParentNode;
-
-			return praParent == node.OwnerDocument;
-		}
-
-		public static IEnumerable<Node> Ancestors(this Node node)
-		{
-			var parent = node.ParentNode;
-			while (parent != null)
-			{
-				yield return parent;
-				parent = parent.ParentNode;
-			}
 		}
 	}
 }

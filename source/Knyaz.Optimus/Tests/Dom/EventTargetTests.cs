@@ -1,6 +1,7 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Interfaces;
 using Moq;
 using NUnit.Framework;
 

@@ -167,7 +167,7 @@ namespace Knyaz.Optimus.Dom
 						CallInContext(OnTimeout);
 					}
 				}
-				catch (Exception e)
+				catch
 				{
 					ReadyState = DONE;
 					CallInContext(OnError);
@@ -185,7 +185,7 @@ namespace Knyaz.Optimus.Dom
 					_response = (HttpResponse)t.Result;
 					_data = _response.Stream.ReadToEnd();
 				}
-				catch (Exception exception)
+				catch
 				{
 					ReadyState = DONE;
 					CallInContext(OnError);

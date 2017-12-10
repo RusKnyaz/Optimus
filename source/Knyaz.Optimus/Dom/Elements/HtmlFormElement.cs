@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -105,8 +106,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				//todo: consider to make search more optimal
 				var allelements = this.IsInDocument() ? this.Flatten() : OwnerDocument.Flatten();
-				return allelements.OfType<IFormElement>().Where(x => x.Form == this).OfType<HtmlElement>().Where(
-					x=> !(x.NodeType is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" );
+				return allelements.OfType<IFormElement>()
+                    .Where(x => x.Form == this)
+                    .OfType<HtmlElement>()
+                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" );
 			}
 		} 
 

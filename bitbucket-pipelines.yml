@@ -1,0 +1,18 @@
+# This is a sample build configuration for .NET Core.
+# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: microsoft/dotnet:2.0.0-sdk
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - dotnetcore
+        script: # Modify the commands below to build your repository.
+          - export PROJECT_NAME=source/Knyaz.Optimus/Knyaz.Optimus.net.csproj
+          - export TEST_NAME=source/Knyaz.Optimus/Knyaz.Optimus.net.csproj
+          - dotnet restore source/Knyaz.Optimus.net.sln
+          - dotnet build $PROJECT_NAME -f netcoreapp2.0
+          - dotnet test $TEST_NAME -f netcoreapp2.0

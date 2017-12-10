@@ -4,7 +4,6 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
-using Knyaz.Optimus.Tools;
 using Moq;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
@@ -170,7 +169,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			CollectionAssert.AreEqual(new[]{"ok"}, log);
 		}
 
-		[Test, Ignore]
+		[Test, Ignore("For manual run")]
 		public void ClearTimeout()
 		{
 			var engine = new Engine();
@@ -246,7 +245,7 @@ window.clearTimeout(timer);"));
 			CollectionAssert.AreEqual(new[]{"hello"}, log);
 		}
 
-		[Test, Ignore] //is not working under Mono
+		[Test, Ignore("For manual run")] //is not working under Mono
 		public void AddScriptAsync()
 		{
 			var engine = new Engine(Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));

@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Html;
-using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
+using R = Knyaz.Optimus.Tests.Resources.Resources;
 
 namespace Knyaz.Optimus.Tests.HtmlReader
 {
@@ -24,9 +24,9 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 		[Test]
 		public void ParseLargeFile()
 		{
-			Read(Resources.Large_Html);
+			Read(R.Large_Html);
 
-			Test(Resources.Large_Html, 100);
+			Test(R.Large_Html, 100);
 			//2.4sec
 		}
 
@@ -40,7 +40,7 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 			}
 			sw.Stop();
 			System.Console.WriteLine("Read {0} chunks from {2}*100 chars, elsaped {1} ms", c, sw.ElapsedMilliseconds,
-				Resources.Large_Html.Length);
+				R.Large_Html.Length);
 		}
 
 		[TestCase(1000, 0, 1, Description = "Deep")]

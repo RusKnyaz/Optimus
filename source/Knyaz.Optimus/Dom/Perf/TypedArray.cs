@@ -1,34 +1,64 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Knyaz.Optimus.Dom.Perf
 {
-	public class TypedArray<T>
+	/// <summary>
+	/// Base class for typed arrays.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public abstract class TypedArray<T>
 	{
-		public TypedArray(ArrayBuffer buffer)
+		protected TypedArray(ArrayBuffer buffer)
 		{
+			if (buffer.Data.Length % _bytesPerElement != 0)
+				throw new ArgumentOutOfRangeException("byte length of "+GetType().Name+" should be a multiple of " + _bytesPerElement);
+
 			_data = buffer.Data;
 		}
 
 		protected TypedArray(T[] data)
 		{
-			_data = new byte[data.Length * BytesPerElement];
+			_data = new byte[data.Length * _bytesPerElement];
 			Buffer.BlockCopy(data,0, _data, 0, _data.Length);
 		} 
 
 		protected byte[] _data;
 
-		private int BytesPerElement {get { return Marshal.SizeOf(typeof(T)); }}
+		protected int _bytesPerElement = Marshal.SizeOf(typeof(T));
 
-		public ulong Length {get { return (ulong) (_data.Length/BytesPerElement); }}
+		/// <summary>
+		/// Returns the length of the typed array from the start of its ArrayBuffer.
+		/// </summary>
+		public ulong Length {get { return (ulong) (_data.Length/ _bytesPerElement); }}
 
+		/// <summary>
+		/// Stores multiple values in the typed array.
+		/// </summary>
+		/// <remarks>
+		/// Two arrays may share the same underlying ArrayBuffer; the browser will intelligently copy the source range of the buffer to the destination range.
+		/// </remarks>
+		/// <param name="array">The array from which to copy values. </param>
+		/// <param name="offset">The offset into the target array at which to begin writing values from the source array. If you omit this value, 0 is assumed (that is, the source array will overwrite values in the target array starting at index 0).</param>
 		public void Set(TypedArray<T> array, int offset)
 		{
-			Buffer.BlockCopy(array._data, 0, _data, offset * BytesPerElement, array._data.Length);
+			//todo: write tests for the cas when two arrays share the same ArrayBuffer.
+
+			Buffer.BlockCopy(array._data, 0, _data, offset * _bytesPerElement, array._data.Length);
 		}
+
+		/// <summary>
+		/// Stores multiple values in the typed array.
+		/// </summary>
+		/// <remarks>
+		/// All values from the source array are copied into the target array, unless the length of the source array plus the offset exceeds the length of the target array, in which case an exception is thrown.
+		/// </remarks>
+		/// <param name="array">The array from which to copy values. </param>
+		/// <param name="offset">The offset into the target array at which to begin writing values from the source array. If you omit this value, 0 is assumed (that is, the source array will overwrite values in the target array starting at index 0).</param>
 		public void Set(T[] array, int offset)
 		{
-			Buffer.BlockCopy(array, 0, _data, offset * BytesPerElement, array.Length * BytesPerElement);
+			Buffer.BlockCopy(array, 0, _data, offset * _bytesPerElement, array.Length * _bytesPerElement);
 		}
 
 		protected T[] GetSub(long begin, long? end)
@@ -38,116 +68,126 @@ namespace Knyaz.Optimus.Dom.Perf
 			Array.Copy(_data, begin, result, 0, cnt);
 			return result;
 		}
-    
-	}
 
-	public class Int8Array : TypedArray<sbyte>
-	{
-		public static int BYTES_PER_ELEMENT = Marshal.SizeOf(typeof(sbyte));
-
-		public Int8Array(ArrayBuffer buffer) : base(buffer) { }
-
-		public Int8Array(sbyte[] data) : base(data) { }
-		public Int8Array Subarray(long begin, long? end = null)
-		{
-			return new Int8Array(GetSub(begin, end));
-		}
-
-		public sbyte this[ulong index]
+		public T this[ulong index]
 		{
 			get
 			{
-				checked
-				{
-					return (sbyte)_data[index];
-				}
+				if (index < 0 || index >= Length)
+					return default(T);
+
+				return GetData((int)index * _bytesPerElement);
 			}
 			set
 			{
-				checked
-				{
-					_data[index] = (byte) value;
-				}
+				if (index < 0 || index >= Length)
+					return;
+
+				var bytes = GetBytes(value);
+				Array.Copy(bytes, 0, _data, (int)index * _bytesPerElement, bytes.Length);
 			}
+		}
+
+		protected abstract T GetData(int index);
+		protected abstract byte[] GetBytes(T val);
+		
+	}
+
+	/// <summary>
+	/// 8-bit two's complement signed integer array.
+	/// </summary>
+	public class Int8Array : TypedArray<sbyte>
+	{
+		public Int8Array(ArrayBuffer buffer) : base(buffer) { }
+		public Int8Array(sbyte[] data) : base(data) { }
+		public Int8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public Int8Array Subarray(long begin, long? end = null)	=> new Int8Array(GetSub(begin, end));
+		protected override sbyte GetData(int index)	=> (sbyte)_data[index];
+		protected override byte[] GetBytes(sbyte val) => new byte[] { (byte)val };
+		public static string Name => "Int8Array";
+
+		static sbyte FromObject(object val)
+		{
+			if (val is double d)
+				return (sbyte)d;
+			else if (val is sbyte u)
+				return u;
+
+			return Convert.ToSByte(val);
 		}
 	}
 
+	/// <summary>
+	/// 8-bit unsigned integer array.
+	/// </summary>
 	public class UInt8Array : TypedArray<byte>
 	{
 		public UInt8Array(ArrayBuffer buffer) : base(buffer) { }
+		public UInt8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public  UInt8Array(byte[] data) : base(data) { }
 
-		protected UInt8Array(byte[] data) : base(data) { }
-		public UInt8Array Subarray(long begin, long? end)
-		{
-			return new UInt8Array(GetSub(begin, end));
-		}
+		public UInt8Array Subarray(long begin, long? end) => new UInt8Array(GetSub(begin, end));
 
-		public byte this[ulong index]
+		protected override byte GetData(int index) => _data[index];
+		protected override byte[] GetBytes(byte val) => new[] { val };
+		public static string Name => "Uint8Array";
+
+		static byte FromObject(object val)
 		{
-			get { return _data[index]; }
-			set { _data[index] = value; }
+			if (val is double d)
+				return (byte)d;
+			else if (val is byte u)
+				return u;
+
+			return Convert.ToByte(val);
 		}
 	}
 
+	/// <summary>
+	/// 16-bit two's complement signed integer array.
+	/// </summary>
 	public class Int16Array : TypedArray<short>
 	{
 		public Int16Array(ArrayBuffer buffer) : base(buffer) { }
+		public Int16Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public Int16Array(short[] data) : base(data) { }
+		public Int16Array Subarray(long begin, long? end) => new Int16Array(GetSub(begin, end));
+		protected override short GetData(int index)	=> BitConverter.ToInt16(_data, index);
+		protected override byte[] GetBytes(short val) => BitConverter.GetBytes(val);
+		public static string Name => "Int8Array";
 
-		protected Int16Array(short[] data) : base(data) { }
-		public Int16Array Subarray(long begin, long? end)
+		static short FromObject(object val)
 		{
-			return new Int16Array(GetSub(begin, end));
-		}
+			if (val is double d)
+				return (short)d;
+			else if (val is short u)
+				return u;
 
-		public unsafe short this[ulong index]
-		{
-			get
-			{
-				//todo: check the limits
-				fixed (byte* pBuffer = _data)
-				{
-					return ((short*)pBuffer)[index];
-				}
-			}
-			set
-			{
-				//todo: check the limits
-				fixed (byte* pBuffer = _data)
-				{
-					((short*)pBuffer)[index] = value;
-				}
-			}
+			return Convert.ToInt16(val);
 		}
 	}
 
+	/// <summary>
+	/// 16-bit unsigned integer
+	/// </summary>
 	public class UInt16Array : TypedArray<ushort>
 	{
 		public UInt16Array(ArrayBuffer buffer) : base(buffer) { }
+		public UInt16Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public UInt16Array(ushort[] data) : base(data) { }
+		public UInt16Array Subarray(long begin, long? end) => new UInt16Array(GetSub(begin, end));
+		protected override ushort GetData(int index) => BitConverter.ToUInt16(_data, index);
+		protected override byte[] GetBytes(ushort val) => BitConverter.GetBytes(val);
+		public static string Name => "Uint16Array";
 
-		protected UInt16Array(ushort[] data) : base(data) { }
-		public UInt16Array Subarray(long begin, long? end)
+		static ushort FromObject(object val)
 		{
-			return new UInt16Array(GetSub(begin, end));
-		}
+			if(val is double d)
+				return (ushort)d;
+			else if(val is ushort u)
+				return u;
 
-		public unsafe ushort this[ulong index]
-		{
-			get
-			{
-				//todo: check the limits
-				fixed (byte* pBuffer = _data)
-				{
-					return ((ushort*)pBuffer)[index];
-				}
-			}
-			set
-			{
-				//todo: check the limits
-				fixed (byte* pBuffer = _data)
-				{
-					((ushort*)pBuffer)[index] = value;
-				}
-			}
+			return Convert.ToUInt16(val);
 		}
 	}
 }

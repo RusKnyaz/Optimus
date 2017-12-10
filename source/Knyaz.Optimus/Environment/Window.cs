@@ -3,6 +3,7 @@ using Jint.Runtime;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Environment
 {
@@ -55,10 +56,10 @@ namespace Knyaz.Optimus.Environment
 		public int InnerWidth { get; set; }
 		public int InnerHeight { get; set; }
 
-		public Screen Screen { get; private set; }
-		public Location Location { get; private set; }
-		public Navigator Navigator { get; private set; }
-		public History History { get; private set; }
+		public IScreen Screen { get; private set; }
+		public ILocation Location { get; private set; }
+		public INavigator Navigator { get; private set; }
+		public IHistory History { get; private set; }
 
 		private readonly WindowTimers _timers;
 
@@ -132,25 +133,5 @@ namespace Knyaz.Optimus.Environment
 		{
 			_timers.Dispose();
 		}
-	}
-
-	public interface IWindow : IEventTarget
-	{
-		int InnerWidth { get; set; }
-		int InnerHeight { get; set; }
-
-		Screen Screen { get; }
-		Location Location { get; }
-		Navigator Navigator { get; }
-		History History { get;  }
-		
-		int SetTimeout(Action<object> handler, double? delay, object ctx);
-		void ClearTimeout(int handle);
-		int SetInterval(Action handler, double? delay);
-		void ClearInterval(int handle);
-
-		ICssStyleDeclaration GetComputedStyle(IElement element);
-		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
-		MediaQueryList MatchMedia(string query);
 	}
 }

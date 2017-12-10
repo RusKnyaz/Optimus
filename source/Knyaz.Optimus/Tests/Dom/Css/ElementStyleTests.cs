@@ -2,6 +2,7 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Moq;
 using NUnit.Framework;
@@ -65,8 +66,8 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			_div.SetAttribute("style","width:100pt");
 
 			_div.Style.Assert(style =>
-				style.Properties.Count == 1 &&
-				style["width"] == "100pt" &&
+				style.Length == 1 &&
+				(string)style["width"] == "100pt" &&
 				style.GetPropertyValue("width") == "100pt" &&
 				style[0] == "width");
 		}
@@ -81,8 +82,8 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			_div.SetAttributeNode(attr);
 
 			_div.Style.Assert(style =>
-				style.Properties.Count == 1 &&
-				style["width"] == "100pt" &&
+				style.Length == 1 &&
+                (string)style["width"] == "100pt" &&
 				style.GetPropertyValue("width") == "100pt" &&
 				style[0] == "width");
 		}

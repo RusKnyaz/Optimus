@@ -7,6 +7,7 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -56,6 +57,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Uint8Array", typeof(UInt8Array));
 			AddClrType("Int16Array", typeof(Int16Array));
 			AddClrType("Uint16Array", typeof(UInt16Array));
+			AddClrType("DataView", typeof(DataView));
 
 			AddGlobalGetter("console", () => engine.Console);
 			AddGlobalGetter("document", () => engine.Document);
@@ -189,6 +191,23 @@ namespace Knyaz.Optimus.ScriptExecuting
 						OnException(e);
 				}
 			}
+		}
+
+		public object Evaluate(string type, string code)
+		{
+			if (string.IsNullOrEmpty(type) || type.ToLowerInvariant() == "text/javascript")
+			{
+				try
+				{
+					return _jsEngine.Execute(code).GetCompletionValue().ToObject();
+				}
+				catch (JavaScriptException e)
+				{
+					return new ScriptExecutingException(e.Error.ToString(), e, code);
+				}
+			}
+
+			throw new Exception("Unsupported script type: " + type);
 		}
 
 		public event Action<Exception> OnException;

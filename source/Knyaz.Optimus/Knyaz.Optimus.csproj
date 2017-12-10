@@ -1,227 +1,86 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{42593765-6DE4-4846-BC61-7C74336DD977}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Knyaz.Optimus</RootNamespace>
-    <AssemblyName>Knyaz.Optimus</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
     <SccProjectName>&lt;Project Location In Database&gt;</SccProjectName>
-    <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
-    <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
     <SccProvider>Mercurial Source Control Package</SccProvider>
+    <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
+    <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NUNIT</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+  
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <TargetFrameworks>net452;netcoreapp2.0</TargetFrameworks>
+    <Authors>Knyaz</Authors>
+    <Company>Knyaz</Company>
+    <PackageLicenseUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/License</PackageLicenseUrl>
+    <PackageProjectUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/Home</PackageProjectUrl>
+    <PackageIconUrl />
+    <RepositoryUrl>https://bitbucket.org/RusKnyaz/optimus/src</RepositoryUrl>
+    <RepositoryType>mercurial</RepositoryType>
+    <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
+    <PackageReleaseNotes>NetCore and NetStandard assemblies added.</PackageReleaseNotes>
+    <PackageTags>headless web browser</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\Knyaz.Optimus.xml</DocumentationFile>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
+    <DocumentationFile>bin\Release\net452\Knyaz.Optimus.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp2.0\Knyaz.Optimus.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;NUNIT</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="jint, Version=2.10.3.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\jint.2.10.3\lib\net45\jint.dll</HintPath>
-    </Reference>
-    <Reference Include="Moq">
-      <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Console.cs" />
-    <Compile Include="Dom\Css\ComputedCssStyleDeclaration.cs" />
-    <Compile Include="Dom\Css\Css.cs" />
-    <Compile Include="Dom\Css\CssMediaRule.cs" />
-    <Compile Include="Dom\Css\CssRule.cs" />
-    <Compile Include="Dom\Css\CssSelector.cs" />
-    <Compile Include="Dom\Css\CssStyleDeclaration.Css2Properties.cs" />
-    <Compile Include="Dom\Css\CssStyleRule.cs" />
-    <Compile Include="Dom\Css\CssStyleSheet.cs" />
-    <Compile Include="Dom\Css\DocumentStyling.cs" />
-    <Compile Include="Dom\Css\ICss2Properties.cs" />
-    <Compile Include="Dom\Css\MediaList.cs" />
-    <Compile Include="Dom\Css\MediaQueryList.cs" />
-    <Compile Include="Dom\Css\StyleSheetBuilder.cs" />
-    <Compile Include="Dom\DOMException.cs" />
-    <Compile Include="Dom\ElementExtension.cs" />
-    <Compile Include="Dom\Elements\Attr.cs" />
-    <Compile Include="Dom\AttributeMappedValue.cs" />
-    <Compile Include="Dom\Elements\AttributesCollection.cs" />
-    <Compile Include="Dom\Elements\DocType.cs" />
-    <Compile Include="Dom\Elements\EventTarget.cs" />
-    <Compile Include="Dom\Elements\HtmlBodyElement.cs" />
-    <Compile Include="Dom\Elements\CharacterData.cs" />
-    <Compile Include="Dom\Document.cs" />
-    <Compile Include="Dom\DocumentBuilder.cs" />
-    <Compile Include="Dom\Css\CssStyleDeclaration.cs" />
-    <Compile Include="Dom\Elements\HtmlBrElement.cs" />
-    <Compile Include="Dom\Elements\HtmlButtonElement.cs" />
-    <Compile Include="Dom\Elements\HtmlCollection.cs" />
-    <Compile Include="Dom\Elements\HtmlDivElement.cs" />
-    <Compile Include="Dom\Elements\HtmlFormElement.cs" />
-    <Compile Include="Dom\Elements\HtmlHtmlElement.cs" />
-    <Compile Include="Dom\Elements\HtmlIFrameElement.cs" />
-    <Compile Include="Dom\Elements\HtmlLinkElement.cs" />
-    <Compile Include="Dom\Elements\HtmlOptionElement.cs" />
-    <Compile Include="Dom\Elements\HtmlSelectElement.cs" />
-    <Compile Include="Dom\Elements\HtmlStyleElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTableCaptionElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTableCellElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTableColElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTableElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTableRowElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTableSectionElement.cs" />
-    <Compile Include="Dom\Elements\HtmlTextAreaElement.cs" />
-    <Compile Include="Dom\Elements\HtmlUnknownElement.cs" />
-    <Compile Include="Dom\Elements\IFormElement.cs" />
-    <Compile Include="Dom\Elements\IResettableElement.cs" />
-    <Compile Include="Dom\Elements\TokenList.cs" />
-    <Compile Include="Dom\Events\CustomEvent.cs" />
-    <Compile Include="Dom\Elements\DocumentFragment.cs" />
-    <Compile Include="Dom\Elements\Element.cs" />
-    <Compile Include="Dom\Events\ErrorEvent.cs" />
-    <Compile Include="Dom\Events\Event.cs" />
-    <Compile Include="Dom\Elements\Head.cs" />
-    <Compile Include="Dom\Elements\HtmlElement.cs" />
-    <Compile Include="Dom\Elements\HtmlInputElement.cs" />
-    <Compile Include="Dom\Elements\IEventTarget.cs" />
-    <Compile Include="Dom\Events\KeyboardEvent.cs" />
-    <Compile Include="Dom\Events\MutationEvent.cs" />
-    <Compile Include="Dom\Elements\Script.cs" />
-    <Compile Include="Dom\Elements\Node.cs" />
-    <Compile Include="Dom\Events\ProgressEvent.cs" />
-    <Compile Include="Dom\Events\UIEvent.cs" />
-    <Compile Include="Dom\Elements\WindowTimers.cs" />
-    <Compile Include="Dom\IDocumentSelector.cs" />
-    <Compile Include="Dom\Perf\TypedArray.cs" />
-    <Compile Include="Dom\TagsNames.cs" />
-    <Compile Include="Dom\XmlHttpRequest.cs" />
-    <Compile Include="Environment\History.cs" />
-    <Compile Include="Environment\Location.cs" />
-    <Compile Include="Environment\Navigator.cs" />
-    <Compile Include="Environment\Screen.cs" />
-    <Compile Include="Html\CssReader.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <None Remove="Resources\moz_default.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\moz_default.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Dom\Interfaces\IEventTarget.cs" />
+    <None Include="Dom\Interfaces\INode.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jint" Version="2.11.23" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Moq" Version="4.7.142" />
+    <PackageReference Include="NUnit" Version="3.9.0" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Resource.Designer.cs">
       <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Compile Include="ResourceProviders\PredictedResourceProvider.cs" />
-    <Compile Include="ScriptExecuting\ClrFuncCtor.cs" />
-    <Compile Include="ScriptExecuting\ClrPrototype.cs" />
-    <Compile Include="ScriptExecuting\DomConverter.cs" />
-    <Compile Include="ScriptExecuting\IScriptExecutor.cs" />
-    <Compile Include="Html\HtmlParser.cs" />
-    <Compile Include="Html\HtmlReader.cs" />
-    <Compile Include="Dom\Elements\INode.cs" />
-    <Compile Include="Engine.cs" />
-    <Compile Include="ResourceProviders\FileResourceProvider.cs" />
-    <Compile Include="ResourceProviders\HttpResourceProvider.cs" />
-    <Compile Include="ResourceProviders\IResource.cs" />
-    <Compile Include="ResourceProviders\IResourceProvider.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceProviders\ResourceProvider.cs" />
-    <Compile Include="ScriptExecuting\ClrObject.cs" />
-    <Compile Include="ScriptExecuting\ListAdapter.cs" />
-    <Compile Include="ScriptExecuting\ScriptExecutor.cs" />
-    <Compile Include="TestingTools\ElementExtension.cs" />
-    <Compile Include="TestingTools\EngineExtension.cs" />
-    <Compile Include="Tests\AssertObjectExtension.cs" />
-    <Compile Include="Tests\Dom\Css\ComputedStyleTests.cs" />
-    <Compile Include="Tests\Dom\Css\CssSelectorTests.cs" />
-    <Compile Include="Tests\Dom\Css\CssStyleDeclarationTests.cs" />
-    <Compile Include="Tests\Dom\Css\ElementStyleTests.cs" />
-    <Compile Include="Tests\Dom\Css\MediaQueryListTests.cs" />
-    <Compile Include="Tests\Dom\Css\StyleSheetBuilderTests.cs" />
-    <Compile Include="Tests\Dom\DocumentBuilderTests.cs" />
-    <Compile Include="Tests\Dom\DocumentFragmentTests.cs" />
-    <Compile Include="Tests\Dom\DocumentTests.cs" />
-    <Compile Include="Tests\Dom\ElementTests.cs" />
-    <Compile Include="Tests\Dom\EventsTests.cs" />
-    <Compile Include="Tests\Dom\EventTargetTests.cs" />
-    <Compile Include="Tests\Dom\HistoryTests.cs" />
-    <Compile Include="Tests\Dom\HtmlBrElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlButtonElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlFormElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlInputElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlInputElementTests.Number.cs" />
-    <Compile Include="Tests\Dom\HtmlLinkElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlSelectElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlTableCellElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlTableElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlTableRowElementTests.cs" />
-    <Compile Include="Tests\Dom\NodeTests.cs" />
-    <Compile Include="Tests\Dom\ScriptTests.cs" />
-    <Compile Include="Tests\Dom\HtmlTextareaElementTests.cs" />
-    <Compile Include="Tests\Dom\HtmlStyleElementTests.cs" />
-    <Compile Include="Tests\Dom\StyleSheetsList.cs" />
-    <Compile Include="Tests\Dom\TokenListTests.cs" />
-    <Compile Include="Tests\Environment\LocationTests.cs" />
-    <Compile Include="Tests\Html\CssReaderTest.cs" />
-    <Compile Include="Tests\IEnumerableExtensionTests.cs" />
-    <Compile Include="Tests\Mocks.cs" />
-    <Compile Include="Tests\ResourceProviders\PredictedResourceProviderTests.cs" />
-    <Compile Include="Tests\ResourceProviders\ResourceProvidersTests.cs" />
-    <Compile Include="Tests\Tools\CachedEnumerableTests.cs" />
-    <Compile Include="Tools\CachedEnumerable.cs" />
-    <Compile Include="Tools\Disposable.cs" />
-    <Compile Include="Tools\IEnumerableExtension.cs" />
-    <Compile Include="Tools\ListExtension.cs" />
-    <Compile Include="Tests\Html\HtmlParserTests.cs" />
-    <Compile Include="Tests\Html\HtmlReaderTests.cs" />
-    <Compile Include="Environment\Window.cs" />
-    <Compile Include="Dom\DocumentScripting.cs" />
-    <Compile Include="Tests\Dom\TypedArrayTests.cs" />
-    <Compile Include="Dom\Perf\ArrayBuffer.cs" />
-    <Compile Include="Tools\UriHelper.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Resources\Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <None Include="Resources\moz_default.css" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <UsingTask TaskName="AssemblyInfo" AssemblyFile="$(SolutionDir)\packages\MSBuild.Extension.Pack.1.8.0\tools\net40\MSBuild.ExtensionPack.dll" />
-  <Target Name="BeforeBuild">
-    <Message Text="Updating AssemblyInfo to Version $(BuildNumber)">
-    </Message>
-    <AssemblyInfo Condition="$(Version) !=''" AssemblyInfoFiles="$(ProjectDir)\Properties\AssemblyInfo.cs" AssemblyVersion="$(Version)" AssemblyFileVersion="$(Version)">
-    </AssemblyInfo>
-  </Target>
+
 </Project>

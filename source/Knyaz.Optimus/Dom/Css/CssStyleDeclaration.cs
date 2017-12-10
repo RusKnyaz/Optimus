@@ -4,37 +4,34 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Css
 {
-	[DomItem]
-	public interface ICssStyleDeclaration
-	{
-		object this[string name] { get; }
-		string this[int idx] { get; }
-		string GetPropertyValue(string propertyName);
-		string GetPropertyPriority(string propertyName);
-	}
-
 	/// <summary>
+	/// Represents a single CSS declaration block.
 	/// http://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/css/CSSStyleDeclaration.html
 	/// </summary>
+	/// <inheritdoc cref="ICssStyleDeclaration"/>
 	public partial class CssStyleDeclaration : ICssStyleDeclaration, ICss2Properties
 	{
 		private string _cssText = string.Empty;
-		
+		private readonly NameValueCollection _properties;
+		private readonly HashSet<string> _importants = new HashSet<string>();
+
 		internal event Action<string> OnStyleChanged;
 
 		public CssStyleDeclaration(CssStyleRule parentRule = null)
 		{
-			Properties = new NameValueCollection();
+			_properties = new NameValueCollection();
 			ParentRule = parentRule;
 		}
 
-		public NameValueCollection Properties { get; private set; }
+		/// <summary>
+		/// The number of properties that have been explicitly set in this declaration block.
+		/// </summary>
+		public int Length => _properties.Count;
 
-		private HashSet<string> _importants = new HashSet<string>();
 
 		//todo: it's not better idea to use 'object' but sometimes js code tries to set the value of 'double' type.
 		public object this[string name]
@@ -45,7 +42,7 @@ namespace Knyaz.Optimus.Dom.Css
 				if (int.TryParse(name, out number))
 					return this[number];
 
-				return Properties[name]; //return value
+				return _properties[name]; //return value
 			}
 			set
 			{
@@ -70,7 +67,7 @@ namespace Knyaz.Optimus.Dom.Css
 		private void UpdateCssText()
 		{
 			var newCss = string.Join(";",
-				Properties.AllKeys.Where(x => !string.IsNullOrEmpty(Properties[x])).Select(x => x + ":" + Properties[x]));
+				_properties.AllKeys.Where(x => !string.IsNullOrEmpty(_properties[x])).Select(x => x + ":" + _properties[x]));
 
 			if (newCss != _cssText)
 			{
@@ -80,16 +77,29 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// Retrieve the properties anmes that have been explicitly set in this declaration block.
+		/// </summary>
+		/// <param name="idx"></param>
+		/// <returns></returns>
 		public string this[int idx]
 		{
-			get { return idx < 0 || idx >= Properties.Count ? string.Empty : Properties.AllKeys[idx]; }
+			get { return idx < 0 || idx >= _properties.Count ? string.Empty : _properties.AllKeys[idx]; }
 		}
 
+		/// <summary>
+		/// Retrieves the value of a CSS property if it has been explicitly set within this declaration block.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
 		public string GetPropertyValue(string propertyName)
 		{
-			return Properties[propertyName];
+			return _properties[propertyName];
 		}
 
+		/// <summary>
+		/// The parsable textual representation of the declaration block (excluding the surrounding curly braces).
+		/// </summary>
 		public string CssText
 		{
 			get { return _cssText; }
@@ -99,7 +109,7 @@ namespace Knyaz.Optimus.Dom.Css
 				if (_cssText != newCssText)
 				{
 					_cssText = newCssText;
-					Properties.Clear();
+					_properties.Clear();
 					if (newCssText != string.Empty)
 						StyleSheetBuilder.FillStyle(this, newCssText);
 
@@ -109,18 +119,32 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// The CSS rule that contains this declaration block or null if this CssStyleDeclaration is not attached to a CssRule.
+		/// </summary>
 		public CssStyleRule ParentRule { get; private set; }
 
+		/// <summary>
+		/// Removes a CSS property if it has been explicitly set within this declaration block.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
 		public string RemoveProperty(string propertyName)
 		{
-			var val = Properties[propertyName];
-			Properties.Remove(propertyName);
+			var val = _properties[propertyName];
+			_properties.Remove(propertyName);
 			if (_importants.Contains(propertyName))
 				_importants.Remove(propertyName);
 
 			return val;
 		}
 
+		/// <summary>
+		/// Sets a property value and priority within this declaration block.
+		/// </summary>
+		/// <param name="name">The name of the property to be set.</param>
+		/// <param name="value">The value of the property.</param>
+		/// <param name="important">The priority of the property.</param>
 		public void SetProperty(string name, string value, string important = null)
 		{
 			if (string.IsNullOrEmpty(value))
@@ -136,7 +160,7 @@ namespace Knyaz.Optimus.Dom.Css
 			else if(_importants.Contains(name))
 				_importants.Remove(name);
 
-			Properties[name] = value;
+			_properties[name] = value;
 			HandleComplexProperty(name, value);
 			UpdateCssText();
 		}
@@ -212,25 +236,25 @@ namespace Knyaz.Optimus.Dom.Css
 				return;
 			}
 
-			Properties[Css.FontFamily] = args[0];
+			_properties[Css.FontFamily] = args[0];
 
 			var sz = args[1].Split('/');
-			Properties[Css.FontSize] = sz[0];
+			_properties[Css.FontSize] = sz[0];
 			if (sz.Length > 1)
-				Properties["line-height"] = sz[1];
+				_properties["line-height"] = sz[1];
 
 			var i = 2;
 
 			if (args.Length == i)
 			{
-				Properties[Css.FontWeight] = Properties[Css.FontStyle] = Properties[Css.FontVariant] = "normal";
+				_properties[Css.FontWeight] = _properties[Css.FontStyle] = _properties[Css.FontVariant] = "normal";
 				return;
 			}
 
 			var val = args[i];
 			if (FontWeights.Contains(val))
 			{
-				Properties[Css.FontWeight] = val;
+				_properties[Css.FontWeight] = val;
 				i++;
 				if (args.Length == i)
 					return;
@@ -238,12 +262,12 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			else
 			{
-				Properties[Css.FontWeight] = "normal";
+				_properties[Css.FontWeight] = "normal";
 			}
 
 			if (FontVariants.Contains(val))
 			{
-				Properties[Css.FontVariant] = val;
+				_properties[Css.FontVariant] = val;
 				i++;
 				if (args.Length == i)
 					return;
@@ -251,16 +275,16 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			else
 			{
-				Properties[Css.FontVariant] = "normal";
+				_properties[Css.FontVariant] = "normal";
 			}
 
-			Properties[Css.FontStyle] = FontStyles.Contains(val) ? val : "normal";
+			_properties[Css.FontStyle] = FontStyles.Contains(val) ? val : "normal";
 		}
 
 
 		private void SetBackground(string value)
 		{
-			Properties[Css.BackgroundColor] = value;
+			_properties[Css.BackgroundColor] = value;
 		}
 
 		private void SetBorder(string value)
@@ -279,7 +303,7 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				if (char.IsDigit(arg[0]))
 				{
-					Properties[prefix + "-width"] = arg;
+					_properties[prefix + "-width"] = arg;
 				}
 				else if (arg == "none" ||
 				         arg == "hidden" ||
@@ -293,11 +317,11 @@ namespace Knyaz.Optimus.Dom.Css
 				         arg == "outset" ||
 				         arg == "inherit")
 				{
-					Properties[prefix + "-style"] = arg;
+					_properties[prefix + "-style"] = arg;
 				}
 				else
 				{
-					Properties[prefix + "-color"] = arg;
+					_properties[prefix + "-color"] = arg;
 				}
 			}
 		}
@@ -329,43 +353,43 @@ namespace Knyaz.Optimus.Dom.Css
 			var left = names[3];
 			if (value == null)
 			{
-				Properties[top] = Properties[right] = Properties[bottom] = Properties[left] = null;
+				_properties[top] = _properties[right] = _properties[bottom] = _properties[left] = null;
 			}
 			else
 			{
 				var args = value.Split(' ');
 				if (args.Length == 1)
 				{
-					Properties[top] = Properties[right] = Properties[bottom] = Properties[left] = args[0];
+					_properties[top] = _properties[right] = _properties[bottom] = _properties[left] = args[0];
 				}
 				else if(args.Length == 2)
 				{
-					Properties[top] = Properties[bottom] = args[0];
-					Properties[right] = Properties[left] = args[1];
+					_properties[top] = _properties[bottom] = args[0];
+					_properties[right] = _properties[left] = args[1];
 				}
 				else if (args.Length == 3)
 				{
-					Properties[top] = args[0];
-					Properties[right] = Properties[left] = args[1];
-					Properties[bottom] = args[2];
+					_properties[top] = args[0];
+					_properties[right] = _properties[left] = args[1];
+					_properties[bottom] = args[2];
 				}else if (args.Length >= 4)
 				{
-					Properties[top] = args[0];
-					Properties[right] = args[1];
-					Properties[bottom] = args[2];
-					Properties[left] = args[3];
+					_properties[top] = args[0];
+					_properties[right] = args[1];
+					_properties[bottom] = args[2];
+					_properties[left] = args[3];
 				}
 			}
 		}
 
+		/// <summary>
+		/// Used to retrieve the priority of a CSS property.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
 		public string GetPropertyPriority(string propertyName)
 		{
 			return _importants.Contains(propertyName) ? Css.ImportantValue : string.Empty;
-		}
-
-		public int Length
-		{
-			get { return Properties.Count; }
 		}
 	}
 }

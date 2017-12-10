@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void ValueSanizitation()
+		public void ValueSanitization()
 		{
 			var input = GetInput();
 			input.SetAttribute("value", "123");

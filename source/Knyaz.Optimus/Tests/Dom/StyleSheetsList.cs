@@ -5,21 +5,18 @@ using Knyaz.Optimus.Dom.Css;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
+	/// <summary>
+	/// Collection of style sheets.
+	/// </summary>
 	public class StyleSheetsList  : IList<CssStyleSheet>
 	{
 		List<CssStyleSheet> _innerList = new List<CssStyleSheet>();
 
 		internal event Action Changed;
 
-		public IEnumerator<CssStyleSheet> GetEnumerator()
-		{
-			return _innerList.GetEnumerator();
-		}
+		public IEnumerator<CssStyleSheet> GetEnumerator() => _innerList.GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return ((IEnumerable) _innerList).GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) _innerList).GetEnumerator();
 
 		public void Add(CssStyleSheet item)
 		{
@@ -41,15 +38,10 @@ namespace Knyaz.Optimus.Tests.Dom
 			prev.Clear();
 		}
 
-		public bool Contains(CssStyleSheet item)
-		{
-			return _innerList.Contains(item);
-		}
+		public bool Contains(CssStyleSheet item) => _innerList.Contains(item);
 
-		public void CopyTo(CssStyleSheet[] array, int arrayIndex)
-		{
+		public void CopyTo(CssStyleSheet[] array, int arrayIndex) => 
 			_innerList.CopyTo(array, arrayIndex);
-		}
 
 		public bool Remove(CssStyleSheet item)
 		{
@@ -58,20 +50,14 @@ namespace Knyaz.Optimus.Tests.Dom
 			return res;
 		}
 
-		public int Count
-		{
-			get { return _innerList.Count; }
-		}
+		public int Count => _innerList.Count;
 
-		public bool IsReadOnly
-		{
-			get { return ((ICollection<CssStyleDeclaration>) _innerList).IsReadOnly; }
-		}
+		/// <summary>
+		/// Always <c>false</c>.
+		/// </summary>
+		public bool IsReadOnly => false;
 
-		public int IndexOf(CssStyleSheet item)
-		{
-			return _innerList.IndexOf(item);
-		}
+		public int IndexOf(CssStyleSheet item) => _innerList.IndexOf(item);
 
 		public void Insert(int index, CssStyleSheet item)
 		{
@@ -79,6 +65,10 @@ namespace Knyaz.Optimus.Tests.Dom
 			Register(item);
 		}
 
+		/// <summary>
+		/// Removes stylesheet at the specified postion.
+		/// </summary>
+		/// <param name="index">Index of the stylesheet to be removed.</param>
 		public void RemoveAt(int index)
 		{
 			Unregister(_innerList[index]);
@@ -104,9 +94,13 @@ namespace Knyaz.Optimus.Tests.Dom
 			OnChanged();
 		}
 
+		/// <summary>
+		/// Gets the stylesheet at the specified index.
+		/// </summary>
+		/// <param name="index">The index of stylesheet to get.</param>
 		public CssStyleSheet this[int index]
 		{
-			get { return _innerList[index]; }
+			get => _innerList[index];
 			set
 			{
 				Unregister(_innerList[index]);

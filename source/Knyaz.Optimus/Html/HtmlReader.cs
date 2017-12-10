@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Knyaz.Optimus.Html
 {
+	/// <summary>
+	/// Represents the minimal piece of html document.
+	/// </summary>
 	public struct HtmlChunk
 	{
 		public Types Type;
@@ -25,8 +28,21 @@ namespace Knyaz.Optimus.Html
 		}
 	}
 
-	public class HtmlReader
+	/// <summary>
+	/// Contains methods to parse HTML document.
+	/// </summary>
+	public static class HtmlReader
 	{
+		/// <summary>
+		/// Reads the sequence of html chunks from HTML document.
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <returns></returns>
+		public static IEnumerable<HtmlChunk> Read(Stream stream)
+		{
+			return Read(new StreamReader(stream));
+		}
+
 		private static string HtmlDecode(string txt)
 		{
 			txt = txt.Replace("&rang;", "\u27E9").Replace("&lang;", "\u27E8");
@@ -178,11 +194,6 @@ namespace Knyaz.Optimus.Html
 					return false;
 			}
 			return true;
-		}
-
-		public static IEnumerable<HtmlChunk> Read(Stream stream)
-		{
-			return Read(new StreamReader(stream));
 		}
 
 		private static IEnumerable<HtmlChunk> Read(StreamReader reader)
@@ -377,7 +388,7 @@ namespace Knyaz.Optimus.Html
 	}
 
 	
-	public static class StreamReaderExtension
+	internal static class StreamReaderExtension
 	{
 		public static string ReadLineWithEndings(this StreamReader streamReader)
 		{

@@ -2,9 +2,9 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
-using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
+using Knyaz.Optimus.Tests.Resources;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -23,14 +23,14 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script>" + Resources.knockout + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
+			engine.Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
 			return engine.Document;
 		}
 
 		[Test]
 		public void KnockoutInclude()
 		{
-			Load("<html><head><script> " + Resources.knockout + " </script></head><body></body></html>");
+			Load("<html><head><script> " + R.KnockoutJs + " </script></head><body></body></html>");
 		}
 
 		[Test]
@@ -66,7 +66,7 @@ ko.applyBindings(new VM());
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
 						   "<script>" + vm + "</script></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
@@ -99,7 +99,7 @@ ko.applyBindings(new VM());
 }
 ko.applyBindings(new VM());";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>"+
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>"+
 				"<body>" +
 				"<input type='text' data-bind='value:Name' id='in'/>" +
 				"<span id = 'c1' data-bind='text:Greeting'/>" +
@@ -207,7 +207,7 @@ ko.utils.arrayPushAll(vm.Peoples, [{Name:'Ivan'},{Name:'Vasil'}]);peoples",
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"<script type='text/html' id='tmpl'>
 <span id = 'c1' data-bind='text:Greeting, click: Click'/>
 </script>
@@ -235,7 +235,7 @@ ko.applyBindings(new VM());
 		[Test]
 		public void TemplateInsideForeachBinding()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"
 <script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
@@ -271,7 +271,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 		[Test]
 		public void BindToNode()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"<script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
 </script>
@@ -307,7 +307,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		[Test]
 		public static void ComponentBinding()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
 @"<body> <div id='view' data-bind=""component:{name:'myco'}""></div> </body>
 <script>
 	ko.components.register('myco', { 
@@ -328,7 +328,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		[Test]
 		public void HtmlWithScriptBinding()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
 @"<body> <div id='view' data-bind=""html:html""></div> </body>
 <script>
 	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
@@ -342,7 +342,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script>" + Resources.jquery_2_1_3+"</script><script> " + Resources.knockout + " </script></head>" +
+			engine.Load("<html><head><script>" + R.JQueryJs+"</script><script> " + R.KnockoutJs + " </script></head>" +
 			            @"<body> <div id='view' data-bind=""html:html""></div> </body>
 <script>
 	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
@@ -357,7 +357,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script>" + Resources.jquery_2_1_3 + "</script><script> " + Resources.knockout + " </script></head>" +
+			engine.Load("<html><head><script>" + R.JQueryJs + "</script><script> " + R.KnockoutJs + " </script></head>" +
 						@"<body> <select id='s' data-bind=""options:options""></select> </body>
 <script>
 	ko.applyBindings({ options: ['A','B']});

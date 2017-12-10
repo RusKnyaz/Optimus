@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Css
 {
+	/// <summary>
+	/// Provides an ordered collection of media. An empty list is the same as a list that contains the medium "all".
+	/// </summary>
 	public class MediaList
 	{
 		private List<string> _mediums = new List<string>();
@@ -52,6 +54,11 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
+		/// <summary>
+		/// Returns the medium from the list specified by index.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
 		public string this[int index] => _mediums[index];
 	}
 }

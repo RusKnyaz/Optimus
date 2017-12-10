@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
+using Knyaz.Optimus.Tests.Resources;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
-			engine.Load("<html><head><script>\r\n" + Resources.requirejs + "\r\n</script></head><body></body></html>");
+			engine.Load("<html><head><script>\r\n" + R.RequireJs + "\r\n</script></head><body></body></html>");
 		}
 
 		[Test]
@@ -30,7 +30,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
 
-			engine.Load("<html><head><script> " + Resources.requirejs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + R.RequireJs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 			System.Threading.Thread.Sleep(5000);
 			//todo: Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
 			CollectionAssert.AreEqual(new[]{"dependency", "main", "val"}, log);
@@ -40,7 +40,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Require()
 		{
 			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});")
-				.Resource("require.js", Resources.requirejs);
+				.Resource("require.js", R.RequireJs);
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();

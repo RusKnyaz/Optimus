@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
 using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Css
 {

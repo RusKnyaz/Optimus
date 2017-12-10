@@ -9,10 +9,10 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 	public class ResourceProvidersTests
 	{
 		[Test, Ignore("For manual run")]
-		public async void HttpRequest()
+		public void HttpRequest()
 		{
 			var provider = new ResourceProvider();
-			await provider.GetResourceAsync("http://google.com");
+			provider.GetResourceAsync("http://google.com").Wait();
 		}
 
 		[Test]

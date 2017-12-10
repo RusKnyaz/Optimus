@@ -1,5 +1,6 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
@@ -15,9 +16,9 @@ namespace Knyaz.Optimus.Tests.Dom
 	{
 		private IResourceProvider _resourceProvider;
 		private Engine _engine;
-		Window Window{get { return _engine.Window; }}
-		private Document Document { get { return _engine.Document; } }
-		History History{get { return Window.History; }}
+		Window Window => _engine.Window;
+		private Document Document => _engine.Document;
+		IHistory History => Window.History;
 
 		[SetUp]
 		public void SetUp()
@@ -31,7 +32,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("http://localhost", "http://remotehost", "http://remotehost")]
 		public void PushStateChangesLocationUrl(string startUrl, string pushUrl, string expectedUrl)
 		{
-			_engine.OpenUrl(startUrl);
+			_engine.OpenUrl(startUrl).Wait();
 			History.PushState(null, null, pushUrl);
 			Assert.AreEqual(expectedUrl, Window.Location.Href);
 		}
@@ -40,7 +41,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("http://localhost/", "http://remotehost")]
 		public void PushStateAndGoBackRestoresUrl(string startUrl, string pushUrl)
 		{
-			_engine.OpenUrl(startUrl);
+			_engine.OpenUrl(startUrl).Wait();
 			History.PushState(null, null, pushUrl);
 			History.Back();
 			Assert.AreEqual(startUrl, Window.Location.Href);
@@ -50,7 +51,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("http://localhost", "http://remotehost", "http://remotehost")]
 		public void PushStateAndGoBackGoNextChangesUrl(string startUrl, string pushUrl, string expectedUrl)
 		{
-			_engine.OpenUrl(startUrl);
+			_engine.OpenUrl(startUrl).Wait();
 			History.PushState(null, null, pushUrl);
 			History.Back();
 			History.Forward();
@@ -60,7 +61,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void PustStateChangesTitle()
 		{
-			_engine.OpenUrl("http://localhost");
+			_engine.OpenUrl("http://localhost").Wait();
 			History.PushState(null, "Action page", "Action");
 			Assert.AreEqual("Action page", Document.Title);
 		}
@@ -70,7 +71,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("http://localhost", "http://remotehost", "http://remotehost")]
 		public void ReplaceStateChagnesLocationUrl(string startUrl, string pushUrl, string expectedUrl)
 		{
-			_engine.OpenUrl(startUrl);
+			_engine.OpenUrl(startUrl).Wait();
 			History.ReplaceState(null, null, pushUrl);
 			Assert.AreEqual(expectedUrl, Window.Location.Href);
 		}
@@ -80,7 +81,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("http://localhost/", "http://remotehost", "http://remotehostother")]
 		public void PustStateReplaceStateAndGoBackLeadsToInitialUrl(string startUrl, string pushUrl, string replaceUrl)
 		{
-			_engine.OpenUrl(startUrl);
+			_engine.OpenUrl(startUrl).Wait();
 			History.PushState(null, null, pushUrl);
 			History.ReplaceState(null, null, replaceUrl);
 			History.Back();

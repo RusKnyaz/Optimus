@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Knyaz.Optimus.Tests
 {
-	public static class AssertObjectExtension
+	internal static class AssertObjectExtension
 	{
 		public static void Assert<T>(this T obj, Expression<Func<T, bool>> predicate)
 		{
@@ -99,7 +99,14 @@ namespace Knyaz.Optimus.Tests
 			var lambdaExpr = Expression.Lambda<Func<T, object>>(
 				Expression.Convert(expression, typeof(object)), parent.Parameters.ToArray());
 			var exprCompiled = lambdaExpr.Compile();
-			return exprCompiled.Invoke(obj);
+			try
+			{
+				return exprCompiled.Invoke(obj);
+			}
+			catch(Exception e)
+			{
+				throw new Exception("Exception occured on evaluating of expression: " + GetMessage(lambdaExpr), e);
+			}
 		}
 
 		private static string GetMessage(Expression expr)

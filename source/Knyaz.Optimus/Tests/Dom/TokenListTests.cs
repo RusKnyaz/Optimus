@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[SetUp]
 		public void SetUp()
 		{
-			_target = new TokenList();
+			_target = new TokenList(() => string.Empty);
 		}
 
 

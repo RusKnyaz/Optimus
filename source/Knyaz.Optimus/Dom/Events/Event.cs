@@ -1,6 +1,5 @@
 ﻿using System;
-using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Events
 {
@@ -60,24 +59,5 @@ namespace Knyaz.Optimus.Dom.Events
 		public const ushort CAPTURING_PHASE                = 1;
 		public const ushort AT_TARGET = 2;
 		public const ushort BUBBLING_PHASE = 3;
-	}
-
-	/// <summary>
-	/// http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event
-	/// </summary>
-	[DomItem]
-	public interface IEvent
-	{
-		void InitEvent(string type, bool canBubble, bool canCancel);
-		void StopPropagation();
-		void PreventDefault();
-
-		IEventTarget Target { get; }
-		IEventTarget CurrentTarget { get; }
-		ushort EventPhase { get; }
-		bool Bubbles { get; }
-		bool Cancellable { get; }
-		DateTime TimeStamp { get; }
-		string Type { get; }
 	}
 }

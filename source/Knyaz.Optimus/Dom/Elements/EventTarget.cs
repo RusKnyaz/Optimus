@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
