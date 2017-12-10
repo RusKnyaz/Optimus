@@ -28,12 +28,12 @@ namespace Knyaz.Optimus.Dom.Elements
 		public object Entities => throw new NotImplementedException();
 
 		/// <summary>
-		/// A string of the internal subset, or null if there is none.Eg "<!ELEMENT foo (bar)>".
+		/// A string of the internal subset, or null if there is none.Eg "&lt;!ELEMENT foo (bar)&gt;".
 		/// </summary>
 		public string InternalSubset => throw new NotImplementedException();
 
 		/// <summary>
-		/// A DOMString, eg "html" for <!DOCTYPE HTML>.
+		/// A DOMString, eg "html" for &lt;!DOCTYPE HTML&gt;.
 		/// </summary>
 		public string Name { get; }
 
