@@ -23,24 +23,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		public override string ToString() => "<!DOCTYPE html>";
 
 		/// <summary>
-		/// A NamedNodeMap of entities declared in the DTD.Every node in this map implements the Entity interface.
-		/// </summary>
-		public object Entities => throw new NotImplementedException();
-
-		/// <summary>
-		/// A string of the internal subset, or null if there is none.Eg "&lt;!ELEMENT foo (bar)&gt;".
-		/// </summary>
-		public string InternalSubset => throw new NotImplementedException();
-
-		/// <summary>
 		/// A DOMString, eg "html" for &lt;!DOCTYPE HTML&gt;.
 		/// </summary>
 		public string Name { get; }
-
-		/// <summary>
-		/// A NamedNodeMap with notations declared in the DTD.Every node in this map implements the Notation interface.
-		/// </summary>
-		public object Notations => throw new NotImplementedException();
 
 		/// <summary>
 		/// A string, eg "-//W3C//DTD HTML 4.01//EN", empty string for HTML5.
