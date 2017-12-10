@@ -100,7 +100,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		public Node RemoveChild(Node node)
 		{
 			ChildNodes.Remove(node);
-			OwnerDocument.HandleNodeRemoved(this, node);
+			OwnerDocument?.HandleNodeRemoved(this, node);
 			return node;
 		}
 

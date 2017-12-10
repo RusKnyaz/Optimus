@@ -17,8 +17,14 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		/// <param name="title">Is a string containing the title to give the new HTML document.</param>
 		[JsName("createHTMLDocument")]
-		public Document CreateHtmlDocument(string title) => 
-			new Document() { Title = title };
+		public Document CreateHtmlDocument(string title = "")
+	    {
+			var doc = new Document() { Title = title };
+		    var docType = CreateDocumentType("html", string.Empty, string.Empty);
+		    doc.AppendChild(docType);
+		    return doc;
+	    } 
+			
 
 
 		/// <summary>
@@ -40,7 +46,7 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="namespaceURI">Is a string containing the namespace URI of the document to be created, or null if the document doesn't belong to one.</param>
 		/// <param name="qualifiedNameStr">Is a string containing the qualified name, that is an optional prefix and colon plus the local root element name, of the document to be created.</param>
 		/// <param name="documentType">Is the DocumentType of the document to be created.</param>
-		public Document CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType = null)
+		public Document CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType)
 		{
 			//todo: we have to do something with namespaceURI and qualifiedNameStr fields.
 			var doc = new Document();

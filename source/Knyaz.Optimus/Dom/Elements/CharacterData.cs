@@ -11,8 +11,9 @@
 		public string Data { get; set; }
 
 		public string NodeValue { get { return Data; } set { Data = value; } }
-		
-		
+
+		public void Remove() => ParentNode?.RemoveChild(this);
+
 		/*
 		 *
 		todo: to be added

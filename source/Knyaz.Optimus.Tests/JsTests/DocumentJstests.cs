@@ -8,9 +8,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ImplementationCreateHtmlDocument")]
 		[TestCase("ImplementationCreateDocumentType")]
 		[TestCase("ImplementationCreateDocumentWithDocType")]
-		public void Run(string testName)
-		{
-			JsTestsRunner.Run("DocumentTests", testName);
-		}
+		[TestCase("RemoveDocType")]
+		public void Run(string testName) => JsTestsRunner.Run("DocumentTests", testName);
+
+		[TestCase("CommentRemove")]
+		[TestCase("TextRemove")]
+		public void NodeTests(string testName) => JsTestsRunner.Run("NodeTests", testName);
 	}
 }

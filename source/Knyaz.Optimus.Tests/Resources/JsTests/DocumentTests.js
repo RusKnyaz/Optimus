@@ -3,6 +3,11 @@
         run: function () {
             var doc = document.implementation.createHTMLDocument("NewDoc");
             Assert.AreEqual("NewDoc", doc.title);
+            Assert.IsNotNull(doc.doctype);
+            Assert.IsNotNull(doc.body);
+            Assert.AreEqual("html", doc.doctype.name);
+            Assert.AreEqual("", doc.doctype.publicId);
+            Assert.AreEqual("", doc.doctype.systemId);
         }
     },
     "ImplementationCreateDocumentType": {
@@ -21,5 +26,12 @@
             Assert.AreEqual("http://www.w3.org/2000/svg", doc.documentElement.namespaceURI);
             Assert.AreEqual(dt, doc.doctype);
         }
-    }
+    },
+    "RemoveDocType": {
+        run: function () {
+            var doc = document.implementation.createHTMLDocument("NewDoc");
+            doc.doctype.remove();
+            Assert.IsNull(doc.doctype);
+        }
+    },
 });

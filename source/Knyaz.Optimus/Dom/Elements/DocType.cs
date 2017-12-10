@@ -51,5 +51,10 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// A string, eg "http://www.w3.org/TR/html4/strict.dtd", empty string for HTML5.
 		/// </summary>
 		public string SystemId { get; }
+
+		/// <summary>
+		/// Removes this doctype from parent document.
+		/// </summary>
+		public void Remove() => ParentNode?.RemoveChild(this);
 	}
 }

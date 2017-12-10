@@ -20,5 +20,19 @@ var Assert = {
             return;
         if (x1 != x2)
             currentRunContext = "Expected " + x1 + " but was " + x2;
+    },
+    IsNotNull : function (x) {
+        if (currentRunContext != null)
+            return;
+        
+        if (x == null)
+            currentRunContext = "Expected null but was " + x;
+    },
+    IsNull : function(x){
+        if (currentRunContext != null)
+            return;
+
+        if (x != null)
+            currentRunContext = "Expected not null";
     }
 };
