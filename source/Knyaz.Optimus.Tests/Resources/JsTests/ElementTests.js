@@ -1,4 +1,4 @@
-﻿Test("ElementJsTests", {
+﻿Test("ElementTests", {
     "SetParent": {
         run: function () {
             var div = document.createElement("div");

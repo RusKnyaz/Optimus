@@ -41,6 +41,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			// look for a property
 			var property = type.GetProperty(pascalCasedPropertyName, BindingFlags.Instance | BindingFlags.Public);
+			if(property == null)
+			{
+				property = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+					.FirstOrDefault(p => (p.GetCustomAttribute(typeof(JsNameAttribute)) as JsNameAttribute)?.Name == propertyName);
+			}
+
 			if (property != null)
 			{
 				var descriptor = new PropertyInfoDescriptor(Engine, property, Target);
@@ -67,6 +73,14 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				return MethodDescriptor(propertyName, methods);
 			}
+			
+			//look for methods with JsNameAttribute
+			var namedMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+				.Where(m => (m.GetCustomAttribute(typeof(JsNameAttribute)) as JsNameAttribute)?.Name == propertyName)
+										 .ToArray();
+			if(namedMethods.Length > 0)
+				return MethodDescriptor(propertyName, namedMethods);
+
 
 			// look for methods using pascal cased name.
 			var pascalCasedMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public)

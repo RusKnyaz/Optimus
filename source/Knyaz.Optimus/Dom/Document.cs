@@ -10,6 +10,7 @@ using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Tests.Dom;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -50,6 +51,8 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="window">The Window object ot be associated with the document. Can be null.</param>
 		public Document(IWindow window) : base(null)
 		{
+			Implementation = new DomImplementation();
+
 			StyleSheets = new StyleSheetsList();
 			NodeType = DOCUMENT_NODE;
 
@@ -64,6 +67,17 @@ namespace Knyaz.Optimus.Dom
 
 			ReadyState = DocumentReadyStates.Loading;
 		}
+
+		/// <summary>
+		/// Returns first DocType element in document.
+		/// </summary>
+		[JsName("doctype")]
+		public DocType DocType => ChildNodes.OfType<DocType>().FirstOrDefault();
+
+		/// <summary>
+		/// Return this document's DOMimplementation object.
+		/// </summary>
+		public DomImplementation Implementation { get; private set; }
 
 		/// <summary>
 		/// Returns the window object associated with a document, or null if none is available.

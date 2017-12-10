@@ -4,7 +4,7 @@ namespace Knyaz.Optimus.Tests.Resources
 {
     class R
     {
-		static string GetString(string file)
+		public static string GetString(string file)
 		{
 			using (var reader = new StreamReader(typeof(R).Assembly.GetManifestResourceStream(file)))
 			{

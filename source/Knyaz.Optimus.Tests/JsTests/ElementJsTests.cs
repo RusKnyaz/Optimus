@@ -14,15 +14,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetOwnerDocument")]
 		public void Run(string testName)
 		{
-			var engine = new Engine();
-			engine.Load("<html></html>");
-			engine.Document.Head.InnerHTML = "<script>" + R.JsTestsBase + "</script>" + "<script>" + R.JsTestsElementTests + "</script>";
-
-			engine.Console.OnLog += o => {	Debug.WriteLine(o.ToString());	};
-			var res = engine.ScriptExecutor.Evaluate("text/javascript", @"Run('ElementJsTests', '" + testName + "');");
-
-			if (res != null)
-				Assert.Fail(res.ToString());
+			JsTestsRunner.Run("ElementTests", testName);
 		}
 	}
 }

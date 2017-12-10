@@ -1,4 +1,4 @@
-﻿Test("DataViewJsTests", {
+﻿Test("DataViewTests", {
     "ConstructWithDefaultOffset": {
         run: function () {
             var dv = new DataView(new ArrayBuffer(10));

@@ -29,6 +29,7 @@
     <None Remove="Resources\jQuery.Form.js" />
     <None Remove="Resources\JsTests\base.js" />
     <None Remove="Resources\JsTests\DataViewTests.js" />
+    <None Remove="Resources\JsTests\DocumentTests.js" />
     <None Remove="Resources\JsTests\ElementTests.js" />
     <None Remove="Resources\knockout.js" />
     <None Remove="Resources\requirejs.js" />
@@ -43,6 +44,7 @@
     <EmbeddedResource Include="Resources\jQuery.Form.js" />
     <EmbeddedResource Include="Resources\JsTests\base.js" />
     <EmbeddedResource Include="Resources\JsTests\DataViewTests.js" />
+    <EmbeddedResource Include="Resources\JsTests\DocumentTests.js" />
     <EmbeddedResource Include="Resources\JsTests\ElementTests.js" />
     <EmbeddedResource Include="Resources\knockout.js" />
     <EmbeddedResource Include="Resources\requirejs.js" />

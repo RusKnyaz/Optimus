@@ -17,17 +17,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetInt32")]
 		public void Run(string testName)
 		{
-			var engine = new Engine();
-			engine.Load("<html></html>");
-			engine.Document.Head.InnerHTML = "<script>" + R.JsTestsBase + "</script>" + "<script>" + R.JsTestsDataViewTests + "</script>";
-
-			engine.Console.OnLog += o => {
-				Debug.WriteLine(o.ToString());
-			};
-			var res = engine.ScriptExecutor.Evaluate("text/javascript", @"Run('DataViewJsTests', '" + testName+"');");
-
-			if (res != null)
-				Assert.Fail(res.ToString());
+			JsTestsRunner.Run("DataViewTests", testName);
 		}
     }
 }
