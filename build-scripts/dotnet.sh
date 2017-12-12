@@ -1,5 +1,13 @@
-version="2.0.$BUILD_NUMBER-dev";
-fileversion="2.0.$BUILD_NUMBER.1";
+versionPref=${$BRANCH:1}
+versionDev="${$BRANCH:0:1}"
+if [ "$versionDev" == "d" ]; then
+	version="$versionPref.$BUILD_NUMBER-dev";
+    fileversion="versionPref.$BUILD_NUMBER.1";
+else
+	version="$versionPref.$BUILD_NUMBER";
+    fileversion="versionPref.$BUILD_NUMBER.0";
+fi
+echo "Starting build of version: $version, fileVersion: $fileVersion"
 echo "Step 1. Clean"
 /bin/rm -f source/Knyaz.Optimus/test-results/*
 /bin/rm -f source/Knyaz.Optimus.Tests/test-results/*
