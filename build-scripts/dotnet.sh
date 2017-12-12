@@ -1,11 +1,11 @@
-versionPref=${$BRANCH:1}
-versionDev="${$BRANCH:0:1}"
+versionPref=${BRANCH:1}
+versionDev="${BRANCH:0:1}"
 if [ "$versionDev" == "d" ]; then
-	version="$versionPref.$BUILD_NUMBER-dev";
-    fileversion="versionPref.$BUILD_NUMBER.1";
+	version="$versionPref.$BUILD_NUMBER-dev"
+    fileVersion="$versionPref.$BUILD_NUMBER.1"
 else
-	version="$versionPref.$BUILD_NUMBER";
-    fileversion="versionPref.$BUILD_NUMBER.0";
+	version="$versionPref.$BUILD_NUMBER"
+    fileversion="$versionPref.$BUILD_NUMBER.0"
 fi
 echo "Starting build of version: $version, fileVersion: $fileVersion"
 echo "Step 1. Clean"
