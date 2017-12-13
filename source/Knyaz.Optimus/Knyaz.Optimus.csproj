@@ -60,11 +60,11 @@
 
   <ItemGroup>
     <PackageReference Include="Jint" Version="2.11.23" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="Moq" Version="4.7.142" />
-    <PackageReference Include="NUnit" Version="3.9.0" />
-    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" Condition="'$(Configuration)'=='Debug'"/>
+    <PackageReference Include="Moq" Version="4.7.142"  Condition="'$(Configuration)'=='Debug'"/>
+    <PackageReference Include="NUnit" Version="3.9.0"  Condition="'$(Configuration)'=='Debug'"/>
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0"  Condition="'$(Configuration)'=='Debug'"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0"  Condition="'$(Configuration)'=='Debug'"/>
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
 
