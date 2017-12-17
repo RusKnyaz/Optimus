@@ -15,7 +15,7 @@ namespace Knyaz.Optimus.Environment
 		private readonly Engine _engine;
 		private EventTarget _eventTarget;
 
-		public WindowTimers Timers { get { return _timers; } }
+		internal WindowTimers Timers => _timers;
 
 		public Window(Func<object> getSyncObj, Engine engine)
 		{
@@ -53,85 +53,131 @@ namespace Knyaz.Optimus.Environment
 			_eventTarget = new EventTarget(this, () => null, () => engine.Document);
 		}
 
+		/// <summary>
+		/// Width (in pixels) of the browser window viewport including, if rendered, the vertical scrollbar.
+		/// </summary>
 		public int InnerWidth { get; set; }
-		public int InnerHeight { get; set; }
 
+		/// <summary>
+		/// Height (in pixels) of the browser window viewport including, if rendered, the horizontal scrollbar.
+		/// </summary>
+		public int InnerHeight { get; set; }
+		
+		/// <summary>
+		/// Returns a reference to the <see cref="Screen"/> object associated with the window
+		/// </summary>
 		public IScreen Screen { get; private set; }
+		
+		/// <summary>
+		/// Represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. 
+		/// </summary>
 		public ILocation Location { get; private set; }
+		
+		/// <summary>
+		/// Gets a reference to the Navigator object, which can be queried for information about the application running the script.
+		/// </summary>
 		public INavigator Navigator { get; private set; }
+		
+		/// <summary>
+		/// Gets a reference to the History object, which provides an interface for manipulating the browser session history (pages visited in the tab or frame that the current page is loaded in).
+		/// </summary>
 		public IHistory History { get; private set; }
 
 		private readonly WindowTimers _timers;
 
-		public int SetTimeout(Action<object> handler, double? delay, object ctx)
-		{
-			return _timers.SetTimeout(handler, (int)(delay ?? 1), ctx);
-		}
+		/// <summary>
+		/// Sets a timer which executes a function or specified piece of code once after the timer expires.
+		/// </summary>
+		/// <param name="handler"></param>
+		/// <param name="delay"></param>
+		/// <param name="ctx"></param>
+		/// <returns></returns>
+		public int SetTimeout(Action<object> handler, double? delay, object ctx) =>
+			_timers.SetTimeout(handler, (int)(delay ?? 1), ctx);
 
-		public void ClearTimeout(int handle)
-		{
-			_timers.ClearTimeout(handle);
-		}
+		/// <summary>
+		/// Cancels a timeout previously established by calling <see cref="SetTimeout"/>.
+		/// </summary>
+		/// <param name="handle"></param>
+		public void ClearTimeout(int handle) => _timers.ClearTimeout(handle);
 
-		public int SetInterval(Action handler, double? delay)
-		{
-			return _timers.SetInterval(handler, (int)(delay ?? 1));
-		}
+		/// <summary>
+		/// Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
+		/// </summary>
+		/// <returns>It returns an interval ID which uniquely identifies the interval, so you can remove it later by calling <see cref="ClearInterval"/></returns>
+		public int SetInterval(Action handler, double? delay) =>
+			_timers.SetInterval(handler, (int)(delay ?? 1));
 
-		public void ClearInterval(int handle)
-		{
-			_timers.ClearTimeout(handle);
-		}
+		/// <summary>
+		/// Cancels a timed, repeating action which was previously established by a call to <see cref="Window.SetInterval"/>.
+		/// </summary>
+		/// <param name="handle">The interval ID to be cancelled.</param>
+		public void ClearInterval(int handle) => _timers.ClearTimeout(handle);
 
-		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
-		{
+		/// <summary>
+		/// Ddds the specified EventListener-compatible object to the list of event listeners for the specified event type on the EventTarget on which it is called. 
+		/// </summary>
+		/// <param name="type">A string representing the event type to listen for.</param>
+		/// <param name="listener">Event handler.</param>
+		/// <param name="useCapture">indicating whether events of this type will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree.</param>
+		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
 			_eventTarget.AddEventListener(type, listener, useCapture);
-		}
 
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
-		{
+		/// <summary>
+		/// Removes from the EventTarget an event listener previously registered with <see cref="AddEventListener"/>
+		/// </summary>
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture) =>
 			_eventTarget.RemoveEventListener(type, listener, useCapture);
-		}
 
-		public bool DispatchEvent(Event evt)
-		{
-			return _eventTarget.DispatchEvent(evt);
-		}
+		/// <summary>
+		/// Dispatches an Event at the specified EventTarget, invoking the affected EventListeners in the appropriate order.
+		/// </summary>
+		/// <param name="evt"></param>
+		/// <returns></returns>
+		public bool DispatchEvent(Event evt) => _eventTarget.DispatchEvent(evt);
 
-		public void Alert(string message)
-		{
-			if (OnAlert != null)
-				OnAlert(message);
-		}
+		/// <summary>
+		/// Displays an alert dialog with the optional specified content and an OK button.
+		/// </summary>
+		/// <param name="message"></param>
+		public void Alert(string message) => OnAlert?.Invoke(message);
 
+		/// <summary>
+		/// Callback to attach the handler of 'alert' method calls.
+		/// </summary>
 		public event Action<string> OnAlert;
 
-		public ICssStyleDeclaration GetComputedStyle(IElement element)
-		{
-			return GetComputedStyle(element, null);
-		}
-		
+		/// <summary>
+		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain.
+		/// </summary>
+		public ICssStyleDeclaration GetComputedStyle(IElement element) => GetComputedStyle(element, null);
+
+		/// <summary>
+		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain. 
+		/// </summary>
+		/// <param name="element">The <see cref="Element"/> for which to get the computed style.</param>
+		/// <param name="pseudoElt">A string specifying the pseudo-element to match. Must be omitted (or null) for regular elements.</param>
 		public ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt)
 		{
 			var styling = _engine.Styling;
 			if (styling != null)
 				return styling.GetComputedStyle(element);
 
-			var htmlElement = element as HtmlElement;
-			if (htmlElement != null)
+			if (element is HtmlElement htmlElement)
 				return htmlElement.Style;
 			
 			return new CssStyleDeclaration();
 		}
 
+		/// <summary>
+		/// Returns a new MediaQueryList object representing the parsed results of the specified media query string.
+		/// </summary>
 		public MediaQueryList MatchMedia(string media)
-		{
-			return new MediaQueryList(media, () => _engine.CurrentMedia);
-		}
+			=> new MediaQueryList(media, () => _engine.CurrentMedia);
 
-		public void Dispose()
-		{
-			_timers.Dispose();
-		}
+		/// <summary>
+		/// Disposes the window object.
+		/// </summary>
+		public void Dispose() => _timers.Dispose();
 	}
 }

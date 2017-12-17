@@ -103,7 +103,6 @@ namespace Knyaz.Optimus.Dom
 		/// Returns a <see cref="Location"/> object, which contains information about the URL of the document 
 		/// and provides methods for changing that URL and loading another URL.
 		/// </summary>
-		[Obsolete("Use window.location")]
 		public ILocation Location => DefaultView.Location;
 
 		/// <summary>
