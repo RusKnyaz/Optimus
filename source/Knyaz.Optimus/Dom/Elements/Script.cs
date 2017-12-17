@@ -44,6 +44,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		public bool Loaded { get; private set; }
 		public bool Executed { get; set; }
 
+		/// <summary>
+		/// Fired immediately after an element has been loaded.
+		/// </summary>
 		public event Action OnLoad;
 		public event Action OnError;
 

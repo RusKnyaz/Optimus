@@ -14,20 +14,22 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public abstract class Element : Node, IElement, IElementSelector
 	{
-		private readonly IAttributesCollection _attributes;
 		private readonly TokenList _classList = null;
 
 		internal Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
-			_attributes = new AttributesCollection();
+			Attributes = new AttributesCollection();
 			_classList = new TokenList(() => ClassName);
 			_classList.Changed += () => {
 				ClassName = string.Join(" ", _classList);
 			};
 		}
 
-		public IAttributesCollection Attributes => _attributes;
+		/// <summary>
+		/// Returns a collection of the specified node's attributes.
+		/// </summary>
+		public AttributesCollection Attributes { get; }
 
 		internal Element(Document ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
 
@@ -218,8 +220,6 @@ namespace Knyaz.Optimus.Dom.Elements
 			UpdatePropertyFromAttribute(value, invariantName);
 		}
 
-		protected virtual string PreGetAttribute(string invariantName, string value) => value;
-
 		protected virtual void UpdatePropertyFromAttribute(string value, string invariantName)
 		{
 			//todo: remove the stuff
@@ -279,7 +279,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Indicates whether this node (if it is an element) has any attributes.
 		/// </summary>
 		/// <returns><c>true</c> if this node has any attributes, <c>false</c> otherwise.</returns>
-		public bool HasAttributes() => Attributes.Count > 0;
+		public bool HasAttributes() => Attributes.Length > 0;
 
 		/// <summary>
 		/// Checks whether a node is a descendant of a given Element or not.
@@ -425,15 +425,17 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public virtual IElement QuerySelector(string query)
-		{
-			return ((CssSelector) query).Select(this).FirstOrDefault();
-		}
+		/// <summary>
+		/// Returns the first descendant element that matches a specified CSS selector(s).
+		/// </summary>
+		public virtual IElement QuerySelector(string query) =>
+			((CssSelector) query).Select(this).FirstOrDefault();
 
-		public virtual IReadOnlyList<IElement> QuerySelectorAll(string query)
-		{
-			return ((CssSelector)query).Select(this).ToList().AsReadOnly();
-		}
+		/// <summary>
+		/// Returns all elements in the document that matches a specified CSS selector(s).
+		/// </summary>
+		public virtual IReadOnlyList<IElement> QuerySelectorAll(string query) =>
+			((CssSelector)query).Select(this).ToList().AsReadOnly();
 
 		/// <summary>
 		/// Returns nearest ancestor or itself which satisfies to specified selector.
@@ -446,6 +448,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			return ((IElement) this).GetRecursive(x => (IElement) x.ParentNode).FirstOrDefault(selector.IsMatches);
 		}
 
+		/// <summary>
+		/// Returns the size of an element and its position relative to the viewport.
+		/// </summary>
+		/// <returns></returns>
 		public DomRect GetBoundingClientRect()
 		{
 			//stub
@@ -453,6 +459,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			return new DomRect();
 		}
 
+		/// <summary>
+		/// Removes this node from its parent.
+		/// </summary>
 		public void Remove() => ParentNode?.RemoveChild(this);
 	}
 

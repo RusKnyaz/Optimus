@@ -99,8 +99,11 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public override string NodeName { get { return "#document"; } }
 
+		/// <summary>
+		/// Returns a <see cref="Location"/> object, which contains information about the URL of the document 
+		/// and provides methods for changing that URL and loading another URL.
+		/// </summary>
 		[Obsolete("Use window.location")]
-		//todo: check is it true for frames
 		public ILocation Location => DefaultView.Location;
 
 		/// <summary>
@@ -276,7 +279,7 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		/// <summary>
-		/// Sets or gets the document's body (the <body> element)
+		/// Sets or gets the document's body (the &lt;body&gt; element)
 		/// </summary>
 		public HtmlBodyElement Body { get; private set; }
 
@@ -290,7 +293,7 @@ namespace Knyaz.Optimus.Dom
 		/// Creates an event of the type specified.
 		/// </summary>
 		/// <remarks>
-		/// The returned object should be first initialized and can then be passed to <see cref="Element.DispatchEvent"/>.
+		/// The returned object should be first initialized and can then be passed to <see cref="Node.DispatchEvent"/>.
 		/// </remarks>
 		/// <param name="type">The string that represents the type of event to be created. 
 		/// Possible event types include: "UIEvents", "MouseEvents", 

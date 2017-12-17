@@ -7,7 +7,8 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
-	public sealed class HtmlInputElement : HtmlElement, IHtmlInputElement, IResettableElement
+	[DomItem]
+	public sealed class HtmlInputElement : HtmlElement, IResettableElement
 	{
 		static class Defaults
 		{
@@ -18,22 +19,22 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Autocomplete = "on";
 		}
 
-		public HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input)
-		{
-			
-		}
+		internal HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input){}
 
 		/// <summary>
 		/// Specifies whether or not an input field should have autocomplete enabled. Available values: "on"|"off".
 		/// </summary>
 		public string Autocomplete
 		{
-			get { return GetAttribute("autocomplete", Defaults.Autocomplete); }
-			set { SetAttribute("autocomplete", value); }
+			get => GetAttribute("autocomplete", Defaults.Autocomplete);
+			set => SetAttribute("autocomplete", value);
 		}
 
 		private object _value = null;
 
+		/// <summary>
+		/// Gets or sets current value of the control.
+		/// </summary>
 		public string Value
 		{
 			get
@@ -68,24 +69,36 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the element's disabled attribute, indicating that the control is not available for interaction.
+		/// </summary>
 		public bool Disabled
 		{
-			get { return AttributeMapper.GetExistAttributeValue(this, "disabled"); }
-			set { AttributeMapper.SetExistAttributeValue(this, "disabled", value); }
+			get => AttributeMapper.GetExistAttributeValue(this, "disabled");
+			set => AttributeMapper.SetExistAttributeValue(this, "disabled", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the element's type attribute, indicating the type of control to display.
+		/// </summary>
 		public string Type
 		{
-			get { return GetAttribute("type", Defaults.Type); }
-			set { SetAttribute("type", value); }
+			get => GetAttribute("type", Defaults.Type);
+			set => SetAttribute("type", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the element's readonly attribute, indicating that the user cannot modify the value of the control.
+		/// </summary>
 		public bool Readonly
 		{
 			get { return GetAttribute("readonly", Defaults.Readonly); }
 			set { SetAttribute("readonly", value.ToString()); }
 		}
 
+		/// <summary>
+		/// Gets or sets the element's required attribute, indicating that the user must fill in a value before submitting a form.
+		/// </summary>
 		public bool Required
 		{
 			get { return GetAttribute("required", Defaults.Required); }
@@ -93,10 +106,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		private bool? _checked;
+		
+		/// <summary>
+		/// Gets or sets the current state of the element when type is checkbox or radio.
+		/// </summary>
 		public bool Checked
 		{
-			get { return _checked ?? HasAttribute("checked"); }
-			set { _checked = value; } 
+			get => _checked ?? HasAttribute("checked");
+			set => _checked = value;
 		}
 
 		void IResettableElement.Reset()
@@ -113,31 +130,46 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		#region . type = number
 
+		/// <summary>
+		///  Gets or sets the element's max attribute, containing the maximum (numeric or date-time) value for this item, which must not be less than its minimum (min attribute) value.
+		/// </summary>
 		public string Max
 		{
-			get { return GetAttribute("max", string.Empty); }
-			set { SetAttribute("max", value); }
+			get => GetAttribute("max", string.Empty);
+			set => SetAttribute("max", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the element's min attribute, containing the minimum (numeric or date-time) value for this item, which must not be greater than its maximum (max attribute) value.
+		/// </summary>
 		public string Min
 		{
-			get { return GetAttribute("min", string.Empty); }
-			set { SetAttribute("min", value); }
+			get => GetAttribute("min", string.Empty);
+			set => SetAttribute("min", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the element's step attribute, which works with min and max to limit the increments at which a numeric or date-time value can be set. It can be the string any or a positive floating point number.
+		/// </summary>
 		public string Step
 		{
-			get { return GetAttribute("step", string.Empty); }
-			set { SetAttribute("step", value);}
+			get => GetAttribute("step", string.Empty);
+			set => SetAttribute("step", value);
 		}
 
+		/// <summary>
+		/// Increments the value by <see cref="HtmlInputElement.Step"/>.
+		/// </summary>
 		public void StepUp()
 		{
 			long step;
 			StepUp(long.TryParse(Step, out step) ? step : 1);
 		}
 
-		public void StepUp(long delta)
+		/// <summary>
+		/// Increments the value by (<see cref="HtmlInputElement.Step"/> * n), where n defaults to 1 if not specified.
+		/// </summary>
+		public void StepUp(long n)
 		{
 			long min;
 			if (!long.TryParse(Min, out min))
@@ -158,7 +190,7 @@ namespace Knyaz.Optimus.Dom.Elements
 				numValue = 0;
 			}
 
-			numValue += delta;
+			numValue += n;
 
 			long max;
 			if (long.TryParse(Max, out max) && numValue > max)
@@ -166,17 +198,23 @@ namespace Knyaz.Optimus.Dom.Elements
 
 			long step;
 			if(long.TryParse(Step, out step))
-				numValue = ((numValue - min) / delta) * delta + min;
+				numValue = ((numValue - min) / n) * n + min;
 
 			_value = numValue;
 		}
 
+		/// <summary>
+		/// Dencrements the value by <see cref="HtmlInputElement.Step"/>.
+		/// </summary>
 		public void StepDown()
 		{
 			long step;
 			StepDown(long.TryParse(Step, out step) ? step : 1);
 		}
 
+		/// <summary>
+		/// Dencrements the value by (<see cref="HtmlInputElement.Step"/> * n), where n defaults to 1 if not specified.
+		/// </summary>
 		public void StepDown(long delta)
 		{
 			long min;
@@ -212,19 +250,12 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		#endregion
 
-		public decimal ValueAsNumber
-		{
-			get
-			{
-				return decimal.Parse(Value, CultureInfo.InvariantCulture);
-			}
-		}
-	}
-
-	[DomItem]
-	public interface IHtmlInputElement
-	{
-		string Value { get; set; }
-		bool Disabled { get; set; }
+		/// <summary>
+		/// Returns the value of the element, interpreted as one of the following, in order:
+		/// a time value
+		/// a number
+		/// NaN if conversion is impossible
+		/// </summary>
+		public decimal? ValueAsNumber => decimal.Parse(Value, CultureInfo.InvariantCulture);
 	}
 }

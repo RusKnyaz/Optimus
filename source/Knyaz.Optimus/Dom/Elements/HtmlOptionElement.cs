@@ -1,8 +1,11 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Represents &lt;OPTION&gt; element.
+	/// </summary>
 	public sealed class  HtmlOptionElement : HtmlElement
 	{
-		public HtmlOptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Option)
+		internal HtmlOptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Option)
 		{
 		}
 
@@ -12,6 +15,9 @@
 			set { SetAttribute("name", value); }
 		}
 
+		/// <summary>
+		/// Reflects the value of the value HTML attribute, if it exists; otherwise reflects value of the Node.textContent property.
+		/// </summary>
 		public string Value
 		{
 			get { return GetAttribute("value", string.Empty); }
@@ -25,6 +31,9 @@
 			set { InnerHTML = value; }
 		}
 
+		/// <summary>
+		/// Indicates whether the option is currently selected.
+		/// </summary>
 		public bool Selected
 		{
 			get { return HasAttribute("selected"); }

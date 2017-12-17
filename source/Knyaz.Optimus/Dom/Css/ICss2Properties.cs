@@ -19,7 +19,7 @@
 		/// <remarks>
 		/// The 'background' property first sets all the individual background properties to their initial values, then assigns explicit values given in the declaration. 
 		/// Value: [&lt;'background-color'&gt; || &lt;'background-image'&gt; || &lt;'background-repeat'&gt; || &lt;'background-attachment'&gt; || &lt;'background-position'&gt;] | inherit 
-		/// &lt;/remarks>
+		/// </remarks>
 		string Background { get; set; }
 		
 		/// <summary>
@@ -28,7 +28,7 @@
 		string BackgroundAttachment { get; set; }
 
 		/// <summary>
-		/// Gets or sets the 'background-color' css property which represents the background color of an element, either a <color> value or the keyword 'transparent', to make the underlying colors shine through.
+		/// Gets or sets the 'background-color' css property which represents the background color of an element, either a &lt;color&gt; value or the keyword 'transparent', to make the underlying colors shine through.
 		/// </summary>
 		/// <remarks>
 		/// Value: &lt;color&gt; | transparent | inherit 
@@ -327,7 +327,9 @@
 		/// Gets or sets the 'empty-cells' css property which controls the rendering of borders around cells that have no visible content.
 		/// </summary>
 		/// <remarks>
-		/// Empty cells and cells with the 'visibility' property set to 'hidden' are considered to have no visible content. Visible content includes "&nbsp;" and other whitespace except ASCII CR ("\0D"), LF ("\0A"), tab ("\09"), and space ("\20"). 
+		/// Empty cells and cells with the 'visibility' property set to 'hidden' are considered to have no visible content. 
+		/// Visible content includes " " and other whitespace except ASCII CR ("\0D"), LF ("\0A"), tab ("\09"), 
+		/// and space ("\20"). 
 		/// When this property has the value 'show', borders are drawn around empty cells (like normal cells). 
 		/// A value of 'hide' means that no borders are drawn around empty cells. Furthermore, if all the cells in a row have a value of 'hide' and have no visible content, the entire row behaves as if it had 'display: none'. 
 		/// Available value: show | hide | inherit 

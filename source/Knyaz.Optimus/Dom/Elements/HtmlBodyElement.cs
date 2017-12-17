@@ -8,10 +8,11 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public class HtmlBodyElement : HtmlElement
 	{
-		public HtmlBodyElement(Document ownerDocument) : base(ownerDocument, TagsNames.Body)
-		{
-		}
+		internal HtmlBodyElement(Document ownerDocument) : base(ownerDocument, TagsNames.Body){}
 
+		/// <summary>
+		/// Fired immediately after a page has been loaded.
+		/// </summary>
 		public Action<Event> OnLoad;
 	}
 }

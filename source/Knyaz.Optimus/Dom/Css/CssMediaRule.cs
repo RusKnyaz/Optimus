@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	public class CssMediaRule : CssRule
 	{
-		public CssMediaRule(string cssText, CssStyleSheet parentStyleSheet) : base(parentStyleSheet)
+		internal CssMediaRule(string cssText, CssStyleSheet parentStyleSheet) : base(parentStyleSheet)
 		{
 			Media = new MediaList(cssText);
 			CssRules = new List<CssRule>();
