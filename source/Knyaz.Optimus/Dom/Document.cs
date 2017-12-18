@@ -118,7 +118,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Returns a collection of &lt;script&gt; elements in the document.
 		/// </summary>
-		public IEnumerable<IHtmlScriptElement> Scripts => GetElementsByTagName("script").Cast<IHtmlScriptElement>();
+		public IEnumerable<Script> Scripts => GetElementsByTagName("script").Cast<Script>();
 
 		/// <summary>
 		/// Writes HTML expressions or JavaScript code to a document.

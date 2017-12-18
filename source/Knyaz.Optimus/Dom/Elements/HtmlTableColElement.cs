@@ -5,10 +5,11 @@
 	/// </summary>
 	public sealed class HtmlTableColElement : HtmlElement
 	{
-		public HtmlTableColElement(Document ownerDocument) : base(ownerDocument, TagsNames.Col)
-		{
-		}
+		internal HtmlTableColElement(Document ownerDocument) : base(ownerDocument, TagsNames.Col){}
 
+		/// <summary>
+		/// Gets or sets 'align' attribute value.
+		/// </summary>
 		public string Align
 		{
 			get { return GetAttribute("align", string.Empty); }

@@ -151,6 +151,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			DispatchEvent(evt);
 		}
 
+		/// <summary>
+		/// Called on form submit.
+		/// </summary>
 		public event Action<Event> OnSubmit;
 
 		public override bool DispatchEvent(Event evt)
@@ -163,8 +166,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				try
 				{
-					if (OnSubmit != null)
-						OnSubmit(evt);
+					OnSubmit?.Invoke(evt);
 				}
 				catch
 				{

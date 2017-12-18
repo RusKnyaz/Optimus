@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public class HtmlTableRowElement : HtmlElement
 	{
-		public HtmlTableRowElement(Document ownerDocument) : base(ownerDocument, TagsNames.Tr)
+		internal HtmlTableRowElement(Document ownerDocument) : base(ownerDocument, TagsNames.Tr)
 		{
 			Cells = new HtmlCollection(() => ChildNodes.OfType<HtmlTableCellElement>());
 		}
@@ -67,26 +67,12 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// This is in logical order and not in document order.
 		/// </summary>
-		public int RowIndex
-		{
-			get
-			{
-				var table = ParentNode as HtmlTableElement ?? ParentNode.ParentNode as HtmlTableElement;
-				return table.Rows.IndexOf(this);
-			}
-		}
+		public int RowIndex => (ParentNode as HtmlTableElement ?? ParentNode.ParentNode as HtmlTableElement).Rows.IndexOf(this);
 
 		/// <summary>
 		/// The index of this row, relative to the current section ( THEAD, TFOOT, or TBODY), starting from 0.
 		/// </summary>
-		public int SectionRowIndex
-		{
-			get
-			{
-				var rows = (ParentNode as HtmlTableElement)?.Rows ?? ((HtmlTableSectionElement) ParentNode).Rows;
-				return rows.IndexOf(this);
-			}
-		}
+		public int SectionRowIndex => ((ParentNode as HtmlTableElement)?.Rows ?? ((HtmlTableSectionElement) ParentNode).Rows).IndexOf(this);
 
 		/// <summary>
 		/// Vertical alignment of data within cells of this row.
