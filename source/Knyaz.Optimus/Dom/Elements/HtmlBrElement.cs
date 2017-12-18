@@ -1,7 +1,8 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// <seealso cref="https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLBRElement.html"/>
+	/// Represents &lt;BR&gt; HTML element.
+	/// https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLBRElement.html
 	/// </summary>
 	public sealed class HtmlBrElement : HtmlElement
 	{
