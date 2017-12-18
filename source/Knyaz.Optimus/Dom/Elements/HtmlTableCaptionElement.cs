@@ -5,14 +5,17 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public sealed class HtmlTableCaptionElement : HtmlElement
 	{
-		public HtmlTableCaptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Caption)
+		internal HtmlTableCaptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Caption)
 		{
 		}
 
+		/// <summary>
+		/// Gets or sets 'align' attribute value.
+		/// </summary>
 		public string Align
 		{
-			get { return GetAttribute("align", string.Empty); }
-			set { SetAttribute("align", value); }
+			get => GetAttribute("align", string.Empty);
+			set => SetAttribute("align", value);
 		}
 	}
 }
