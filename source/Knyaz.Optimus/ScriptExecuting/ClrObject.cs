@@ -11,7 +11,10 @@ using Jint.Runtime.Interop;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
-	public class ClrObject : ObjectInstance, IObjectWrapper
+	/// <summary>
+	/// Represents c# object (DOM and other) in JS environment.
+	/// </summary>
+	internal class ClrObject : ObjectInstance, IObjectWrapper
 	{
 		public Object Target { get; set; }
 

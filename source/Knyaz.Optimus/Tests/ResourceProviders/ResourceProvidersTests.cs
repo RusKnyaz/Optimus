@@ -1,6 +1,7 @@
 ﻿﻿#if NUNIT
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.ResourceProviders

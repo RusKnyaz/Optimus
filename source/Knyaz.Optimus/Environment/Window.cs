@@ -13,11 +13,11 @@ namespace Knyaz.Optimus.Environment
 	public class Window : IWindow
 	{
 		private readonly Engine _engine;
-		private EventTarget _eventTarget;
+		private readonly EventTarget _eventTarget;
 
 		internal WindowTimers Timers => _timers;
 
-		public Window(Func<object> getSyncObj, Engine engine)
+		internal Window(Func<object> getSyncObj, Engine engine)
 		{
 			_engine = engine;
 			Screen = new Screen

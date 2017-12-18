@@ -5,11 +5,9 @@ using Jint.Native.Function;
 using Jint.Native.Object;
 using System.Linq;
 
-
-
 namespace Knyaz.Optimus.ScriptExecuting
 {
-	public class ClrPrototype : FunctionInstance, IConstructor
+	internal class ClrPrototype : FunctionInstance, IConstructor
 	{
 		private readonly Type _type;
 

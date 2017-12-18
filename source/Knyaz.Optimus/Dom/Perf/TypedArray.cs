@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// <summary>
 		/// Returns the length of the typed array from the start of its ArrayBuffer.
 		/// </summary>
-		public ulong Length {get { return (ulong) (_data.Length/ _bytesPerElement); }}
+		public ulong Length => (ulong) (_data.Length/ _bytesPerElement);
 
 		/// <summary>
 		/// Stores multiple values in the typed array.
@@ -43,7 +43,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// <param name="offset">The offset into the target array at which to begin writing values from the source array. If you omit this value, 0 is assumed (that is, the source array will overwrite values in the target array starting at index 0).</param>
 		public void Set(TypedArray<T> array, int offset)
 		{
-			//todo: write tests for the cas when two arrays share the same ArrayBuffer.
+			//todo: write tests for the case when two arrays share the same ArrayBuffer.
 
 			Buffer.BlockCopy(array._data, 0, _data, offset * _bytesPerElement, array._data.Length);
 		}
@@ -69,6 +69,10 @@ namespace Knyaz.Optimus.Dom.Perf
 			return result;
 		}
 
+		/// <summary>
+		/// Gets or sets the value from/to specified position.
+		/// </summary>
+		/// <param name="index"></param>
 		public T this[ulong index]
 		{
 			get
@@ -90,7 +94,6 @@ namespace Knyaz.Optimus.Dom.Perf
 
 		protected abstract T GetData(int index);
 		protected abstract byte[] GetBytes(T val);
-		
 	}
 
 	/// <summary>
@@ -124,7 +127,7 @@ namespace Knyaz.Optimus.Dom.Perf
 	{
 		public UInt8Array(ArrayBuffer buffer) : base(buffer) { }
 		public UInt8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
-		public  UInt8Array(byte[] data) : base(data) { }
+		public UInt8Array(byte[] data) : base(data) { }
 
 		public UInt8Array Subarray(long begin, long? end) => new UInt8Array(GetSub(begin, end));
 

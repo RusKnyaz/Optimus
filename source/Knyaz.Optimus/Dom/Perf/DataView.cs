@@ -222,7 +222,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// </summary>
 		/// <param name="byteOffset">The offset, in byte, from the start of the view where to store the data.</param>
 		/// <param name="value">The value to set.</param>
-		public void SetInt8(int byteOffset, sbyte value, bool littleEndian = false)
+		public void SetInt8(int byteOffset, sbyte value)
 			=>	Buffer.Data[byteOffset] = (byte)value;
 
 		/// <summary>
@@ -230,7 +230,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// </summary>
 		/// <param name="byteOffset">The offset, in byte, from the start of the view where to store the data.</param>
 		/// <param name="value">The value to set.</param>
-		public void SetUint8(int byteOffset, byte value, bool littleEndian = false)
+		public void SetUint8(int byteOffset, byte value)
 			=> Buffer.Data[byteOffset] = value;
 	}
 }

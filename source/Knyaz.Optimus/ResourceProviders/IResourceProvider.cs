@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+	/// <summary>
+	/// Allows to get resources like files, html pages and etc (dependes on implementation).
+	/// </summary>
 	public interface IResourceProvider
 	{
 		string Root { get; set; }
@@ -27,8 +30,8 @@ namespace Knyaz.Optimus.ResourceProviders
 
 	public class ReceivedEventArguments : EventArgs
 	{
-		public IRequest Request { get; private set; }
-		public IResource Resource { get; private set; }
+		public readonly IRequest Request;
+		public readonly IResource Resource;
 
 		public ReceivedEventArguments(IRequest request, IResource resource)
 		{

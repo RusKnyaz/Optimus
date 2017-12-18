@@ -6,6 +6,7 @@ using System.Text;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -215,7 +216,7 @@ namespace Knyaz.Optimus.Dom
 		{
 			lock (_syncObj())
 			{
-				action.Fire();
+				action?.Invoke();
 			}
 		}
 
@@ -234,23 +235,6 @@ namespace Knyaz.Optimus.Dom
 					throw new InvalidOperationException("Not opened");
 				_request.Timeout = value;
 			}
-		}
-	}
-
-	public static class ActionExtension
-	{
-		public static void Fire(this Action action)
-		{
-			if (action != null) action();
-		}
-	}
-
-	public static class StreamExtension
-	{
-		public static string ReadToEnd(this Stream stream)
-		{
-			using (var reader = new StreamReader(stream))
-				return reader.ReadToEnd();
 		}
 	}
 } 

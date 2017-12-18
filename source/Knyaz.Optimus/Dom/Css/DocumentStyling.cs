@@ -97,6 +97,11 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private Dictionary<IElement, ICssStyleDeclaration> _cache = new Dictionary<IElement, ICssStyleDeclaration>();
 
+		/// <summary>
+		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain.
+		/// </summary>
+		/// <param name="elt">The <see cref="Element"/> for which to get the computed style.</param>
+		/// <returns>The <see cref="ICssStyleDeclaration"/> containing all element's computed properties.</returns>
 		public ICssStyleDeclaration GetComputedStyle(IElement elt)
 		{
 			if (_cache.ContainsKey(elt))
