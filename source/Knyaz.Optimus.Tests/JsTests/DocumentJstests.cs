@@ -14,5 +14,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("CommentRemove")]
 		[TestCase("TextRemove")]
 		public void NodeTests(string testName) => JsTestsRunner.Run("NodeTests", testName);
+
+		[TestCase("Clone")]
+		public void DocumentFragmentTests(string testName) => JsTestsRunner.Run("DocumentFragmentTests", testName);
 	}
 }

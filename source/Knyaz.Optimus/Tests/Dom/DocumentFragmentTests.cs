@@ -1,5 +1,6 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -27,6 +28,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var clone = docFrag.CloneNode(true);
 
 			Assert.AreEqual(1, clone.ChildNodes.Count);
+			Assert.AreEqual("<DIV></DIV>", ((Element)clone.FirstChild).OuterHTML);
 		}
 	}
 }
