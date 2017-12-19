@@ -20,11 +20,13 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 			Assert.AreEqual(",window", t.Result.Stream.ReadToEnd());
 		}
 
-		[TestCase("http://chromium.github.io/octane", "http://chromium.github.io/octane/js/jquery.js")]
-		[TestCase("file:///var/www/site/subdir", "file:///var/www/site/subdir/js/jquery.js")]
-		public void CreateRequestRelativePath(string root, string result) =>
+		[TestCase("http://todosoft.ru/test", "./js/script.js", "http://todosoft.ru/test/js/script.js")]
+		[TestCase("http://todosoft.ru/test", "/js/script.js", "http://todosoft.ru/js/script.js")]
+		[TestCase("http://chromium.github.io/octane", "js/jquery.js", "http://chromium.github.io/octane/js/jquery.js")]
+		[TestCase("file:///var/www/site/subdir", "js/jquery.js", "file:///var/www/site/subdir/js/jquery.js")]
+		public void CreateRequestRelativePath(string root, string rel, string result) =>
 			new ResourceProvider {Root = root}
-				.CreateRequest("js/jquery.js")
+				.CreateRequest(rel)
 				.Assert(request => request.Url == result);
 	}
 }
