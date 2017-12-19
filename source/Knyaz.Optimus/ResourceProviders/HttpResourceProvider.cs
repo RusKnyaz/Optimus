@@ -49,10 +49,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		public Task<IResource> SendRequestAsync(IRequest request)
-		{
-			return SendRequestEx(request);
-		}
+		public Task<IResource> SendRequestAsync(IRequest request) => SendRequestEx(request);
 
 		private HttpRequestMessage MakeWebRequest(HttpRequest request)
 		{
@@ -86,7 +83,9 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (uri.Substring(0, 2) == "./")
 				uri = uri.Remove(0, 2);
 
-			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
+			var root = Root.Last() == '/' ? Root : Root + "/";
+
+			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(root), uri);
 		}
 	}
 

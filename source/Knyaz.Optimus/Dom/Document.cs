@@ -108,7 +108,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Sets or gets the location of the document
 		/// </summary>
-		public string DocumentURI { get { return DefaultView.Location.Href; } set { DefaultView.Location.Href = value; } }
+		public string DocumentURI { get => DefaultView.Location.Href; set => DefaultView.Location.Href = value;}
 
 		/// <summary>
 		/// Returns a collection of all &lt;form&gt; elements in the document.

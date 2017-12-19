@@ -67,7 +67,32 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string OuterHTML
 		{
-			get { return ToString();}
+			get {
+				var sb = new StringBuilder();
+				sb.Append("<");
+				sb.Append(TagName ?? NodeName);
+				if (HasAttributes())
+				{
+					foreach (var attribute in Attributes)
+					{
+						sb.Append(" ");
+						sb.Append(attribute.Name);//todo: use invariant name
+						if (attribute.Value != null)
+						{
+							sb.Append("=\"");
+							sb.Append(attribute.Value.Replace("\"", "\\\""));
+							sb.Append("\"");
+						}
+					}
+				}
+				sb.Append(">");
+				if(true)
+					sb.Append(InnerHTML);
+				sb.Append("</");
+				sb.Append(TagName);
+				sb.Append(">");
+				return sb.ToString();
+			}
 			set
 			{
 				if (ParentNode == null)
@@ -96,7 +121,7 @@ namespace Knyaz.Optimus.Dom.Elements
 					switch (child)
 					{
 						case Text text:sb.Append(text.Data);break;
-						case Element elem:sb.Append(elem);break;
+						case Element elem:sb.Append(elem.OuterHTML);break;
 					}
 				}
 
@@ -293,35 +318,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public override string NodeName => TagName;
 
-		public override string ToString() => ToString(true);
-
-		private string ToString(bool deep)
-		{
-			var sb = new StringBuilder();
-			sb.Append("<");
-			sb.Append(TagName ?? NodeName);
-			if (HasAttributes())
-			{
-				foreach (var attribute in Attributes)
-				{
-					sb.Append(" ");
-					sb.Append(attribute.Name);//todo: use invariant name
-					if (attribute.Value != null)
-					{
-						sb.Append("=\"");
-						sb.Append(attribute.Value.Replace("\"", "\\\""));
-						sb.Append("\"");
-					}
-				}
-			}
-			sb.Append(">");
-			if(deep)
-				sb.Append(InnerHTML);
-			sb.Append("</");
-			sb.Append(TagName);
-			sb.Append(">");
-			return sb.ToString();
-		}
+		public override string ToString() => "[Object " + GetType().Name+"]";
 
 		public override Node CloneNode(bool deep)
 		{

@@ -312,6 +312,14 @@ namespace Knyaz.Optimus.Tests.Dom
 			doc.Write(html);
 			Assert.AreEqual(expectedResult, string.Join(",", doc.QuerySelectorAll(selector).Select(x => x.ToString())));
 		}
+
+		[Test]
+		public void InnerHtml()
+		{
+			var doc = new Document();
+			doc.Head.InnerHTML=("<script>var a = 5;</script>");
+			Assert.AreEqual("<HEAD><SCRIPT>var a = 5;</SCRIPT></HEAD><BODY></BODY>", doc.DocumentElement.InnerHTML);
+		}
 	}
 }
 #endif
