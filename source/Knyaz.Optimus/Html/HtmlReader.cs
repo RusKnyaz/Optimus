@@ -100,11 +100,21 @@ namespace Knyaz.Optimus.Html
 						buffer.AddRange(ReadToPhrase(reader, "*/"));
 						buffer.AddRange("*/");
 					}
-					else if (buffer.Last() != '<') //regexp
+					else if (buffer.Last() != '<') //may be regexp
 					{
-						buffer.Add('/');
-						buffer.AddRange(ReadWhileWithEscapes(reader, _ => false, (c,e) => e || ((Func<char, bool>) (x => x != '/'))(c)));
-						buffer.Add((char) reader.Read());
+						//try to distinguish regexp declaration and division operator
+						var lastNonWhiteSpace = buffer.LastOrDefault(x => x != ' ' && x != '\r' && x != '\n');
+						if (char.IsLetterOrDigit(lastNonWhiteSpace) || lastNonWhiteSpace == '.' || lastNonWhiteSpace == ')')
+						{
+							buffer.Add(symbol);
+						}
+						else //regexp
+						{
+							buffer.Add('/');
+							buffer.AddRange(ReadWhileWithEscapes(reader, _ => false,
+								(c, e) => e || ((Func<char, bool>) (x => x != '/'))(c)));
+							buffer.Add((char) reader.Read());
+						}
 					}
 					else
 					{
