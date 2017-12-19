@@ -57,6 +57,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Uint8Array", typeof(UInt8Array));
 			AddClrType("Int16Array", typeof(Int16Array));
 			AddClrType("Uint16Array", typeof(UInt16Array));
+			AddClrType("Int32Array", typeof(Int32Array));
+			AddClrType("Uint32Array", typeof(UInt32Array));
+			AddClrType("Float32Array", typeof(Float32Array));
+			AddClrType("Float64Array", typeof(Float64Array));
 			AddClrType("DataView", typeof(DataView));
 
 			AddGlobalGetter("console", () => engine.Console);
@@ -108,7 +112,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalFunc("getComputedStyle", (value, values) =>
 			{
 				var elt = (ClrObject) values[0].AsObject();
-				var res = engine.Window.GetComputedStyle((IElement)elt.Target, values.Length > 1 ? values[1].AsString() : null);
+				var res = engine.Window.GetComputedStyle((IElement)elt.Target, values.Length > 1 ? values[1].TryCast<string>() : null);
 				return new JsValue(new ClrObject(_jsEngine, res));
 			});
 			
