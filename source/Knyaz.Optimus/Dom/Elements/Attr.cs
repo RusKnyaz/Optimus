@@ -5,7 +5,8 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// Represents an HTML attribute of an element.
 	/// </summary>
-	public class Attr : Node, IAttr
+	[DomItem]
+	public class Attr : Node
 	{
 		private string _name;
 		private Element _ownerElement;
@@ -57,22 +58,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// <c>true</c> if the attribute is of type Id, otherwise it returns <c>false</c>.
 		/// </summary>
-		public bool IsId { get { return _name == "id"; } }
-		
+		public bool IsId => _name == "id";
+
 		//todo: is it right?
 		/// <summary>
 		/// <c>true</c> if the attribute has been specified, otherwise it returns <c>false</c>.
 		/// </summary>
-		public bool Specified { get { return true; } }
-		//todo: TypeInfo SchemaTypeInfo {get{}}
-	}
+		public bool Specified => true;
 
-	[DomItem]
-	public interface IAttr
-	{
-		string Value { get; set; }
-		string Name { get; }
-		bool IsId { get; }
-		bool Specified { get; }
+		//todo: TypeInfo SchemaTypeInfo {get{}}
 	}
 }

@@ -103,7 +103,7 @@ namespace Knyaz.Optimus.Dom
 		/// Returns a <see cref="Location"/> object, which contains information about the URL of the document 
 		/// and provides methods for changing that URL and loading another URL.
 		/// </summary>
-		public ILocation Location => DefaultView.Location;
+		public Location Location => DefaultView.Location;
 
 		/// <summary>
 		/// Sets or gets the location of the document
@@ -209,7 +209,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Div: return new HtmlDivElement(this);
 				case TagsNames.Span:
 				case TagsNames.Nav:
-				case TagsNames.B: return new HtmlElement(this, invariantTagName);
+				case TagsNames.Bold: return new HtmlElement(this, invariantTagName);
 				case TagsNames.Button: return new HtmlButtonElement(this);
 				case TagsNames.Input: return new HtmlInputElement(this);
 				case TagsNames.Script: return new Script(this);

@@ -5,6 +5,9 @@ using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Environment
 {
+	/// <summary>
+	/// Part of WEB API that allows manipulation of the session history.
+	/// </summary>
 	public class History : IHistory
 	{
 		//todo: history should updated on navigatin using links, and Open method call.
@@ -20,18 +23,25 @@ namespace Knyaz.Optimus.Environment
 
 		private readonly Engine _engine;
 
-		public History(Engine engine)
-		{
-			_engine = engine;
-		}
+		internal History(Engine engine) => _engine = engine;
 
-		public long Lenght { get { return _history.Count; } }
+		/// <summary>
+		/// Gets the number of elements in the session history.
+		/// </summary>
+		public long Lenght => _history.Count;
 
+		/// <summary>
+		/// Loads a page from the session history, identified by its relative location to the current page.
+		/// </summary>
+		/// <param name="delta">Relative page location in history stack (-1 - previous, 1 - next, etc).</param>
 		public void Go(long delta = 0)
 		{
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Goes to the previous page in session history. Equivalent to History.Go(-1)
+		/// </summary>
 		public void Back()
 		{
 			if (_currentPosition == 0)
@@ -41,6 +51,9 @@ namespace Knyaz.Optimus.Environment
 			SetState(_history[_currentPosition]);
 		}
 
+		/// <summary>
+		/// Goes to the next page in session history; this is equivalent to History.Go(1).
+		/// </summary>
 		public void Forward()
 		{
 			if (_currentPosition == _history.Count - 1)
@@ -50,6 +63,13 @@ namespace Knyaz.Optimus.Environment
 			SetState(_history[_currentPosition]);
 		}
 
+		/// <summary>
+		/// Updates the most recent entry on the history stack to have the specified data, title, and, if provided, URL.
+		/// </summary>
+		/// <param name="data">The object which is associated with the new history entry created by pushState(). 
+		/// This object passed in to the popstate event handler.</param>
+		/// <param name="title">Some title.</param>
+		/// <param name="url">The new history entry's URL is given by this parameter. Note that the new page won't be loaded.</param>
 		public void ReplaceState(object data, string title, string url)
 		{
 			var item = new HistoryItem { Data = data, Title = title, Url = url };
@@ -57,6 +77,13 @@ namespace Knyaz.Optimus.Environment
 			SetState(item);
 		}
 
+		/// <summary>
+		/// Adds new history entry.
+		/// </summary>
+		/// <param name="data">The object which is associated with the new history entry created by pushState(). 
+		/// This object passed in to the popstate event handler.</param>
+		/// <param name="title">Some title.</param>
+		/// <param name="url">The new history entry's URL is given by this parameter. Note that the new page won't be loaded.</param>
 		public void PushState(object data, string title, string url)
 		{
 			//todo: raise events

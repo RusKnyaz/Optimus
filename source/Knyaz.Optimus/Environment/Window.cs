@@ -71,7 +71,7 @@ namespace Knyaz.Optimus.Environment
 		/// <summary>
 		/// Represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. 
 		/// </summary>
-		public ILocation Location { get; private set; }
+		public Location Location { get; private set; }
 		
 		/// <summary>
 		/// Gets a reference to the Navigator object, which can be queried for information about the application running the script.

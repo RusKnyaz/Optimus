@@ -7,6 +7,9 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Collection of element attributes.
+	/// </summary>
 	[DomItem]
 	public class AttributesCollection : IEnumerable<Attr>
 	{

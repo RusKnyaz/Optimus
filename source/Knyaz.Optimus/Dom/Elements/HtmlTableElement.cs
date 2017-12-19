@@ -4,9 +4,12 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Represents &lt;TABLE&gt; element.
+	/// </summary>
 	public sealed class HtmlTableElement : HtmlElement
 	{
-		public HtmlTableElement(Document ownerDocument) : base(ownerDocument, TagsNames.Table)
+		internal HtmlTableElement(Document ownerDocument) : base(ownerDocument, TagsNames.Table)
 		{
 			Rows = new HtmlCollection(GetRows);
 			TBodies = new HtmlCollection(() => ChildNodes.OfType<HtmlTableSectionElement>().Where(x => x.TagName == TagsNames.TBody));
@@ -174,7 +177,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Returns a collection of all the rows in the table, including all in THEAD, TFOOT, all TBODY elements.
 		/// </summary>
-		public HtmlCollection Rows { get; private set; }
+		public HtmlCollection Rows { get; }
 
 		/// <summary>
 		/// Specifies which internal table borders to render. On of:none|groups|rows|cols|all

@@ -1,23 +1,31 @@
 ﻿using Knyaz.Optimus.Dom.Interfaces;
 using System;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Environment
 {
-	public class Location : ILocation
+	/// <summary>
+	/// Represents the location (URL) of the document.
+	/// </summary>
+	[DomItem]
+	public class Location
 	{
 		private readonly IEngine _engine;
 		private readonly IHistory _history;
 
-		public Location(IEngine engine, IHistory history)
+		internal Location(IEngine engine, IHistory history)
 		{
 			_engine = engine;
 			_history = history;
 		}
 
+		/// <summary>
+		/// Gets or sets the entire URL. If changed, the associated document navigates to the new page.
+		/// </summary>
 		public string Href
 		{
-			get { return _engine.Uri.OriginalString; } 
-			set { _engine.OpenUrl(value);	}
+			get => _engine.Uri.OriginalString;
+			set => _engine.OpenUrl(value);
 		}
 
 		/// <summary>
@@ -25,7 +33,7 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Hash
 		{
-			get { return _engine.Uri.Fragment;}
+			get => _engine.Uri.Fragment;
 			set
 			{
 				var hash = string.IsNullOrEmpty(value)
@@ -38,12 +46,12 @@ namespace Knyaz.Optimus.Environment
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the host, that is the hostname, a ':', and the port of the URL.
+		/// </summary>
 		public string Host
 		{
-			get
-			{
-				return _engine.Uri.Authority;
-			}
+			get => _engine.Uri.Authority;
 			set
 			{
 				var parts = value.Split(':');
@@ -51,31 +59,31 @@ namespace Knyaz.Optimus.Environment
 				_engine.OpenUrl(builder.Uri.ToString());
 			}
 		}
+		
+		/// <summary>
+		/// Gets or sets the domain of the URL.
+		/// </summary>
 		public string Hostname
 		{
-			get { return _engine.Uri.Host;}
-			set
-			{
-				_engine.OpenUrl(new UriBuilder(_engine.Uri) {Host = value}.Uri.ToString());
-			}
+			get => _engine.Uri.Host;
+			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) {Host = value}.Uri.ToString());
 		}
+		
+		/// <summary>
+		/// Gets or sets the canonical form of the origin of the specific location.
+		/// </summary>
 		public string Origin
 		{
-			get
-			{
-				return _engine.Uri.GetLeftPart(UriPartial.Authority);
-			}
-			set
-			{
-				var b = new UriBuilder(new Uri(value)){Path = _engine.Uri.PathAndQuery,Fragment = _engine.Uri.Fragment.TrimStart('#')};
-				_engine.OpenUrl(b.ToString());
-			}
+			get => _engine.Uri.GetLeftPart(UriPartial.Authority);
+			set => _engine.OpenUrl(new UriBuilder(new Uri(value)){Path = _engine.Uri.PathAndQuery,Fragment = _engine.Uri.Fragment.TrimStart('#')}.ToString());
 		}
 
-		//The relative path with query but without the hash
+		/// <summary>
+		/// Gets or sets the string ontaining an initial '/' followed by the path of the URL.
+		/// </summary>
 		public string Pathname
 		{
-			get { return _engine.Uri.PathAndQuery; }
+			get => _engine.Uri.PathAndQuery;
 			set
 			{
 				var u = new Uri(new Uri(Origin), value);
@@ -86,47 +94,60 @@ namespace Knyaz.Optimus.Environment
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the port number of the URL.
+		/// </summary>
 		public int Port
 		{
-			get { return _engine.Uri.Port; }
-			set
-			{
-				_engine.OpenUrl(new UriBuilder(_engine.Uri) {Port = value}.Uri.ToString());
-			}
+			get => _engine.Uri.Port;
+			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) {Port = value}.Uri.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the protocol scheme of the URL, including the final ':'.
+		/// </summary>
 		public string Protocol
 		{
-			get { return _engine.Uri.Scheme + ":"; }
-			set
-			{
-				_engine.OpenUrl(new UriBuilder(_engine.Uri) { Scheme = value }.Uri.ToString());
-			}
+			get => _engine.Uri.Scheme + ":";
+			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) { Scheme = value }.Uri.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets a string containing a '?' followed by the parameters or "querystring" of the URL.
+		/// </summary>
 		public string Search
 		{
-			get
-			{
-				return _engine.Uri.Query;
-			}
-			set
-			{
-				var b = new UriBuilder(_engine.Uri) {Query = value};
-				_engine.OpenUrl(b.Uri.ToString());
-			}
+			get => _engine.Uri.Query;
+			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) {Query = value}.Uri.ToString());
 		}
-		public void Assign(string uri)
+		
+		/// <summary>
+		/// Loads the resource at the URL provided in parameter.
+		/// </summary>
+		/// <param name="url">The URL of the page to navigate to.</param>
+		public void Assign(string url)
 		{
-			_history.PushState(null, null, uri );
+			_history.PushState(null, null, url );
+			//todo: load the page
 		}
 
-		public void Replace(string uri)
+		/// <summary>
+		/// Replaces the current resource with the one at the provided URL. 
+		/// The difference from the assign() method is that after using Replace() the current page will not be saved
+		/// in session History, meaning the user won't be able to use the back button to navigate to it.
+		/// </summary>
+		/// <param name="url"></param>
+		public void Replace(string url)
 		{
-			_history.ReplaceState(null, null, uri );
+			_history.ReplaceState(null, null, url );
+			//todo: reload page
 		}
 
-		public void Reload(bool force)
+		/// <summary>
+		/// Reloads the resource from the current URL.
+		/// </summary>
+		/// <param name="force">If <c>true</c>, the page to be reloaded from the server. Othervise, the engine may reload the page from its cache.</param>
+		public void Reload(bool force = false)
 		{
 			_engine.OpenUrl(_engine.Uri.ToString());
 		}

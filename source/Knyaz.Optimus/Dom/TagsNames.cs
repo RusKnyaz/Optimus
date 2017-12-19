@@ -18,7 +18,7 @@
 		
 		/// <summary>B</summary>
 		/// <remarks>Bold</remarks>
-		public const string B = "B";
+		public const string Bold = "B";
 		
 		/// <summary>BUTTON</summary>
 		public const string Button = "BUTTON";
