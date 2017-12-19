@@ -27,7 +27,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(false, _textArea.Autofocus);
 			Assert.AreEqual("", _textArea.Placeholder);
 			Assert.AreEqual(false, _textArea.Required);
-			Assert.AreEqual(false, _textArea.Readonly);
+			Assert.AreEqual(false, _textArea.ReadOnly);
 		}
 
 		[Test]

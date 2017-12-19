@@ -20,9 +20,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Target = String.Empty;
 		}
 
-		public HtmlLinkElement(Document ownerDocument) : base(ownerDocument, TagsNames.Link)
-		{
-		}
+		internal HtmlLinkElement(Document ownerDocument) : base(ownerDocument, TagsNames.Link){}
 
 		/// <summary>
 		/// Gets or sets a list of one or more media formats to which the resource applies.

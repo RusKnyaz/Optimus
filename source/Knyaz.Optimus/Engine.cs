@@ -15,18 +15,43 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus
 {
+	/// <summary>
+	/// The web engine that allows you you to load html pages, execute JavaScript and get live DOM.
+	/// </summary>
 	public class Engine: IEngine, IDisposable
 	{
 		private Document _document;
 		private Uri _uri;
+		
+		/// <summary>
+		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
+		/// </summary>
 		public IResourceProvider ResourceProvider { get; private set; }
+		
+		/// <summary>
+		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
+		/// </summary>
 		public IScriptExecutor ScriptExecutor { get; private set; }
+		
+		/// <summary>
+		/// Glues Document and ScriptExecutor.
+		/// </summary>
 		public DocumentScripting Scripting	{get; private set;}
 		internal DocumentStyling Styling { get; private set; }
 
+		/// <summary>
+		/// Gets the browser's console object.
+		/// </summary>
 		public Console Console { get; private set; }
+		
+		/// <summary>
+		/// Gets the current Window object.
+		/// </summary>
    		public Window Window { get; private set; }
 
+		/// <summary>
+		/// Creates new Engine instance with default settings (Js enabled, css disabled).
+		/// </summary>
 		public Engine() : this(new PredictedResourceProvider(new ResourceProvider())) { }
 
    		public Engine(IResourceProvider resourceProvider)
@@ -38,6 +63,9 @@ namespace Knyaz.Optimus
    			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
    		}
 
+		/// <summary>
+		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).
+		/// </summary>
 		public Document Document
 		{
 			get { return _document; }
@@ -75,22 +103,15 @@ namespace Knyaz.Optimus
 					}
 				}
 
-				if (DocumentChanged != null)
-					DocumentChanged();
+				DocumentChanged?.Invoke();
 			}
 		}
 
-		private void OnNodeException(Node node, Exception exception)
-		{
+		private void OnNodeException(Node node, Exception exception) =>
 			Console.Log("Node event handler exception: " + exception.Message);
-		}
 
 
-
-		/// <summary>
-		/// todo: rewrite and complete the stuff
-		/// </summary>
-		/// <param name="form"></param>
+		// todo: rewrite and complete the stuff
 		private async void OnFormSubmit(HtmlFormElement form)
 		{
 			if (string.IsNullOrEmpty(form.Action))
@@ -151,21 +172,33 @@ namespace Knyaz.Optimus
 			//todo: handle 'about:blank'
 		}
 
+		/// <summary>
+		/// Gets the current Uri of the document.
+		/// </summary>
 		public Uri Uri
 		{
-			get { return _uri; }
+			get => _uri;
 			internal set
 			{
 				_uri = value;
-				if (OnUriChanged != null)
-				{
-					OnUriChanged();
-				}
+				OnUriChanged?.Invoke();
 			}
 		}
 
+		/// <summary>
+		/// Called on <see cref="Engine.Uri"/> changed.
+		/// </summary>
 		public event Action OnUriChanged;
+		
+		/// <summary>
+		/// Called when new Document created and assigned to <see cref="Engine.Document"/> property.
+		/// </summary>
+		public event Action DocumentChanged;
 
+		/// <summary>
+		/// Creates new <see cref="Document"/> and loads it from specified path (http or file).
+		/// </summary>
+		/// <param name="path">The string which represents Uri of the document to be loaded.</param>
 		public async Task OpenUrl(string path)
 		{
 			//todo: stop unfinished ajax requests or drop their results
@@ -213,8 +246,7 @@ namespace Knyaz.Optimus
 
 			var html = HtmlParser.Parse(stream).ToList();
 
-			var resourceProvider = ResourceProvider as PredictedResourceProvider;
-			if (resourceProvider != null)
+			if (ResourceProvider is PredictedResourceProvider resourceProvider)
 			{
 				foreach (var script in html.OfType<Html.IHtmlElement>()
 					.Flat(x => x.Children.OfType<Html.IHtmlElement>())
@@ -244,19 +276,16 @@ namespace Knyaz.Optimus
 			Document.Complete();
 		}
 
-		public event Action DocumentChanged;
-		public void Dispose()
-		{
-			Window.Dispose();
-		}
+		public void Dispose() => Window.Dispose();
 
 		private bool _computedStylesEnabled;
+		
+		/// <summary>
+		/// Enables or disables the css loading and styles evaluation.
+		/// </summary>
 		public bool ComputedStylesEnabled
 		{
-			get
-			{
-				return _computedStylesEnabled;
-			}
+			get => _computedStylesEnabled;
 			set
 			{
 				if (_computedStylesEnabled == value)
@@ -282,6 +311,9 @@ namespace Knyaz.Optimus
 			Styling.LoadDefaultStyles();
 		}
 
+		/// <summary>
+		/// Gets the current media settings (used in computed styles evaluation).
+		/// </summary>
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
 	}
 

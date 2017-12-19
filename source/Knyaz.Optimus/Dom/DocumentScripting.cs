@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Dom
 		private readonly IDocument _document;
 		private readonly IScriptExecutor _scriptExecutor;
 
-		public DocumentScripting (
+		internal DocumentScripting (
 			IDocument document, 
 			IScriptExecutor scriptExecutor,
 			IResourceProvider resourceProvider)
@@ -179,8 +179,19 @@ namespace Knyaz.Optimus.Dom
 			script.OwnerDocument.DispatchEvent(evt);
 		}
 
+		/// <summary>
+		/// Faired before running the script.
+		/// </summary>
 		public event Action<Script> BeforeScriptExecute;
+		
+		/// <summary>
+		/// Faired after running the script.
+		/// </summary>
 		public event Action<Script> AfterScriptExecute;
+		
+		/// <summary>
+		/// Faired on script execution error.
+		/// </summary>
 		public event Action<Script, Exception> ScriptExecutionError;
 
 		#region IDisposable implementation

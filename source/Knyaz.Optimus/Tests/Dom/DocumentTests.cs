@@ -12,18 +12,13 @@ namespace Knyaz.Optimus.Tests.Dom
 		private Document _document;
 
 		[SetUp]
-		public void SetUp()
-		{
-			_document = new Document();
-		}
+		public void SetUp() => _document = new Document();
 
 		[Test]
-		public void Document()
-		{
-			var document = new Document();
-			Assert.IsNull(document.OwnerDocument);
-			Assert.IsNull(document.ParentNode);
-		}
+		public void Document() => 
+			new Document().Assert(document => 
+				document.OwnerDocument == null &&
+				document.ParentNode == null);
 
 		[Test]
 		public void Element()
@@ -310,7 +305,15 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			var doc = new Document();
 			doc.Write(html);
-			Assert.AreEqual(expectedResult, string.Join(",", doc.QuerySelectorAll(selector).Select(x => x.ToString())));
+			Assert.AreEqual(expectedResult, string.Join(",", doc.QuerySelectorAll(selector).OfType<HtmlElement>().Select(x => x.OuterHTML)));
+		}
+
+		[Test]
+		public void InnerHtml()
+		{
+			var doc = new Document();
+			doc.Head.InnerHTML=("<script>var a = 5;</script>");
+			Assert.AreEqual("<HEAD><SCRIPT>var a = 5;</SCRIPT></HEAD><BODY></BODY>", doc.DocumentElement.InnerHTML);
 		}
 	}
 }

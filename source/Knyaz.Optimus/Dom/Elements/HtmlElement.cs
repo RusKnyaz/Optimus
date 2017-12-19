@@ -6,9 +6,10 @@ using Knyaz.Optimus.ScriptExecuting;
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// http://www.w3.org/TR/2012/WD-html5-20121025/elements.html#htmlelement
+	/// The base class for the classes representing html elemenets.
 	/// </summary>
-	public class HtmlElement : Element, IHtmlElement
+	[DomItem]
+	public class HtmlElement : Element
 	{
 		private CssStyleDeclaration _style;
 
@@ -18,17 +19,20 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		internal HtmlElement(Document ownerDocument, string tagName)
-			: base(ownerDocument, tagName)
-		{
-			
-		}
+			: base(ownerDocument, tagName) {}
 
+		/// <summary>
+		/// Gets or sets the 'hidden' attribute value, indicating if the element is hidden or not.
+		/// </summary>
 		public bool Hidden
 		{
-			get { return GetAttribute("hidden", Defaults.Hidden); }
-			set { SetAttribute("hidden", value.ToString());}
+			get => GetAttribute("hidden", Defaults.Hidden);
+			set => SetAttribute("hidden", value.ToString());
 		}
 
+		/// <summary>
+		/// Sends a mouse click event to the element.
+		/// </summary>
 		public virtual void Click()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
@@ -36,6 +40,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			DispatchEvent(evt);
 		}
 
+		/// <summary>
+		/// Called before the mouse 'click' dispatched.
+		/// </summary>
 		public event Action OnClick;
 
 		/// <summary>
@@ -85,24 +92,14 @@ namespace Knyaz.Optimus.Dom.Elements
 				Style.CssText = value;
 		}
 
-		public void Blur()
-		{
-			OwnerDocument.ActiveElement = null;
-		}
+		/// <summary>
+		/// Removes keyboard focus from the current element.
+		/// </summary>
+		public void Blur() => OwnerDocument.ActiveElement = null;
 
-		public void Focus()
-		{
-			OwnerDocument.ActiveElement = this;
-		}
-	}
-
-	[DomItem]
-	public interface IHtmlElement
-	{
-		bool Hidden { get; set; }
-		void Click();
-		event Action OnClick;
-		void Blur();
-		void Focus();
+		/// <summary>
+		/// Sets keyboard focus on the specified element, if it can be focused.
+		/// </summary>
+		public void Focus() => OwnerDocument.ActiveElement = this;
 	}
 }

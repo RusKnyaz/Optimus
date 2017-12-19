@@ -5,11 +5,14 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Represents readonly colletion of html elements.
+	/// </summary>
 	public class HtmlCollection : IReadOnlyList<HtmlElement>
 	{
 		private readonly Func<IEnumerable<HtmlElement>> _items;
 
-		public HtmlCollection(Func<IEnumerable<HtmlElement>> items) {_items = items;}
+		internal HtmlCollection(Func<IEnumerable<HtmlElement>> items) {_items = items;}
 
 		public IEnumerator<HtmlElement> GetEnumerator() { return _items().GetEnumerator();}
 

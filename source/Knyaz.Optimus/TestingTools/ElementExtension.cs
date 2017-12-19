@@ -3,6 +3,9 @@ using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.TestingTools
 {
+	/// <summary>
+	/// Contains helper methods for work with <see cref="Engine"/>.
+	/// </summary>
 	public static class ElementExtension
 	{
 		/// <summary>
@@ -27,9 +30,11 @@ namespace Knyaz.Optimus.TestingTools
 			input.DispatchEvent(evt);
 		}
 
-		public static ICssStyleDeclaration GetComputedStyle(this IElement elt)
-		{
-			return elt.OwnerDocument.DefaultView.GetComputedStyle(elt);
-		}
+		/// <summary>
+		/// Gets the all element styles. Shortened form for to call Element.OwnerDocument.DefaultView.GetComputedStyle(elt).
+		/// </summary>
+		/// <param name="elt">The element to get style for.</param>
+		public static ICssStyleDeclaration GetComputedStyle(this IElement elt) =>
+			elt.OwnerDocument.DefaultView.GetComputedStyle(elt);
 	}
 }

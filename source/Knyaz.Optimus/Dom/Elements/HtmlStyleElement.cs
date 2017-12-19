@@ -11,7 +11,7 @@
 			public static string Media = string.Empty;
 		};
 
-		public HtmlStyleElement(Document ownerDocument) : base(ownerDocument, TagsNames.Style)
+		internal HtmlStyleElement(Document ownerDocument) : base(ownerDocument, TagsNames.Style)
 		{
 		}
 
@@ -20,8 +20,8 @@
 		/// </summary>
 		public string Type
 		{
-			get { return GetAttribute("type", Defaults.Type); }
-			set { SetAttribute("type", value); }
+			get => GetAttribute("type", Defaults.Type);
+			set => SetAttribute("type", value);
 		}
 
 
@@ -30,15 +30,17 @@
 		/// </summary>
 		public string Media
 		{
-			get { return GetAttribute("media", Defaults.Media); }
-			set { SetAttribute("media", value); }
+			get => GetAttribute("media", Defaults.Media);
+			set => SetAttribute("media", value);
 		}
 
-
+		/// <summary>
+		/// Gets or sets the 'disabled' attribute value.
+		/// </summary>
 		public bool Disabled
 		{
-			get { return GetAttribute("disabled") != null; }
-			set { SetAttribute("disabled", value ? "" : null); }
+			get => GetAttribute("disabled") != null;
+			set => SetAttribute("disabled", value ? "" : null);
 		}
 
 	}

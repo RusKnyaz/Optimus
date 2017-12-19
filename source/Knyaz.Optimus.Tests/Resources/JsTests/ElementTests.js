@@ -26,5 +26,21 @@
             childDiv.remove();
             Assert.AreEqual(0, div.childNodes.length);
         }
+    },
+    "AttributesLength":{
+        run:function () {
+            var div = document.createElement("div");
+            div.setAttribute("A", 1);
+            div.setAttribute("B", 2);
+            Assert.AreEqual(2, div.attributes.length);
+        }
+    },
+    "AttributesGetByName":{
+        run:function () {
+            var div = document.createElement("div");
+            div.setAttribute("A", 1);
+            Assert.AreEqual(1, div.attributes["A"].value);
+            Assert.AreEqual("a", div.attributes["A"].name);
+        }
     }
 });

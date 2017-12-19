@@ -11,7 +11,7 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	class HttpResourceProvider : IHttpResourceProvider
+	class HttpResourceProvider : ISpecResourceProvider
 	{
 		private readonly CookieContainer _cookies;
 
@@ -20,7 +20,6 @@ namespace Knyaz.Optimus.ResourceProviders
 			_cookies = cookies;
 		}
 
-		public string Root { get; set; }
 		public IRequest CreateRequest(string url)
 		{
 			return new HttpRequest("GET", url);
@@ -49,14 +48,11 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		public Task<IResource> SendRequestAsync(IRequest request)
-		{
-			return SendRequestEx(request);
-		}
+		public Task<IResource> SendRequestAsync(IRequest request) => SendRequestEx(request);
 
 		private HttpRequestMessage MakeWebRequest(HttpRequest request)
 		{
-			var u = MakeUri(request.Url);
+			var u = new Uri(request.Url);
 			var resultRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
 
 			if (request.Data != null && resultRequest.Method.Method != "GET")
@@ -81,18 +77,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			return resultRequest;
 		}
 
-		private Uri MakeUri(string uri)
-		{
-			if (uri.Substring(0, 2) == "./")
-				uri = uri.Remove(0, 2);
-
-			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-		}
-	}
-
-	public interface IHttpResourceProvider : ISpecResourceProvider
-	{
-		string Root { get; set; }
+		
 	}
 
 	public class HttpRequest : IRequest

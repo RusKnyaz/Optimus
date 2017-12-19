@@ -4,9 +4,12 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Represents &lt;SELECT&gt; HTML element.
+	/// </summary>
 	public sealed class HtmlSelectElement : HtmlElement
 	{
-		public HtmlSelectElement(Document ownerDocument) : base(ownerDocument, TagsNames.Select)
+		internal HtmlSelectElement(Document ownerDocument) : base(ownerDocument, TagsNames.Select)
 		{
 			Options = new HtmlOptionsCollection(this);
 			SelectedOptions = new List<HtmlOptionElement>();
@@ -45,30 +48,51 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public int Length { get { return ChildNodes.Count; } }
+		/// <summary>
+		/// The number of &lt;option&gt; elements in this select element.
+		/// </summary>
+		public int Length => ChildNodes.Count;
 
+		/// <summary>
+		/// Gets an options collection of this select element.
+		/// </summary>
 		public HtmlOptionsCollection Options { get; private set; }
 
+		/// <summary>
+		/// Reflects the multiple HTML attribute, indicating whether multiple items can be selected.
+		/// </summary>
 		public bool Multiple { get; set; }
 
-		public string Type { get { return Multiple ? "select-multiple" : "select-one"; } }
+		/// <summary>
+		/// The form control's type. When multiple is true, it returns "select-multiple"; otherwise, it returns "select-one".
+		/// </summary>
+		public string Type => Multiple ? "select-multiple" : "select-one";
 
-		public string Value { get { return SelectedOptions.Count > 0 ? SelectedOptions[0].Value : null; } }
+		/// <summary>
+		/// Gets the first selected option or <c>null</c> if nothing have been selected.
+		/// </summary>
+		public string Value => SelectedOptions.Count > 0 ? SelectedOptions[0].Value : null;
 
+		/// <summary>
+		/// Gets a collection of selected options.
+		/// </summary>
 		public IList<HtmlOptionElement> SelectedOptions { get; private set; }
 
+		/// <summary>
+		/// Gets or sets the 'name' attribute, used by servers and DOM search functions.
+		/// </summary>
 		public string Name
 		{
-			get { return GetAttribute("name", string.Empty); }
-			set { SetAttribute("name", value); }
+			get => GetAttribute("name", string.Empty);
+			set => SetAttribute("name", value);
 		}
 
+		/// <summary>
+		/// Gets the index of the first selected <option> element. The value -1 indicates no element is selected.
+		/// </summary>
 		public long SelectedIndex
 		{
-			get
-			{
-				return SelectedOptions.Count == 0 ? -1 : ChildNodes.IndexOf(SelectedOptions[0]);
-			}
+			get => SelectedOptions.Count == 0 ? -1 : ChildNodes.IndexOf(SelectedOptions[0]);
 			set
 			{
 				SelectedOptions.Clear();
@@ -77,21 +101,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 	}
 
+	/// <summary>
+	/// Represents collection of 'option' elements inside 'select'.
+	/// </summary>
 	public class HtmlOptionsCollection : IEnumerable<HtmlOptionElement>
 	{
 		private readonly HtmlSelectElement _owner;
 
-		public HtmlOptionsCollection(HtmlSelectElement owner)
-		{
-			_owner = owner;
-		}
+		internal HtmlOptionsCollection(HtmlSelectElement owner) => _owner = owner;
 
 		public int Length
 		{
-			get
-			{
-				return _owner.Length;
-			}
+			get => _owner.Length;
 			set
 			{
 				while (value > _owner.Length)
@@ -102,17 +123,28 @@ namespace Knyaz.Optimus.Dom.Elements
 			}	
 		}
 
-		public HtmlOptionElement Item(int index)
-		{
-			return (HtmlOptionElement)_owner.ChildNodes[index];
-		}
+		/// <summary>
+		/// Gets the specific node at the given zero-based index (gives null if out of range).
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		public HtmlOptionElement Item(int index) => (HtmlOptionElement)_owner.ChildNodes[index];
 
+		/// <summary>
+		/// Searches the specific node with the given name. Returns null if no such named node exists.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		public HtmlOptionElement NamedItem(string name)
 		{
 			return _owner.ChildNodes.OfType<HtmlOptionElement>().FirstOrDefault(x => x.Id == name)
 			       ?? _owner.ChildNodes.OfType<HtmlOptionElement>().FirstOrDefault(x => x.Name == name);
 		}
 
+		/// <summary>
+		/// Gets a node by specified name or index.
+		/// </summary>
+		/// <param name="key"></param>
 		[System.Runtime.CompilerServices.IndexerName("_Item")]
 		public HtmlOptionElement this[object key]
 		{
@@ -124,14 +156,8 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public IEnumerator<HtmlOptionElement> GetEnumerator()
-		{
-			return _owner.ChildNodes.OfType<HtmlOptionElement>().GetEnumerator();
-		}
+		public IEnumerator<HtmlOptionElement> GetEnumerator() => _owner.ChildNodes.OfType<HtmlOptionElement>().GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

@@ -26,15 +26,9 @@ namespace Knyaz.Optimus.Dom.Events
 			Type = type;
 		}
 
-		public void StopPropagation()
-		{
-			_stopped = true;
-		}
+		public void StopPropagation() => _stopped = true;
 
-		public bool IsPropagationStopped()
-		{
-			return _stopped;
-		}
+		public bool IsPropagationStopped() => _stopped;
 
 		public void PreventDefault()
 		{
@@ -42,11 +36,14 @@ namespace Knyaz.Optimus.Dom.Events
 				Cancelled = true;
 		}
 
-		public bool IsDefaultPrevented()
-		{
-			return Cancelled;
-		}
+		public bool IsDefaultPrevented() => Cancelled;
 
+		/// <summary>
+		/// Initializes the value of an Event created. If the event has already being dispatched, this method does nothing.
+		/// </summary>
+		/// <param name="type">Defines the type of event.</param>
+		/// <param name="canBubble">Specifies whether the event should bubble up through the event chain or not.</param>
+		/// <param name="canCancel">Specifies whether the event can be canceled.</param>
 		public void InitEvent(string type, bool canBubble, bool canCancel)
 		{
 			Type = type;

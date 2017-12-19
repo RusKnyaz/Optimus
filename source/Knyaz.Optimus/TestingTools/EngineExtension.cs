@@ -88,7 +88,6 @@ namespace Knyaz.Optimus.TestingTools
 		/// </summary>
 		/// <param name="engine">Document owner.</param>
 		/// <param name="id">Identifier of the item to be disappeared.</param>
-		/// <param name="timeout">The timeout</param>
 		/// <returns>Element if found, <c>null</c> othervise.</returns>
 		public static Element WaitDesappearingOfId(this Engine engine, string id)
 		{

@@ -9,13 +9,10 @@ namespace Knyaz.Optimus.Dom
 		public static HtmlFormElement FindOwnerForm(this Element element)
 		{
 			var formId = element.GetAttribute("form");
-			if (!string.IsNullOrEmpty(formId))
-			{
-				var form = element.OwnerDocument.GetElementById(formId) as HtmlFormElement;
-				if (form != null)
-					return form;
-			}
-			return element.Ancestors().OfType<HtmlFormElement>().FirstOrDefault();
+			return 
+				!string.IsNullOrEmpty(formId) && element.OwnerDocument.GetElementById(formId) is HtmlFormElement form
+				? form
+				: element.Ancestors().OfType<HtmlFormElement>().FirstOrDefault();
 		}
 	}
 }

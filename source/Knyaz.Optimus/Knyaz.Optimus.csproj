@@ -1,13 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Globals">
     <SccProjectName>&lt;Project Location In Database&gt;</SccProjectName>
     <SccProvider>Mercurial Source Control Package</SccProvider>
     <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
     <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
   </PropertyGroup>
-
-  
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <TargetFrameworks>net452;netcoreapp2.0;netstandard2.0</TargetFrameworks>
@@ -38,36 +35,31 @@
     <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;NUNIT</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="Resources\moz_default.css" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\moz_default.css" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="Dom\Interfaces\IEventTarget.cs" />
     <None Include="Dom\Interfaces\INode.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Jint" Version="2.11.23" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" Condition="'$(Configuration)'=='Debug'"/>
-    <PackageReference Include="Moq" Version="4.7.142"  Condition="'$(Configuration)'=='Debug'"/>
-    <PackageReference Include="NUnit" Version="3.9.0"  Condition="'$(Configuration)'=='Debug'"/>
-    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0"  Condition="'$(Configuration)'=='Debug'"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0"  Condition="'$(Configuration)'=='Debug'"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="Moq" Version="4.7.142" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="NUnit" Version="3.9.0" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" Condition="'$(Configuration)'=='Debug'" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Resources\Resource.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -75,12 +67,19 @@
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Resources\Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
+  <ItemGroup>
+    <Compile Remove="test-results\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="test-results\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="test-results\**" />
+  </ItemGroup>
 </Project>

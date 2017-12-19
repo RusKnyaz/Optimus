@@ -1,5 +1,6 @@
 ﻿using Knyaz.Optimus.Dom.Css;
 using System;
+using Knyaz.Optimus.Environment;
 
 namespace Knyaz.Optimus.Dom.Interfaces
 {
@@ -9,7 +10,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		int InnerHeight { get; set; }
 
 		IScreen Screen { get; }
-		ILocation Location { get; }
+		Location Location { get; }
 		INavigator Navigator { get; }
 		IHistory History { get; }
 

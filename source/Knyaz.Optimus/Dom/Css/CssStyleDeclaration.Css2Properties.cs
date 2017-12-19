@@ -37,7 +37,7 @@
 		/// </summary>
 		/// <remarks>
 		/// [ [&lt;percentage&gt; | &lt;length&gt; ]{1,2} | [ [top | center | bottom] || [left | center | right] ] ] | inherit
-		/// <seealso cref="http://www.w3.org/TR/1998/REC-CSS2-19980512/colors.html#propdef-background-position"/>
+		/// http://www.w3.org/TR/1998/REC-CSS2-19980512/colors.html#propdef-background-position
 		/// </remarks>
 		public string BackgroundPosition
 		{

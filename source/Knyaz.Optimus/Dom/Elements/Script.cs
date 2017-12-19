@@ -8,9 +8,10 @@ using Knyaz.Optimus.Tools;
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// http://www.w3.org/TR/html5/scripting-1.html#the-script-element
+	/// Represents &lt;SCRIPT&gt; element.
 	/// </summary>
-	public sealed class Script : HtmlElement, IDelayedResource, IHtmlScriptElement
+	[DomItem]
+	public sealed class Script : HtmlElement
 	{
 		private readonly AttributeMappedValue<string> _type;
 		private readonly AttributeMappedValue<string> _charset;
@@ -18,15 +19,34 @@ namespace Knyaz.Optimus.Dom.Elements
 		private readonly AttributeMappedBoolValue _async;
 		private readonly AttributeMappedBoolValue _defer;
 
-		public string Charset { get { return _charset.Value; } set { _charset.Value = value; } }
-		public bool Async { get { return _async.Value; } set { _async.Value = value; } }
-		public bool Defer { get { return _defer.Value; } set { _defer.Value = value; } }
-		public string Src { get { return _src.Value; } set { _src.Value = value; } }
-		public string Type { get { return _type.Value; } set { _type.Value = value; }}
+		/// <summary>
+		/// Gets or sets the 'charset' attribute value reflecting the charset attribute.
+		/// </summary>
+		public string Charset {get => _charset.Value;set => _charset.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'async' attribute value.
+		/// </summary>
+		public bool Async { get => _async.Value; set => _async.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'defer' attribute value.
+		/// </summary>
+		public bool Defer { get => _defer.Value;set => _defer.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'src' attirbute representing the address of the external script resource to use. 
+		/// </summary>
+		public string Src { get => _src.Value; set => _src.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'type' attribute value representing MIME type of the script.
+		/// </summary>
+		public string Type { get => _type.Value;set => _type.Value = value;}
 
 		public string CrossOrigin { get; set; }
 	
-		public Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
+		internal Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
 		{
 			_type = new AttributeMappedValue<string>(this, "type");
 			_charset = new AttributeMappedValue<string>(this, "charset");
@@ -39,15 +59,19 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public string Text { get { return InnerHTML; } set { InnerHTML = value; } }
 
-		public bool HasDelayedContent { get { return !string.IsNullOrEmpty(Src); } }
+		internal bool HasDelayedContent => !string.IsNullOrEmpty(Src);
 
 		public bool Loaded { get; private set; }
-		public bool Executed { get; set; }
+		internal bool Executed { get; set; }
 
+		/// <summary>
+		/// Fired immediately after an element has been loaded.
+		/// </summary>
 		public event Action OnLoad;
 		public event Action OnError;
 
-		public Task LoadAsync(IResourceProvider resourceProvider)
+		//todo: revise it. it shouldn't be here.
+		internal Task LoadAsync(IResourceProvider resourceProvider)
 		{
 			if (string.IsNullOrEmpty(Src))
 				throw new InvalidOperationException("Src not set.");
@@ -74,8 +98,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			if (HasDelayedContent)
 			{
-				if (OnLoad != null)
-					OnLoad();
+				OnLoad?.Invoke();
 				this.RaiseEvent("load", false, false);
 			}
 		}
@@ -84,13 +107,12 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			lock(OwnerDocument)
 			{
-				if (OnError != null)
-					OnError();
+				OnError?.Invoke();
 				this.RaiseEvent("error", false, false);
 			}
 		}
 
-		public void Execute(IScriptExecutor scriptExecutor)
+		internal void Execute(IScriptExecutor scriptExecutor)
 		{
 			scriptExecutor.Execute(Type ?? "text/javascript", Text);
 			Executed = true;
@@ -103,25 +125,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			node.Text = Text;
 			return node;
 		}
-	}
 
-	[DomItem]
-	public interface IHtmlScriptElement
-	{
-		string Src { get; set; }
-        string Type { get;set; }
-		string Charset { get; set; }
-		bool Async { get; set; }
-		bool Defer { get; set; }
-		string CrossOrigin { get;set; }
-		string Text { get; }
-	}
-
-
-	internal interface IDelayedResource
-	{
-		bool Loaded { get; }
-		bool HasDelayedContent { get; }
-		Task LoadAsync(IResourceProvider resourceProvider);
+		public override string ToString() => "[Object HTMLScriptElement]";
 	}
 }

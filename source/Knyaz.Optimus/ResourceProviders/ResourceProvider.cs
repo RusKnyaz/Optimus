@@ -1,5 +1,6 @@
 ﻿﻿using System;
-using System.IO;
+ using System.Diagnostics;
+ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,30 +14,17 @@ namespace Knyaz.Optimus.ResourceProviders
 		public event Action<string> OnRequest;
 		public event EventHandler<ReceivedEventArguments> Received;
 
-		private readonly CookieContainer _cookies;
-		private string _root;
-
-		public ResourceProvider()
+		public ResourceProvider() 
 		{
-			_cookies = new CookieContainer();
-			HttpResourceProvider = new HttpResourceProvider(_cookies);
+			HttpResourceProvider = new HttpResourceProvider(new CookieContainer());
 			FileResourceProvider = new FileResourceProvider();
 		}
 
-		protected FileResourceProvider FileResourceProvider { get; private set; }
-		public IHttpResourceProvider HttpResourceProvider { get; private set; }
+		protected ISpecResourceProvider FileResourceProvider { get; private set; }
+		public ISpecResourceProvider HttpResourceProvider { get; private set; }
 
-		public string Root
-		{
-			get { return _root; }
-			set
-			{
-				HttpResourceProvider.Root = value;
-				_root = value;
-			}
-		}
+		public string Root { get; set; }
 
-		
 		private ISpecResourceProvider GetResourceProvider(Uri u)
 		{
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
@@ -56,9 +44,27 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		public IRequest CreateRequest(string uri)
+		public IRequest CreateRequest(string path)
 		{
-			return GetResourceProvider(UriHelper.GetUri(Root, uri)).CreateRequest(uri);
+			var uri = MakeUri(path);
+			var resourceProvider = GetResourceProvider(uri);
+
+			if (resourceProvider is DataResourceProvider data)
+			{
+				return data.CreateRequest(path);
+			}
+			
+			return resourceProvider.CreateRequest(uri.ToString());
+		}
+		
+		private Uri MakeUri(string uri)
+		{
+			if (uri.Substring(0, 2) == "./")
+				uri = uri.Remove(0, 2);
+
+			var root = Root == null || Root.Last() == '/' ? Root : Root + "/";
+
+			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(root), uri);
 		}
 
 		public Task<IResource> GetResourceAsync(IRequest req)

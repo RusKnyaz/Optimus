@@ -99,14 +99,16 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public override string NodeName { get { return "#document"; } }
 
-		[Obsolete("Use window.location")]
-		//todo: check is it true for frames
-		public ILocation Location => DefaultView.Location;
+		/// <summary>
+		/// Returns a <see cref="Location"/> object, which contains information about the URL of the document 
+		/// and provides methods for changing that URL and loading another URL.
+		/// </summary>
+		public Location Location => DefaultView.Location;
 
 		/// <summary>
 		/// Sets or gets the location of the document
 		/// </summary>
-		public string DocumentURI { get { return DefaultView.Location.Href; } set { DefaultView.Location.Href = value; } }
+		public string DocumentURI { get => DefaultView.Location.Href; set => DefaultView.Location.Href = value;}
 
 		/// <summary>
 		/// Returns a collection of all &lt;form&gt; elements in the document.
@@ -116,7 +118,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Returns a collection of &lt;script&gt; elements in the document.
 		/// </summary>
-		public IEnumerable<IHtmlScriptElement> Scripts => GetElementsByTagName("script").Cast<IHtmlScriptElement>();
+		public IEnumerable<Script> Scripts => GetElementsByTagName("script").Cast<Script>();
 
 		/// <summary>
 		/// Writes HTML expressions or JavaScript code to a document.
@@ -207,7 +209,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Div: return new HtmlDivElement(this);
 				case TagsNames.Span:
 				case TagsNames.Nav:
-				case TagsNames.B: return new HtmlElement(this, invariantTagName);
+				case TagsNames.Bold: return new HtmlElement(this, invariantTagName);
 				case TagsNames.Button: return new HtmlButtonElement(this);
 				case TagsNames.Input: return new HtmlInputElement(this);
 				case TagsNames.Script: return new Script(this);
@@ -276,7 +278,7 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		/// <summary>
-		/// Sets or gets the document's body (the <body> element)
+		/// Sets or gets the document's body (the &lt;body&gt; element)
 		/// </summary>
 		public HtmlBodyElement Body { get; private set; }
 
@@ -290,7 +292,7 @@ namespace Knyaz.Optimus.Dom
 		/// Creates an event of the type specified.
 		/// </summary>
 		/// <remarks>
-		/// The returned object should be first initialized and can then be passed to <see cref="Element.DispatchEvent"/>.
+		/// The returned object should be first initialized and can then be passed to <see cref="Node.DispatchEvent"/>.
 		/// </remarks>
 		/// <param name="type">The string that represents the type of event to be created. 
 		/// Possible event types include: "UIEvents", "MouseEvents", 

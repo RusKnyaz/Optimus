@@ -13,6 +13,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetParent")]
 		[TestCase("SetOwnerDocument")]
 		[TestCase("Remove")]
+		[TestCase("AttributesLength")]
+		[TestCase("AttributesGetByName")]
 		public void Run(string testName)
 		{
 			JsTestsRunner.Run("ElementTests", testName);

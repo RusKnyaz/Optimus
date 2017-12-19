@@ -61,15 +61,12 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		private void OnChanged()
 		{
-			Changed.Fire();
+			Changed?.Invoke();
 			//prevent token list recreation if it is a source of changes.
 			_className = _classNameFn();
 		}
 
-		public void Clear()
-		{
-			InternalList.Clear();
-		}
+		public void Clear() => InternalList.Clear();
 
 		public bool Contains(string item) => InternalList.Contains(item);
 

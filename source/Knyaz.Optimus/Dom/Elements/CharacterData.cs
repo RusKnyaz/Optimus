@@ -8,10 +8,19 @@
 	{
 		internal CharacterData(Document owner) => SetOwner(owner);
 
+		/// <summary>
+		/// The text of this node.
+		/// </summary>
 		public string Data { get; set; }
 
-		public string NodeValue { get { return Data; } set { Data = value; } }
+		/// <summary>
+		/// The text of this node.
+		/// </summary>
+		public string NodeValue { get => Data; set => Data = value;}
 
+		/// <summary>
+		/// Removes this node from parent.
+		/// </summary>
 		public void Remove() => ParentNode?.RemoveChild(this);
 
 		/*
@@ -36,7 +45,7 @@
 	/// </summary>
 	public class Text : CharacterData
 	{
-		public Text(Document owner) : base(owner) => NodeType = TEXT_NODE;
+		internal Text(Document owner) : base(owner) => NodeType = TEXT_NODE;
 
 		public override Node CloneNode(bool deep) => new Text(OwnerDocument) { Data = Data };
 

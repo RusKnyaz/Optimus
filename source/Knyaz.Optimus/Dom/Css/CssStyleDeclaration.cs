@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		internal event Action<string> OnStyleChanged;
 
-		public CssStyleDeclaration(CssStyleRule parentRule = null)
+		internal CssStyleDeclaration(CssStyleRule parentRule = null)
 		{
 			_properties = new NameValueCollection();
 			ParentRule = parentRule;

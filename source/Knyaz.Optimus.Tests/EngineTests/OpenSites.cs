@@ -29,10 +29,10 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.OpenUrl("http://chromium.github.io/octane").Wait(timeout);
-			var startButton = engine.WaitId("main-banner") /*as HtmlElement*/;
-			Assert.IsNotNull(startButton);
+			var startButton = engine.WaitSelector("h1#main-banner", 10000) as HtmlElement;
+			Assert.IsNotNull(startButton, "Start button not found.");
 
-			//startButton.Click();
+			startButton.Click();
 
 			Thread.Sleep(10000);
 
