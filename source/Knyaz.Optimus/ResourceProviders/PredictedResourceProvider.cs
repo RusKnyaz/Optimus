@@ -41,9 +41,9 @@ namespace Knyaz.Optimus.ResourceProviders
 				: _resourceProvider.GetResourceAsync(req);
 		}
 
-		public IRequest CreateRequest(string uri)
+		public IRequest CreateRequest(string path)
 		{
-			return _resourceProvider.CreateRequest(uri);
+			return _resourceProvider.CreateRequest(path);
 		}
 
 		public void Preload(string uri)

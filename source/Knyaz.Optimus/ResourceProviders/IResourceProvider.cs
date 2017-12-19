@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.ResourceProviders
 		event Action<string> OnRequest;
 		event EventHandler<ReceivedEventArguments> Received;
 		Task<IResource> GetResourceAsync(IRequest req);
-		IRequest CreateRequest(string uri);
+		IRequest CreateRequest(string path);
 	}
 
 	public static class ResourceProviderExtension
