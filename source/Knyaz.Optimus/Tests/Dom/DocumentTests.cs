@@ -315,6 +315,15 @@ namespace Knyaz.Optimus.Tests.Dom
 			doc.Head.InnerHTML=("<script>var a = 5;</script>");
 			Assert.AreEqual("<HEAD><SCRIPT>var a = 5;</SCRIPT></HEAD><BODY></BODY>", doc.DocumentElement.InnerHTML);
 		}
+
+		[Test]
+		public void AddDocType()
+		{
+			var doc = new Document();
+			var dt = doc.Implementation.CreateDocumentType("HTML", "", "");
+			doc.AppendChild(dt);
+			Assert.AreEqual(doc, dt.OwnerDocument);
+		}
 	}
 }
 #endif

@@ -26,7 +26,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			_ownerDocument = ownerDocument;
 			ChildNodes = new List<Node>();
-			EventTarget = new EventTarget(this, () => ParentNode, () => OwnerDocument);
+			EventTarget = new EventTarget(this, () => ParentNode, () => OwnerDocument ?? this as Document);
 		}
 	
 		private Document _ownerDocument;
@@ -68,10 +68,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected virtual void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
-			if (OwnerDocument != null)
+			var owner = OwnerDocument ?? this as Document;
+			if (owner != null)
 			{
-				node.SetOwner(OwnerDocument);
-				OwnerDocument.HandleNodeAdded(node);
+				node.SetOwner(owner);
+				owner.HandleNodeAdded(node);
 			}
 		}
 
