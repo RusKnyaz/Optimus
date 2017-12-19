@@ -73,4 +73,13 @@
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="test-results\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="test-results\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="test-results\**" />
+  </ItemGroup>
 </Project>
