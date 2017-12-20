@@ -207,10 +207,22 @@ namespace Knyaz.Optimus
 			Document = new Document(Window);
 			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
-			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
+			
+			
+			ResourceProvider.Root = GetRoot(Uri);
 
 			var response = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
 			LoadFromResponse(response);
+		}
+
+		private string GetRoot(Uri uri)
+		{
+			var root =Uri.GetLeftPart(UriPartial.Path);
+			var ur = new Uri(root);
+			if (ur.PathAndQuery != null && !ur.PathAndQuery.Contains('.') && ur.PathAndQuery.Last() != '/')
+				return root + "/";
+
+			return root;
 		}
 
 		private void LoadFromResponse(IResource resource)

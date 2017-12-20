@@ -307,5 +307,44 @@ window.clearTimeout(timer);"));
 			engine.Document.Body.InnerHTML = "<script>console.log('HI');</script>";
 			Assert.AreEqual(new[]{"HI"}, log);
 		}
+
+		[TestCase("http://todosoft.ru", "http://todosoft.ru/")]
+		[TestCase("http://todosoft.ru/", "http://todosoft.ru/")]
+		[TestCase("http://todosoft.ru/subfolder", "http://todosoft.ru/subfolder/")]
+		[TestCase("http://todosoft.ru/index.html", "http://todosoft.ru/index.html")]
+		public void OpenUrl(string url, string expectedRoot)
+		{
+			var resourceProvider = Mocks.ResourceProvider(url.TrimEnd('/'), "<html><head></head></html>");
+
+			var engine = new Engine(resourceProvider);
+			engine.OpenUrl(url).Wait();
+			
+			Assert.AreEqual(expectedRoot, resourceProvider.Root);
+		}
+
+		[TestCase("http://a.ru/index.html", "k.js", "http://a.ru/k.js")]
+		[TestCase("http://a.ru/test", "./js/k.js", "http://a.ru/test/js/k.js")]
+		[TestCase("http://a.ru/test", "/js/k.js", "http://a.ru/js/k.js")]
+		[TestCase("http://chromium.github.io/octane", "js/jquery.js", "http://chromium.github.io/octane/js/jquery.js")]
+		public void OpenUrlWithResource(string url, string resUrl, string expectedResUrl)
+		{
+			var httpResourceProvider = Mock.Of<ISpecResourceProvider>().Resource(
+				url.TrimEnd('/'), 
+				"<html><head><script src='"+resUrl+"'></script></head></html>");
+
+			httpResourceProvider.Resource(expectedResUrl, "console.Log('ok');");
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+			var log = new List<string>();
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+
+			engine.OpenUrl(url).Wait();
+		}
 	}
 }

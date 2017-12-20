@@ -794,5 +794,13 @@ dispatchEvent(evt);");
 			CreateEngine("", "var data; if(data !== undefined) {console.log('a');}else{console.log('b');}");
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
+
+		[Test]
+		public void OnLoad()
+		{
+			_engine.Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad'></body></html>");
+			
+			CollectionAssert.AreEqual(new object[] { "b" }, _log);
+		}
 	}
 }

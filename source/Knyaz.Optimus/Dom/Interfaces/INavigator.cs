@@ -15,5 +15,6 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		string Product { get; }
 		string UserAgent { get; }
 		bool JavaEnabled();
+		string Language { get; }
 	}
 }
