@@ -1,6 +1,4 @@
-﻿using Knyaz.Optimus.Tests.Resources;
-using NUnit.Framework;
-using System.Diagnostics;
+﻿using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
@@ -15,6 +13,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Remove")]
 		[TestCase("AttributesLength")]
 		[TestCase("AttributesGetByName")]
+		[TestCase("SetOnClickAttribute")]
 		public void Run(string testName)
 		{
 			JsTestsRunner.Run("ElementTests", testName);

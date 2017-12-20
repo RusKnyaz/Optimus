@@ -42,5 +42,13 @@
             Assert.AreEqual(1, div.attributes["A"].value);
             Assert.AreEqual("a", div.attributes["A"].name);
         }
+    },
+    "SetOnClickAttribute":{
+        fun:function () {
+            var d = document.createElement('div');
+            d.setAttribute('onclick','event.currentTarget.innerHTML="HI"');
+            d.click();
+            Assert.AreEqual("HI", d.innerHTML);
+        }
     }
 });
