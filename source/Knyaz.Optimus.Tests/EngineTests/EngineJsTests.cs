@@ -412,7 +412,8 @@ console.log('afterappend');"));
 		[Test]
 		public void AddScriptAsync()
 		{
-			var engine = new Engine(Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
+			var engine = new Engine(
+				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
 			var log = new List<string>();
 			engine.Console.OnLog += o =>
 				{
@@ -433,7 +434,8 @@ document.head.appendChild(d);
 console.log('afterappend');"));
 
 			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[] {"nodeadded", "afterappend", "in new script", "onload"}, log);
+			Assert.AreEqual("nodeadded,afterappend,in new script,onload", 
+				string.Join(",", log));
 		}
 
 		[Test]

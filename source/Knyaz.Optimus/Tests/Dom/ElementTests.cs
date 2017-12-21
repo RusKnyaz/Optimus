@@ -1,6 +1,8 @@
 ﻿#if NUNIT
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
@@ -269,6 +271,54 @@ namespace Knyaz.Optimus.Tests.Dom
 			var div = doc.GetElementById("d");
 			div.Remove();
 			Assert.IsNull(doc.GetElementById("d"));
+		}
+
+		[Test]
+		public void EventHandlingOrder()
+		{
+			var sequence = new List<string>();
+			var document = new Document();
+			var d1 = document.CreateElement("div") as HtmlElement;
+			d1.Id = "A";
+			var d2 = document.CreateElement("div") as HtmlElement;
+			d2.Id = "B";
+			d1.AppendChild(d2);
+			d1.OnClick += e => sequence.Add("d1 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d1.AddEventListener("click", e => sequence.Add("d1 bubbling - " + e.EventPhase+((HtmlElement)e.CurrentTarget).Id), false);
+			d1.AddEventListener("click", e => sequence.Add("d1 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
+			d2.OnClick += e => sequence.Add("d2 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d2.AddEventListener("click", e => sequence.Add("d2 bubbling - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), false);
+			d2.AddEventListener("click", e => sequence.Add("d2 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
+
+			d2.Click();
+
+			Assert.AreEqual("d1 capture - 1A,d2 attr - 2B,d2 bubbling - 2B,d2 capture - 2B,d1 attr - 3A,d1 bubbling - 3A", 
+				string.Join(",", sequence));
+		}
+
+		[Test]
+		public void EventHandlingOrderNotBubblable()
+		{
+			var sequence = new List<string>();
+			var document = new Document();
+			var d1 = document.CreateElement("div") as HtmlElement;
+			d1.Id = "A";
+			var d2 = document.CreateElement("div") as HtmlElement;
+			d2.Id = "B";
+			d1.AppendChild(d2);
+			d1.OnClick += e => sequence.Add("d1 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d1.AddEventListener("click", e => sequence.Add("d1 bubbling - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), false);
+			d1.AddEventListener("click", e => sequence.Add("d1 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
+			d2.OnClick += e => sequence.Add("d2 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d2.AddEventListener("click", e => sequence.Add("d2 bubbling - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), false);
+			d2.AddEventListener("click", e => sequence.Add("d2 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
+
+			var evt = document.CreateEvent("Event");
+			evt.InitEvent("click", false, true);
+			d2.DispatchEvent(evt);
+
+			Assert.AreEqual("d1 capture - 1A,d2 attr - 2B,d2 bubbling - 2B,d2 capture - 2B",
+				string.Join(",", sequence));
 		}
 	}
 }

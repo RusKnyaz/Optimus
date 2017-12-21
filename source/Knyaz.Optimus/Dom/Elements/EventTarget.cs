@@ -7,9 +7,9 @@ namespace Knyaz.Optimus.Dom.Elements
 {
 	public class EventTarget : IEventTarget
 	{
-		private readonly IEventTarget _originalTarget;
+		private readonly IEventTarget _element;
 		private readonly Func<IEventTarget> _getParent;
-		readonly Dictionary<string, List<Action<Event>>> _listeners = new Dictionary<string, List<Action<Event>>>();
+		readonly Dictionary<string, List<Action<Event>>> _bubblingListeners = new Dictionary<string, List<Action<Event>>>();
 		readonly Dictionary<string, List<Action<Event>>> _capturingListeners = new Dictionary<string, List<Action<Event>>>();
 
 		public Func<object> _getLockObject;
@@ -22,41 +22,27 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public EventTarget(IEventTarget originalTarget, Func<IEventTarget> getParent, Func<object> getLockObject)
 		{
-			_originalTarget = originalTarget;
+			_element = originalTarget;
 			_getParent = getParent;
 			_getLockObject = getLockObject;
 		}
 
-		List<Action<Event>> GetListeners(string type)
-		{
-			return _listeners.ContainsKey(type) ? _listeners[type] : (_listeners[type] = new List<Action<Event>>());
-		}
+		List<Action<Event>> GetBubblingListeners(string type) =>
+			_bubblingListeners.ContainsKey(type) ? _bubblingListeners[type] : (_bubblingListeners[type] = new List<Action<Event>>());
 
-		List<Action<Event>> GetCapturingListeners(string type)
-		{
-			return _capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
-		}
+		List<Action<Event>> GetCapturingListeners(string type) =>
+			_capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
 
-		public void AddEventListener(string type, Action<Event> listener)
-		{
-			AddEventListener(type, listener, false);
-		}
+		public void AddEventListener(string type, Action<Event> listener) => AddEventListener(type, listener, false);
 
-		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
-		{
-			(useCapture ? GetCapturingListeners(type) : GetListeners(type)).Add(listener);
-		}
+		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
+			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Add(listener);
 
-		public void RemoveEventListener(string type, Action<Event> listener)
-		{
+		public void RemoveEventListener(string type, Action<Event> listener) =>
 			RemoveEventListener(type, listener, false);
-		}
 
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
-		{
-			//todo: test it
-			(useCapture ? GetCapturingListeners(type) : GetListeners(type)).Remove(listener);
-		}
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture) =>
+			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Remove(listener);
 
 		public event Action<Exception> HandlerException;
 
@@ -68,7 +54,7 @@ namespace Knyaz.Optimus.Dom.Elements
 
 			if (evt.Target == null)
 			{
-				evt.Target = _originalTarget;
+				evt.Target = _element;
 				evt.EventPhase = Event.CAPTURING_PHASE;
 			}
 
@@ -78,42 +64,62 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				if (parentTarget != null)
 				{
-
 					parentTarget.DispatchEvent(evt);
 
 					if (evt.IsPropagationStopped())
 						return !evt.Cancelled;
-
-					evt.CurrentTarget = _originalTarget;
-					NotifyListeners(evt, GetCapturingListeners);
 				}
-				else if(isOriginalTarget)
+
+				if (!isOriginalTarget)
 				{
 					NotifyListeners(evt, GetCapturingListeners);
-				}
 
-				if (evt.IsPropagationStopped() || !isOriginalTarget)
+					if (evt.IsPropagationStopped())
+						return !evt.Cancelled;
+				}
+			}
+
+			if (isOriginalTarget)
+			{
+				evt.EventPhase = Event.AT_TARGET;
+			}
+			else if(evt.EventPhase == Event.CAPTURING_PHASE)
+			{
+				return !evt.Cancelled;
+			}
+
+			if (evt.EventPhase == Event.AT_TARGET || evt.EventPhase == Event.BUBBLING_PHASE)
+			{
+				//direct subscribed event handlers (from attributes or element properties like div.onclick
+				evt.CurrentTarget = _element;
+				BeforeEventDispatch?.Invoke(evt);
+				if (evt.IsPropagationStopped())
+					return !evt.Cancelled;
+
+				NotifyListeners(evt, GetBubblingListeners);
+				if (evt.IsPropagationStopped())
 					return !evt.Cancelled;
 			}
 
-			evt.EventPhase = Event.AT_TARGET;
-			evt.CurrentTarget = _originalTarget;
+			if (isOriginalTarget)
+			{
+				NotifyListeners(evt, GetCapturingListeners);
+				if (evt.IsPropagationStopped())
+					return !evt.Cancelled;
+			}
 
-			NotifyListeners(evt, GetListeners);
-			
-			evt.EventPhase = Event.BUBBLING_PHASE;
-			BeforeEventDispatch?.Invoke(evt);
-
-			if (evt.Bubbles && !evt.IsPropagationStopped() && parentTarget != null)
+			if (evt.Bubbles && !evt.IsPropagationStopped() && parentTarget != null && evt.Bubbles)
+			{
+				evt.EventPhase = Event.BUBBLING_PHASE;
 				parentTarget.DispatchEvent(evt);
-
-			//todo: handle default action;
+			}
 
 			return !evt.Cancelled;
 		}
 
 		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listeners)
 		{
+			evt.CurrentTarget = _element;
 			lock (_getLockObject())
 			{
 				foreach (var listener in listeners(evt.Type))
@@ -124,8 +130,7 @@ namespace Knyaz.Optimus.Dom.Elements
 					}
 					catch (Exception e)
 					{
-						if (HandlerException != null)
-							HandlerException(e);
+						HandlerException?.Invoke(e);
 					}
 				}
 			}

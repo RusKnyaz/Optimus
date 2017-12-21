@@ -340,19 +340,14 @@ namespace Knyaz.Optimus.Dom
 		public event Action<Node, Exception> OnNodeException;
 		internal event Action<HtmlFormElement> OnFormSubmit;
 
-		internal void HandleNodeRemoved(Node parent, Node node)
-		{
-			if (NodeRemoved!= null)
-				NodeRemoved(parent, node);
-		}
+		internal void HandleNodeRemoved(Node parent, Node node) => NodeRemoved?.Invoke(parent, node);
 
 		internal void HandleNodeAdded(Node newChild)
 		{
 			if (!newChild.IsInDocument ())
 				return;
 
-			if (NodeInserted != null)
-				NodeInserted (newChild);
+			NodeInserted?.Invoke(newChild);
 
 			if (newChild.Source != NodeSources.DocumentBuilder)
 				RaiseDomNodeInserted(newChild);
@@ -360,26 +355,19 @@ namespace Knyaz.Optimus.Dom
 
 		private void RaiseDomNodeInserted(Node newChild)
 		{
-			if (DomNodeInserted != null)
-				DomNodeInserted(newChild);
+			DomNodeInserted?.Invoke(newChild);
 
 			var evt = (MutationEvent)CreateEvent("MutationEvent");
-			evt.InitMutationEvent("DOMNodeInserted", false, false, newChild.ParentNode, null, null, null, 0);
-			evt.Target = newChild;
-			DispatchEvent(evt);
+			evt.InitMutationEvent("DOMNodeInserted", true, false, newChild.ParentNode, null, null, null, 0);
+			newChild.DispatchEvent(evt);
 		}
 
 
-		internal void HandleNodeEventException(Node node, Exception exception)
-		{
+		internal void HandleNodeEventException(Node node, Exception exception) => 
 			OnNodeException?.Invoke(node, exception);
-		}
 
-		internal void HandleFormSubmit(HtmlFormElement htmlFormElement)
-		{
-			if (OnFormSubmit != null)
-				OnFormSubmit(htmlFormElement);
-		}
+		internal void HandleFormSubmit(HtmlFormElement htmlFormElement) => 
+			OnFormSubmit?.Invoke(htmlFormElement);
 
 		public string CompatMode => ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat";
 

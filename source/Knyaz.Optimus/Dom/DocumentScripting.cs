@@ -171,9 +171,8 @@ namespace Knyaz.Optimus.Dom
 			AfterScriptExecute?.Invoke(script);
 
 			var evt = script.OwnerDocument.CreateEvent("Event");
-			evt.InitEvent("AfterScriptExecute",false, false);
-			evt.Target = script;
-			script.OwnerDocument.DispatchEvent(evt);
+			evt.InitEvent("AfterScriptExecute",true, false);
+			script.DispatchEvent(evt);
 		}
 
 		private void RaiseBeforeScriptExecute(Script script)
@@ -181,9 +180,8 @@ namespace Knyaz.Optimus.Dom
 			BeforeScriptExecute?.Invoke(script);
 
 			var evt = script.OwnerDocument.CreateEvent("Event");
-			evt.InitEvent("BeforeScriptExecute", false, false);
-			evt.Target = script;
-			script.OwnerDocument.DispatchEvent(evt);
+			evt.InitEvent("BeforeScriptExecute", true, false);
+			script.DispatchEvent(evt);
 		}
 
 		/// <summary>

@@ -60,5 +60,23 @@
             subDiv.click();
             Assert.AreEqual("HI", d.innerHTML);
         }
+    },
+    "EventHandlingOrder": {
+        run: function () {
+            var sequence = [];
+            var d1 = document.createElement("div");
+            d1.id = "A";
+            var d2 = document.createElement("div");
+            d2.id = "B";
+            d1.appendChild(d2);
+            d1.onclick = function (e) { sequence.push('d1 attr - ' + e.eventPhase + e.currentTarget.id); };
+            d1.addEventListener("click", function (e) { sequence.push('d1 bubbling - ' + e.eventPhase + e.currentTarget.id) }, false);
+            d1.addEventListener("click", function (e) { sequence.push('d1 capture - ' + e.eventPhase + e.currentTarget.id) }, true);
+            d2.onclick = function (e) { sequence.push('d2 attr - ' + e.eventPhase + e.currentTarget.id); };
+            d2.addEventListener("click", function (e) { sequence.push('d2 bubbling - ' + e.eventPhase + e.currentTarget.id) }, false);
+            d2.addEventListener("click", function (e) { sequence.push('d2 capture - ' + e.eventPhase + e.currentTarget.id) }, true);
+            d2.click();
+            Assert.AreEqual("d1 capture - 1A,d2 attr - 2B,d2 bubbling - 2B,d2 capture - 2B,d1 attr - 3A,d1 bubbling - 3A", sequence.toString());
+        }
     }
 });

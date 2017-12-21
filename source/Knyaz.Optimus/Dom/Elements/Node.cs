@@ -19,16 +19,22 @@ namespace Knyaz.Optimus.Dom.Elements
 	public abstract class Node : INode, IEventTarget
 	{
 		protected EventTarget EventTarget;
-
 		internal NodeSources Source;
 
 		protected Node(Document ownerDocument)
 		{
 			_ownerDocument = ownerDocument;
 			ChildNodes = new List<Node>();
-			EventTarget = new EventTarget(this, () => ParentNode, () => OwnerDocument ?? this as Document);
+			EventTarget = new EventTarget(this, () => ParentNode?.EventTarget, () => OwnerDocument ?? this as Document);
 		}
-	
+
+		protected Node()
+		{
+			ChildNodes = new List<Node>();
+			NodeType = _NODE;
+			EventTarget = new EventTarget(this, () => ParentNode?.EventTarget, () => OwnerDocument ?? this as Document);
+		}
+
 		private Document _ownerDocument;
 
 		public virtual Document OwnerDocument
@@ -82,12 +88,7 @@ namespace Knyaz.Optimus.Dom.Elements
 				node.ParentNode.ChildNodes.Remove(node);
 		}
 
-		protected Node()
-		{
-			ChildNodes = new List<Node>();
-			NodeType = _NODE;
-		}
-
+		
 		/// <summary>
 		/// Gets a live collection of child nodes of the given element.
 		/// </summary>
