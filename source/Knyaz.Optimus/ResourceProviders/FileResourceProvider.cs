@@ -5,13 +5,19 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+	/// <summary>
+	/// Allows to request files content from file system.
+	/// </summary>
 	class FileResourceProvider : ISpecResourceProvider
 	{
-		public IRequest CreateRequest(string url)
-		{
-			return new FileRequest(url);
-		}
+		/// <summary>
+		/// Creates resource request.
+		/// </summary>
+		public IRequest CreateRequest(string url) => new FileRequest(url);
 
+		/// <summary>
+		/// Requests file resource..
+		/// </summary>
 		public Task<IResource> SendRequestAsync(IRequest request)
 		{
 			var uri = new Uri(request.Url);
@@ -31,15 +37,9 @@ namespace Knyaz.Optimus.ResourceProviders
 		}
 	}
 
-	public interface ISpecResourceProvider
-	{
-		IRequest CreateRequest(string url);
-		Task<IResource> SendRequestAsync(IRequest request);
-	}
-
 	class FileResponse : IResource
 	{
-		public FileResponse(string type, Stream stream)
+		internal FileResponse(string type, Stream stream)
 		{
 			Type = type;
 			Stream = stream;
@@ -51,11 +51,8 @@ namespace Knyaz.Optimus.ResourceProviders
 
 	class FileRequest : IRequest
 	{
-		public FileRequest(string url)
-		{
-			Url = url;
-		}
+		public FileRequest(string url) => Url = url;
 
-		public string Url { get; private set; }
+		public string Url { get; }
 	}
 }

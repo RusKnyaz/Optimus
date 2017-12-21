@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// </summary>
 	public sealed class HtmlTableSectionElement : HtmlElement
 	{
-		public HtmlTableSectionElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
+		internal HtmlTableSectionElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
 		{
 			Rows = new HtmlCollection(() => ChildNodes.OfType<HtmlTableRowElement>());
 		}
@@ -52,7 +52,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// The collection of rows in this table section.
 		/// </summary>
-		public HtmlCollection Rows { get; private set; }
+		public HtmlCollection Rows { get; }
 
 		/// <summary>
 		/// Vertical alignment of data in cells.

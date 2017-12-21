@@ -362,7 +362,7 @@ client.send();"));
 
 			Thread.Sleep(1000);
 
-			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync(It.IsAny<HttpRequest>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once());
 			CollectionAssert.AreEqual(new[] {"1", "4", "200", "hello"}, log);
 		}
 

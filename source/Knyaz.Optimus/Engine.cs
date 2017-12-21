@@ -159,7 +159,7 @@ namespace Knyaz.Optimus
 					}
 				}
 
-				var response = await ResourceProvider.GetResourceAsync(request);
+				var response = await ResourceProvider.SendRequestAsync(request);
 
 				//what should we do if the frame is not found?
 				if (response.Type == ResourceTypes.Html)

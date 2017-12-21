@@ -232,38 +232,68 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public abstract string NodeName { get; }
 
+		#region .    constants    .
+		/// <summary>
+		/// 1
+		/// </summary>
 		public const ushort ELEMENT_NODE = 1;
+		/// <summary>
+		/// 2
+		/// </summary>
 		public const ushort _NODE = 2;
+		/// <summary>
+		/// 3
+		/// </summary>
 		public const ushort TEXT_NODE = 3;
+		/// <summary>
+		/// 4
+		/// </summary>
 		public const ushort CDATA_SECTION_NODE = 4;
+		/// <summary>
+		/// 5
+		/// </summary>
 		public const ushort ENTITY_REFERENCE_NODE = 5;
+		/// <summary>
+		/// 6
+		/// </summary>
 		public const ushort ENTITY_NODE = 6;
+		/// <summary>
+		/// 7
+		/// </summary>
 		public const ushort PROCESSING_INSTRUCTION_NODE = 7;
+		/// <summary>
+		/// 8
+		/// </summary>
 		public const ushort COMMENT_NODE = 8;
+		/// <summary>
+		/// 9
+		/// </summary>
 		public const ushort DOCUMENT_NODE = 9;
+		/// <summary>
+		/// 10
+		/// </summary>
 		public const ushort DOCUMENT_TYPE_NODE = 10;
+		/// <summary>
+		/// 11
+		/// </summary>
 		public const ushort DOCUMENT_FRAGMENT_NODE = 11;
+		/// <summary>
+		/// 12
+		/// </summary>
 		public const ushort NOTATION_NODE = 12;
+		#endregion
 
-		public void AddEventListener(string type, Action<Event> listener)
-		{
+		public void AddEventListener(string type, Action<Event> listener) =>
 			EventTarget.AddEventListener(type,  listener);
-		}
 
-		public void AddEventListener(string type, Action<Event> listener, bool useCapture)
-		{
+		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
 			EventTarget.AddEventListener(type, listener, useCapture);
-		}
 
-		public void RemoveEventListener(string type, Action<Event> listener)
-		{
+		public void RemoveEventListener(string type, Action<Event> listener) =>
 			EventTarget.RemoveEventListener(type, listener);
-		}
 
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture)
-		{
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture) =>
 			EventTarget.RemoveEventListener(type, listener, useCapture);
-		}
 
 		/// <summary>
 		/// This method allows the dispatch of events into the implementations event model. 

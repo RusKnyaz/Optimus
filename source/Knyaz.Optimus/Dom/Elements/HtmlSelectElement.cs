@@ -15,7 +15,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			SelectedOptions = new List<HtmlOptionElement>();
 		}
 
-		//todo: revise insertChild
+		/// <summary>
+		/// Adds new 'OPTION' nodes to the dropdown. Other nodes types are ignored.
+		/// </summary>
 		public override Node AppendChild(Node node)
 		{
 			var option = node as HtmlOptionElement;
@@ -28,6 +30,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			return base.AppendChild(node);
 		}
 
+		/// <summary>
+		/// Adds an element to the collection of option elements for this select element.
+		/// </summary>
+		/// <param name="option">The element to be added.</param>
+		/// <param name="before">An element of the collection, should be inserted before.</param>
 		public void Add(HtmlOptionElement option, HtmlOptionElement before = null)
 		{
 			if (before == null)
@@ -36,6 +43,18 @@ namespace Knyaz.Optimus.Dom.Elements
 				InsertBefore(option, before);
 		}
 
+		/// <summary>
+		/// Adds an element to the collection of option elements for this select element.
+		/// </summary>
+		/// <param name="option">The element to be added.</param>
+		/// <param name="index">The index, representing the item item should be inserted before.</param>
+		public void Add(HtmlOptionElement option, long index) =>
+			InsertBefore(option, Options[index]);
+		
+		/// <summary>
+		/// Removes the option from specified position.
+		/// </summary>
+		/// <param name="index">Position of option to be removed.</param>
 		public void Remove(int index)
 		{
 			var options = Options;
