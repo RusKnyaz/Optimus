@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Linq;
+﻿using System.Linq;
 using Knyaz.Optimus.Dom;
 using NUnit.Framework;
 using Knyaz.Optimus.Tools;
@@ -20,4 +19,3 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 	}
 }
-#endif

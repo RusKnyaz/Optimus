@@ -8,7 +8,7 @@ using Knyaz.Optimus.Html;
 using NUnit.Framework;
 using R = Knyaz.Optimus.Tests.Resources.Resources;
 
-namespace Knyaz.Optimus.Tests.HtmlReader
+namespace Knyaz.Optimus.Tests.Performance
 {
 	[TestFixture]
 	public class HtmlReaderPerfTests
@@ -17,7 +17,7 @@ namespace Knyaz.Optimus.Tests.HtmlReader
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(str)))
 			{
-				return Knyaz.Optimus.Html.HtmlReader.Read(stream).ToList();
+				return HtmlReader.Read(stream).ToList();
 			}
 		}
 

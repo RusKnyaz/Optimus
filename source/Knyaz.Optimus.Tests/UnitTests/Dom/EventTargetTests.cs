@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using Knyaz.Optimus.Dom.Elements;
+﻿using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
 using Moq;
@@ -72,4 +71,3 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 	}
 }
-#endif

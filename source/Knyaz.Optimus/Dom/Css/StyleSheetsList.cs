@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Knyaz.Optimus.Dom.Css;
 
-namespace Knyaz.Optimus.Tests.Dom
+namespace Knyaz.Optimus.Dom.Css
 {
 	/// <summary>
 	/// Collection of style sheets.

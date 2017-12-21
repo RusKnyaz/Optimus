@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -124,11 +123,9 @@ namespace Knyaz.Optimus.Tests.Html
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
 			{
-				var result = ((IEnumerable<HtmlChunk>) HtmlReader.Read(stream).ToList()).ToArray();
+				var result = ((IEnumerable<HtmlChunk>)HtmlReader.Read(stream).ToList()).ToArray();
 				return string.Join(", ", result.Select(x => x.Type + ":" + x.Value).ToArray());
 			}
 		}
 	}
 }
-
-#endif

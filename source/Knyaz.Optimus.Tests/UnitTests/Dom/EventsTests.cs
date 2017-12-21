@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
@@ -55,4 +54,3 @@ namespace Knyaz.Optimus.Tests.Dom
 		//todo: test default event handlers
 	}
 }
-#endif

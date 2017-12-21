@@ -1,5 +1,4 @@
-﻿﻿#if NUNIT
-using Knyaz.Optimus.ResourceProviders;
+﻿using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 
@@ -31,4 +30,3 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 				.Assert(request => request.Url == result);
 	}
 }
-#endif

@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Linq;
+﻿using System.Linq;
 using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 
@@ -23,4 +22,3 @@ namespace Knyaz.Optimus.Tests
 		}
 	}
 }
-#endif

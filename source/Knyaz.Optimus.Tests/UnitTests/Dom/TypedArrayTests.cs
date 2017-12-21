@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using Knyaz.Optimus.Dom.Perf;
+﻿using Knyaz.Optimus.Dom.Perf;
 using NUnit.Framework;
 using System;
 
@@ -103,4 +102,3 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 	}
 }
-#endif

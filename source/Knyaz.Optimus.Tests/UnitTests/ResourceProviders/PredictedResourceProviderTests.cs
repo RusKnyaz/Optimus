@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
 using NUnit.Framework;
@@ -71,4 +70,3 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 		}
 	}
 }
-#endif

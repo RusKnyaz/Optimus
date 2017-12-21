@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom;
@@ -124,4 +123,3 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 	}
 }
-#endif

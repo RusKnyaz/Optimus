@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -121,4 +120,3 @@ namespace Knyaz.Optimus.Tests
 		}
 	}
 }
-#endif

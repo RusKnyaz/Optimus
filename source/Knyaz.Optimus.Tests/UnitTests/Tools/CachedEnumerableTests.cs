@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Tools;
 using NUnit.Framework;
@@ -50,4 +49,3 @@ namespace Knyaz.Optimus.Tests.Tools
 		}
 	}
 }
-#endif

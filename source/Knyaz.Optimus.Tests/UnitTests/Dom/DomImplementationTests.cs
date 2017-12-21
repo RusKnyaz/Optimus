@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using Knyaz.Optimus.Dom;
+﻿using Knyaz.Optimus.Dom;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -15,4 +14,3 @@ namespace Knyaz.Optimus.Tests.Dom
 				doc.Body != null);
     }
 }
-#endif

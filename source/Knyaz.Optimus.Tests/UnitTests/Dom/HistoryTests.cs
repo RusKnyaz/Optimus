@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using Knyaz.Optimus.Dom;
+﻿using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
@@ -94,4 +93,3 @@ namespace Knyaz.Optimus.Tests.Dom
 		//Go(0), Go(-1), Go(+1), Go(x)
 	}
 }
-#endif

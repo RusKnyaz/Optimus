@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using Knyaz.Optimus.Dom.Css;
+﻿using Knyaz.Optimus.Dom.Css;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom.Css
@@ -108,4 +107,3 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 	}
 }
-#endif

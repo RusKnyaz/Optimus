@@ -1,5 +1,4 @@
-﻿#if NUNIT
-using System.Linq;
+﻿using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
@@ -15,8 +14,8 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void SetUp() => _document = new Document();
 
 		[Test]
-		public void Document() => 
-			new Document().Assert(document => 
+		public void Document() =>
+			new Document().Assert(document =>
 				document.OwnerDocument == null &&
 				document.ParentNode == null);
 
@@ -63,7 +62,7 @@ namespace Knyaz.Optimus.Tests.Dom
 
 			Assert.AreEqual(1, div1.ChildNodes.Count);
 			Assert.AreEqual(0, div2.ChildNodes.Count);
-			div2.AppendChild(span); 
+			div2.AppendChild(span);
 			Assert.AreEqual(0, div1.ChildNodes.Count);
 			Assert.AreEqual(1, div2.ChildNodes.Count);
 		}
@@ -75,7 +74,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			document.Write("<html><body><div id='p1'><span id='s'></span></div></body></html>");
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
-			
+
 			Assert.AreEqual(1, div1.ChildNodes.Count, "Child nodes count before inserting");
 			Assert.AreEqual(1, document.Body.ChildNodes.Count);
 			document.Body.InsertBefore(span, div1);
@@ -91,7 +90,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
 			var span = document.GetElementById("s");
 
-			document.Assert(doc => 
+			document.Assert(doc =>
 				doc.Body.ChildNodes.Count == 1 &&
 				doc.GetElementById("p1").ChildNodes.Count == 1 &&
 				doc.GetElementById("s").ChildNodes.Count == 1);
@@ -141,7 +140,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(document, x.OwnerDocument);
 			Assert.IsNull(x.ParentNode);
 		}
-		
+
 		[Test]
 		public void HeadBody()
 		{
@@ -163,14 +162,14 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			var document = new Document();
 			document.Write("<html><head><meta></head><body>" +
-			               "<div class='a' id='d1'></div>" +
-			               "<div class = 'b' id = 'd2'></div>" +
-			               "<div class='a b' id='d3'></div></body></html>");
+						   "<div class='a' id='d1'></div>" +
+						   "<div class = 'b' id = 'd2'></div>" +
+						   "<div class='a b' id='d3'></div></body></html>");
 
 			var result = document.GetElementsByClassName("a");
 
 			Assert.AreEqual(2, result.Length);
-			CollectionAssert.AreEqual(new[] { document.GetElementById("d1"), document.GetElementById("d3") },  result);
+			CollectionAssert.AreEqual(new[] { document.GetElementById("d1"), document.GetElementById("d3") }, result);
 		}
 
 		[Test]
@@ -234,10 +233,10 @@ namespace Knyaz.Optimus.Tests.Dom
 			Div("<a href='\nbar'></a>").Assert(e => ((HtmlElement)e.FirstChild).GetAttribute("href") == "\nbar");
 			Div("<!DOCTYPE html>").Assert(e => e.FirstChild == null);
 
-			Div("<?import namespace=\"foo\" implementation=\"#bar\">").Assert(e => 
+			Div("<?import namespace=\"foo\" implementation=\"#bar\">").Assert(e =>
 				((CharacterData)e.FirstChild).NodeValue == "?import namespace=\"foo\" implementation=\"#bar\"" &&
 				e.FirstChild.NodeType == 8);
-			
+
 			Div("<!--foo--bar-->").Assert(e => e.FirstChild.NodeType == 8 && ((Comment)e.FirstChild).NodeValue == "foo--bar");
 
 			Div("<![CDATA[x]]>").Assert(e => e.FirstChild.NodeType == 8 && ((Comment)e.FirstChild).NodeValue == "[CDATA[x]]");
@@ -312,7 +311,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void InnerHtml()
 		{
 			var doc = new Document();
-			doc.Head.InnerHTML=("<script>var a = 5;</script>");
+			doc.Head.InnerHTML = ("<script>var a = 5;</script>");
 			Assert.AreEqual("<HEAD><SCRIPT>var a = 5;</SCRIPT></HEAD><BODY></BODY>", doc.DocumentElement.InnerHTML);
 		}
 
@@ -326,4 +325,3 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 	}
 }
-#endif
