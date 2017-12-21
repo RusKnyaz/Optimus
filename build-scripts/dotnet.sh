@@ -11,7 +11,10 @@ echo "Starting build of version: $version, fileVersion: $fileversion"
 echo "Step 1. Clean"
 /bin/rm -f source/Knyaz.Optimus/test-results/*
 /bin/rm -f source/Knyaz.Optimus.Tests/test-results/*
-/bin/rm -f -r source/Knyaz.Optimus/bin/*
+/bin/rm -rf source/Knyaz.Optimus/bin/*
+/bin/rm -rf source/Knyaz.Optimus/obj/*
+/bin/rm -rf source/Knyaz.Optimus.Tests/bin/*
+/bin/rm -rf source/Knyaz.Optimus.Tests/obj/*
 echo "Step 2. Restore packages"
 /usr/bin/dotnet restore source/Knyaz.Optimus/Knyaz.Optimus.csproj
 /usr/bin/dotnet restore source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj
