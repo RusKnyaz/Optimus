@@ -8,6 +8,7 @@ using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Tools;
+using Jint.Native;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -22,7 +23,7 @@ namespace Knyaz.Optimus.Dom
 		private readonly IScriptExecutor _scriptExecutor;
 
 		internal DocumentScripting (
-			IDocument document, 
+			Document document, 
 			IScriptExecutor scriptExecutor,
 			IResourceProvider resourceProvider)
 		{
@@ -31,7 +32,13 @@ namespace Knyaz.Optimus.Dom
 			_resourceProvider = resourceProvider;
 			document.NodeInserted += OnDocumentNodeInserted;
 			document.DomContentLoaded += OnDocumentDomContentLoaded;
+			document.OnHandleNodeScript += OnHandleNodeScript;
 			_unresolvedDelayedResources = new Queue<Tuple<Task, Script>>();
+		}
+
+		private void OnHandleNodeScript(Event evt, string handlerCode)
+		{
+			_scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + ";}", evt);
 		}
 
 		void OnDocumentNodeInserted (Node node)

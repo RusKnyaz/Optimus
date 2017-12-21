@@ -44,10 +44,20 @@
         }
     },
     "SetOnClickAttribute":{
-        fun:function () {
+        run:function () {
             var d = document.createElement('div');
             d.setAttribute('onclick','event.currentTarget.innerHTML="HI"');
             d.click();
+            Assert.AreEqual("HI", d.innerHTML);
+        }
+    },
+    "SetOnClickAttributePropogation": {
+        run: function () {
+            var d = document.createElement('div');
+            var subDiv = document.createElement('div');
+            d.setAttribute('onclick', 'event.currentTarget.innerHTML="HI"');
+            d.appendChild(subDiv);
+            subDiv.click();
             Assert.AreEqual("HI", d.innerHTML);
         }
     }

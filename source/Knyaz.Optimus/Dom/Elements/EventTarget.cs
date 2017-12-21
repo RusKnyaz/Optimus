@@ -60,6 +60,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public event Action<Exception> HandlerException;
 
+		public event Action<Event> BeforeEventDispatch;
+
 		public virtual bool DispatchEvent(Event evt)
 		{
 			bool isOriginalTarget = evt.Target == null;
@@ -100,6 +102,8 @@ namespace Knyaz.Optimus.Dom.Elements
 			NotifyListeners(evt, GetListeners);
 			
 			evt.EventPhase = Event.BUBBLING_PHASE;
+			BeforeEventDispatch?.Invoke(evt);
+
 			if (evt.Bubbles && !evt.IsPropagationStopped() && parentTarget != null)
 				parentTarget.DispatchEvent(evt);
 

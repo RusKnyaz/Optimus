@@ -372,8 +372,7 @@ namespace Knyaz.Optimus.Dom
 
 		internal void HandleNodeEventException(Node node, Exception exception)
 		{
-			if (OnNodeException != null)
-				OnNodeException(node, exception);
+			OnNodeException?.Invoke(node, exception);
 		}
 
 		internal void HandleFormSubmit(HtmlFormElement htmlFormElement)
@@ -407,5 +406,18 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>The Readonly collection of found elements.</returns>
 		public override IReadOnlyList<IElement> QuerySelectorAll(string query) => new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
+
+		/// <summary>
+		/// Document nodes call this method when execution of some event handler script required. 
+		/// For example when clicked on the node with attribute onclick='callFunc()'.
+		/// </summary>
+		/// <param name="evt"></param>
+		/// <param name="code"></param>
+		internal void HandleNodeScript(Event evt, string code) => OnHandleNodeScript?.Invoke(evt, code);
+
+		/// <summary>
+		/// Called when execution of some code inside attribute event handler requred.
+		/// </summary>
+		internal event Action<Event, string> OnHandleNodeScript;
 	}
 }

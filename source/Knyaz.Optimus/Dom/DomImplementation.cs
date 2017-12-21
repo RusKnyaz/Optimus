@@ -24,8 +24,6 @@ namespace Knyaz.Optimus.Dom
 		    doc.AppendChild(docType);
 		    return doc;
 	    } 
-			
-
 
 		/// <summary>
 		/// Creates a DocumentType object.

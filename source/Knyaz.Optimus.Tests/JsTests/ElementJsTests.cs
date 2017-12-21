@@ -14,6 +14,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AttributesLength")]
 		[TestCase("AttributesGetByName")]
 		[TestCase("SetOnClickAttribute")]
+		[TestCase("SetOnClickAttributePropogation")]
 		public void Run(string testName)
 		{
 			JsTestsRunner.Run("ElementTests", testName);
