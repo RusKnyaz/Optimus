@@ -800,7 +800,7 @@ dispatchEvent(evt);");
 		[Test]
 		public void OnLoad()
 		{
-			_engine.Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad'></body></html>");
+			_engine.Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad()'></body></html>");
 			
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}

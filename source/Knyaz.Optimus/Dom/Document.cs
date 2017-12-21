@@ -154,15 +154,20 @@ namespace Knyaz.Optimus.Dom
 		{
 			ReadyState = DocumentReadyStates.Interactive;
 
-			if (DomContentLoaded != null)
-				DomContentLoaded (this);
+			DomContentLoaded?.Invoke(this);
 
 			Trigger("DOMContentLoaded");
 			//todo: check is it right
 			ReadyState = DocumentReadyStates.Complete;
 
-			//todo: we should fire this event properly
-			Trigger("load");
+			//onload event
+			var evt = CreateEvent("Event");
+			evt.InitEvent("load", false, false);
+			lock (this)
+			{
+				//todo: deadlock possible if event raised from js
+				Body.DispatchEvent(evt);
+			}
 		}
 
 		private void Trigger(string type)
