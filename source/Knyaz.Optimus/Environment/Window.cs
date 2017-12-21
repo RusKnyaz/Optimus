@@ -15,7 +15,7 @@ namespace Knyaz.Optimus.Environment
 		private readonly Engine _engine;
 		private readonly EventTarget _eventTarget;
 
-		internal WindowTimers Timers => _timers;
+		public WindowTimers Timers => _timers;
 
 		internal Window(Func<object> getSyncObj, Engine engine)
 		{

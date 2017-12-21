@@ -5,6 +5,7 @@ using System.Text;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Tools;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.Dom.Events;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -24,7 +25,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			_classList.Changed += () => {
 				ClassName = string.Join(" ", _classList);
 			};
+
+			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
 		}
+
+		protected virtual void BeforeEventDispatch(Event obj) {}
 
 		/// <summary>
 		/// Returns a collection of the specified node's attributes.

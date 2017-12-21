@@ -53,6 +53,7 @@ namespace Knyaz.Optimus.Dom.Events
 
 		//todo: implement remains properties
 		//todo: do something with const in js
+		public const ushort NOT_STARTED = 0;
 		public const ushort CAPTURING_PHASE                = 1;
 		public const ushort AT_TARGET = 2;
 		public const ushort BUBBLING_PHASE = 3;

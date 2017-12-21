@@ -169,6 +169,54 @@ namespace Knyaz.Optimus.Dom.Perf
 			return Convert.ToInt16(val);
 		}
 	}
+	
+	/// <summary>
+	/// 32-bit integer array.
+	/// </summary>
+	public class Int32Array : TypedArray<int>
+	{
+		public Int32Array(ArrayBuffer buffer) : base(buffer) { }
+		public Int32Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public Int32Array(int[] data) : base(data) { }
+		public Int32Array Subarray(long begin, long? end) => new Int32Array(GetSub(begin, end));
+		protected override int GetData(int index)	=> BitConverter.ToInt32(_data, index);
+		protected override byte[] GetBytes(int val) => BitConverter.GetBytes(val);
+		public static string Name => "Int8Array";
+
+		static int FromObject(object val)
+		{
+			if (val is double d)
+				return (int)d;
+			else if (val is int u)
+				return u;
+
+			return Convert.ToInt32(val);
+		}
+	}
+	
+	/// <summary>
+	/// 32-bit integer array.
+	/// </summary>
+	public class UInt32Array : TypedArray<uint>
+	{
+		public UInt32Array(ArrayBuffer buffer) : base(buffer) { }
+		public UInt32Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public UInt32Array(uint[] data) : base(data) { }
+		public UInt32Array Subarray(long begin, long? end) => new UInt32Array(GetSub(begin, end));
+		protected override uint GetData(int index)	=> BitConverter.ToUInt32(_data, index);
+		protected override byte[] GetBytes(uint val) => BitConverter.GetBytes(val);
+		public static string Name => "Int8Array";
+
+		static uint FromObject(object val)
+		{
+			if (val is double d)
+				return (uint)d;
+			else if (val is uint u)
+				return u;
+
+			return Convert.ToUInt32(val);
+		}
+	}
 
 	/// <summary>
 	/// 16-bit unsigned integer
@@ -191,6 +239,54 @@ namespace Knyaz.Optimus.Dom.Perf
 				return u;
 
 			return Convert.ToUInt16(val);
+		}
+	}
+
+	/// <summary>
+	/// float 32 (single) array.
+	/// </summary>
+	public class Float32Array : TypedArray<float>
+	{
+		public Float32Array(ArrayBuffer buffer) : base(buffer) { }
+		public Float32Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public Float32Array(float[] data) : base(data) { }
+		public Float32Array Subarray(long begin, long? end) => new Float32Array(GetSub(begin, end));
+		protected override float GetData(int index) => BitConverter.ToSingle(_data, index);
+		protected override byte[] GetBytes(float val) => BitConverter.GetBytes(val);
+		public static string Name => "Float32Array";
+
+		static float FromObject(object val)
+		{
+			switch (val)
+			{
+				case double d: return (float)d;
+				case float u: return u;
+				default: return Convert.ToSingle(val);
+			}
+		}
+	}
+	
+	/// <summary>
+	/// float 64 (double) array.
+	/// </summary>
+	public class Float64Array : TypedArray<double>
+	{
+		public Float64Array(ArrayBuffer buffer) : base(buffer) { }
+		public Float64Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
+		public Float64Array(double[] data) : base(data) { }
+		public Float64Array Subarray(long begin, long? end) => new Float64Array(GetSub(begin, end));
+		protected override double GetData(int index) => BitConverter.ToDouble(_data, index);
+		protected override byte[] GetBytes(double val) => BitConverter.GetBytes(val);
+		public static string Name => "Float64Array";
+
+		static double FromObject(object val)
+		{
+			switch (val)
+			{
+				case double d: return d;
+				case float u: return u;
+				default: return Convert.ToSingle(val);
+			}
 		}
 	}
 }

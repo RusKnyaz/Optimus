@@ -26,6 +26,18 @@ namespace Knyaz.Optimus.Tests
 				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(Encoding.UTF8.GetBytes(data)), null)));
 			return resourceProvider;
 		}
+		
+		public static ISpecResourceProvider Resource(this ISpecResourceProvider resourceProvider, string url, string data)
+		{
+			var request = new HttpRequest("GET", url);
+
+			Mock.Get(resourceProvider)
+				.Setup(x => x.CreateRequest(url)).Returns(request);
+			Mock.Get(resourceProvider)
+				.Setup(x => x.SendRequestAsync(request))
+				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(Encoding.UTF8.GetBytes(data)), null)));
+			return resourceProvider;
+		}
 
 		public static string Page(string script)
 		{

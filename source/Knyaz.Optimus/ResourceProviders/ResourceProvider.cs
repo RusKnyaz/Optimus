@@ -15,9 +15,15 @@ namespace Knyaz.Optimus.ResourceProviders
 		public event EventHandler<ReceivedEventArguments> Received;
 
 		public ResourceProvider() 
+		:this(new HttpResourceProvider(
+				new CookieContainer()), new FileResourceProvider())
+		{}
+
+		public ResourceProvider(ISpecResourceProvider httpResourceProvider,
+			ISpecResourceProvider fileResourceProvider)
 		{
-			HttpResourceProvider = new HttpResourceProvider(new CookieContainer());
-			FileResourceProvider = new FileResourceProvider();
+			HttpResourceProvider = httpResourceProvider;
+			FileResourceProvider = fileResourceProvider;
 		}
 
 		protected ISpecResourceProvider FileResourceProvider { get; private set; }
@@ -62,9 +68,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (uri.Substring(0, 2) == "./")
 				uri = uri.Remove(0, 2);
 
-			var root = Root == null || Root.Last() == '/' ? Root : Root + "/";
-
-			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(root), uri);
+			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 		}
 
 		public Task<IResource> GetResourceAsync(IRequest req)

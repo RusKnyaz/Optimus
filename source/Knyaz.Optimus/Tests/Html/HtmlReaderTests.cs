@@ -65,6 +65,8 @@ namespace Knyaz.Optimus.Tests.Html
 			"TagStart:head, Text:\n\n\t, TagStart:script, Text:somecode, TagEnd:script, TagEnd:head")]
 		[TestCase("\u000D", "Text:\u000A")]
 		[TestCase("<div class=A>1</div>", "TagStart:div, AttributeName:class, AttributeValue:A, Text:1, TagEnd:div")]
+		[TestCase("<script>var bar = 2/1 + '/';</script><body></body>", "TagStart:script, Text:var bar = 2/1 + '/';, TagEnd:script, TagStart:body, TagEnd:body")]
+		[TestCase("<script>var bar = (2)/1 + '/';</script><body></body>", "TagStart:script, Text:var bar = (2)/1 + '/';, TagEnd:script, TagStart:body, TagEnd:body")]
 		public void ReadString(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));

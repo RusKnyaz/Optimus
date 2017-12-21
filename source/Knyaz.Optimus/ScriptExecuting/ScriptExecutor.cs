@@ -8,6 +8,7 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.Dom.Interfaces;
+using System.Linq;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -57,6 +58,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddClrType("Uint8Array", typeof(UInt8Array));
 			AddClrType("Int16Array", typeof(Int16Array));
 			AddClrType("Uint16Array", typeof(UInt16Array));
+			AddClrType("Int32Array", typeof(Int32Array));
+			AddClrType("Uint32Array", typeof(UInt32Array));
+			AddClrType("Float32Array", typeof(Float32Array));
+			AddClrType("Float64Array", typeof(Float64Array));
 			AddClrType("DataView", typeof(DataView));
 
 			AddGlobalGetter("console", () => engine.Console);
@@ -108,7 +113,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalFunc("getComputedStyle", (value, values) =>
 			{
 				var elt = (ClrObject) values[0].AsObject();
-				var res = engine.Window.GetComputedStyle((IElement)elt.Target, values.Length > 1 ? values[1].AsString() : null);
+				var res = engine.Window.GetComputedStyle((IElement)elt.Target, values.Length > 1 ? values[1].TryCast<string>() : null);
 				return new JsValue(new ClrObject(_jsEngine, res));
 			});
 			
@@ -199,7 +204,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				try
 				{
-					return _jsEngine.Execute(code).GetCompletionValue().ToObject();
+					var res = _jsEngine.Execute(code).GetCompletionValue().ToObject();
+
+					if(res is Func<JsValue, JsValue[], JsValue> func)
+					{
+						return (Func<object[], object>)((args) =>
+							func(JsValue.Null, args.Select(x => JsValue.FromObject(_jsEngine, x)).ToArray()));
+					}
+
+					return res;
 				}
 				catch (JavaScriptException e)
 				{
@@ -214,6 +227,27 @@ namespace Knyaz.Optimus.ScriptExecuting
 		public void Clear()
 		{
 			CreateEngine(_engine);
+		}
+
+		public object EvalFuncAndCall(string code, params object[] args)
+		{
+			var funcCode = "(function(){ return "+code+";})()";
+
+			var func = Evaluate("text/javascript", funcCode) as Func<object[], object>;
+
+			try
+			{
+				return func(args);
+			}
+			catch (JavaScriptException e)
+			{
+				OnException?.Invoke(new ScriptExecutingException(e.Error.ToString(), e, code));
+			}
+			catch (Exception e)
+			{
+				OnException?.Invoke(e);
+			}
+			return null;
 		}
 	}
 

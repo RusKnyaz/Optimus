@@ -32,6 +32,7 @@
     <None Remove="Resources\template.js" />
     <None Remove="Resources\text.js" />
     <None Remove="Resources\ya.js" />
+    <None Remove="Resources\JsTests\DocumentFragmentTests.js" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\jquery-2.1.3.js" />
@@ -40,6 +41,7 @@
     <EmbeddedResource Include="Resources\JsTests\DataViewTests.js" />
     <EmbeddedResource Include="Resources\JsTests\DocumentTests.js" />
     <EmbeddedResource Include="Resources\JsTests\ElementTests.js" />
+    <EmbeddedResource Include="Resources\JsTests\DocumentFragmentTests.js" />
     <EmbeddedResource Include="Resources\JsTests\NodeTests.js" />
     <EmbeddedResource Include="Resources\knockout.js" />
     <EmbeddedResource Include="Resources\requirejs.js" />
