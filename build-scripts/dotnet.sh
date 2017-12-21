@@ -22,7 +22,7 @@ echo "Step 3. Build Knyaz.Optimus"
 echo "Step 4. Build Knyaz.Optimus.Tests"
 /usr/bin/dotnet build source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Release -v n
 echo "Step 5. Run tests"
-/usr/bin/dotnet test source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/ -f netcoreapp2.0 -r test-results --logger "trx;LogFileName=Optimus.netcore.trx"
+/usr/bin/dotnet test source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/ -f netcoreapp2.0 -r test-results --logger "trx;LogFileName=Optimus.netcore.trx" -c Release
 if [ "$versionDev" == "r" ]; then
 	echo "Step 6. Pack nupkg"
 	/usr/bin/dotnet pack source/Knyaz.Optimus/Knyaz.Optimus.csproj -c Release /p:Version=$version --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/
