@@ -14,5 +14,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Fired immediately after a page has been loaded.
 		/// </summary>
 		public Action<Event> OnLoad;
+
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			base.BeforeEventDispatch(evt);
+
+			if (evt.Type == "load")
+			{
+				if (OnLoad != null)
+					OnLoad(evt);
+				else if (GetAttribute("onload") is string handler)
+					OwnerDocument.HandleNodeScript(evt, handler);
+			}
+		}
 	}
 }

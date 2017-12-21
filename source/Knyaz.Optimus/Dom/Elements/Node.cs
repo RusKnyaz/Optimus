@@ -19,16 +19,22 @@ namespace Knyaz.Optimus.Dom.Elements
 	public abstract class Node : INode, IEventTarget
 	{
 		protected EventTarget EventTarget;
-
 		internal NodeSources Source;
 
 		protected Node(Document ownerDocument)
 		{
 			_ownerDocument = ownerDocument;
 			ChildNodes = new List<Node>();
-			EventTarget = new EventTarget(this, () => ParentNode, () => OwnerDocument ?? this as Document);
+			EventTarget = new EventTarget(this, () => ParentNode?.EventTarget, () => OwnerDocument ?? this as Document);
 		}
-	
+
+		protected Node()
+		{
+			ChildNodes = new List<Node>();
+			NodeType = _NODE;
+			EventTarget = new EventTarget(this, () => ParentNode?.EventTarget, () => OwnerDocument ?? this as Document);
+		}
+
 		private Document _ownerDocument;
 
 		public virtual Document OwnerDocument
@@ -82,12 +88,7 @@ namespace Knyaz.Optimus.Dom.Elements
 				node.ParentNode.ChildNodes.Remove(node);
 		}
 
-		protected Node()
-		{
-			ChildNodes = new List<Node>();
-			NodeType = _NODE;
-		}
-
+		
 		/// <summary>
 		/// Gets a live collection of child nodes of the given element.
 		/// </summary>
@@ -264,10 +265,12 @@ namespace Knyaz.Optimus.Dom.Elements
 			EventTarget.RemoveEventListener(type, listener, useCapture);
 		}
 
-		public virtual bool DispatchEvent(Event evt)
-		{
-			return EventTarget.DispatchEvent(evt);
-		}
+		/// <summary>
+		/// This method allows the dispatch of events into the implementations event model. 
+		/// Events dispatched in this manner will have the same capturing and bubbling behavior as events dispatched directly by the implementation. The target of the event is the EventTarget on which dispatchEvent is called.
+		/// </summary>
+		/// <returns> If preventDefault was called the value is false, else the value is true.</returns>
+		public virtual bool DispatchEvent(Event evt) => EventTarget.DispatchEvent(evt);
 
 		/// <summary>
 		/// 1: No relationship, the two nodes do not belong to the same document.

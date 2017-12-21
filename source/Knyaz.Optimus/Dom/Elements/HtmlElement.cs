@@ -18,8 +18,18 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static bool Hidden = false;
 		}
 
-		internal HtmlElement(Document ownerDocument, string tagName)
-			: base(ownerDocument, tagName) {}
+		internal HtmlElement(Document ownerDocument, string tagName): base(ownerDocument, tagName)	{}
+
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			if (evt.Type == "click")
+			{
+				if (OnClick != null)
+					OnClick(evt);
+				else if (GetAttribute("onclick") is string handler)
+					OwnerDocument.HandleNodeScript(evt, handler);
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the 'hidden' attribute value, indicating if the element is hidden or not.
@@ -43,21 +53,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Called before the mouse 'click' dispatched.
 		/// </summary>
-		public event Action OnClick;
+		public event Action<Event> OnClick;
 
-		/// <summary>
-		/// This method allows the dispatch of events into the implementations event model. 
-		/// Events dispatched in this manner will have the same capturing and bubbling behavior as events dispatched directly by the implementation. The target of the event is the EventTarget on which dispatchEvent is called.
-		/// </summary>
-		/// <returns> If preventDefault was called the value is false, else the value is true.</returns>
-		public override bool DispatchEvent(Event evt)
-		{
-			if (evt.Type == "click" && OnClick != null)
-				OnClick();
-			
-			return base.DispatchEvent(evt);
-		}
-
+		
 		/// <summary>
 		/// Gets a CssStyleDeclaration whose value represents the declarations specified in the attribute, if present. 
 		/// </summary>

@@ -154,15 +154,20 @@ namespace Knyaz.Optimus.Dom
 		{
 			ReadyState = DocumentReadyStates.Interactive;
 
-			if (DomContentLoaded != null)
-				DomContentLoaded (this);
+			DomContentLoaded?.Invoke(this);
 
 			Trigger("DOMContentLoaded");
 			//todo: check is it right
 			ReadyState = DocumentReadyStates.Complete;
 
-			//todo: we should fire this event properly
-			Trigger("load");
+			//onload event
+			var evt = CreateEvent("Event");
+			evt.InitEvent("load", false, false);
+			lock (this)
+			{
+				//todo: deadlock possible if event raised from js
+				Body.DispatchEvent(evt);
+			}
 		}
 
 		private void Trigger(string type)
@@ -340,19 +345,14 @@ namespace Knyaz.Optimus.Dom
 		public event Action<Node, Exception> OnNodeException;
 		internal event Action<HtmlFormElement> OnFormSubmit;
 
-		internal void HandleNodeRemoved(Node parent, Node node)
-		{
-			if (NodeRemoved!= null)
-				NodeRemoved(parent, node);
-		}
+		internal void HandleNodeRemoved(Node parent, Node node) => NodeRemoved?.Invoke(parent, node);
 
 		internal void HandleNodeAdded(Node newChild)
 		{
 			if (!newChild.IsInDocument ())
 				return;
 
-			if (NodeInserted != null)
-				NodeInserted (newChild);
+			NodeInserted?.Invoke(newChild);
 
 			if (newChild.Source != NodeSources.DocumentBuilder)
 				RaiseDomNodeInserted(newChild);
@@ -360,27 +360,19 @@ namespace Knyaz.Optimus.Dom
 
 		private void RaiseDomNodeInserted(Node newChild)
 		{
-			if (DomNodeInserted != null)
-				DomNodeInserted(newChild);
+			DomNodeInserted?.Invoke(newChild);
 
 			var evt = (MutationEvent)CreateEvent("MutationEvent");
-			evt.InitMutationEvent("DOMNodeInserted", false, false, newChild.ParentNode, null, null, null, 0);
-			evt.Target = newChild;
-			DispatchEvent(evt);
+			evt.InitMutationEvent("DOMNodeInserted", true, false, newChild.ParentNode, null, null, null, 0);
+			newChild.DispatchEvent(evt);
 		}
 
 
-		internal void HandleNodeEventException(Node node, Exception exception)
-		{
-			if (OnNodeException != null)
-				OnNodeException(node, exception);
-		}
+		internal void HandleNodeEventException(Node node, Exception exception) => 
+			OnNodeException?.Invoke(node, exception);
 
-		internal void HandleFormSubmit(HtmlFormElement htmlFormElement)
-		{
-			if (OnFormSubmit != null)
-				OnFormSubmit(htmlFormElement);
-		}
+		internal void HandleFormSubmit(HtmlFormElement htmlFormElement) => 
+			OnFormSubmit?.Invoke(htmlFormElement);
 
 		public string CompatMode => ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat";
 
@@ -407,5 +399,18 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>The Readonly collection of found elements.</returns>
 		public override IReadOnlyList<IElement> QuerySelectorAll(string query) => new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
+
+		/// <summary>
+		/// Document nodes call this method when execution of some event handler script required. 
+		/// For example when clicked on the node with attribute onclick='callFunc()'.
+		/// </summary>
+		/// <param name="evt"></param>
+		/// <param name="code"></param>
+		internal void HandleNodeScript(Event evt, string code) => OnHandleNodeScript?.Invoke(evt, code);
+
+		/// <summary>
+		/// Called when execution of some code inside attribute event handler requred.
+		/// </summary>
+		internal event Action<Event, string> OnHandleNodeScript;
 	}
 }

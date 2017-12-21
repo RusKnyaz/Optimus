@@ -8,6 +8,7 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.Dom.Interfaces;
+using System.Linq;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -203,7 +204,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				try
 				{
-					return _jsEngine.Execute(code).GetCompletionValue().ToObject();
+					var res = _jsEngine.Execute(code).GetCompletionValue().ToObject();
+
+					if(res is Func<JsValue, JsValue[], JsValue> func)
+					{
+						return (Func<object[], object>)((args) =>
+							func(JsValue.Null, args.Select(x => JsValue.FromObject(_jsEngine, x)).ToArray()));
+					}
+
+					return res;
 				}
 				catch (JavaScriptException e)
 				{
@@ -218,6 +227,27 @@ namespace Knyaz.Optimus.ScriptExecuting
 		public void Clear()
 		{
 			CreateEngine(_engine);
+		}
+
+		public object EvalFuncAndCall(string code, params object[] args)
+		{
+			var funcCode = "(function(){ return "+code+";})()";
+
+			var func = Evaluate("text/javascript", funcCode) as Func<object[], object>;
+
+			try
+			{
+				return func(args);
+			}
+			catch (JavaScriptException e)
+			{
+				OnException?.Invoke(new ScriptExecutingException(e.Error.ToString(), e, code));
+			}
+			catch (Exception e)
+			{
+				OnException?.Invoke(e);
+			}
+			return null;
 		}
 	}
 

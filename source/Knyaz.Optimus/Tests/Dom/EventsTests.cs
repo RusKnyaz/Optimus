@@ -41,6 +41,16 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 
+		[Test]
+		public void DomNodeInsertedTest()
+		{
+			var called = false;
+			var document = new Document();
+			var x = document.CreateElement("div");
+			x.AddEventListener("DOMNodeInserted", e => called = true, false);
+			document.AppendChild(x);
+			Assert.IsTrue(called);
+		}
 
 		//todo: test default event handlers
 	}
