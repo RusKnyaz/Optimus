@@ -1,0 +1,1 @@
+﻿window.counter += "-in sample js-";

@@ -26,6 +26,7 @@
     <None Remove="Resources\JsTests\DocumentTests.js" />
     <None Remove="Resources\JsTests\ElementTests.js" />
     <None Remove="Resources\JsTests\NodeTests.js" />
+    <None Remove="Resources\JsTests\ScriptTests.js" />
     <None Remove="Resources\knockout.js" />
     <None Remove="Resources\requirejs.js" />
     <None Remove="Resources\stringTemplateEngine.js" />
@@ -43,6 +44,7 @@
     <EmbeddedResource Include="Resources\JsTests\ElementTests.js" />
     <EmbeddedResource Include="Resources\JsTests\DocumentFragmentTests.js" />
     <EmbeddedResource Include="Resources\JsTests\NodeTests.js" />
+    <EmbeddedResource Include="Resources\JsTests\ScriptTests.js" />
     <EmbeddedResource Include="Resources\knockout.js" />
     <EmbeddedResource Include="Resources\requirejs.js" />
     <EmbeddedResource Include="Resources\stringTemplateEngine.js" />

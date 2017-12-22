@@ -17,5 +17,12 @@ namespace Knyaz.Optimus.Tests.JsTests
 
 		[TestCase("Clone")]
 		public void DocumentFragmentTests(string testName) => JsTestsRunner.Run("DocumentFragmentTests", testName);
+
+		[TestCase("AppendScriptTwice")]
+		[TestCase("AppendScriptClone")]
+		[TestCase("AppendClonesOfScript")]
+		[TestCase("OnloadOnEmbeddedScript")]
+		[TestCase("OnloadOnExternalScript")]
+		public void ScriptTests(string testName) => JsTestsRunner.Run("ScriptTests", testName);
 	}
 }
