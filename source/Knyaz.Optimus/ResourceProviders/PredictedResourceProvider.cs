@@ -33,12 +33,12 @@ namespace Knyaz.Optimus.ResourceProviders
 			remove { _resourceProvider.Received -= value; }
 		}
 
-		public Task<IResource> GetResourceAsync(IRequest req)
+		public Task<IResource> SendRequestAsync(IRequest req)
 		{
 			Task<IResource> preloaded;
 			return _preloadedResources.TryRemove(req, out preloaded)
 				? preloaded
-				: _resourceProvider.GetResourceAsync(req);
+				: _resourceProvider.SendRequestAsync(req);
 		}
 
 		public IRequest CreateRequest(string path)
@@ -53,7 +53,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (_preloadedResources.ContainsKey(request))
 				return;
 
-			var task = _resourceProvider.GetResourceAsync(request);
+			var task = _resourceProvider.SendRequestAsync(request);
 			_preloadedResources.AddOrUpdate(request, task, (s, task1) => task1);
 		}
 

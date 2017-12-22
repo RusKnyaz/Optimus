@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.Dom.Css
 	/// http://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/css/CSSStyleDeclaration.html
 	/// </summary>
 	/// <inheritdoc cref="ICssStyleDeclaration"/>
-	public partial class CssStyleDeclaration : ICssStyleDeclaration, ICss2Properties
+	public partial class CssStyleDeclaration : ICssStyleDeclaration
 	{
 		private string _cssText = string.Empty;
 		private readonly NameValueCollection _properties;

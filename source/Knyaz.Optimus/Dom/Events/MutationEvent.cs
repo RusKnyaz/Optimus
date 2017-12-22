@@ -1,25 +1,15 @@
-﻿using Knyaz.Optimus.Dom.Elements;
+﻿using System;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
+	/// <summary>
+	/// Represents DOM changes event.
+	/// </summary>
 	[DomItem]
-	public interface IMutationEvent
-	{
-		ushort MODIFICATION { get; }
-		ushort ADDITION { get; }
-		ushort REMOVAL { get; }
-		Node RelatedNode { get; }
-		string PrevValue { get; }
-		string NewValue { get; }
-		string AttrName { get; }
-		ushort AttrChange { get; }
-
-		void InitMutationEvent(string type, bool bubbles, bool cancelable, Node relatedNode,
-			string prevValue, string newValue, string attrName, ushort attrChange);
-	}
-
-	public class MutationEvent : Event, IMutationEvent
+	[Obsolete]
+	public class MutationEvent : Event
 	{
 		public ushort MODIFICATION {get { return 1; }}
 		public ushort ADDITION  {get { return 2; }}

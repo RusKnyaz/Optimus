@@ -5,24 +5,35 @@ using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class EventTarget : IEventTarget
+	/// <summary>
+	/// Implements logic for event propogation and handling.
+	/// </summary>
+	public sealed class EventTarget : IEventTarget
 	{
-		private readonly IEventTarget _element;
+		private readonly object _target;
 		private readonly Func<IEventTarget> _getParent;
 		readonly Dictionary<string, List<Action<Event>>> _bubblingListeners = new Dictionary<string, List<Action<Event>>>();
 		readonly Dictionary<string, List<Action<Event>>> _capturingListeners = new Dictionary<string, List<Action<Event>>>();
 
-		public Func<object> _getLockObject;
+		private Func<object> _getLockObject;
 
-		public EventTarget(IEventTarget originalTarget, Func<IEventTarget> getParent)
-			: this(originalTarget, getParent, () => new object())
-		{
-			
-		}
+		/// <summary>
+		/// Creates new EventTarget.
+		/// </summary>
+		/// <param name="target">The html node or Window object this event target attached to.</param>
+		/// <param name="getParent">The function to get event target of parent element.</param>
+		public EventTarget(object target, Func<IEventTarget> getParent)
+			: this(target, getParent, () => new object()){}
 
-		public EventTarget(IEventTarget originalTarget, Func<IEventTarget> getParent, Func<object> getLockObject)
+		/// <summary>
+		/// Creates new EventTarget.
+		/// </summary>
+		/// <param name="target">The html node or Window object this event target attached to.</param>
+		/// <param name="getParent">The function to get event target of parent element.</param>
+		/// <param name="getLockObject">The function to get sync object.</param>
+		public EventTarget(object target, Func<IEventTarget> getParent, Func<object> getLockObject)
 		{
-			_element = originalTarget;
+			_target = target;
 			_getParent = getParent;
 			_getLockObject = getLockObject;
 		}
@@ -33,28 +44,47 @@ namespace Knyaz.Optimus.Dom.Elements
 		List<Action<Event>> GetCapturingListeners(string type) =>
 			_capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
 
-		public void AddEventListener(string type, Action<Event> listener) => AddEventListener(type, listener, false);
-
-		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
+		/// <summary>
+		/// Registers new event handler.
+		/// </summary>
+		/// <param name="type">The type name of the event.</param>
+		/// <param name="listener">The event handler.</param>
+		/// <param name="useCapture">If <c>true</c> the handler invoked in 'capturing' order, 
+		/// othervise in the handler invoked in 'bubbling' order.</param>
+		public void AddEventListener(string type, Action<Event> listener, bool useCapture = false) =>
 			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Add(listener);
 
-		public void RemoveEventListener(string type, Action<Event> listener) =>
-			RemoveEventListener(type, listener, false);
-
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture) =>
+		/// <summary>
+		/// Removes previously registered event handler.
+		/// </summary>
+		/// <param name="type">The type name of event.</param>
+		/// <param name="listener">The handler to be removed.</param>
+		/// <param name="useCapture">The invocation order to be handler removed from.</param>
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture = false) =>
 			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Remove(listener);
 
+		/// <summary>
+		/// Called when exception in handler occured.
+		/// </summary>
 		public event Action<Exception> HandlerException;
 
+		/// <summary>
+		/// Called before the event dispatched.
+		/// </summary>
 		public event Action<Event> BeforeEventDispatch;
 
-		public virtual bool DispatchEvent(Event evt)
+		/// <summary>
+		/// Dispatches an event.
+		/// </summary>
+		/// <param name="evt">The event to be dispatched.</param>
+		/// <returns><c>False</c> if event was cancelled.</returns>
+		public bool DispatchEvent(Event evt)
 		{
 			bool isOriginalTarget = evt.Target == null;
 
 			if (evt.Target == null)
 			{
-				evt.Target = _element;
+				evt.Target = _target;
 				evt.EventPhase = Event.CAPTURING_PHASE;
 			}
 
@@ -91,7 +121,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			if (evt.EventPhase == Event.AT_TARGET || evt.EventPhase == Event.BUBBLING_PHASE)
 			{
 				//direct subscribed event handlers (from attributes or element properties like div.onclick
-				evt.CurrentTarget = _element;
+				evt.CurrentTarget = _target;
 				BeforeEventDispatch?.Invoke(evt);
 				if (evt.IsPropagationStopped())
 					return !evt.Cancelled;
@@ -119,7 +149,7 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listeners)
 		{
-			evt.CurrentTarget = _element;
+			evt.CurrentTarget = _target;
 			lock (_getLockObject())
 			{
 				foreach (var listener in listeners(evt.Type))

@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Css
 {
+	/// <summary>
+	/// Stores information on a media query applied to a document, 
+	/// </summary>
 	public class MediaQueryList
 	{
 		private readonly Func<MediaSettings> _getMedia;
@@ -13,15 +16,15 @@ namespace Knyaz.Optimus.Dom.Css
 			Media = media;
 		}
 
+		/// <summary>
+		/// Gets a serialized media query.
+		/// </summary>
 		public string Media { get; private set; }
 
-		public bool Matches
-		{
-			get
-			{
-				return Media.Split(',').Select(x => x.Trim()).Any(MatchMedia);
-			}
-		}
+		/// <summary>
+		/// Returns <c>true</c> if the document currently matches the media query list, or <c>false</c> if not.
+		/// </summary>
+		public bool Matches => Media.Split(',').Select(x => x.Trim()).Any(MatchMedia);
 
 		private bool MatchMedia(string media)
 		{

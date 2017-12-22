@@ -7,6 +7,9 @@
 	{
 		internal HtmlHtmlElement(Document ownerDocument) : base(ownerDocument, TagsNames.Html){}
 
+		/// <summary>
+		/// Gets or sets inner html of the 'HTML' element.
+		/// </summary>
 		public override string InnerHTML
 		{
 			get => base.InnerHTML;

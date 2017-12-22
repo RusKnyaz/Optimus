@@ -9,17 +9,21 @@ else
 fi
 echo "Starting build of version: $version, fileVersion: $fileversion"
 echo "Step 1. Clean"
-/bin/rm -f source/Knyaz.Optimus/test-results/*
 /bin/rm -f source/Knyaz.Optimus.Tests/test-results/*
-/bin/rm -f -r source/Knyaz.Optimus/bin/*
-echo "Step 2. Build debug version"
-/usr/bin/dotnet build source/Knyaz.Optimus.sln /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Debug -v n
-echo "Step 3. Run tests"
-/usr/bin/dotnet test source/Knyaz.Optimus.sln --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/ -f netcoreapp2.0 -r test-results --logger "trx;LogFileName=Optimus.netcore.trx"
-echo "Step 4. Build release version"
-/usr/bin/dotnet build source/Knyaz.Optimus.sln /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Release -v n
-
+/bin/rm -rf source/Knyaz.Optimus/bin/*
+/bin/rm -rf source/Knyaz.Optimus/obj/*
+/bin/rm -rf source/Knyaz.Optimus.Tests/bin/*
+/bin/rm -rf source/Knyaz.Optimus.Tests/obj/*
+echo "Step 2. Restore packages"
+/usr/bin/dotnet restore source/Knyaz.Optimus/Knyaz.Optimus.csproj
+/usr/bin/dotnet restore source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj
+echo "Step 3. Build Knyaz.Optimus"
+/usr/bin/dotnet build source/Knyaz.Optimus/Knyaz.Optimus.csproj /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Release -v n
+echo "Step 4. Build Knyaz.Optimus.Tests"
+/usr/bin/dotnet build source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Release -v n
+echo "Step 5. Run tests"
+/usr/bin/dotnet test source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/ -f netcoreapp2.0 -r test-results --logger "trx;LogFileName=Optimus.netcore.trx" -c Release
 if [ "$versionDev" == "r" ]; then
-	echo "Step 5. Pack nupkg"
+	echo "Step 6. Pack nupkg"
 	/usr/bin/dotnet pack source/Knyaz.Optimus/Knyaz.Optimus.csproj -c Release /p:Version=$version --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/
 fi

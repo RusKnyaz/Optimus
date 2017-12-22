@@ -11,6 +11,9 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+	/// <summary>
+	/// Allows to request web resources. 
+	/// </summary>
 	class HttpResourceProvider : ISpecResourceProvider
 	{
 		private readonly CookieContainer _cookies;

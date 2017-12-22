@@ -8,8 +8,8 @@ namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents &lt;FORM&gt; element.
-	/// <seealso cref="http://www.w3.org/TR/html5/forms.html"/>
-	/// <seealso cref="https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement"/>
+	/// http://www.w3.org/TR/html5/forms.html"
+	/// https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement"
 	/// </summary>
 	public sealed class HtmlFormElement : HtmlElement
 	{
