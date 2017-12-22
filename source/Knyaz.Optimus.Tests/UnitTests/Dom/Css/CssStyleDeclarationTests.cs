@@ -105,5 +105,14 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("font-size") == "12px" &&
 				style.GetPropertyValue("line-height") == "30px");
 		}
+
+		[Test]
+		public void ValueWithSpaces()
+		{
+			Style("border-top: rgb(255, 255, 255) solid 1px").Assert(style => 
+				style.GetPropertyValue("border-top-color") == "rgb(255, 255, 255)" &&
+				style.GetPropertyValue("border-top-width") == "1px" &&
+				style.GetPropertyValue("border-top-style") == "solid");
+		}
 	}
 }

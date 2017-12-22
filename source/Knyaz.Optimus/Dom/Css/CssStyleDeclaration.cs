@@ -295,9 +295,39 @@ namespace Knyaz.Optimus.Dom.Css
 			SetBorder("left", value);
 		}
 
+		private IEnumerable<string> SplitValues(string values)
+		{
+			var splitIndex = 0;
+			var inBrackets = false;
+			int i = 0;
+			for(; i< values.Length; i++)
+			{
+				var c = values[i];
+				if (!inBrackets)
+				{
+					if (c == '(')
+						inBrackets = true;
+					else if(c == ' ')
+					{
+						var res = values.Substring(splitIndex, i - splitIndex);
+						splitIndex = i + 1;
+						if (!string.IsNullOrWhiteSpace(res))
+							yield return res;
+					}
+				}
+				else if(c == ')')
+				{
+					inBrackets = false;
+				}
+			}
+
+			if(splitIndex != values.Length)
+				yield return values.Substring(splitIndex);
+		}
+
 		private void SetBorder(string side, string value)
 		{
-			var args = value.Split(' ').Where(x => !string.IsNullOrWhiteSpace(x));
+			var args = SplitValues(value);
 			var prefix = "border-" + side;
 			foreach (var arg in args)
 			{
