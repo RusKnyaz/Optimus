@@ -44,8 +44,6 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Type { get => _type.Value;set => _type.Value = value;}
 
-		public string CrossOrigin { get; set; }
-	
 		internal Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
 		{
 			_type = new AttributeMappedValue<string>(this, "type");

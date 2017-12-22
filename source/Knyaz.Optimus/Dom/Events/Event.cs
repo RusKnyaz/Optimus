@@ -1,4 +1,5 @@
 ﻿using System;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ScriptExecuting;
 
@@ -18,12 +19,12 @@ namespace Knyaz.Optimus.Dom.Events
 		/// <summary>
 		/// A reference to the target to which the event was originally dispatched.
 		/// </summary>
-		public IEventTarget Target { get; internal set; }
+		public object Target { get; internal set; }
 		
 		/// <summary>
 		/// A reference to the currently registered target for the event.
 		/// </summary>
-		public IEventTarget CurrentTarget { get; internal set; }
+		public object CurrentTarget { get; internal set; }
 		
 		/// <summary>
 		/// The phase of the event flow is being processed. 

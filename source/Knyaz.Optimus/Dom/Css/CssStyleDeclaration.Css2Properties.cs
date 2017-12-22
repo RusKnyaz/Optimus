@@ -810,7 +810,8 @@
 		}
 
 		/// <summary>
-		/// The shorthand property for setting 'outline-color', 'outline-style' and 'outline-width' properties. Specifies outlines around visual objects such as buttons, active form fields, image maps, etc.
+		/// The shorthand property for setting 'outline-color', 'outline-style' and 'outline-width' properties. 
+		/// Specifies outlines around visual objects such as buttons, active form fields, image maps, etc.
 		/// </summary>
 		/// <remarks>
 		/// CSS2 outlines differ from borders in the following ways:
@@ -825,7 +826,7 @@
 		}
 
 		/// <summary>
-		/// Gets or sets 'outline-color' css property. <see cref="ICss2Properties.Outline"/> for more details.
+		/// Gets or sets 'outline-color' css property. <see cref="Outline"/> for more details.
 		/// </summary>
 		public string OutlineColor
 		{

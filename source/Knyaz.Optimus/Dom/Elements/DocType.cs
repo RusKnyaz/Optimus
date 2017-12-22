@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Knyaz.Optimus.Dom.Elements
+﻿namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents the doctype element of the DOM.
@@ -16,11 +14,20 @@ namespace Knyaz.Optimus.Dom.Elements
 			SystemId = systemId;
 		}
 
+		/// <summary>
+		/// Creates a copy of this DocType object.
+		/// </summary>
 		public override Node CloneNode(bool deep) => new DocType();
 
-		public override string NodeName => "html";
+		/// <summary>
+		/// The same as <see cref="Name"/>.
+		/// </summary>
+		public override string NodeName => Name;
 
-		public override string ToString() => "<!DOCTYPE html>";
+		/// <summary>
+		/// Always [Object DocumentType] for the DocType element.
+		/// </summary>
+		public override string ToString() => "[Object DocumentType]";
 
 		/// <summary>
 		/// A DOMString, eg "html" for &lt;!DOCTYPE HTML&gt;.
