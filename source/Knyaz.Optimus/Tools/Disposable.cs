@@ -9,14 +9,8 @@ namespace Knyaz.Optimus.Tools
 	{
 		private readonly Action _disposeAction;
 
-		public Disposable(Action disposeAction)
-		{
-			_disposeAction = disposeAction;
-		}
+		public Disposable(Action disposeAction) => _disposeAction = disposeAction;
 
-		public void Dispose()
-		{
-			_disposeAction();
-		}
+		public void Dispose() => _disposeAction();
 	}
 }

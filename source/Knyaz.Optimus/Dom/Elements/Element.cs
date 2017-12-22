@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// Represents the element of the DOM.
 	/// https://www.w3.org/TR/2004/REC-DOM-Level-3-Core-2004040
 	/// </summary>
-	public abstract class Element : Node, IElement, IElementSelector
+	public abstract class Element : Node, IElement
 	{
 		private readonly TokenList _classList = null;
 

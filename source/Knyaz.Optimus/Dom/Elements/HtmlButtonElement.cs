@@ -78,13 +78,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			set => SetAttribute("tabIndex", value.ToString());
 		}
 
-		public override void Click()
-		{
-			var evt = OwnerDocument.CreateEvent("Event");
-			evt.InitEvent("click", true, true);
-			DispatchEvent(evt);
-		}
-
+		/// <summary>
+		/// Overrides base DispatchEvent to submit parent form on click event.
+		/// </summary>
 		public override bool DispatchEvent(Event evt)
 		{
 			if (!base.DispatchEvent(evt))

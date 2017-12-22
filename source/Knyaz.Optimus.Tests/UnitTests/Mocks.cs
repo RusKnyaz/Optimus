@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Tests
 			Mock.Get(resourceProvider)
 				.Setup(x => x.CreateRequest(url)).Returns(request);
 			Mock.Get(resourceProvider)
-				.Setup(x => x.GetResourceAsync(request))
+				.Setup(x => x.SendRequestAsync(request))
 				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(Encoding.UTF8.GetBytes(data)), null)));
 			return resourceProvider;
 		}

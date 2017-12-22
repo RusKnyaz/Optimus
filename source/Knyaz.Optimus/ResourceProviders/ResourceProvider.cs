@@ -71,7 +71,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 		}
 
-		public Task<IResource> GetResourceAsync(IRequest req)
+		public Task<IResource> SendRequestAsync(IRequest req)
 		{
 			if (OnRequest != null)
 				OnRequest(req.Url);

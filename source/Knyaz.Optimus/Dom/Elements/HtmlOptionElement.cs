@@ -9,6 +9,9 @@
 		{
 		}
 
+		/// <summary>
+		/// Gets or sets the 'name' attribute value.
+		/// </summary>
 		public string Name
 		{
 			get { return GetAttribute("name", string.Empty); }

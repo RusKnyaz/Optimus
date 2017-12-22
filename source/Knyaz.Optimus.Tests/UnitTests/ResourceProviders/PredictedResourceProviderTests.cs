@@ -17,16 +17,16 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 
 			var provider = Mock.Of<IResourceProvider>(x =>
 				x.CreateRequest("some uri") == request &&
-				x.GetResourceAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
+				x.SendRequestAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
 
 			var target = new PredictedResourceProvider(provider);
 			target.Preload("some uri");
 
-			Mock.Get(provider).Verify(x => x.GetResourceAsync(It.IsAny<IRequest>()), Times.Once);
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
 
 			target.GetResourceAsync("some uri");
 
-            Mock.Get(provider).Verify(x => x.GetResourceAsync(It.IsAny<IRequest>()), Times.Once);
+            Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
 		}
 
 		[Test]
@@ -38,13 +38,13 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 
 			var provider = Mock.Of<IResourceProvider>(x =>
 					x.CreateRequest("some uri") == request &&
-					x.GetResourceAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
+					x.SendRequestAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
 
 			var target = new PredictedResourceProvider(provider);
 			target.GetResourceAsync("some uri");
 
 			Mock.Get(provider).Verify(x => x.CreateRequest("some uri"), Times.Once);
-			Mock.Get(provider).Verify(x => x.GetResourceAsync(It.IsAny<IRequest>()), Times.Once);
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
 		}
 
 		[Test]
@@ -56,17 +56,17 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 
 			var provider = Mock.Of<IResourceProvider>(x =>
 				x.CreateRequest("some uri") == request &&
-				x.GetResourceAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
+				x.SendRequestAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
 
 			var target = new PredictedResourceProvider(provider);
 			target.Preload("some uri");
-			Mock.Get(provider).Verify(x => x.GetResourceAsync(It.IsAny<IRequest>()), Times.Once);
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
 
 			target.Clear();
 
 			target.GetResourceAsync("some uri");
 
-			Mock.Get(provider).Verify(x => x.GetResourceAsync(It.IsAny<IRequest>()), Times.Exactly(2));
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Exactly(2));
 		}
 	}
 }

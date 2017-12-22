@@ -65,7 +65,7 @@ namespace Knyaz.Optimus.Dom.Css
             {
                 //todo: check type
                 var request = _resourceProvider.CreateRequest(linkElt.Href);
-                var task = _resourceProvider.GetResourceAsync(request);
+                var task = _resourceProvider.SendRequestAsync(request);
                 task.Wait();
                 using (var reader = new StreamReader(task.Result.Stream))
                     AddStyleToDocument(reader);
@@ -76,7 +76,7 @@ namespace Knyaz.Optimus.Dom.Css
 		private TextReader GetImport(string url)
 		{
 			var req = _resourceProvider.CreateRequest(url);
-			var task = _resourceProvider.GetResourceAsync(req);
+			var task = _resourceProvider.SendRequestAsync(req);
 			task.Wait();
 			var stream = task.Result.Stream;
 			return new StreamReader(stream);

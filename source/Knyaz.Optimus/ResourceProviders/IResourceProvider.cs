@@ -3,18 +3,6 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	/// <summary>
-	/// Allows to get resources like files, html pages and etc (dependes on implementation).
-	/// </summary>
-	public interface IResourceProvider
-	{
-		string Root { get; set; }
-		event Action<string> OnRequest;
-		event EventHandler<ReceivedEventArguments> Received;
-		Task<IResource> GetResourceAsync(IRequest req);
-		IRequest CreateRequest(string path);
-	}
-
 	public static class ResourceProviderExtension
 	{
 		public static Task<IResource> GetResourceAsync(this IResourceProvider provider, string uri)
@@ -24,7 +12,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 			var req = provider.CreateRequest(uri);
 
-			return provider.GetResourceAsync(req);
+			return provider.SendRequestAsync(req);
 		}
 	}
 

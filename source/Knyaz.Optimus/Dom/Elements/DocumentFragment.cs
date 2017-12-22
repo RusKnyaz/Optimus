@@ -8,8 +8,16 @@
 		internal DocumentFragment(Document ownerDocument): base(ownerDocument)
 			=>	NodeType = DOCUMENT_FRAGMENT_NODE;
 		
+		/// <summary>
+		/// Always "#document-fragment".
+		/// </summary>
 		public override string NodeName => "#document-fragment";
 
+		/// <summary>
+		/// Creates a new copy of the DocumentFragment.
+		/// </summary>
+		/// <param name="deep">Specifies whether or not the child nodes should be clonned too.</param>
+		/// <returns></returns>
 		public override Node CloneNode(bool deep)
 		{
 			var node = OwnerDocument.CreateDocumentFragment();

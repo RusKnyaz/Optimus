@@ -37,7 +37,7 @@ namespace Knyaz.Optimus.Dom
 	/// http://dev.w3.org/html5/spec-preview/dom.html
 	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
-	public class Document : Element, IDocument, IElementSelector
+	public class Document : Element, IDocument
 	{
 		internal Document() : this(null)
 		{
@@ -96,7 +96,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// This is always #document.
 		/// </summary>
-		public override string NodeName { get { return "#document"; } }
+		public override string NodeName => "#document";
 
 		/// <summary>
 		/// Returns a <see cref="Location"/> object, which contains information about the URL of the document 

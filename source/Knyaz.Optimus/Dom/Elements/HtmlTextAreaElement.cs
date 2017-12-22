@@ -183,6 +183,9 @@
 		/// </summary>
 		public HtmlFormElement Form => this.FindOwnerForm();
 
+		/// <summary>
+		/// Returns "[object HTMLTextAreaElement]".
+		/// </summary>
 		public override string ToString() => "[object HTMLTextAreaElement]";
 	}
 }
