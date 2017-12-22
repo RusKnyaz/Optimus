@@ -387,7 +387,7 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			else
 			{
-				var args = value.Split(' ');
+				var args = SplitValues(value).ToArray();
 				if (args.Length == 1)
 				{
 					_properties[top] = _properties[right] = _properties[bottom] = _properties[left] = args[0];
