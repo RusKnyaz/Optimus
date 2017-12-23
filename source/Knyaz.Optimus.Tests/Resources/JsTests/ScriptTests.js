@@ -49,5 +49,25 @@
             document.head.appendChild(script);
             Assert.AreEqual("", window.counter);//external script executed after the current script finished.
         }
+    },
+    "CloneScript": {
+        run: function () {
+            var script = document.createElement("script");
+            script.id = "yohoho";
+            script.text = "console.log('hi');";
+            var cloneScript = script.cloneNode(false);
+            Assert.AreEqual("", cloneScript.text ||"");
+            Assert.AreEqual("yohoho", cloneScript.id);
+        }
+    },
+    "DeepCloneScript": {
+        run: function () {
+            var script = document.createElement("script");
+            script.id = "yohoho";
+            script.text = "console.log('hi');";
+            var cloneScript = script.cloneNode(true);
+            Assert.AreEqual("console.log('hi');", cloneScript.text);
+            Assert.AreEqual("yohoho", cloneScript.id);
+        }
     }
 });

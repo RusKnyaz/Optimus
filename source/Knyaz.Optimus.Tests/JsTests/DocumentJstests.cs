@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ImplementationCreateDocumentType")]
 		[TestCase("ImplementationCreateDocumentWithDocType")]
 		[TestCase("RemoveDocType")]
-		public void Run(string testName) => JsTestsRunner.Run("DocumentTests", testName);
+		public void DocumentTests(string testName) => JsTestsRunner.Run("DocumentTests", testName);
 
 		[TestCase("CommentRemove")]
 		[TestCase("TextRemove")]
@@ -23,6 +23,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AppendClonesOfScript")]
 		[TestCase("OnloadOnEmbeddedScript")]
 		[TestCase("OnloadOnExternalScript")]
+		[TestCase("CloneScript")]
+		[TestCase("DeepCloneScript")]
 		public void ScriptTests(string testName) => JsTestsRunner.Run("ScriptTests", testName);
 	}
 }
