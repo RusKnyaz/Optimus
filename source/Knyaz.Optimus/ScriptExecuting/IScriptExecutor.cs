@@ -8,6 +8,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 		object Evaluate(string type, string code);
 		event Action<Exception> OnException;
 		void Clear();
-		object EvalFuncAndCall(string v, params object[] evt);
+		object EvalFuncAndCall(string v, object @this, params object[] evt);
 	}
 }

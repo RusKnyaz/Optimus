@@ -78,14 +78,14 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
 
-			AddGlobalAct("addEventListener", (_, x) => engine.Window.AddEventListener(
+			AddGlobalAct("addEventListener", (@this, x) => engine.Window.AddEventListener(
 				x.Length > 0 ? x[0].AsString() : null,
-				_typeConverter.ConvertDelegate<Event>(x[1]),
+				_typeConverter.ConvertDelegate<Event>(@this, x[1]),
 				x.Length > 2 && ToBoolean(x[2])));
 
-			AddGlobalAct("removeEventListener", (_, x) => engine.Window.RemoveEventListener(
+			AddGlobalAct("removeEventListener", (@this, x) => engine.Window.RemoveEventListener(
 				x.Length > 0 ? x[0].AsString() : null,
-				_typeConverter.ConvertDelegate<Event>(x[1]),
+				_typeConverter.ConvertDelegate<Event>(@this, x[1]),
 				x.Length > 2 && ToBoolean(x[2])));
 
 			AddGlobalFunc("matchMedia", (value, values) =>
@@ -94,19 +94,19 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return new JsValue(new ClrObject(_jsEngine, res));
 			});
 
-			AddGlobalFunc("setTimeout", (_, x) =>
+			AddGlobalFunc("setTimeout", (@this, x) =>
 			{
 				if (x.Length == 0)
 					return JsValue.Undefined;
-				var res= engine.Window.SetTimeout(_typeConverter.ConvertDelegate<object>(x[0]), x.Length > 1 ? x[1].AsNumber() : 1, x.Length > 2 ? x[2].ToObject() : null);
+				var res= engine.Window.SetTimeout(_typeConverter.ConvertDelegate<object>(@this, x[0]), x.Length > 1 ? x[1].AsNumber() : 1, x.Length > 2 ? x[2].ToObject() : null);
 				return new JsValue(res);
 			});
 
-			AddGlobalFunc("setInterval", (_, x) =>
+			AddGlobalFunc("setInterval", (@this, x) =>
 			{
 				if (x.Length == 0)
 					return JsValue.Undefined;
-				var res = engine.Window.SetInterval(_typeConverter.ConvertDelegate(x[0]), x.Length > 1 ? x[1].AsNumber() : 1);
+				var res = engine.Window.SetInterval(_typeConverter.ConvertDelegate(x[0], @this), x.Length > 1 ? x[1].AsNumber() : 1);
 				return new JsValue(res);
 			});
 
@@ -208,8 +208,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 					if(res is Func<JsValue, JsValue[], JsValue> func)
 					{
-						return (Func<object[], object>)((args) =>
-							func(JsValue.Null, args.Select(x => JsValue.FromObject(_jsEngine, x)).ToArray()));
+						return (Func<object, object[], object>)((@this, args) =>
+							func(JsValue.FromObject(_jsEngine, @this), args.Select(x => JsValue.FromObject(_jsEngine, x)).ToArray()));
 					}
 
 					return res;
@@ -229,15 +229,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 			CreateEngine(_engine);
 		}
 
-		public object EvalFuncAndCall(string code, params object[] args)
+		public object EvalFuncAndCall(string code, object @this, params object[] args)
 		{
 			var funcCode = "(function(){ return "+code+";})()";
 
-			var func = Evaluate("text/javascript", funcCode) as Func<object[], object>;
+			var func = Evaluate("text/javascript", funcCode) as Func<object, object[], object>;
 
 			try
 			{
-				return func(args);
+				return func(@this, args);
 			}
 			catch (JavaScriptException e)
 			{

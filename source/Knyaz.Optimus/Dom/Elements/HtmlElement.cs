@@ -23,15 +23,10 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected override void BeforeEventDispatch(Event evt)
 		{
 			if (evt.Type == "click")
-			{
-				if (OnClick != null)
-					OnClick(evt);
-				else if (GetAttribute("onclick") is string handler)
-					OwnerDocument.HandleNodeScript(evt, handler);
-			}
+				Handle("onclick", OnClick, evt);
 		}
 
-		/// <summary>
+				/// <summary>
 		/// Gets or sets the 'hidden' attribute value, indicating if the element is hidden or not.
 		/// </summary>
 		public bool Hidden

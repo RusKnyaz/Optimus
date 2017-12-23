@@ -38,7 +38,7 @@ namespace Knyaz.Optimus.Dom
 
 		private void OnHandleNodeScript(Event evt, string handlerCode)
 		{
-			_scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + ";}", evt);
+			_scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + ";}", evt.Target, evt);
 		}
 
 		void OnDocumentNodeInserted (Node node)

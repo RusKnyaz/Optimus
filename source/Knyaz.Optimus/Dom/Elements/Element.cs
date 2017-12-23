@@ -31,6 +31,14 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		protected virtual void BeforeEventDispatch(Event obj) {}
 
+		protected void Handle(string attrName, Action<Event> actionHandler, Event evt)
+		{
+			if (actionHandler != null)
+				actionHandler(evt);
+			else if (GetAttribute(attrName) is string handler)
+				OwnerDocument.HandleNodeScript(evt, handler);
+		}
+
 		/// <summary>
 		/// Returns a collection of the specified node's attributes.
 		/// </summary>
