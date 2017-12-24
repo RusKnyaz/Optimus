@@ -91,7 +91,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalFunc("matchMedia", (value, values) =>
 			{
 				var res = engine.Window.MatchMedia(values[0].AsString());
-				return new JsValue(new ClrObject(_jsEngine, res));
+				_typeConverter.TryConvert(res, out var val);
+				return val;
 			});
 
 			AddGlobalFunc("setTimeout", (@this, x) =>
@@ -114,7 +115,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				var elt = (ClrObject) values[0].AsObject();
 				var res = engine.Window.GetComputedStyle((IElement)elt.Target, values.Length > 1 ? values[1].TryCast<string>() : null);
-				return new JsValue(new ClrObject(_jsEngine, res));
+				_typeConverter.TryConvert(res, out var val);
+				return val;
 			});
 			
 			var jsFunc = new ClrFuncCtor(_jsEngine, (x) =>
@@ -173,7 +175,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		private void AddClrType(string jsName, Type type)
 		{
-			_jsEngine.Global.FastAddProperty(jsName, new JsValue(new ClrPrototype(_jsEngine, type)), false, false, false);
+			_jsEngine.Global.FastAddProperty(jsName, new JsValue(new ClrPrototype(_jsEngine, type, _typeConverter)), false, false, false);
 		}
 
 		public void Execute(string type, string code)

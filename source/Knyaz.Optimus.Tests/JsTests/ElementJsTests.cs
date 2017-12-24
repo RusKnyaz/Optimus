@@ -19,6 +19,10 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("EventListenerParams")]
 		[TestCase("EventHandlerParams")]
 		[TestCase("AttrEventHandlerParams")]
+		[TestCase("AddRemoveEventListener")]
+		[TestCase("AddTwoEventListeners")]
+		[TestCase("RemoveEventListenerInsideHandler")]
+		[TestCase("RemoveOtherEventListenerInsideHandler")]
 		public void ElementTests(string testName) => JsTestsRunner.Run("ElementTests", testName);
 	}
 }

@@ -83,7 +83,7 @@
         run: function () {
             var res = {};
             var elt = document.createElement("div");
-            elt.addEventListener = elt.addEventListener("click",
+            elt.addEventListener("click",
                 function (e) {
                     res.e = { target: e.target, currentTarget: e.currentTarget };
                     res.$this = this;
@@ -120,6 +120,55 @@
             Assert.AreEqual(elt, res.$this, "this");
             Assert.AreEqual(elt, res.e.target, "event.target");
             Assert.AreEqual(elt, res.e.currentTarget, "event.currentTarget");
+        }
+    },
+    "AddRemoveEventListener" :{
+        run:function () {
+            var called = false;
+            var handler = function (e) {  called = true;  }; 
+            var elt = document.createElement("div");
+            elt.addEventListener("click", handler);
+            elt.removeEventListener("click", handler);
+            elt.click();
+            Assert.AreEqual(false, called);
+        }
+    },
+    "AddTwoEventListeners":{
+        run:function () {
+            var resultThis = [];
+            var root = document.createElement("div");
+            var child = document.createElement("span");
+            root.appendChild(child);
+            var handler = function (e) { resultThis.push(this); };
+            root.addEventListener("click", handler);
+            child.addEventListener("click", handler);
+            child.click();
+            Assert.AreEqual(2, resultThis.length);
+            Assert.AreEqual(child,  resultThis[0], "child's this");
+            Assert.AreEqual(root,  resultThis[1], "root's this");
+        }
+    },
+    "RemoveEventListenerInsideHandler":{
+        run:function () {
+            var counter = 0;
+            var handler = function (e) {  counter++; elt.removeEventListener("click", handler); };
+            var elt = document.createElement("div");
+            elt.addEventListener("click", handler);
+            elt.click();
+            elt.click();
+            Assert.AreEqual(1, counter);
+        }
+    },
+    "RemoveOtherEventListenerInsideHandler":{
+        run:function () {
+            var counter = 0;
+            var handler2= function (e) {  counter++; };
+            var handler = function (e) {  counter++; elt.removeEventListener("click", handler2); };
+            var elt = document.createElement("div");
+            elt.addEventListener("click", handler);
+            elt.addEventListener("click", handler2);
+            elt.click();
+            Assert.AreEqual(1, counter);
         }
     }
 });

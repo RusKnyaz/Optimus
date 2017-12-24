@@ -55,7 +55,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				if (_bindedTypes.Any(x => x.IsInstanceOfType(value)))
 				{
-					result = new ClrObject(engine, value);
+					result = new ClrObject(engine, value, this);
 					_cache[value] = result;
 					return true;
 				}
