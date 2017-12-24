@@ -10,11 +10,13 @@ namespace Knyaz.Optimus.ScriptExecuting
 	internal class ClrPrototype : FunctionInstance, IConstructor
 	{
 		private readonly Type _type;
+		private readonly DomConverter _converter;
 
-		public ClrPrototype(Jint.Engine engine, Type type) : 
+		public ClrPrototype(Jint.Engine engine, Type type, DomConverter converter) : 
 			base(engine, null, null, false)
 		{
 			_type = type;
+			_converter = converter;
 			Prototype = engine.Object;
 		}
 
@@ -31,7 +33,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if(exactCtor  != null)
 			{
 				var obj = exactCtor.Invoke(argsValues);
-				return new ClrObject(Engine, obj);
+				JsValue val;
+				if (_converter.TryConvert(obj, out val))
+					return val.ToObject() as ClrObject;
 			}
 
 			foreach (var ctor in _type.GetConstructors())
@@ -53,7 +57,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 							.ToArray();
 						
 						var obj = ctor.Invoke(args);
-						return new ClrObject(Engine, obj);
+						return new ClrObject(Engine, obj, _converter);
 					}
 				} 
 			}
