@@ -17,7 +17,7 @@
 		/// <summary>
 		/// Creates a copy of this DocType object.
 		/// </summary>
-		public override Node CloneNode(bool deep) => new DocType();
+		public override Node CloneNode(bool deep) => new DocType(Name, PublicId, SystemId);
 
 		/// <summary>
 		/// The same as <see cref="Name"/>.
