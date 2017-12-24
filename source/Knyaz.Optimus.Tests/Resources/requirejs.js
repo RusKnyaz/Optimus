@@ -1197,8 +1197,7 @@ var requirejs, require, define;
 					node.detachEvent(ieName, func);
 				}
 			} else {
-			    //node.removeEventListener(name, func, false);
-			    node.removeEventListener(name, null, false);
+			    node.removeEventListener(name, func, false);
 			}
 		}
 

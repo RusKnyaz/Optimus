@@ -51,8 +51,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="listener">The event handler.</param>
 		/// <param name="useCapture">If <c>true</c> the handler invoked in 'capturing' order, 
 		/// othervise in the handler invoked in 'bubbling' order.</param>
-		public void AddEventListener(string type, Action<Event> listener, bool useCapture = false) =>
+		public void AddEventListener(string type, Action<Event> listener, bool useCapture = false)
+		{
+			if (listener == null)
+				return;
+			
 			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Add(listener);
+		}
 
 		/// <summary>
 		/// Removes previously registered event handler.
@@ -60,8 +65,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="type">The type name of event.</param>
 		/// <param name="listener">The handler to be removed.</param>
 		/// <param name="useCapture">The invocation order to be handler removed from.</param>
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture = false) =>
-			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Remove(listener);
+		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture = false)
+		{
+			if (listener == null)
+				return;
+			
+			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Remove(listener);	
+		}
+		
 
 		/// <summary>
 		/// Called when exception in handler occured.
@@ -147,13 +158,16 @@ namespace Knyaz.Optimus.Dom.Elements
 			return !evt.Cancelled;
 		}
 
-		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listeners)
+		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listenersFn)
 		{
 			evt.CurrentTarget = _target;
 			lock (_getLockObject())
 			{
-				foreach (var listener in listeners(evt.Type))
+				var listeners = listenersFn(evt.Type);
+				// ReSharper disable once ForCanBeConvertedToForeach, to avoid 'collection was modified' exception
+				for(var i = 0;i< listeners.Count;i++)
 				{
+					var listener = listeners[i];
 					try
 					{
 						listener(evt);

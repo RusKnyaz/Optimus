@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
@@ -8,6 +9,8 @@ using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Environments;
 using Jint.Runtime.Interop;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -16,14 +19,16 @@ namespace Knyaz.Optimus.ScriptExecuting
 	/// </summary>
 	internal class ClrObject : ObjectInstance, IObjectWrapper
 	{
+		private readonly DomConverter _converter;
 		public Object Target { get; set; }
 
-		public ClrObject(Jint.Engine engine, Object obj)
+		public ClrObject(Jint.Engine engine, Object obj, DomConverter converter)
 			: base(engine)
 		{
+			_converter = converter;
 			Target = obj;
 			//todo: use static prototypes
-			Prototype = new ClrPrototype(engine, obj.GetType());
+			Prototype = new ClrPrototype(engine, obj.GetType(), _converter);
 			Extensible = true;
 		}
 
@@ -201,7 +206,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		private PropertyDescriptor MethodDescriptor(string propertyName, MethodInfo[] methods)
 		{
-			var func = new ClrMethodInfoFunc(Engine, methods);
+			var func = new ClrMethodInfoFunc(Engine, methods, this);
 			func.FastAddProperty("toString",
 				new JsValue(new ClrFunctionInstance(Engine,
 					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
@@ -211,22 +216,72 @@ namespace Knyaz.Optimus.ScriptExecuting
 			Properties.Add(propertyName, descriptor);
 			return descriptor;
 		}
+		
+		
+		readonly ConditionalWeakTable<ICallable, object> _delegatesCache = new ConditionalWeakTable<ICallable, object>();
+		internal Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsValue)
+		{
+			if (jsValue.IsNull())
+				return null;
+			
+			var callable = jsValue.AsObject() as ICallable;
+			Action<T> handler = null;
+			if (callable != null)
+			{
+				handler = (Action<T>)_delegatesCache.GetValue(callable, key => (Action<T>)(e =>
+				{
+					_converter.TryConvert(e, out var val);
+					key.Call(@this, new[] { val });
+				}));
+			}
+			return handler;
+		}
 	}
 
 	class ClrMethodInfoFunc : FunctionInstance
 	{
-		private MethodInfoFunctionInstance _internalFunc;
-		private MethodInfo[] _methods;
+		private readonly MethodInfoFunctionInstance _internalFunc;
+		private readonly MethodInfo[] _methods;
+		private readonly ClrObject _clrObject;
 
-		public ClrMethodInfoFunc(Jint.Engine engine, MethodInfo[] methods) : base(engine, (string[]) null, (LexicalEnvironment) null, false)
+		public ClrMethodInfoFunc(Jint.Engine engine, MethodInfo[] methods, ClrObject clrObject)
+			: base(engine, null, null, false)
 		{
 			_internalFunc = new MethodInfoFunctionInstance(engine, methods);
 			_methods = methods;
+			_clrObject = clrObject;
 			Prototype = engine.Function.PrototypeObject;
 		}
 
 		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
 		{
+			//hack to pass 'this' to event handler function.
+			bool add;
+			if (((add = _methods[0].Name == "AddEventListener") ||
+			          _methods[0].Name == "RemoveEventListener")&& 
+			    arguments.Length > 1)
+			{
+				var eventName = arguments[0].AsString();
+				var handler = _clrObject.ConvertDelegate<Event>(thisObject, arguments[1]);
+
+				if (handler == null)
+				{
+					
+				}
+				
+				var capture = arguments.Length > 2 && arguments[2].AsBoolean();
+
+				if ((thisObject.AsObject() as ClrObject)?.Target is IEventTarget et)
+				{
+					if (add)
+						et.AddEventListener(eventName, handler, capture);
+					else
+						et.RemoveEventListener(eventName, handler, capture);
+
+					return JsValue.Undefined;
+				}
+			}
+
 			//todo: it should be done for any count of such methods.
 			
 			//handle default parameters

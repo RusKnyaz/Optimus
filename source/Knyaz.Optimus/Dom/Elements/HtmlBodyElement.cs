@@ -24,12 +24,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			base.BeforeEventDispatch(evt);
 
 			if (evt.Type == "load")
-			{
-				if (OnLoad != null)
-					OnLoad(evt);
-				else if (GetAttribute("onload") is string handler)
-					OwnerDocument.HandleNodeScript(evt, handler);
-			}
+				Handle("onload", OnLoad, evt);
 		}
 	}
 }

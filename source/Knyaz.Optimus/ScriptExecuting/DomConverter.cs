@@ -55,7 +55,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				if (_bindedTypes.Any(x => x.IsInstanceOfType(value)))
 				{
-					result = new ClrObject(engine, value);
+					result = new ClrObject(engine, value, this);
 					_cache[value] = result;
 					return true;
 				}
@@ -89,7 +89,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			get { return _getEngine(); }
 		}
 
-		public Action<T> ConvertDelegate<T>(JsValue jsValue)
+		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsValue)
 		{
 			var callable = jsValue.AsObject() as ICallable;
 			Action<T> handler = null;
@@ -99,22 +99,21 @@ namespace Knyaz.Optimus.ScriptExecuting
 				{
 					JsValue val;
 					TryConvert(e, out val);
-					key.Call(JsValue.Undefined, new[] { val });
+					key.Call(@this, new[] { val });
 				}));
 			}
 			return handler;
 		}
 
-		public Action ConvertDelegate(JsValue jsValue)
+		public Action ConvertDelegate(JsValue jsValue, JsValue @this)
 		{
 			var callable = jsValue.AsObject() as ICallable;
 			Action handler = null;
 			if (callable != null)
 			{
-				handler = (Action)_delegatesCache.GetValue(callable, key => (Action)(() =>
-				{
-					key.Call(JsValue.Undefined, new JsValue[0]);
-				}));
+				handler = (Action)_delegatesCache.GetValue(callable, 
+					key => (Action)(() => key.Call(@this, new JsValue[0])
+				));
 			}
 			return handler;
 		}
