@@ -73,9 +73,8 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public Task<IResource> SendRequestAsync(IRequest req)
 		{
-			if (OnRequest != null)
-				OnRequest(req.Url);
-			
+			OnRequest?.Invoke(req.Url);
+
 			var u = UriHelper.GetUri(Root, req.Url);
 
 			var provider = GetResourceProvider(u);
@@ -84,8 +83,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					{
 						try
 						{
-							if (Received != null)
-								Received(this, new ReceivedEventArguments(req, t.Result));
+							Received?.Invoke(this, new ReceivedEventArguments(req, t.Result));
 						}
 						catch { }
 						return t.Result;

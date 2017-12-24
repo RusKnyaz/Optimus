@@ -8,7 +8,7 @@ using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Tools;
-using Jint.Native;
+using System.IO;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -46,35 +46,25 @@ namespace Knyaz.Optimus.Dom
 			if (!node.IsInDocument ())
 				return;
 
-			var attr = node as Attr;
-			if (attr != null)
-			{
-				RegisterAttr(attr);
-
+			if (node is Attr)
 				return;
-			}
 
 			foreach (var elt in node.Flatten().OfType<HtmlElement>())
 			{
-				foreach (var attribute in elt.Attributes)
-				{
-					RegisterAttr(attribute);
-				}
-
 				if (elt is Script script)
 				{
-					var remote = script.HasDelayedContent;
+					var remote = script.IsExternalScript;
 					var async = script.Async && remote || script.Source == NodeSources.Script;
 					var defer = script.Defer && remote && !async && script.Source == NodeSources.DocumentBuilder;
 
 					if (defer)
 					{
-						_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(script.LoadAsync(_resourceProvider), script));
+						_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(LoadAsync(script, _resourceProvider), script));
 					}
 					else if (remote)
 					{
-						var task = script
-							.LoadAsync(_resourceProvider)
+						var task = 
+							LoadAsync(script, _resourceProvider)
 							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
 
 						if (!async)
@@ -88,6 +78,33 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
+		//todo: revise it. it shouldn't be here.
+		internal static Task LoadAsync(Script script, IResourceProvider resourceProvider)
+		{
+			if (string.IsNullOrEmpty(script.Src))
+				throw new InvalidOperationException("Src not set.");
+
+			return resourceProvider.GetResourceAsync(script.Src).ContinueWith(
+				resource =>
+				{
+					try
+					{
+						using (var reader = new StreamReader(resource.Result.Stream))
+						{
+							script.InnerHTML = reader.ReadToEnd();//wrong.
+						}
+					}
+					catch
+					{
+						lock (script.OwnerDocument)
+						{
+							script.RaiseEvent("error", false, false);
+						}
+					}
+				});
+		}
+
+
 		/// <summary>
 		/// Map attribute to event (onclick->click, etc...)
 		/// </summary>
@@ -96,25 +113,6 @@ namespace Knyaz.Optimus.Dom
 			{"onclick", "click"},
 			{"onload", "load"}
 		};
-
-		private void RegisterAttr(Attr attr)
-		{
-			if (_eventAttr.TryGetValue(attr.Name.ToLowerInvariant(), out var eventName))
-			{
-				var parentElement = attr.OwnerElement;
-
-				var fname = eventName + "Handler_" + DateTime.Now.Ticks;
-				var funcInit = "function " + fname + "(){" + attr.Value.Trim() + ";}";
-				_scriptExecutor.Execute("text/javascript", funcInit);
-
-				var funcCall = fname + "();";
-
-				//todo: what we should to do with e.Onclick public properties?
-				parentElement.AddEventListener(eventName, e => { _scriptExecutor.Execute("text/javascript", funcCall); }, false);
-
-				//todo: unsubscribe if attribute value changed
-			}
-		}
 
 		void OnDocumentDomContentLoaded (IDocument document)
 		{
@@ -139,13 +137,19 @@ namespace Knyaz.Optimus.Dom
 
 		private void ExecuteScript(Script script)
 		{
+			if (script.Executed)
+				return;
+
 			lock (script.OwnerDocument)
 			{
 				RaiseBeforeScriptExecute(script);
 
 				try
 				{
-					script.Execute(_scriptExecutor);
+					_scriptExecutor.Execute(script.Type ?? "text/javascript", script.Text);
+					script.Executed = true;
+					if (script.IsExternalScript)
+						script.RaiseEvent("load", true, false);
 				}
 				catch (Exception ex)
 				{

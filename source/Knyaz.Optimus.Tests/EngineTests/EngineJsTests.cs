@@ -439,6 +439,28 @@ console.log('afterappend');"));
 		}
 
 		[Test]
+		public void AddScriptOnloadThisAccess()
+		{
+			var script = @"var script = document.createElement('script');
+script.src = 'script.js';
+script.someData = 'hello';
+script.onload = function(){ console.log(this.someData); };
+			document.head.appendChild(script); ";
+
+			var engine = new Engine(
+				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
+			var log = new List<string>();
+			engine.Console.OnLog += o => {
+				log.Add(o == null ? "<null>" : o.ToString());
+				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			};
+			engine.Load(Mocks.Page(script));
+
+			Thread.Sleep(1000);
+			Assert.AreEqual("in new script,hello", string.Join(",", log));
+		}
+
+		[Test]
 		public void InstanceOfHtmlElement()
 		{
 			var engine = CreateEngine("<div id='d'></div>",

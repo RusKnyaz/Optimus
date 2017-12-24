@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
-using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -57,9 +54,11 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		public string Text { get { return InnerHTML; } set { InnerHTML = value; } }
 
-		internal bool HasDelayedContent => !string.IsNullOrEmpty(Src);
+		internal bool IsExternalScript => !string.IsNullOrEmpty(Src);
 
-		public bool Loaded { get; private set; }
+		/// <summary>
+		/// Indicates whether the script was executed or not.
+		/// </summary>
 		internal bool Executed { get; set; }
 
 		/// <summary>
@@ -68,62 +67,44 @@ namespace Knyaz.Optimus.Dom.Elements
 		public event Action OnLoad;
 		public event Action OnError;
 
-		//todo: revise it. it shouldn't be here.
-		internal Task LoadAsync(IResourceProvider resourceProvider)
-		{
-			if (string.IsNullOrEmpty(Src))
-				throw new InvalidOperationException("Src not set.");
 
-			return resourceProvider.GetResourceAsync(Src).ContinueWith(
-				resource =>
-				{
-					try
-					{
-						using (var reader = new StreamReader(resource.Result.Stream))
-						{
-							InnerHTML = reader.ReadToEnd();
-							Loaded = true;
-						}
-					}
-					catch
-					{
-						RaiseError();
-					}
-				});
-		}
-
-		private void RaiseOnLoad()
+		protected override void BeforeEventDispatch(Event evt)
 		{
-			if (HasDelayedContent)
+			base.BeforeEventDispatch(evt);
+
+			if(evt.Type == "load")
 			{
-				OnLoad?.Invoke();
-				this.RaiseEvent("load", false, false);
+				if(OnLoad != null)
+					OnLoad.Invoke();
+				else if (GetAttribute("onload") is string handler)
+					OwnerDocument.HandleNodeScript(evt, handler);
+
+			} else if(evt.Type == "error")
+			{
+				if(OnError != null)
+					OnError.Invoke();
+				else if (GetAttribute("onerror") is string handler)
+					OwnerDocument.HandleNodeScript(evt, handler);
 			}
 		}
 
-		private void RaiseError()
-		{
-			lock(OwnerDocument)
-			{
-				OnError?.Invoke();
-				this.RaiseEvent("error", false, false);
-			}
-		}
-
-		internal void Execute(IScriptExecutor scriptExecutor)
-		{
-			scriptExecutor.Execute(Type ?? "text/javascript", Text);
-			Executed = true;
-			RaiseOnLoad();
-		}
-
+		/// <summary>
+		/// Creates new copy of the script node.
+		/// </summary>
+		/// <param name="deep"></param>
+		/// <returns></returns>
 		public override Node CloneNode(bool deep)
 		{
 			var node = (Script)base.CloneNode(deep);
-			node.Text = Text;
+			if(deep)
+				node.Text = Text;
+			node.Executed = Executed;
 			return node;
 		}
 
+		/// <summary>
+		/// [Object HTMLScriptElement]
+		/// </summary>
 		public override string ToString() => "[Object HTMLScriptElement]";
 	}
 }
