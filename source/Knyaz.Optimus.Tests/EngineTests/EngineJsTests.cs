@@ -448,13 +448,14 @@ script.onload = function(){ console.log(this.someData); };
 			document.head.appendChild(script); ";
 
 			var engine = new Engine(
-				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
+				Mocks.ResourceProvider("script.js", "console.log('in new script');")
+					.Resource("http://localhost", Mocks.Page(script)));
 			var log = new List<string>();
 			engine.Console.OnLog += o => {
 				log.Add(o == null ? "<null>" : o.ToString());
 				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
 			};
-			engine.Load(Mocks.Page(script));
+			engine.OpenUrl("http://localhost").Wait();
 
 			Thread.Sleep(1000);
 			Assert.AreEqual("in new script,hello", string.Join(",", log));

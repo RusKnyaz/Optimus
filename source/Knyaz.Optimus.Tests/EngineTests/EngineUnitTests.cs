@@ -245,7 +245,7 @@ window.clearTimeout(timer);"));
 			CollectionAssert.AreEqual(new[]{"hello"}, log);
 		}
 
-		[Test, Ignore("For manual run")] //is not working under Mono
+		[Test]
 		public void AddScriptAsync()
 		{
 			var engine = new Engine(Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
@@ -261,16 +261,21 @@ window.clearTimeout(timer);"));
 				engine.Console.Log("nodeadded");
 			}, false);
 
+			var onloadSignal = new ManualResetEvent(false);
+			
 			var d = (Script)engine.Document.CreateElement("script");
 			d.Id = "aaa";
 			d.Async = true;
 			d.Src = "http://localhost/script.js";
-			d.OnLoad += () => engine.Console.Log("onload");
+			d.OnLoad += e =>
+			{
+				engine.Console.Log("onload");
+				onloadSignal.Set();
+			};
 			engine.Document.Head.AppendChild(d);
-			engine.Console.Log("afterappend");
-			
-			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[] { "nodeadded", "afterappend", "in new script", "onload" }, log);
+
+			onloadSignal.WaitOne(10000);
+			CollectionAssert.AreEqual(new[] { "nodeadded", "in new script", "onload" }, log);
 		}
 
 		[Test]

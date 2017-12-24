@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
@@ -64,27 +65,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Fired immediately after an element has been loaded.
 		/// </summary>
-		public event Action OnLoad;
-		public event Action OnError;
-
+		public event Action<Event> OnLoad;
+		public event Action<Event> OnError;
 
 		protected override void BeforeEventDispatch(Event evt)
 		{
 			base.BeforeEventDispatch(evt);
 
-			if(evt.Type == "load")
+			switch (evt.Type)
 			{
-				if(OnLoad != null)
-					OnLoad.Invoke();
-				else if (GetAttribute("onload") is string handler)
-					OwnerDocument.HandleNodeScript(evt, handler);
-
-			} else if(evt.Type == "error")
-			{
-				if(OnError != null)
-					OnError.Invoke();
-				else if (GetAttribute("onerror") is string handler)
-					OwnerDocument.HandleNodeScript(evt, handler);
+				case "load":Handle("onload", OnLoad, evt);break;
+				case "error":Handle("onerror", OnError, evt);break;
 			}
 		}
 
