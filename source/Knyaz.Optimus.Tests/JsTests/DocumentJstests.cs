@@ -9,6 +9,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ImplementationCreateDocumentType")]
 		[TestCase("ImplementationCreateDocumentWithDocType")]
 		[TestCase("RemoveDocType")]
+		[TestCase("DefaultViewIsWindow")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run("DocumentTests", testName);
 
 		[TestCase("CommentRemove")]
@@ -35,6 +36,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("CallThisIsUndefined")]
 		[TestCase("CallThisIsNullStrict")]
 		[TestCase("CallThisIsUndefinedStrict")]
+		[TestCase("CompareObjectWithWindow")]
+		[TestCase("CompareObjectWithWindowInverted")]
+		[TestCase("CallAndCompareThisIsUndefined")]
 		public void JavaScriptTests(string testName) => JsTestsRunner.Run("JavaScriptTests", testName);
 	}
 }

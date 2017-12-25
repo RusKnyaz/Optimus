@@ -61,13 +61,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Indicates whether the script was executed or not.
 		/// </summary>
 		internal bool Executed { get; set; }
+		internal string Code { get; set; }
 
 		/// <summary>
 		/// Fired immediately after an element has been loaded.
 		/// </summary>
 		public event Action<Event> OnLoad;
 		public event Action<Event> OnError;
-
+		
 		protected override void BeforeEventDispatch(Event evt)
 		{
 			base.BeforeEventDispatch(evt);

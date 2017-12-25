@@ -34,4 +34,10 @@
             Assert.IsNull(doc.doctype);
         }
     },
+    "DefaultViewIsWindow":{
+        run:function () {
+            Assert.AreEqual(window, document.defaultView, "window == document.defaultView");
+            Assert.AreEqual(document.defaultView, window, "document.defaultView == window");
+        }
+    }
 });
