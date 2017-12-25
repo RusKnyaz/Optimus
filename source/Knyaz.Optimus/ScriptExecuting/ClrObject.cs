@@ -264,11 +264,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 				var eventName = arguments[0].AsString();
 				var handler = _clrObject.ConvertDelegate<Event>(thisObject, arguments[1]);
 
-				if (handler == null)
-				{
-					
-				}
-				
 				var capture = arguments.Length > 2 && arguments[2].AsBoolean();
 
 				if ((thisObject.AsObject() as ClrObject)?.Target is IEventTarget et)
