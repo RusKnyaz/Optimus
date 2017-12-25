@@ -29,5 +29,12 @@ namespace Knyaz.Optimus.Tests.JsTests
 
 		[TestCase("Clone")]
 		public void DocTypeTests(string testName) => JsTestsRunner.Run("DocTypeTests", testName);
+
+		[TestCase("CallThisIsObj")]
+		[TestCase("CallThisIsNull")]
+		[TestCase("CallThisIsUndefined")]
+		[TestCase("CallThisIsNullStrict")]
+		[TestCase("CallThisIsUndefinedStrict")]
+		public void JavaScriptTests(string testName) => JsTestsRunner.Run("JavaScriptTests", testName);
 	}
 }
