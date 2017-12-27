@@ -26,6 +26,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetTextContent")]
 		[TestCase("SetTextContentRemovesChildren")]
 		[TestCase("GetTextContent")]
+		[TestCase("SetTextContentEmpty")]
 		public void ElementTests(string testName) => JsTestsRunner.Run("ElementTests", testName);
 	}
 }

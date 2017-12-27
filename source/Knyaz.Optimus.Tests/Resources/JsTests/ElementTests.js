@@ -191,6 +191,14 @@
             Assert.AreEqual("#text", div.firstChild.nodeName);
         }
     },
+    "SetTextContentEmpty":{
+        run:function () {
+            var div = document.createElement("div");
+            div.textContent = "";
+            Assert.AreEqual(0, div.childNodes.length);
+            Assert.AreEqual("", div.textContent);
+        }
+    },
     "GetTextContent":{
         run: function () {
             var div = document.createElement("div");
