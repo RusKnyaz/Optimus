@@ -93,7 +93,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var document = new Document();
 			document.Write("<html><body><ul id=\"myList\"><li id=\"item1\">Coffee</li><li id=\"item2\">Tea</li></ul></body></html>");
 			var ul = document.GetElementById("myList");
-			Assert.AreEqual("Coffee Tea", ul.TextContent);
+			Assert.AreEqual("CoffeeTea", ul.TextContent);
 		}
 
 		[Test]
