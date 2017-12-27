@@ -13,5 +13,11 @@ Test("DocTypeTests", {
             Assert.AreEqual('-//W3C//DTD SVG 1.1//EN', clone.publicId);
             Assert.AreEqual('http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd', clone.systemId);
         }
+    },
+    "TextContentIsNull":{
+        run:function () {
+            var docType = document.implementation.createDocumentType("html", "","");
+            Assert.IsNull(docType.textContent);
+        }
     }
 });

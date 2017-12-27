@@ -68,6 +68,15 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		/// <summary>
+		/// Is always null.
+		/// </summary>
+		public override string TextContent
+		{
+			get => null;
+			set { }
+		}
+
+		/// <summary>
 		/// Returns first DocType element in document.
 		/// </summary>
 		[JsName("doctype")]
@@ -76,17 +85,17 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Return this document's DOMimplementation object.
 		/// </summary>
-		public DomImplementation Implementation { get; private set; }
+		public DomImplementation Implementation { get; }
 
 		/// <summary>
 		/// Returns the window object associated with a document, or null if none is available.
 		/// </summary>
-		public IWindow DefaultView { get; private set; }
+		public IWindow DefaultView { get; }
 
 		/// <summary>
 		/// Gets the Document Element of the document (the &lt;html&gt; element)
 		/// </summary>
-		public Element DocumentElement { get; private set; }
+		public Element DocumentElement { get; }
 
 		/// <summary>
 		/// Gets the (loading) status of the document.
@@ -147,7 +156,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Returns a StyleSheetList of CSSStyleSheet objects for stylesheets explicitly linked into or embedded in a document.
 		/// </summary>
-		public StyleSheetsList StyleSheets { get; private set; }
+		public StyleSheetsList StyleSheets { get; }
 
 		internal void Complete()
 		{
@@ -187,9 +196,9 @@ namespace Knyaz.Optimus.Dom
 		public Element CreateElement(string tagName)
 		{
 			if(tagName == null)
-				throw new ArgumentNullException("tagName");
+				throw new ArgumentNullException(nameof(tagName));
 			if(tagName == string.Empty)
-				throw new ArgumentOutOfRangeException("tagName");
+				throw new ArgumentOutOfRangeException(nameof(tagName));
 
 			var invariantTagName = tagName.ToUpperInvariant();
 			switch (invariantTagName)

@@ -23,6 +23,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AddTwoEventListeners")]
 		[TestCase("RemoveEventListenerInsideHandler")]
 		[TestCase("RemoveOtherEventListenerInsideHandler")]
+		[TestCase("SetTextContent")]
+		[TestCase("SetTextContentRemovesChildren")]
+		[TestCase("GetTextContent")]
 		public void ElementTests(string testName) => JsTestsRunner.Run("ElementTests", testName);
 	}
 }

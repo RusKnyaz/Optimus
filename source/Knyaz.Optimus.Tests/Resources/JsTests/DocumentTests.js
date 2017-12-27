@@ -34,4 +34,9 @@
             Assert.IsNull(doc.doctype);
         }
     },
+    "TextContentIsNull":{
+        run:function () {
+            Assert.IsNull(document.textContent);
+        }
+    }
 });

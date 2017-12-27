@@ -152,8 +152,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public virtual string TextContent
 		{
-			get => string.Join(" ", ChildNodes.Flat(x => x.ChildNodes).OfType<CharacterData>().Select(x => x.Data));
-			set => InnerHTML = value;
+			get => string.Join("", ChildNodes.Flat(x => x.ChildNodes).OfType<Text>().Select(x => x.Data));
+			set
+			{
+				if (ChildNodes.Count == 1 && FirstChild is Text text)
+				{
+					text.Data = value;
+				}
+				else
+				{
+					ChildNodes.Clear();
+					AppendChild(OwnerDocument.CreateTextNode(value));
+				}
+			}
 		}
 
 		/// <summary>

@@ -170,5 +170,32 @@
             elt.click();
             Assert.AreEqual(1, counter);
         }
+    },
+    "SetTextContent":{
+        run:function(){
+            var div = document.createElement("div");
+            div.textContent = "<p>Text</p><p>Text 2</p>";
+            Assert.AreEqual("<p>Text</p><p>Text 2</p>", div.textContent);
+            Assert.AreEqual(1, div.childNodes.length);
+            Assert.AreEqual("#text", div.firstChild.nodeName);
+        }
+    },
+    "SetTextContentRemovesChildren":{
+        run:function () {
+            var div = document.createElement("div");
+            var span = document.createElement("span");
+            div.appendChild(span);
+            div.textContent = "Hello";
+            Assert.AreEqual("Hello", div.innerHTML);
+            Assert.AreEqual(1, div.childNodes.length);
+            Assert.AreEqual("#text", div.firstChild.nodeName);
+        }
+    },
+    "GetTextContent":{
+        run: function () {
+            var div = document.createElement("div");
+            div.innerHTML = "<!-- Some comment --><p>Paragraph 1<span>text</span></p><p>Paragraph 2</p><script>var x = 5;</script>";
+            Assert.AreEqual("Paragraph 1textParagraph 2var x = 5;", div.textContent);
+        }
     }
 });
