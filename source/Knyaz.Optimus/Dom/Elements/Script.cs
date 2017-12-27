@@ -51,9 +51,17 @@ namespace Knyaz.Optimus.Dom.Elements
 			_defer = new AttributeMappedBoolValue(this, "defer");
 		}
 
-		public override string InnerHTML { get; set; }
+		public override string InnerHTML
+		{
+			get => Text;
+			set => Text = value;
+		}
 
-		public string Text { get { return InnerHTML; } set { InnerHTML = value; } }
+		public string Text 
+		{ 
+			get => TextContent ?? "";
+			set => TextContent = value; 
+		}
 
 		internal bool IsExternalScript => !string.IsNullOrEmpty(Src);
 
@@ -88,8 +96,6 @@ namespace Knyaz.Optimus.Dom.Elements
 		public override Node CloneNode(bool deep)
 		{
 			var node = (Script)base.CloneNode(deep);
-			if(deep)
-				node.Text = Text;
 			node.Executed = Executed;
 			return node;
 		}

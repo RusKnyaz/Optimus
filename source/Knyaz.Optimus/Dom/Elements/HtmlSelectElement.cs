@@ -20,8 +20,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public override Node AppendChild(Node node)
 		{
-			var option = node as HtmlOptionElement;
-			if (option == null)
+			if (!(node is HtmlOptionElement option))
 				return node;
 
 			if (node.ChildNodes.Count == 0 && !Multiple)

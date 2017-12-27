@@ -27,6 +27,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetTextContentRemovesChildren")]
 		[TestCase("GetTextContent")]
 		[TestCase("SetTextContentEmpty")]
+		[TestCase("TableDoesNotAcceptDivs")]
+		[TestCase("TableCreatedBodies")]
+		[TestCase("TableWrongTBody")]
 		public void ElementTests(string testName) => JsTestsRunner.Run("ElementTests", testName);
 	}
 }

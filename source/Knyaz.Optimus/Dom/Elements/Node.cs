@@ -71,28 +71,22 @@ namespace Knyaz.Optimus.Dom.Elements
 			return node;
 		}
 
-		protected virtual void RegisterNode(Node node)
+		protected void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
 			var owner = OwnerDocument ?? this as Document;
-			if (owner != null)
-			{
-				node.SetOwner(owner);
-				owner.HandleNodeAdded(node);
-			}
+			if (owner == null) return;
+			node.SetOwner(owner);
+			owner.HandleNodeAdded(node);
 		}
 
-		private void UnattachFromParent(Node node)
-		{
-			if (node.ParentNode != null)
-				node.ParentNode.ChildNodes.Remove(node);
-		}
+		private void UnattachFromParent(Node node) => node.ParentNode?.ChildNodes.Remove(node);
 
 		
 		/// <summary>
 		/// Gets a live collection of child nodes of the given element.
 		/// </summary>
-		public IList<Node> ChildNodes { get; protected set; }
+		public IList<Node> ChildNodes { get; }
 
 		/// <summary>
 		/// Removes a child node from the DOM.

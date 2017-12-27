@@ -37,7 +37,7 @@ namespace Knyaz.Optimus.Tests.Dom
 				((HtmlElement)doc.Body.ChildNodes[0]).TagName == "DIV" &&
 				((HtmlElement) doc.Body.ChildNodes[1]).TagName == "SPAN" &&
 				((HtmlElement) doc.Body.ChildNodes[2]).TagName == "TABLE" &&
-				((HtmlElement)doc.Body.ChildNodes[2]).InnerHTML == "<TBODY><TR></TR></TBODY>");
+				((HtmlElement)doc.Body.ChildNodes[2]).InnerHTML == "<TBODY></TBODY><TBODY><TR></TR></TBODY>");
 		}
 
 		[Test]

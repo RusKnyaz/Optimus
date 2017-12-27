@@ -5,7 +5,6 @@ function Test(fixtureName, definition) {
 }
 
 
-var currentRunContext = null;
 function Run(fixtureName, testName) {
     var definition = Tests[fixtureName];
     if (definition == null)
@@ -13,33 +12,40 @@ function Run(fixtureName, testName) {
     var test = definition[testName];
     if (test == null)
         return "Test not found: " + testName;
-    currentRunContext = null;
-    test.run();
-    return currentRunContext;
+    try {
+        test.run();
+    }
+    catch (error){
+        return error;
+    }
 }
 
 var Assert = {
-    AreEqual: function (x1, x2, msg) {
-        if (currentRunContext != null)
+    AreSame: function (x1, x2, msg) {
+        if (x1 == x2)
             return;
+
+        var error = "Expected \r\n \'" + x1 + "\' but was \r\n\'" + x2 + "\'";
+        if (msg)
+            error = msg + "\r\n" + error;
+
+        throw error;
+    },
+    AreEqual: function (x1, x2, msg) {
         if (x1 != x2) {
-            currentRunContext = "Expected \'" + x1 + "\' but was \'" + x2+"\'";
+            var error = "Expected \r\n\'" + x1 + "\' but was \r\n\'" + x2+"\'";
             if (msg)
-                currentRunContext = msg + "\r\n" + currentRunContext;
+                error = msg + "\r\n" + error;
+            
+            throw error;
         }
     },
     IsNotNull : function (x) {
-        if (currentRunContext != null)
-            return;
-        
         if (x == null)
-            currentRunContext = "Expected not null";
+            throw "Expected not null";
     },
     IsNull : function(x){
-        if (currentRunContext != null)
-            return;
-
         if (x != null)
-            currentRunContext = "Expected null but was " + x;
+            throw "Expected null but was " + x;
     }
 };

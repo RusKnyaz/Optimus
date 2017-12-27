@@ -18,7 +18,7 @@ namespace Knyaz.Optimus.Dom
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
 				var html = HtmlParser.Parse(stream);
-				BuildInternal(parentNode, html, source);
+				BuildInternal(parentNode, html, source, true);
 			}
 		}
 
@@ -52,118 +52,122 @@ namespace Knyaz.Optimus.Dom
 			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements));
 		}
 
-		private static void BuildInternal(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
+		private static IEnumerable<IHtmlNode> BuildInternal(Node node, IEnumerable<IHtmlNode> htmlNodes, NodeSources source = NodeSources.DocumentBuilder, bool root = false)
 		{
-			foreach (var htmlElement in htmlElements)
+			var extruded = new List<IHtmlNode>();
+
+			HtmlTableSectionElement currentTBody = null;
+			
+			foreach (var htmlNode in htmlNodes)
 			{
-				BuildElem(parentNode, htmlElement, source);
+				var currentNode = node;
+				
+				if (htmlNode is HtmlDocType docType)
+				{
+					//todo: may be it's wrong to assume the doctype element placed before html in source document
+					currentNode.OwnerDocument.InsertBefore(new DocType(), currentNode.OwnerDocument.DocumentElement);
+				}
+
+				if (htmlNode is HtmlComment comment)
+				{
+					currentNode.AppendChild(currentNode.OwnerDocument.CreateComment(comment.Text));
+					continue;
+				}
+				
+				var htmlElement = htmlNode as IHtmlElement;
+
+				var htmlHtmlElt = currentNode as HtmlHtmlElement;
+				if (htmlHtmlElt != null && (htmlElement == null || (
+					                            !htmlElement.Name.Equals(TagsNames.Body,
+						                            StringComparison.InvariantCultureIgnoreCase) &&
+					                            !htmlElement.Name.Equals(TagsNames.Head,
+						                            StringComparison.InvariantCultureIgnoreCase))))
+				{
+					currentNode = currentNode.OwnerDocument.Body;
+				}
+				
+				if (htmlNode is IHtmlText txt)
+				{
+					var c = currentNode.OwnerDocument.CreateTextNode(txt.Value);
+					c.Source = source;
+					currentNode.AppendChild(c);
+					continue;
+				}
+				
+				if (currentNode is Script)
+					continue;
+
+				if (htmlElement == null)
+					continue;
+
+
+				if (htmlHtmlElt != null)
+				{
+					var invariantName = htmlElement.Name.ToUpperInvariant();
+					if (invariantName == "HEAD" || invariantName == "BODY")
+					{
+						var headOrBody = htmlHtmlElt.GetElementsByTagName(invariantName).FirstOrDefault();
+						headOrBody.Source = source;
+						SetAttributes(htmlElement, headOrBody);
+						BuildInternal(headOrBody, htmlElement.Children, source);
+						continue;
+					}
+				}
+
+				//if parent is table
+				if (currentNode is HtmlTableElement table)
+				{
+					var elementInvariantName = htmlElement.Name.ToUpperInvariant();
+					if (elementInvariantName == TagsNames.Tr)
+					{
+						if (currentTBody == null)
+						{
+							currentTBody = (HtmlTableSectionElement)currentNode.OwnerDocument.CreateElement(TagsNames.TBody);
+							currentTBody.Source = source;
+							table.AppendChild(currentTBody);
+						}
+						currentNode = currentTBody;
+					}
+					else if (elementInvariantName == TagsNames.Col)
+					{
+						var colgroup = currentNode.OwnerDocument.CreateElement(TagsNames.Colgroup);
+						table.AppendChild(colgroup);
+						currentNode = colgroup;
+					}
+					else if(elementInvariantName == TagsNames.TBody)
+					{
+						currentTBody = null;
+					}
+					else if (!root &&
+					         elementInvariantName != TagsNames.TBody &&
+					         elementInvariantName != TagsNames.Tr &&
+					         elementInvariantName != TagsNames.Caption &&
+					         elementInvariantName != TagsNames.THead &&
+					         elementInvariantName != TagsNames.TFoot &&
+					         elementInvariantName != TagsNames.Colgroup &&
+					         elementInvariantName != TagsNames.Col)
+					{
+						extruded.Add(htmlElement);
+						continue;
+					}
+				}
+
+				var elem = currentNode.OwnerDocument.CreateElement(htmlElement.Name);
+				elem.Source = source;
+				SetAttributes(htmlElement, elem);
+
+				var extrudedNodes = BuildInternal(elem, htmlElement.Children, source);
+				BuildInternal(currentNode, extrudedNodes, source);
+
+				currentNode.AppendChild(elem);
 			}
+			return extruded;
 		}
 
-		private static void BuildElem(Node node, IHtmlNode htmlNode, NodeSources source, Node insertBefore = null)
+		private static void SetAttributes(IHtmlElement htmlElement, Element elem)
 		{
-			var docType = htmlNode as HtmlDocType;
-			if (docType != null)
-			{
-				//todo: may be it's wrong to assume the doctype element placed before html in source document
-				node.OwnerDocument.InsertBefore(new DocType(), node.OwnerDocument.DocumentElement);
-			}
-			
-			var comment = htmlNode as HtmlComment;
-			if (comment != null)
-			{
-				node.AppendChild(node.OwnerDocument.CreateComment(comment.Text));
-				return;
-			}
-
-			var htmlElement = htmlNode as IHtmlElement;
-
-			var htmlHtmlElt = node as HtmlHtmlElement;
-			if (htmlHtmlElt != null && (htmlElement == null || (
-				!htmlElement.Name.Equals(TagsNames.Body, StringComparison.InvariantCultureIgnoreCase) && 
-				!htmlElement.Name.Equals(TagsNames.Head, StringComparison.InvariantCultureIgnoreCase))))
-			{
-				node = node.OwnerDocument.Body;
-			}
-
-			var txt = htmlNode as IHtmlText;
-			if (txt != null)
-			{
-				var c = node.OwnerDocument.CreateTextNode(txt.Value);
-				c.Source = source;
-
-				node.AppendChild(c);
-				return;
-			}
-
-			
-			if (htmlElement == null)
-				return;
-
-			Element elem = null;
-			var append = false;
-
-			if (htmlHtmlElt != null)
-			{
-				var invariantName = htmlElement.Name.ToUpperInvariant();
-				if (invariantName == "HEAD" || invariantName == "BODY")
-					elem = htmlHtmlElt.GetElementsByTagName(invariantName).FirstOrDefault();
-			}
-
-			//if parent is table
-			var table = node as HtmlTableElement;
-			var elementInvariantName = htmlElement.Name.ToUpperInvariant();
-			if (table != null)
-			{
-				if(elementInvariantName == TagsNames.Tr)
-					elem = table.InsertRow();
-				else if (elementInvariantName == TagsNames.Col)
-				{
-					var colgroup = node.OwnerDocument.CreateElement(TagsNames.Colgroup);
-					table.AppendChild(colgroup);
-					node = colgroup;
-				}
-				else if (node.ParentNode != null && elementInvariantName != TagsNames.TBody &&
-				         elementInvariantName != TagsNames.Tr &&
-				         elementInvariantName != TagsNames.Caption &&
-				         elementInvariantName != TagsNames.THead &&
-				         elementInvariantName != TagsNames.TFoot &&
-				         elementInvariantName != TagsNames.Colgroup &&
-						 elementInvariantName != TagsNames.Col)
-				{
-					BuildElem(node.ParentNode, htmlNode, source, node);
-					return;
-				}
-			}
-
-			if (elem == null)
-			{
-				append = true;
-				elem = node.OwnerDocument.CreateElement(htmlElement.Name);	
-			}
-
-			elem.Source = source;
-			
-			if (elem is Script)
-			{
-				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;
-				elem.InnerHTML = htmlText != null ? htmlText.Value : string.Empty;
-			}
-			
 			foreach (var attribute in htmlElement.Attributes)
-			{
 				elem.SetAttribute(attribute.Key, attribute.Value);
-			}
-
-			if (append)
-			{
-				if (insertBefore != null)
-					node.InsertBefore(elem, insertBefore);
-				else
-					node.AppendChild(elem);
-			}
-
-			BuildInternal(elem, htmlElement.Children, source);
 		}
 	}
 }

@@ -69,5 +69,40 @@
             Assert.AreEqual("console.log('hi');", cloneScript.text);
             Assert.AreEqual("yohoho", cloneScript.id);
         }
+    },
+    "TextContent":{
+        run: function () {
+            var script = document.createElement("script");
+            script.text = "var x = 5;";
+            Assert.AreEqual(1, script.childNodes.length);
+            Assert.AreEqual("#text", script.firstChild.nodeName);
+            Assert.AreEqual("var x = 5;", script.firstChild.data);
+        } 
+    },
+    "ParseFromHtml":{
+        run:function () {
+            var div = document.createElement("div");
+            div.innerHTML = "<script>var x = 5;</script>";
+            var script = div.firstChild;
+            Assert.IsNotNull(script);
+            Assert.AreEqual(1, script.childNodes.length);
+            Assert.AreEqual("#text", script.firstChild.nodeName);
+            Assert.AreEqual("var x = 5;", script.firstChild.data);
+        }
+    },
+    "SetInnerHtml":{
+        run:function () {
+            var script = document.createElement("script");
+            script.innerHTML = "var x = 5;";
+            Assert.AreEqual(1, script.childNodes.length);
+            Assert.AreEqual("#text", script.firstChild.nodeName);
+            Assert.AreEqual("var x = 5;", script.firstChild.data);
+        }
+    },
+    "TextOfExternal":{
+        run:function () {
+            var script = document.createElement("script");
+            Assert.AreSame("", script.text);
+        }
     }
 });

@@ -1,6 +1,7 @@
 ﻿using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
@@ -13,8 +14,20 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			var document = new Document(null);
 			document.Write(html);
-			var s = document.GetElementById("s");
-			Assert.AreEqual(expectedInnerHtml, s.InnerHTML);
+			document.GetElementById("s").Assert(script => script.InnerHTML == expectedInnerHtml); 
+		}
+
+		[Test]
+		public void ParseFromHtml()
+		{
+			var document = new Document(null);
+			var div = document.CreateElement("div");
+			div.InnerHTML = "<script>var x = 5;</script>";
+			div.Assert(d=> 
+				d.ChildNodes.Count == 1 &&
+				d.FirstChild.ChildNodes.Count == 1 &&
+				d.FirstChild.FirstChild.NodeName == "#text" &&
+				((Text)d.FirstChild.FirstChild).NodeValue == "var x = 5;");
 		}
 
 		[Test]
