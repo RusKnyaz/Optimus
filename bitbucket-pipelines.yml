@@ -11,8 +11,5 @@ pipelines:
         caches:
           - dotnetcore
         script: # Modify the commands below to build your repository.
-          - export PROJECT_NAME=source/Knyaz.Optimus/Knyaz.Optimus.csproj
-          - export TEST_NAME=source/Knyaz.Optimus/Knyaz.Optimus.csproj
           - dotnet restore source/Knyaz.Optimus.sln
-          - dotnet build $PROJECT_NAME -f netcoreapp2.0
-          - dotnet test $TEST_NAME -f netcoreapp2.0
+          - dotnet test source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj -f netcoreapp2.0
