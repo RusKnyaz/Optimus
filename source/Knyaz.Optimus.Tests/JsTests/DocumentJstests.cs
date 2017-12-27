@@ -27,6 +27,10 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("OnloadOnExternalScript")]
 		[TestCase("CloneScript")]
 		[TestCase("DeepCloneScript")]
+		[TestCase("TextContent")]
+		[TestCase("ParseFromHtml")]
+		[TestCase("SetInnerHtml")]
+		[TestCase("TextOfExternal")]
 		public void ScriptTests(string testName) => JsTestsRunner.Run("ScriptTests", testName);
 
 		[TestCase("Clone")]

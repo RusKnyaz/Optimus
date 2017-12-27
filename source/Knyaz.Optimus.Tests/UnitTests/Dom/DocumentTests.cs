@@ -311,7 +311,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void InnerHtml()
 		{
 			var doc = new Document();
-			doc.Head.InnerHTML = ("<script>var a = 5;</script>");
+			doc.Head.InnerHTML = "<script>var a = 5;</script>";
 			Assert.AreEqual("<HEAD><SCRIPT>var a = 5;</SCRIPT></HEAD><BODY></BODY>", doc.DocumentElement.InnerHTML);
 		}
 

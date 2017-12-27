@@ -197,5 +197,29 @@
             div.innerHTML = "<!-- Some comment --><p>Paragraph 1<span>text</span></p><p>Paragraph 2</p><script>var x = 5;</script>";
             Assert.AreEqual("Paragraph 1textParagraph 2var x = 5;", div.textContent);
         }
+    },
+    "TableDoesNotAcceptDivs":{
+        run:function () {
+            var d = document.createElement("div");
+            d.innerHTML="<table><div></div><span></span><tbody></tbody><tr></tr></table>";
+            Assert.AreEqual("<div></div><span></span><table><tbody></tbody><tbody><tr></tr></tbody></table>",
+                d.innerHTML.toLowerCase())
+        }
+    },
+    "TableWrongTBody":{
+        run:function () {
+            var d= document.createElement("div");
+            d.innerHTML = "<table><div></div><span></span><tbody></tbody><tr></tr></table>";
+            Assert.AreEqual("<div></div><span></span><table><tbody></tbody><tbody><tr></tr></tbody></table>", 
+                d.innerHTML.toLowerCase());
+        }
+    },
+    "TableCreatedBodies":{
+        run:function () {
+            var d = document.createElement("div");
+            d.innerHTML="<table><tbody></tbody><tr id=x></tr><tbody></tbody><tr></tr></table>";
+            Assert.AreEqual("<table><tbody></tbody><tbody><tr id=\"x\"></tr></tbody><tbody></tbody><tbody><tr></tr></tbody></table>",
+                d.innerHTML.toLowerCase())
+        }
     }
 });
