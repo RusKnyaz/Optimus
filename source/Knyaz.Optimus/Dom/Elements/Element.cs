@@ -157,7 +157,8 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				while(ChildNodes.Count > 0)
 					RemoveChild(LastChild);
-				AppendChild(OwnerDocument.CreateTextNode(value));
+				if(!string.IsNullOrEmpty(value))
+					AppendChild(OwnerDocument.CreateTextNode(value));
 			}
 		}
 
