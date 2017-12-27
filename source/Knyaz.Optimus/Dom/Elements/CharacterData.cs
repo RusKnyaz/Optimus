@@ -38,7 +38,11 @@
 		void deleteData(unsigned long offset, unsigned long count);
 		void replaceData(unsigned long offset, unsigned long count, DOMString data);*/
 
-		public string TextContent => NodeValue;
+		public string TextContent
+		{
+			get => NodeValue;
+			set => NodeValue = value;
+		}
 	}
 
 	/// <summary>

@@ -155,15 +155,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			get => string.Join("", ChildNodes.Flat(x => x.ChildNodes).OfType<Text>().Select(x => x.Data));
 			set
 			{
-				if (ChildNodes.Count == 1 && FirstChild is Text text)
-				{
-					text.Data = value;
-				}
-				else
-				{
-					ChildNodes.Clear();
-					AppendChild(OwnerDocument.CreateTextNode(value));
-				}
+				while(ChildNodes.Count > 0)
+					RemoveChild(LastChild);
+				AppendChild(OwnerDocument.CreateTextNode(value));
 			}
 		}
 
