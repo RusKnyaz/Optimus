@@ -81,6 +81,8 @@ namespace Knyaz.Optimus.WfApp.Controls
 			}
 		}
 
+		public bool LogInfo = false;
+
 		private void DocumentOnScriptExecutionError(Script script, Exception exception)
 		{
 			Log("Script execution error: " + (script.Src ?? script.Id ?? "...") + " Ex: " + exception.Message);
@@ -88,29 +90,37 @@ namespace Knyaz.Optimus.WfApp.Controls
 
 		private void OnScriptExecuted(Event @event)
 		{
+			if (!LogInfo)
+				return;
 			var script = (Script) @event.Target;
 			Log("Executed: " + (script.Src ?? script.Id ?? "..."));
 		}
 
 		private void OnScriptExecuting(Event @event)
 		{
+			if (!LogInfo)
+				return;
 			var script = (Script)@event.Target;
 			Log("Executing: " + (script.Src ?? script.Id ?? "..."));
 		}
 
 		private void ResourceProviderOnOnRequest(string s)
 		{
+			if (!LogInfo)
+				return;
 			Log("Request: " + s);
 		}
 
 		private void ResourceProviderOnReceived(object sender, ReceivedEventArguments args)
 		{
+			if (!LogInfo)
+				return;
 			Log("Received: " + args.Request.Url);
 		}
 
 		private void ConsoleOnOnLog(object o)
 		{
-			Log(o.ToString());
+			Log((o ?? "<null>").ToString());
 		}
 
 		void Log(string text)

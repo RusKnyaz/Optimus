@@ -38,5 +38,11 @@
         run:function () {
             Assert.IsNull(document.textContent);
         }
+    },
+    "DefaultViewIsWindow":{
+        run:function () {
+            Assert.AreEqual(window, document.defaultView, "window == document.defaultView");
+            Assert.AreEqual(document.defaultView, window, "document.defaultView == window");
+        }
     }
 });

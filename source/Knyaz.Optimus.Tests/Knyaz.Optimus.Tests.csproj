@@ -63,7 +63,7 @@
     <EmbeddedResource Include="Resources\ya.js" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Jint" Version="2.11.23" />
+    <PackageReference Include="Jint" Version="2.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="Moq" Version="4.7.142" />
     <PackageReference Include="NUnit" Version="3.9.0" />

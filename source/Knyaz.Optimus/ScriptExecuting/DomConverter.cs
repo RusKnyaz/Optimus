@@ -10,6 +10,7 @@ using Jint.Native.Array;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
+using Knyaz.Optimus.Environment;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -40,11 +41,16 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return false;
 			}
 
+			if (value is Window)
+			{
+				result = engine.Global;
+				return true;
+			}
+
 			if (value != null && _cache.TryGetValue(value, out result))
 				return true;
 
-			var list = value as IList;
-			if (list != null)
+			if (value is IList list)
 			{
 				result = new ListAdapterEx(engine, list);
 				_cache[value] = result;

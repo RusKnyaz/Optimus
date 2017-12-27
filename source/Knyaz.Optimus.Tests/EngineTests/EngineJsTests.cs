@@ -827,5 +827,12 @@ dispatchEvent(evt);");
 			
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
+
+		[Test]
+		public void CompareWithThis()
+		{
+			var engine = CreateEngine("<div></div>", @"console.log({}===this);");
+			CollectionAssert.AreEqual(new object[] {false}, _log);
+		}
 	}
 }

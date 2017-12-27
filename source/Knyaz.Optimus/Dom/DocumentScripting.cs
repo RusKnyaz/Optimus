@@ -91,7 +91,7 @@ namespace Knyaz.Optimus.Dom
 					{
 						using (var reader = new StreamReader(resource.Result.Stream))
 						{
-							script.InnerHTML = reader.ReadToEnd();//wrong.
+							script.Code = reader.ReadToEnd();//wrong.
 						}
 					}
 					catch
@@ -146,7 +146,8 @@ namespace Knyaz.Optimus.Dom
 
 				try
 				{
-					_scriptExecutor.Execute(script.Type ?? "text/javascript", script.Text);
+					_scriptExecutor.Execute(script.Type ?? "text/javascript", 
+						script.IsExternalScript ? script.Code : script.Text);
 					script.Executed = true;
 					if (script.IsExternalScript)
 						script.RaiseEvent("load", true, false);
