@@ -44,5 +44,18 @@
             Assert.AreEqual(window, document.defaultView, "window == document.defaultView");
             Assert.AreEqual(document.defaultView, window, "document.defaultView == window");
         }
+    },
+    "DomBuildOrder":{
+        run:function () {
+            var res = "";
+            
+            var div = document.createElement("div");
+            div.addEventListener("DOMNodeInserted", function(x){
+                res = x.target.innerHTML;
+            });
+
+            div.innerHTML = "<div><span></span></div>";
+            Assert.AreEqual("<span></span>", res.toLowerCase());
+        }
     }
 });

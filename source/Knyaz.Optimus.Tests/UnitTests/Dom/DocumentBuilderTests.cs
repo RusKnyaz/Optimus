@@ -67,6 +67,21 @@ namespace Knyaz.Optimus.Tests.Dom
 				doc.InnerHTML == "<HTML><HEAD></HEAD><BODY>Text<P>para</P></BODY></HTML>");
 		}
 
+		[Test]
+		public void DomBuildOrder()
+		{
+			var document = new Document();
+			var res = "";
+            
+			var div = document.CreateElement("div");
+			div.AddEventListener("DOMNodeInserted", x => {
+				res = ((HtmlElement)x.Target).OuterHTML;
+			});
+
+			div.InnerHTML = "<div><span></span></div>";
+			Assert.AreEqual("<DIV><SPAN></SPAN></DIV>", res);
+		}
+
 		private Document Build(string txt)
 		{
 			var d = new Document();
