@@ -323,5 +323,16 @@ namespace Knyaz.Optimus.Tests.Dom
 			doc.AppendChild(dt);
 			Assert.AreEqual(doc, dt.OwnerDocument);
 		}
+
+		[Test]
+		public void SetBody()
+		{
+			var doc = new Document();
+			var body = doc.CreateElement("body");
+			body.InnerHTML = "ABC";
+			doc.Body = (HtmlElement)body;
+			Assert.AreEqual("<HEAD></HEAD><BODY>ABC</BODY>", doc.DocumentElement.InnerHTML);
+			
+		}
 	}
 }

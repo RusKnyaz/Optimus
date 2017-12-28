@@ -229,5 +229,12 @@
             Assert.AreEqual("<table><tbody></tbody><tbody><tr id=\"x\"></tr></tbody><tbody></tbody><tbody><tr></tr></tbody></table>",
                 d.innerHTML.toLowerCase())
         }
+    },
+    "SetInnerHtmlText":{
+        run:function () {
+            var div = document.createElement("div");
+            div.innerHTML = "abc";
+            Assert.AreEqual("abc", div.innerHTML);
+        }
     }
 });

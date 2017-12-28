@@ -39,6 +39,8 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	public class Document : Element, IDocument
 	{
+		private Element _body;
+
 		internal Document() : this(null)
 		{
 			ReadyState = DocumentReadyStates.Loading;
@@ -293,7 +295,22 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Sets or gets the document's body (the &lt;body&gt; element)
 		/// </summary>
-		public HtmlBodyElement Body { get; private set; }
+		public Element Body
+		{
+			get => _body;
+			set
+			{
+				if (value == null)
+					throw new ArgumentNullException(nameof(value));
+				
+				if(!(value is HtmlBodyElement /*|| value is HtmlFramesetElement*/))
+					throw new ArgumentOutOfRangeException("Should be BODY or FRAMESET element");
+
+				DocumentElement.RemoveChild(_body);
+				_body = value;
+				DocumentElement.AppendChild(_body);
+			}
+		}
 
 		/// <summary>
 		/// Returns the &lt;head&gt; element of the current document. If there are more than one &lt;head&gt; elements, the first one is returned.

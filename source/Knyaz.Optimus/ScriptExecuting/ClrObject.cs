@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
+using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Environments;
@@ -57,7 +59,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (property != null)
 			{
-				var descriptor = new PropertyInfoDescriptor(Engine, property, Target);
+				var descriptor = new ClrPropertyInfoDescriptor(Engine, property, Target);
 				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
@@ -298,8 +300,55 @@ namespace Knyaz.Optimus.ScriptExecuting
 					}
 				}
 			}
-			
+
 			return _internalFunc.Call(thisObject, arguments);
+		}
+	}
+	
+	public sealed class ClrPropertyInfoDescriptor : PropertyDescriptor
+	{
+		private readonly Jint.Engine _engine;
+		private readonly PropertyInfo _propertyInfo;
+		private readonly object _item;
+
+		public ClrPropertyInfoDescriptor(Jint.Engine engine, PropertyInfo propertyInfo, object item)
+		{
+			this._engine = engine;
+			this._propertyInfo = propertyInfo;
+			this._item = item;
+			this.Writable = new bool?(propertyInfo.CanWrite);
+		}
+
+		public override JsValue Value
+		{
+			get
+			{
+				return JsValue.FromObject(_engine, _propertyInfo.GetValue(_item, null));
+			}
+			set
+			{
+				try
+				{
+					JsValue jsValue = value;
+					object obj;
+					if (_propertyInfo.PropertyType == typeof(JsValue))
+					{
+						obj = jsValue;
+					}
+					else
+					{
+						obj = jsValue.ToObject();
+						if (obj != null && obj.GetType() != this._propertyInfo.PropertyType)
+							obj = _engine.ClrTypeConverter.Convert(obj, this._propertyInfo.PropertyType,
+								(IFormatProvider) CultureInfo.InvariantCulture);
+					}
+					_propertyInfo.SetValue(_item, obj, null);
+				}
+				catch (Exception ex)
+				{
+					throw new JavaScriptException(JsValue.FromObject(_engine, ex));
+				}
+			}
 		}
 	}
 }

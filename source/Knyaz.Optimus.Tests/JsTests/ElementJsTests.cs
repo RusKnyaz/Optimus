@@ -30,6 +30,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("TableDoesNotAcceptDivs")]
 		[TestCase("TableCreatedBodies")]
 		[TestCase("TableWrongTBody")]
+		[TestCase("SetInnerHtmlText")]
 		public void ElementTests(string testName) => JsTestsRunner.Run("ElementTests", testName);
 	}
 }

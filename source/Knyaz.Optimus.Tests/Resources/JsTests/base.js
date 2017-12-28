@@ -47,5 +47,25 @@ var Assert = {
     IsNull : function(x){
         if (x != null)
             throw "Expected null but was " + x;
+    },
+    AreNotEqual: function (x1, x2, msg) {
+        if (x1 != x2)
+            return;
+
+        var error = "Expected not \r\n \'" + x1 + "\'";
+        if (msg)
+            error = msg + "\r\n" + error;
+
+        throw error;
+    },
+    Throws: function (fun) {
+        try{
+            fun();
+        }
+        catch(ex){
+            return ex;
+        }
+        
+        throw "Expected exception, but was not."
     }
 };

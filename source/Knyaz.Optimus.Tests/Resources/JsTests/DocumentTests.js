@@ -57,5 +57,28 @@
             div.innerHTML = "<div><span></span></div>";
             Assert.AreEqual("<span></span>", res.toLowerCase());
         }
+    },
+    "SetBody":{
+        run:function () {
+            var doc = document.implementation.createHTMLDocument();
+            var body = doc.createElement("body");
+            body.innerHTML = "abc";
+            doc.body = body;
+            Assert.AreEqual("<head></head><body>abc</body>",
+                doc.documentElement.innerHTML.toLowerCase());
+        }
+    },
+    "SetBodyDiv":{
+        run: function () {
+            var doc = document.implementation.createHTMLDocument();
+            var div = doc.createElement("div");
+            Assert.Throws(function () { doc.body = div; });
+        }
+    },
+    "SetBodyNull":{
+        run:function () {
+            var doc = document.implementation.createHTMLDocument();
+            Assert.Throws(function () { doc.body = null; });   
+        }
     }
 });

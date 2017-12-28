@@ -272,8 +272,8 @@ namespace Knyaz.Optimus
 
 				if (ComputedStylesEnabled)
 				{
-					foreach (var script in html.OfType<Html.IHtmlElement>()
-					.Flat(x => x.Children.OfType<Html.IHtmlElement>())
+					foreach (var script in html.OfType<IHtmlElement>()
+					.Flat(x => x.Children.OfType<IHtmlElement>())
 					.Where(x => x.Name == "link" && x.Attributes.ContainsKey("href") &&
 					            (!x.Attributes.ContainsKey("type") || x.Attributes["type"] == "text/css"))
 					.Select(x => x.Attributes["href"])
