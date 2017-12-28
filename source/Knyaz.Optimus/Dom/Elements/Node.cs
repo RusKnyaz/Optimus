@@ -78,6 +78,17 @@ namespace Knyaz.Optimus.Dom.Elements
 			if (owner == null) return;
 			node.SetOwner(owner);
 			owner.HandleNodeAdded(node);
+		
+			if (node.Source != NodeSources.DocumentBuilder)
+				RaiseDomNodeInserted(node);
+		}
+		
+		private void RaiseDomNodeInserted(Node newChild)
+		{
+			var owner = OwnerDocument ?? this as Document;
+			var evt = (MutationEvent)owner.CreateEvent("MutationEvent");
+			evt.InitMutationEvent("DOMNodeInserted", true, false, newChild.ParentNode, null, null, null, 0);
+			newChild.DispatchEvent(evt);
 		}
 
 		private void UnattachFromParent(Node node) => node.ParentNode?.ChildNodes.Remove(node);

@@ -11,6 +11,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("RemoveDocType")]
 		[TestCase("TextContentIsNull")]
 		[TestCase("DefaultViewIsWindow")]
+		[TestCase("DomBuildOrder")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run("DocumentTests", testName);
 
 		[TestCase("CommentRemove")]

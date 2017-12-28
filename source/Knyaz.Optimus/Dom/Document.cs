@@ -361,21 +361,19 @@ namespace Knyaz.Optimus.Dom
 				return;
 
 			NodeInserted?.Invoke(newChild);
-
-			if (newChild.Source != NodeSources.DocumentBuilder)
-				RaiseDomNodeInserted(newChild);
 		}
 
-		private void RaiseDomNodeInserted(Node newChild)
+		protected override void BeforeEventDispatch(Event obj)
 		{
-			DomNodeInserted?.Invoke(newChild);
+			base.BeforeEventDispatch(obj);
 
-			var evt = (MutationEvent)CreateEvent("MutationEvent");
-			evt.InitMutationEvent("DOMNodeInserted", true, false, newChild.ParentNode, null, null, null, 0);
-			newChild.DispatchEvent(evt);
+			if (obj.Type == "DOMNodeInserted")
+			{
+				DomNodeInserted?.Invoke((Node)obj.Target);	
+			}
 		}
 
-
+		
 		internal void HandleNodeEventException(Node node, Exception exception) => 
 			OnNodeException?.Invoke(node, exception);
 
