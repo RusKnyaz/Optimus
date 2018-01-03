@@ -53,6 +53,13 @@ namespace Knyaz.Optimus.Tests.JsTests
 		
 		[TestCase("Clone")]
 		[TestCase("TextContent")]
-		public void CommentTests(string testName)=> JsTestsRunner.Run("CommentTests", testName);
+		[TestCase("AppendData")]
+		[TestCase("AppendDataNull")]
+		[TestCase("DeleteData")]
+		[TestCase("InsertData")]
+		[TestCase("ReplaceData")]
+		[TestCase("SubstringData")]
+		[TestCase("LengthTest")]
+		public void CommentTests(string testName) => JsTestsRunner.Run("CommentTests", testName);
 	}
 }

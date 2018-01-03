@@ -23,21 +23,47 @@
 		/// </summary>
 		public void Remove() => ParentNode?.RemoveChild(this);
 
-		/*
-		 *
-		todo: to be added
 		/// <summary>
-		/// The number of code units in data.
+		/// Returns a string containing the part of <see cref="Data"/> of the specified length and starting at the specified offset.
 		/// </summary>
-		public abstract int Length { get; }
-		
-		
-		DOMString substringData(unsigned long offset, unsigned long count);
-		void appendData(DOMString data);
-		void insertData(unsigned long offset, DOMString data);
-		void deleteData(unsigned long offset, unsigned long count);
-		void replaceData(unsigned long offset, unsigned long count, DOMString data);*/
+		public string SubstringData(int offset, int count) => Data.Substring(offset, count);
 
+		/// <summary>
+		/// Appends the given string to the <see cref="Data"/> string.
+		/// </summary>
+		/// <param name="text">String that specifies the text to insert</param>
+		public void AppendData(string text) => Data = Data + (text ?? "null");
+
+		/// <summary>
+		/// Removes the specified part of the text content.
+		/// </summary>
+		/// <param name="offset">Integer that specifies the start position of the contents to remove.</param>
+		/// <param name="count">Integer that specifies the number of characters to remove.</param>
+		public void DeleteData(int offset, int count) => Data = Data.Remove(offset, count);
+
+
+		/// <summary>
+		/// Inserts text content into the current element at the specified position.
+		/// </summary>
+		/// <param name="offset">Integer that specifies the start position of the insertion.</param>
+		/// <param name="text">String that specifies the text to insert.</param>
+		public void InsertData(int offset, string text) => Data = Data.Insert(offset, text);
+
+		/// <summary>
+		/// Replaces the specified part of the text content.
+		/// </summary>
+		/// <param name="start">Integer that specifies start position of the contents to remove.</param>
+		/// <param name="charsToRemove">Integer that specifies the number of characters to remove.</param>
+		/// <param name="text">String that specifies the text to insert.</param>
+		public void ReplaceData(int start, int charsToRemove, string text) =>
+			Data = Data.Remove(start, charsToRemove).Insert(start, text);
+
+
+		/// <summary>
+		/// Returns an integer representing the size of the string contained in <see cref="Data"/>.
+		/// </summary>
+		public int Length => Data.Length;
+		
 		public string TextContent
 		{
 			get => NodeValue;
