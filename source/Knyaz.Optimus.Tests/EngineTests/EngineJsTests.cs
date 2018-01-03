@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
@@ -312,6 +315,26 @@ console.log(style['width']);");
 //todo:			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.org/sub"), Times.Once());
 
 			Assert.AreEqual("http://todosoft.org/sub", engine.Window.Location.Href);
+		}
+		
+		[Test]
+		public void SetLocationHrefAndShareCookies()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org",
+				Mocks.Page("document.cookie='user=ivan';" +
+					       "window.location.href = 'http://todosoft.org/sub';"))
+				.Resource("http://todosoft.org/sub", Mocks.Page("console.log(document.cookie);"));
+
+			var cookie = new CookieContainer();
+			Mock.Get(resourceProvider).SetupGet(x => x.CookieContainer).Returns(cookie);
+			
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.AttachLog();
+			engine.OpenUrl("http://todosoft.org");
+
+			Thread.Sleep(1000);
+
+			CollectionAssert.AreEqual(new object[]{"user=ivan"}, log);
 		}
 
 		[Test]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
@@ -33,18 +34,12 @@ namespace Knyaz.Optimus.ResourceProviders
 			remove { _resourceProvider.Received -= value; }
 		}
 
-		public Task<IResource> SendRequestAsync(IRequest req)
-		{
-			Task<IResource> preloaded;
-			return _preloadedResources.TryRemove(req, out preloaded)
-				? preloaded
-				: _resourceProvider.SendRequestAsync(req);
-		}
+		public Task<IResource> SendRequestAsync(IRequest req) => 
+			_preloadedResources.TryRemove(req, out var preloaded)
+			? preloaded
+			: _resourceProvider.SendRequestAsync(req);
 
-		public IRequest CreateRequest(string path)
-		{
-			return _resourceProvider.CreateRequest(path);
-		}
+		public IRequest CreateRequest(string path) => _resourceProvider.CreateRequest(path);
 
 		public void Preload(string uri)
 		{
@@ -57,9 +52,8 @@ namespace Knyaz.Optimus.ResourceProviders
 			_preloadedResources.AddOrUpdate(request, task, (s, task1) => task1);
 		}
 
-		public void Clear()
-		{
-			_preloadedResources.Clear();
-		}
+		public void Clear() => _preloadedResources.Clear();
+
+		public CookieContainer CookieContainer => _resourceProvider.CookieContainer;
 	}
 }

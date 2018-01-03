@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
@@ -38,5 +39,7 @@ namespace Knyaz.Optimus.ResourceProviders
         /// Called on request handled and data received.
         /// </summary>
         event EventHandler<ReceivedEventArguments> Received;
+
+        CookieContainer CookieContainer { get; }
     }
 }

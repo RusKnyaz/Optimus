@@ -96,6 +96,8 @@ namespace Knyaz.Optimus
 					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
+					
+					Document.CookieContainer = ResourceProvider.CookieContainer;
 
 					if (_computedStylesEnabled)
 					{
@@ -204,10 +206,10 @@ namespace Knyaz.Optimus
 			//todo: stop unfinished ajax requests or drop their results
 			Window.Timers.ClearAll();
 			ScriptExecutor.Clear();
-			Document = new Document(Window);
 			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
+			Document = new Document(Window);
 			
 			ResourceProvider.Root = GetRoot(Uri);
 
