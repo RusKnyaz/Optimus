@@ -330,9 +330,9 @@ console.log(style['width']);");
 			
 			var engine = new Engine(resourceProvider);
 			var log = engine.Console.AttachLog();
-			engine.OpenUrl("http://todosoft.org");
-
-			Thread.Sleep(1000);
+			engine.OpenUrl("http://todosoft.org").Wait();
+			
+			Thread.Sleep(5000);
 
 			CollectionAssert.AreEqual(new object[]{"user=ivan"}, log);
 		}
