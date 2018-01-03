@@ -13,11 +13,13 @@ namespace Knyaz.Optimus.ResourceProviders
 	{
 		public event Action<string> OnRequest;
 		public event EventHandler<ReceivedEventArguments> Received;
+		public CookieContainer CookieContainer { get; } = new CookieContainer();
 
-		public ResourceProvider() 
-		:this(new HttpResourceProvider(
-				new CookieContainer()), new FileResourceProvider())
-		{}
+		public ResourceProvider()
+		{
+			HttpResourceProvider = new HttpResourceProvider(CookieContainer);
+			FileResourceProvider = new FileResourceProvider();
+		}
 
 		public ResourceProvider(ISpecResourceProvider httpResourceProvider,
 			ISpecResourceProvider fileResourceProvider)

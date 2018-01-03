@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
@@ -44,6 +45,30 @@ namespace Knyaz.Optimus.Dom
 		internal Document() : this(null)
 		{
 			ReadyState = DocumentReadyStates.Loading;
+		}
+
+		/// <summary>
+		/// Get or set the cookies associated with the current document. 
+		/// </summary>
+		public string Cookie
+		{
+			get
+			{
+				if (CookieContainer == null)
+					return "";
+
+				return CookieParser.ToString(CookieContainer.GetCookies(new Uri(Location.Origin)));
+			}
+			set
+			{
+				if (CookieContainer == null)
+					return;
+
+				var cookie = CookieParser.FromString(value);
+				cookie.Domain = Location.Host;
+				
+				CookieContainer.Add(cookie);
+			}
 		}
 
 		/// <summary>
@@ -408,6 +433,8 @@ namespace Knyaz.Optimus.Dom
 		/// Gets the currently focused element in the document.
 		/// </summary>
 		public object ActiveElement { get; set; }
+
+		internal CookieContainer CookieContainer { get; set; }
 
 		/// <summary>
 		/// Gets the first element that matches a specified CSS selector(s) in the document.

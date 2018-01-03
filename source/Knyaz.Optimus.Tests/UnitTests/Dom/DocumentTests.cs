@@ -1,6 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ResourceProviders;
+using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -333,6 +341,72 @@ namespace Knyaz.Optimus.Tests.Dom
 			doc.Body = (HtmlElement)body;
 			Assert.AreEqual("<HEAD></HEAD><BODY>ABC</BODY>", doc.DocumentElement.InnerHTML);
 			
+		}
+
+		[Test]
+		public void SetCookie()
+		{
+			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
+			Mock.Get(rp).SetupGet(x => x.CookieContainer).Returns(new CookieContainer());
+			var engine = new Engine(rp);
+			engine.OpenUrl("http://knyaz.ru").Wait();
+			var document = engine.Document;
+			
+			document.Cookie = "name=oeschger";
+			document.Cookie = "favorite_food=tripe";
+			
+			Assert.AreEqual("name=oeschger; favorite_food=tripe", document.Cookie);
+		}
+
+		[Test]
+		public void ChangeCookieValue()
+		{
+			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
+			Mock.Get(rp).SetupGet(x => x.CookieContainer).Returns(new CookieContainer());
+			var engine = new Engine(rp);
+			engine.OpenUrl("http://knyaz.ru").Wait();
+			var document = engine.Document;
+			
+			document.Cookie = "name=oeschger";
+			document.Cookie = "favorite_food=tripe";
+			document.Cookie = "name=ivan";
+			
+			Assert.AreEqual("name=ivan; favorite_food=tripe", document.Cookie);
+		}
+
+		[Test]
+		public void RemoveCookie()
+		{
+			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
+			Mock.Get(rp).SetupGet(x => x.CookieContainer).Returns(new CookieContainer());
+			var engine = new Engine(rp);
+			engine.OpenUrl("http://knyaz.ru").Wait();
+			var document = engine.Document;
+			
+			document.Cookie = "name=oeschger";
+			document.Cookie = "authid=12345";
+			document.Cookie = "name=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+			
+			Assert.AreEqual("authid=12345", document.Cookie);
+		}
+
+		[Test]
+		public void SetCookieExpiration()
+		{
+			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
+			Mock.Get(rp).SetupGet(x => x.CookieContainer).Returns(new CookieContainer());
+			var engine = new Engine(rp);
+			engine.OpenUrl("http://knyaz.ru").Wait();
+			var document = engine.Document;
+			
+			var time = DateTime.UtcNow.AddSeconds(3).ToString(
+				"ddd, dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+			var cookie = "name=ivan; Expires="+ time +" GMT;";
+			document.Cookie = cookie;
+			
+			Assert.AreEqual("name=ivan", document.Cookie, "Cookie value before expiration");
+			Thread.Sleep(4000);
+			Assert.AreEqual("", document.Cookie, "Cookie value after expiration");
 		}
 	}
 }
