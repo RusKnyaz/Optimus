@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
 
@@ -916,6 +917,56 @@ dispatchEvent(evt);");
 			var log = engine.Console.AttachLog();
 			engine.OpenUrl("http://site.net/").Wait();
 			Assert.AreEqual(new[]{"onclick"}, log);
+		}
+
+		[Test]
+		public void SubmitForm()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://site.net",
+				"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
+				.Resource("/login?username=Jonh&password=123456", "");
+			
+			var engine = new Engine(resourceProvider);
+
+			engine.OpenUrl("http://site.net/").Wait();
+
+			var doc = engine.Document;
+			var form = doc.GetElementsByTagName("form").First() as HtmlFormElement;
+			var username = doc.GetElementsByName("username").First() as HtmlInputElement;
+			var password = doc.GetElementsByName("password").First() as HtmlInputElement;
+
+			username.Value = "John";
+			password.Value = "123456";
+			form.Submit();
+			
+			Assert.AreEqual(
+				"http://site.net/login?username=John&password=123456",
+				doc.Location.Href);
+		}
+
+		[TestCase("login?var2=y", "http://site.net/sub/login?username=John&password=123456")]
+		[TestCase("/login?var2=y", "http://site.net/login?username=John&password=123456")]
+		public void SubmitFormInSubWithParams(string action, string expected)
+		{
+			//1. initial query should be removed from request on form submit
+			//2. Form action query should be ignored.
+			var httpResources = Mock.Of<ISpecResourceProvider>()
+				.Resource("http://site.net/sub/?var1=x",
+					"<form method=get action='"+action+"'><input name=username type=text/><input name=password type=password/></form>")
+				.Resource("http://site.net/sub/login?username=Jonh&password=123456", "")
+				.Resource("http://site.net/login?username=Jonh&password=123456", "");
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net/sub/?var1=x").Wait();
+			
+			var doc = engine.Document;
+			var form = doc.Get<HtmlFormElement>("form").First();
+			var username = doc.Get<HtmlInputElement>("[name=username]").First();
+			var password = doc.Get<HtmlInputElement>("[name=password]").First();
+
+			username.Value = "John";
+			password.Value = "123456";
+			form.Submit();
+			Assert.AreEqual(expected, doc.Location.Href);
 		}
 	}
 }

@@ -1,5 +1,8 @@
-﻿using Knyaz.Optimus.Dom;
+﻿using System;
+using System.Linq;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -27,6 +30,18 @@ namespace Knyaz.Optimus.Tests.Dom
 			_form.Method = setValue;
 			Assert.AreEqual(setValue, _form.GetAttribute("method"));
 			Assert.AreEqual(getValue, _form.Method);
+		}
+
+		[Test]
+		public void NeighbourElements()
+		{
+			var resources = Mocks.ResourceProvider(
+				"http://a.bc", "<html><body><form id=f></form><input form=f/></body></html>");
+			
+			var engine = new Engine(resources);
+			engine.OpenUrl("http://a.bc").Wait();
+			engine.Document.Get<HtmlFormElement>("#f").FirstOrDefault()
+				.Assert(form => form.Elements.Count == 1);
 		}
 	}
 }

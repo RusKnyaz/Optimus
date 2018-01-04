@@ -211,5 +211,13 @@ namespace Knyaz.Optimus.TestingTools
 				stream.Write(data);
 			}
 		}
+
+		/// <summary>
+		/// Alias for QuerySelectorAll method with element types filtration.
+		/// </summary>
+		public static IEnumerable<T> Get<T>(this Element elt, string query)
+		{
+			return elt.QuerySelectorAll(query).OfType<T>();
+		}
 	}
 }

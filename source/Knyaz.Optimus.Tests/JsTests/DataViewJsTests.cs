@@ -17,7 +17,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetInt32")]
 		public void Run(string testName)
 		{
-			JsTestsRunner.Run("DataViewTests", testName);
+			JsTestsRunner.Run(testName, "DataViewTests");
 		}
     }
 }

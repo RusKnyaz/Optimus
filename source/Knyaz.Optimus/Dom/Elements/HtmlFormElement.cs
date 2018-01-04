@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Knyaz.Optimus.Dom.Events;
-using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -125,16 +125,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// is the form element, with the exception of input elements whose type attribute is in the Image Button state, 
 		/// which must, for historical reasons, be excluded from this particular collection.
 		/// </summary>
-		public IEnumerable<HtmlElement> Elements
+		public IReadOnlyCollection<HtmlElement> Elements
 		{
 			get
 			{
 				//todo: consider to make search more optimal
-				var allelements = this.IsInDocument() ? this.Flatten() : OwnerDocument.Flatten();
+				var allelements = this.IsInDocument() ? OwnerDocument.Flatten() : this.Flatten();
 				return allelements.OfType<IFormElement>()
                     .Where(x => x.Form == this)
                     .OfType<HtmlElement>()
-                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" );
+                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" )
+					.ToList();
 			}
 		} 
 
@@ -159,7 +160,30 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public void Submit()
 		{
-			//todo: implement submission. on call from user code or java script 'onSubmit' event should not be occured.	
+			if (Method == "get")
+			{
+				var uri = UriHelper.IsAbsolete(Action)
+						? new Uri(Action)
+						: new Uri(new Uri(OwnerDocument.Location.Href), Action);
+
+				var queryBuilder = new StringBuilder();
+				foreach (var elt in Elements.OfType<IFormElement>())
+				{
+					if(string.IsNullOrEmpty(elt.Name))
+						continue;
+
+					queryBuilder.Append(elt.Name);
+					queryBuilder.Append('=');
+					queryBuilder.Append(elt.Value);
+					queryBuilder.Append('&');
+					//todo: encode special chars
+				}
+				
+				OwnerDocument.Location.Href = 
+					uri.AbsolutePath + "?" + queryBuilder.ToString().TrimEnd('&');
+			}
+			
+			//todo: implement submission. on call from user code or java script 'onSubmit' event should not be occured.
 		}
 
 		internal void RaiseSubmit()

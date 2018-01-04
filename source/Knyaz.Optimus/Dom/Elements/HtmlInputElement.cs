@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
 	[DomItem]
-	public sealed class HtmlInputElement : HtmlElement, IResettableElement
+	public sealed class HtmlInputElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults
 		{
@@ -31,6 +31,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 		
 		public HtmlFormElement Form => this.FindOwnerForm();
+		public string Name
+		{
+			get => GetAttribute("name", string.Empty);
+			set => SetAttribute("name", value);
+		}
 
 		/// <summary>
 		/// Specifies whether or not an input field should have autocomplete enabled. Available values: "on"|"off".
