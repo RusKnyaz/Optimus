@@ -74,6 +74,23 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalGetter("innerHeight", () => engine.Window.InnerHeight);
 			
 			AddGlobalAct("alert", (_,x) => engine.Window.Alert(x[0].AsString()));
+
+			var windowOpenFunc = new ClrFunctionInstance(_jsEngine, (thisValue, values) =>
+			{
+				if(values.Length == 0)
+					engine.Window.Open();
+				else if(values.Length == 1)
+					engine.Window.Open(values[0].AsString());
+				else if(values.Length == 2)
+					engine.Window.Open(values[0].AsString(), values[1].AsString());
+				else 
+					engine.Window.Open(values[0].AsString(), values[1].AsString(), values[2].AsString());
+				
+				return JsValue.Undefined;
+			});
+			_jsEngine.Global.DefineOwnProperty("open", new ClrAccessDescriptor(_jsEngine, value => windowOpenFunc), true);
+			
+			
 			AddGlobalAct("clearInterval", (_,x) => engine.Window.ClearInterval(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
