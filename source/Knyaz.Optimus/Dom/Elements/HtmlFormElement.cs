@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -28,6 +29,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		private static string[] AllowedMethods = new[] {"get", "post"};
 
 		internal HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form){}
+
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			base.BeforeEventDispatch(evt);
+
+			if (evt.Type == "submit")
+			{
+				Handle("onsubmit", OnSubmit, evt);
+				if(!evt.IsDefaultPrevented())
+					Submit();
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the 'name' attribute value reflecting the value of the form's name HTML attribute, containing the name of the form.
@@ -146,10 +159,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public void Submit()
 		{
+			//todo: implement submission. on call from user code or java script 'onSubmit' event should not be occured.	
+		}
+
+		internal void RaiseSubmit()
+		{
 			var evt = OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("submit", true, true);
 			DispatchEvent(evt);
 		}
+		
+		
 
 		/// <summary>
 		/// Called on form submit.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -20,6 +21,16 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		internal HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input){}
+
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			base.BeforeEventDispatch(evt);
+			
+			if (evt.Type == "click" && !evt.IsDefaultPrevented() && Type == "submit")
+				Form?.RaiseSubmit();
+		}
+		
+		public HtmlFormElement Form => this.FindOwnerForm();
 
 		/// <summary>
 		/// Specifies whether or not an input field should have autocomplete enabled. Available values: "on"|"off".

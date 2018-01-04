@@ -20,6 +20,14 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlButtonElement(Document ownerDocument) : base(ownerDocument, TagsNames.Button) { }
 
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			base.BeforeEventDispatch(evt);
+
+			if (evt.Type == "click" && !evt.IsDefaultPrevented())
+				Form?.RaiseSubmit();
+		}
+
 		/// <summary>
 		/// Is a string indicating the behavior of the button. This is an enumerated attribute with the following possible values:
 		/// "submit": The button submits the form. This is the default value if the attribute is not specified, HTML5 or if it is dynamically changed to an empty or invalid value.
@@ -76,24 +84,6 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			get => GetAttribute("tabIndex", Defaults.TabIndex);
 			set => SetAttribute("tabIndex", value.ToString());
-		}
-
-		/// <summary>
-		/// Overrides base DispatchEvent to submit parent form on click event.
-		/// </summary>
-		public override bool DispatchEvent(Event evt)
-		{
-			if (!base.DispatchEvent(evt))
-				return false;
-			
-			//default actions;
-			if (evt.Type == "click")
-			{
-				var form = Form;
-				if (form != null)
-					form.Submit();
-			}
-			return true;
 		}
 
 		/// <summary>

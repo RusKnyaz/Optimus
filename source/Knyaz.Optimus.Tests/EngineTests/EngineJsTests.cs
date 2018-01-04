@@ -887,5 +887,35 @@ dispatchEvent(evt);");
 			Assert.AreEqual(null, calledName, "name");
 			Assert.AreEqual(null, calledOptions, "options");
 		}
+
+		[Test]
+		public void FormAutoSubmit()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://site.net",
+				@"<html><body><form method=get onsubmit=""console.log('onsubmit');event.preventDefault();"" id=f action='http://todosoft.ru/test/file.dat'>
+				<input name=username/>
+				<button type=submit id=b onclick=""console.log('onclick')"">Download!</button>
+				</form><script>document.getElementById(""b"").click();</script></body></html>");
+			
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.AttachLog();
+			engine.OpenUrl("http://site.net/").Wait();
+			Assert.AreEqual(new[]{"onclick", "onsubmit"}, log);
+		}
+		
+		[Test]
+		public void FormAutoSubmitPrevented()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://site.net",
+				@"<html><body><form method=get onsubmit=""console.log('onsubmit');event.preventDefault();"" id=f action='http://todosoft.ru/test/file.dat'>
+				<input name=username/>
+				<button type=submit id=b onclick=""console.log('onclick');event.preventDefault();"">Download!</button>
+				</form><script>document.getElementById(""b"").click();</script></body></html>");
+			
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.AttachLog();
+			engine.OpenUrl("http://site.net/").Wait();
+			Assert.AreEqual(new[]{"onclick"}, log);
+		}
 	}
 }

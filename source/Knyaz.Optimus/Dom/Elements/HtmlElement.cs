@@ -22,6 +22,8 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		protected override void BeforeEventDispatch(Event evt)
 		{
+			base.BeforeEventDispatch(evt);
+			
 			if (evt.Type == "click")
 				Handle("onclick", OnClick, evt);
 		}
