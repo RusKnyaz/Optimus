@@ -7,7 +7,8 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
-	[TestFixture, Ignore("For manual run")]
+	[TestFixture]
+	[Ignore("For manual run")]
 	[Category("manual")]
 	public class OpenSites
 	{
@@ -165,6 +166,22 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			Assert.Throws<AggregateException>(() => engine.OpenUrl("http://asd.okkamtech.com/").Wait());
+		}
+
+		[Test]
+		public void Redmine()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://red.todosoft.ru").Wait();
+			var login = engine.WaitSelector("a.login").FirstOrDefault() as HtmlElement;
+			Assert.IsNotNull(login, "login button");
+			engine.Window.Location.Href = login.GetAttribute("href");//login.Click();
+			var userNameInput = engine.WaitId("username") as HtmlElement;
+			Assert.IsNotNull(userNameInput, "user name inpit");
+			var passwordInput = engine.WaitId("password") as HtmlElement;
+			Assert.IsNotNull(passwordInput, "password input");
+			var loginButton = engine.Document.GetElementsByName("login").FirstOrDefault() as HtmlInputElement;
+			Assert.IsNotNull(loginButton);
 		}
 	}
 }
