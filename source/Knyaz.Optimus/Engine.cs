@@ -58,10 +58,15 @@ namespace Knyaz.Optimus
    		{
    			ResourceProvider = resourceProvider;
    			Console = new Console();
-   			Window = new Window(() => Document, this);
+   			Window = new Window(() => Document, this, (url, name, opts)=> OnWindowOpen?.Invoke(url, name, opts));
    			ScriptExecutor = new ScriptExecutor(this);
    			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
    		}
+
+		/// <summary>
+		/// Occurs when window.open method called.
+		/// </summary>
+		public event Action<string, string, string> OnWindowOpen;
 
 		/// <summary>
 		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).

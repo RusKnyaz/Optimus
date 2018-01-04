@@ -13,13 +13,15 @@ namespace Knyaz.Optimus.Environment
 	public class Window : IWindow
 	{
 		private readonly Engine _engine;
+		private readonly Action<string, string, string> _openWindow;
 		private readonly EventTarget _eventTarget;
 
 		public WindowTimers Timers => _timers;
 
-		internal Window(Func<object> getSyncObj, Engine engine)
+		internal Window(Func<object> getSyncObj, Engine engine, Action<string, string, string> openWindow)
 		{
 			_engine = engine;
+			_openWindow = openWindow ?? ((x,y,z) => {});
 			Screen = new Screen
 				{
 					Width = 1024,
@@ -39,8 +41,7 @@ namespace Knyaz.Optimus.Environment
 			_timers = new WindowTimers(getSyncObj);
 			_timers.OnException += exception =>
 				{
-					var jsEx = exception as JavaScriptException;
-					if (jsEx != null)
+					if (exception is JavaScriptException jsEx)
 					{
 						engine.Console.Log("Unhandled exception in timer handler function: " + jsEx.Error.ToString());
 					}
@@ -179,5 +180,14 @@ namespace Knyaz.Optimus.Environment
 		/// Disposes the window object.
 		/// </summary>
 		public void Dispose() => _timers.Dispose();
+
+		/// <summary>
+		/// Loads the specified resource into the browsing context (window, <iframe> or tab) with the specified name.
+		/// </summary>
+		/// <param name="url">The URL of the resource to be loaded.</param>
+		/// <param name="windowName">The name of the browsing context (window, <iframe> or tab) into which to load the specified resource.</param>
+		/// <param name="features">The comma-separated list of window features given with their corresponding values in the form "name=value"</param>
+		public void Open(string url = null, string windowName = null, string features = null) => 
+			_openWindow(url, windowName, features);
 	}
 }

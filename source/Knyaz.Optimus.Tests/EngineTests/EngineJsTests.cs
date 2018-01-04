@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
 using Moq;
 using NUnit.Framework;
@@ -854,8 +855,37 @@ dispatchEvent(evt);");
 		[Test]
 		public void CompareWithThis()
 		{
-			var engine = CreateEngine("<div></div>", @"console.log({}===this);");
+			CreateEngine("<div></div>", @"console.log({}===this);");
 			CollectionAssert.AreEqual(new object[] {false}, _log);
+		}
+
+		[Test]
+		public void WindowOpen()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://site.net", Mocks.Page("",
+				"<button id=download type=submit onclick=\"window.open('file.txt')\">Download!</button>"))
+				.Resource("file.txt", "Hello");
+			
+			var engine = new Engine(resourceProvider);
+
+			engine.OpenUrl("http://site.net").Wait();
+
+			string calledUrl = null;
+			string calledName = null;
+			string calledOptions = null;
+			engine.OnWindowOpen += (url, name, options) =>
+			{
+				calledUrl = url;
+				calledName = name;
+				calledOptions = options;
+			};
+
+			var button = engine.Document.GetElementById("download") as HtmlElement;
+			button.Click();
+			
+			Assert.AreEqual("file.txt", calledUrl, "url");
+			Assert.AreEqual(null, calledName, "name");
+			Assert.AreEqual(null, calledOptions, "options");
 		}
 	}
 }
