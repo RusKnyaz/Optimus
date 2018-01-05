@@ -176,12 +176,16 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var login = engine.WaitSelector("a.login").FirstOrDefault() as HtmlElement;
 			Assert.IsNotNull(login, "login button");
 			engine.Window.Location.Href = login.GetAttribute("href");//login.Click();
-			var userNameInput = engine.WaitId("username") as HtmlElement;
+			var userNameInput = engine.WaitId("username") as HtmlInputElement;
 			Assert.IsNotNull(userNameInput, "user name inpit");
-			var passwordInput = engine.WaitId("password") as HtmlElement;
-			Assert.IsNotNull(passwordInput, "password input");
-			var loginButton = engine.Document.GetElementsByName("login").FirstOrDefault() as HtmlInputElement;
-			Assert.IsNotNull(loginButton);
+			var passwordInput = engine.WaitId("password") as HtmlInputElement;
+
+			userNameInput.Value = "";
+			passwordInput.Value = "";
+			engine.Document.Get<HtmlInputElement>("[name=login]").First().Click();
+
+			var loggedUser = engine.WaitSelector("a.user.active").FirstOrDefault();
+			Assert.IsNotNull(loggedUser);
 		}
 	}
 }

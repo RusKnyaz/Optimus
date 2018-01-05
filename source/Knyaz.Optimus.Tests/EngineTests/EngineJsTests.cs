@@ -8,6 +8,7 @@ using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
+using System.Text;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -920,53 +921,90 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void SubmitForm()
+		public void SubmitGetForm()
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://site.net",
-				"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
-				.Resource("/login?username=Jonh&password=123456", "");
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
+				.Resource("http://site.net/login?username=John&password=123456", "");
 			
-			var engine = new Engine(resourceProvider);
-
+			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/").Wait();
 
 			var doc = engine.Document;
-			var form = doc.GetElementsByTagName("form").First() as HtmlFormElement;
-			var username = doc.GetElementsByName("username").First() as HtmlInputElement;
-			var password = doc.GetElementsByName("password").First() as HtmlInputElement;
 
-			username.Value = "John";
-			password.Value = "123456";
-			form.Submit();
-			
-			Assert.AreEqual(
-				"http://site.net/login?username=John&password=123456",
-				doc.Location.Href);
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
+			doc.Get<HtmlInputElement>("[name=password]").First().Value = "123456";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+
+			doc.Assert(document => document.Location.Href == "http://site.net/login?username=John&password=123456");
 		}
 
-		[TestCase("login?var2=y", "http://site.net/sub/login?username=John&password=123456")]
-		[TestCase("/login?var2=y", "http://site.net/login?username=John&password=123456")]
-		public void SubmitFormInSubWithParams(string action, string expected)
+		[Test]
+		public void SubmitPostForm()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'><input name=username type=text></form>")
+				.Resource("http://site.net/login", "");
+
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+
+			var data = 	Encoding.UTF8.GetString(httpResources.History[1].Data);
+
+			Assert.AreEqual("username=John", data);
+		}
+
+		[Test]
+		public void SubmitFormUtf8()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'><input name=username type=text></form>")
+				.Resource("http://site.net/login", "");
+
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "✓";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+
+			var data = Encoding.UTF8.GetString(httpResources.History[1].Data);
+
+			Assert.AreEqual("username=%E2%9C%93", data);
+		}
+
+		[TestCase("get", "login?var2=y", "http://site.net/sub/login?username=John&password=123456")]
+		[TestCase("get","/login?var2=y", "http://site.net/login?username=John&password=123456")]
+		[TestCase("post", "login?var2=y", "http://site.net/sub/login?var2=y")]
+		[TestCase("post","/login?var2=y", "http://site.net/login?var2=y")]
+		public void SubmitFormInSubWithParams(string method, string action, string expected)
 		{
 			//1. initial query should be removed from request on form submit
 			//2. Form action query should be ignored.
-			var httpResources = Mock.Of<ISpecResourceProvider>()
+			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/sub/?var1=x",
-					"<form method=get action='"+action+"'><input name=username type=text/><input name=password type=password/></form>")
-				.Resource("http://site.net/sub/login?username=Jonh&password=123456", "")
-				.Resource("http://site.net/login?username=Jonh&password=123456", "");
+					"<form method=" + method + " action='" + action + "'><input name=username type=text/><input name=password type=password/></form>")
+				.Resource(expected, "");
+
 			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/sub/?var1=x").Wait();
 			
 			var doc = engine.Document;
-			var form = doc.Get<HtmlFormElement>("form").First();
-			var username = doc.Get<HtmlInputElement>("[name=username]").First();
-			var password = doc.Get<HtmlInputElement>("[name=password]").First();
+			
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
+			doc.Get<HtmlInputElement>("[name=password]").First().Value = "123456";
+			doc.Get<HtmlFormElement>("form").First().Submit();
 
-			username.Value = "John";
-			password.Value = "123456";
-			form.Submit();
-			Assert.AreEqual(expected, doc.Location.Href);
+			doc.Assert(document => document.Location.Href == expected);
 		}
 	}
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
@@ -18,7 +16,7 @@ namespace Knyaz.Optimus
 	/// <summary>
 	/// The web engine that allows you you to load html pages, execute JavaScript and get live DOM.
 	/// </summary>
-	public class Engine: IEngine, IDisposable
+	public partial class Engine: IEngine, IDisposable
 	{
 		private Document _document;
 		private Uri _uri;
@@ -118,67 +116,6 @@ namespace Knyaz.Optimus
 			Console.Log("Node event handler exception: " + exception.Message);
 
 
-		// todo: rewrite and complete the stuff
-		private async void OnFormSubmit(HtmlFormElement form)
-		{
-			if (string.IsNullOrEmpty(form.Action))
-				return;
-			//todo: we should consider the case when button clicked and the button have 'method' or other attributes.
-			
-			var dataElements = form.Elements.OfType<IFormElement>().Where(x => !string.IsNullOrEmpty(x.Name));
-
-			var replaceSpaces = form.Method != "post" || form.Enctype != "multipart/form-data";
-			
-			var data = string.Join("&", dataElements.Select(x => 
-				x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
-				));
-
-			var isGet = form.Method.ToLowerInvariant() == "get";
-
-			var url = form.Action;
-
-			if (isGet)
-				url += "?" + data;
-
-			if (form.Action != "about:blank")
-			{
-				var document = new Document(Window);
-
-				HtmlIFrameElement targetFrame = null;
-				if (!string.IsNullOrEmpty(form.Target) &&
-					(targetFrame = Document.GetElementsByName(form.Target).FirstOrDefault() as HtmlIFrameElement) != null)
-				{
-					targetFrame.ContentDocument = document;
-				}
-				else
-				{
-					Document = document;
-				}
-
-				var request = ResourceProvider.CreateRequest(url);
-				if (!isGet)
-				{
-					var httpRequest = request as HttpRequest;
-					if (httpRequest != null)
-					{
-						//todo: use right encoding and enctype
-						httpRequest.Data = Encoding.UTF8.GetBytes(data);
-					}
-				}
-
-				var response = await ResourceProvider.SendRequestAsync(request);
-
-				//what should we do if the frame is not found?
-				if (response.Type == ResourceTypes.Html)
-				{
-					//todo: clear js runtime context
-					DocumentBuilder.Build(document, response.Stream);
-					document.Complete();
-				}
-			}
-			//todo: handle 'about:blank'
-		}
-
 		/// <summary>
 		/// Gets the current Uri of the document.
 		/// </summary>
@@ -219,7 +156,7 @@ namespace Knyaz.Optimus
 			ResourceProvider.Root = GetRoot(Uri);
 
 			var response = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
-			LoadFromResponse(response);
+			LoadFromResponse(Document, response);
 		}
 
 		private string GetRoot(Uri uri)
@@ -232,16 +169,15 @@ namespace Knyaz.Optimus
 			return root;
 		}
 
-		private void LoadFromResponse(IResource resource)
+		private void LoadFromResponse(Document document, IResource resource)
 		{
 			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
 				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
 
-			var httpResponse = resource as HttpResponse;
-			if (httpResponse != null && httpResponse.Uri != null)
+			if (resource is HttpResponse httpResponse && httpResponse.Uri != null)
 				Uri = httpResponse.Uri;
 
-			BuildDocument(resource.Stream);
+			BuildDocument(document, resource.Stream);
 		}
 
 		/// <summary>
@@ -252,10 +188,10 @@ namespace Knyaz.Optimus
 		{
 			ScriptExecutor.Clear();
 			Document = new Document(Window);
-			BuildDocument(stream);
+			BuildDocument(Document, stream);
 		}
 
-		private void BuildDocument(Stream stream)
+		private void BuildDocument(Document document, Stream stream)
 		{
 			//todo: fix protocol
 			if(Uri == null)
@@ -291,8 +227,8 @@ namespace Knyaz.Optimus
 				}
 			}
 
-			DocumentBuilder.Build(Document, html);
-			Document.Complete();
+			DocumentBuilder.Build(document, html);
+			document.Complete();
 		}
 
 		public void Dispose() => Window.Dispose();

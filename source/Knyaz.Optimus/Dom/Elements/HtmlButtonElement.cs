@@ -87,7 +87,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary>
-		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with. If the button is a descendant of a form element, then this attribute is the ID of that form element.
+		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with.
 		/// </summary>
 		public HtmlFormElement Form => this.FindOwnerForm();
 	}

@@ -30,7 +30,14 @@ namespace Knyaz.Optimus.Dom.Elements
 				Form?.RaiseSubmit();
 		}
 		
+		/// <summary>
+		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with.
+		/// </summary>
 		public HtmlFormElement Form => this.FindOwnerForm();
+		
+		/// <summary>
+		/// Gets or sets the 'name' attribute value reflecting the value of the form's name HTML attribute, containing the name of the form.
+		/// </summary>
 		public string Name
 		{
 			get => GetAttribute("name", string.Empty);

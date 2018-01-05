@@ -63,6 +63,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		public void CommentTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("ChildElements")]
+		[TestCase("DefaultEnctype")]
 		public void FormTests(string testName) => JsTestsRunner.Run(testName);
 	}
 }

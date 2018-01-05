@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Tools;
 
@@ -158,34 +157,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Submits the form to the server.
 		/// </summary>
-		public void Submit()
-		{
-			if (Method == "get")
-			{
-				var uri = UriHelper.IsAbsolete(Action)
-						? new Uri(Action)
-						: new Uri(new Uri(OwnerDocument.Location.Href), Action);
+		public void Submit() => OwnerDocument.HandleFormSubmit(this);
 
-				var queryBuilder = new StringBuilder();
-				foreach (var elt in Elements.OfType<IFormElement>())
-				{
-					if(string.IsNullOrEmpty(elt.Name))
-						continue;
-
-					queryBuilder.Append(elt.Name);
-					queryBuilder.Append('=');
-					queryBuilder.Append(elt.Value);
-					queryBuilder.Append('&');
-					//todo: encode special chars
-				}
-				
-				OwnerDocument.Location.Href = 
-					uri.AbsolutePath + "?" + queryBuilder.ToString().TrimEnd('&');
-			}
-			
-			//todo: implement submission. on call from user code or java script 'onSubmit' event should not be occured.
-		}
-
+		
 		internal void RaiseSubmit()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
@@ -199,32 +173,6 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Called on form submit.
 		/// </summary>
 		public event Action<Event> OnSubmit;
-
-		public override bool DispatchEvent(Event evt)
-		{
-			if (!base.DispatchEvent(evt))
-				return false;
-
-			//default actions;
-			if (evt.Type == "submit")
-			{
-				try
-				{
-					OnSubmit?.Invoke(evt);
-				}
-				catch
-				{
-					//todo: log
-				}
-
-				if (evt.IsDefaultPrevented())
-					return false;
-
-				OwnerDocument.HandleFormSubmit(this);
-			}
-
-			return true;
-		}
 
 		/*
            attribute boolean noValidate;
