@@ -245,9 +245,10 @@ window.clearTimeout(timer);"));
 			CollectionAssert.AreEqual(new[]{"hello"}, log);
 		}
 
-		[Test]
+		[Test, Ignore("Unstable")]
 		public void AddScriptAsync()
 		{
+			//todo: rewrite it with JS. current test is not stbable due to multithreading.
 			var engine = new Engine(Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
 			var log = new List<string>();
 			engine.Console.OnLog += o =>

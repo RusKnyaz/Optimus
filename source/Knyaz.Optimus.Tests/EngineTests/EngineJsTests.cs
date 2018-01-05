@@ -926,7 +926,7 @@ dispatchEvent(evt);");
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
 					"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
-				.Resource("http://site.net/login?username=John&password=123456", "");
+				.Resource("http://site.net/login?username=John&password=123456", "<div id=d></div>");
 			
 			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/").Wait();
@@ -936,6 +936,7 @@ dispatchEvent(evt);");
 			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
 			doc.Get<HtmlInputElement>("[name=password]").First().Value = "123456";
 			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
 
 			doc.Assert(document => document.Location.Href == "http://site.net/login?username=John&password=123456");
 		}
@@ -946,7 +947,7 @@ dispatchEvent(evt);");
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
 					"<form method=post action='login'><input name=username type=text></form>")
-				.Resource("http://site.net/login", "");
+				.Resource("http://site.net/login", "<div id=d></div>");
 
 			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net").Wait();
@@ -955,6 +956,7 @@ dispatchEvent(evt);");
 
 			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
 			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
 
 			var data = 	Encoding.UTF8.GetString(httpResources.History[1].Data);
 
@@ -967,7 +969,7 @@ dispatchEvent(evt);");
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
 					"<form method=post action='login'><input name=username type=text></form>")
-				.Resource("http://site.net/login", "");
+				.Resource("http://site.net/login", "<div id=d></div>");
 
 			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net").Wait();
@@ -976,6 +978,7 @@ dispatchEvent(evt);");
 
 			doc.Get<HtmlInputElement>("[name=username]").First().Value = "✓";
 			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
 
 			var data = Encoding.UTF8.GetString(httpResources.History[1].Data);
 
@@ -993,7 +996,7 @@ dispatchEvent(evt);");
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/sub/?var1=x",
 					"<form method=" + method + " action='" + action + "'><input name=username type=text/><input name=password type=password/></form>")
-				.Resource(expected, "");
+				.Resource(expected, "<div id=d></div>");
 
 			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/sub/?var1=x").Wait();
@@ -1003,7 +1006,7 @@ dispatchEvent(evt);");
 			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
 			doc.Get<HtmlInputElement>("[name=password]").First().Value = "123456";
 			doc.Get<HtmlFormElement>("form").First().Submit();
-
+			Assert.IsNotNull(engine.WaitId("d"));
 			doc.Assert(document => document.Location.Href == expected);
 		}
 	}
