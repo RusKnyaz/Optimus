@@ -169,8 +169,22 @@ namespace Knyaz.Optimus
 			return root;
 		}
 
+		/// <summary>
+		/// Occurs before the document being loaded from response. 
+		/// Can be used to handle non-html response types.
+		/// </summary>
+		public event EventHandler<ResponseEventArags> PreHandleResponse; 
+
 		private void LoadFromResponse(Document document, IResource resource)
 		{
+			if (PreHandleResponse != null)
+			{
+				var args = new ResponseEventArags(resource);
+				PreHandleResponse(this, args);
+				if (args.Cancel)
+					return;
+			}
+			
 			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
 				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
 
@@ -276,5 +290,16 @@ namespace Knyaz.Optimus
 	{
 		Uri Uri {get;}
 		Task OpenUrl(string url);
+	}
+
+	public class ResponseEventArags : EventArgs
+	{
+		public bool Cancel { get; set; }
+		public readonly IResource Response;
+
+		public ResponseEventArags(IResource resource)
+		{
+			Response = resource;
+		}
 	}
 }

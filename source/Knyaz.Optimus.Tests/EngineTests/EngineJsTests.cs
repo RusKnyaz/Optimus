@@ -1009,5 +1009,36 @@ dispatchEvent(evt);");
 			Assert.IsNotNull(engine.WaitId("d"));
 			doc.Assert(document => document.Location.Href == expected);
 		}
+
+		[Test]
+		public void SubmitNonHtmlResponse()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/sub",
+					"<form method=get action='download'></form>")
+				.Resource("http://site.net/sub/download", "<div id=d></div>");
+			
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net/sub").Wait();
+			
+			engine.Document.Get<HtmlFormElement>("form").First().Submit();
+			
+			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/sub");
+		}
+
+		[Test]
+		public void CancelResponse()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/sub",
+					"<form method=get action='download'></form>");
+			
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.PreHandleResponse += (sender, arags) => arags.Cancel = true;
+			
+			engine.OpenUrl("http://site.net/sub").Wait();
+			
+			Assert.False(engine.Document.Get<HtmlFormElement>("form").Any());
+		}
 	}
 }
