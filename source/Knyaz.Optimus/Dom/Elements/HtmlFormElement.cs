@@ -29,6 +29,18 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form){}
 
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			base.BeforeEventDispatch(evt);
+
+			if (evt.Type == "submit")
+			{
+				Handle("onsubmit", OnSubmit, evt);
+				if(!evt.IsDefaultPrevented())
+					Submit();
+			}
+		}
+
 		/// <summary>
 		/// Gets or sets the 'name' attribute value reflecting the value of the form's name HTML attribute, containing the name of the form.
 		/// </summary>
@@ -112,16 +124,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// is the form element, with the exception of input elements whose type attribute is in the Image Button state, 
 		/// which must, for historical reasons, be excluded from this particular collection.
 		/// </summary>
-		public IEnumerable<HtmlElement> Elements
+		public IReadOnlyCollection<HtmlElement> Elements
 		{
 			get
 			{
 				//todo: consider to make search more optimal
-				var allelements = this.IsInDocument() ? this.Flatten() : OwnerDocument.Flatten();
+				var allelements = this.IsInDocument() ? OwnerDocument.Flatten() : this.Flatten();
 				return allelements.OfType<IFormElement>()
                     .Where(x => x.Form == this)
                     .OfType<HtmlElement>()
-                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" );
+                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" )
+					.ToList();
 			}
 		} 
 
@@ -144,43 +157,22 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Submits the form to the server.
 		/// </summary>
-		public void Submit()
+		public void Submit() => OwnerDocument.HandleFormSubmit(this);
+
+		
+		internal void RaiseSubmit()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
 			evt.InitEvent("submit", true, true);
 			DispatchEvent(evt);
 		}
+		
+		
 
 		/// <summary>
 		/// Called on form submit.
 		/// </summary>
 		public event Action<Event> OnSubmit;
-
-		public override bool DispatchEvent(Event evt)
-		{
-			if (!base.DispatchEvent(evt))
-				return false;
-
-			//default actions;
-			if (evt.Type == "submit")
-			{
-				try
-				{
-					OnSubmit?.Invoke(evt);
-				}
-				catch
-				{
-					//todo: log
-				}
-
-				if (evt.IsDefaultPrevented())
-					return false;
-
-				OwnerDocument.HandleFormSubmit(this);
-			}
-
-			return true;
-		}
 
 		/*
            attribute boolean noValidate;

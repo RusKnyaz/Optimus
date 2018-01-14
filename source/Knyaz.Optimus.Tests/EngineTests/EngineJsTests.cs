@@ -5,8 +5,10 @@ using System.Net;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
+using System.Text;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -886,6 +888,157 @@ dispatchEvent(evt);");
 			Assert.AreEqual("file.txt", calledUrl, "url");
 			Assert.AreEqual(null, calledName, "name");
 			Assert.AreEqual(null, calledOptions, "options");
+		}
+
+		[Test]
+		public void FormAutoSubmit()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://site.net",
+				@"<html><body><form method=get onsubmit=""console.log('onsubmit');event.preventDefault();"" id=f action='http://todosoft.ru/test/file.dat'>
+				<input name=username/>
+				<button type=submit id=b onclick=""console.log('onclick')"">Download!</button>
+				</form><script>document.getElementById(""b"").click();</script></body></html>");
+			
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.AttachLog();
+			engine.OpenUrl("http://site.net/").Wait();
+			Assert.AreEqual(new[]{"onclick", "onsubmit"}, log);
+		}
+		
+		[Test]
+		public void FormAutoSubmitPrevented()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://site.net",
+				@"<html><body><form method=get onsubmit=""console.log('onsubmit');event.preventDefault();"" id=f action='http://todosoft.ru/test/file.dat'>
+				<input name=username/>
+				<button type=submit id=b onclick=""console.log('onclick');event.preventDefault();"">Download!</button>
+				</form><script>document.getElementById(""b"").click();</script></body></html>");
+			
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.AttachLog();
+			engine.OpenUrl("http://site.net/").Wait();
+			Assert.AreEqual(new[]{"onclick"}, log);
+		}
+
+		[Test]
+		public void SubmitGetForm()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
+				.Resource("http://site.net/login?username=John&password=123456", "<div id=d></div>");
+			
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net/").Wait();
+
+			var doc = engine.Document;
+
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
+			doc.Get<HtmlInputElement>("[name=password]").First().Value = "123456";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
+
+			doc.Assert(document => document.Location.Href == "http://site.net/login?username=John&password=123456");
+		}
+
+		[Test]
+		public void SubmitPostForm()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'><input name=username type=text></form>")
+				.Resource("http://site.net/login", "<div id=d></div>");
+
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
+
+			var data = 	Encoding.UTF8.GetString(httpResources.History[1].Data);
+
+			Assert.AreEqual("username=John", data);
+		}
+
+		[Test]
+		public void SubmitFormUtf8()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'><input name=username type=text></form>")
+				.Resource("http://site.net/login", "<div id=d></div>");
+
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "✓";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
+
+			var data = Encoding.UTF8.GetString(httpResources.History[1].Data);
+
+			Assert.AreEqual("username=%E2%9C%93", data);
+		}
+
+		[TestCase("get", "login?var2=y", "http://site.net/sub/login?username=John&password=123456")]
+		[TestCase("get","/login?var2=y", "http://site.net/login?username=John&password=123456")]
+		[TestCase("post", "login?var2=y", "http://site.net/sub/login?var2=y")]
+		[TestCase("post","/login?var2=y", "http://site.net/login?var2=y")]
+		public void SubmitFormInSubWithParams(string method, string action, string expected)
+		{
+			//1. initial query should be removed from request on form submit
+			//2. Form action query should be ignored.
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/sub/?var1=x",
+					"<form method=" + method + " action='" + action + "'><input name=username type=text/><input name=password type=password/></form>")
+				.Resource(expected, "<div id=d></div>");
+
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net/sub/?var1=x").Wait();
+			
+			var doc = engine.Document;
+			
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John";
+			doc.Get<HtmlInputElement>("[name=password]").First().Value = "123456";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
+			doc.Assert(document => document.Location.Href == expected);
+		}
+
+		[Test]
+		public void SubmitNonHtmlResponse()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/sub",
+					"<form method=get action='download'></form>")
+				.Resource("http://site.net/sub/download", "<div id=d></div>");
+			
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net/sub").Wait();
+			
+			engine.Document.Get<HtmlFormElement>("form").First().Submit();
+			
+			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/sub");
+		}
+
+		[Test]
+		public void CancelResponse()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/sub",
+					"<form method=get action='download'></form>");
+			
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.PreHandleResponse += (sender, arags) => arags.Cancel = true;
+			
+			engine.OpenUrl("http://site.net/sub").Wait();
+			
+			Assert.False(engine.Document.Get<HtmlFormElement>("form").Any());
 		}
 	}
 }

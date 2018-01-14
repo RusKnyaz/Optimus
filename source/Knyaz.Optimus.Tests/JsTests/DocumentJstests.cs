@@ -15,14 +15,14 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetBody")]
 		[TestCase("SetBodyDiv")]
 		[TestCase("SetBodyNull")]
-		public void DocumentTests(string testName) => JsTestsRunner.Run("DocumentTests", testName);
+		public void DocumentTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("CommentRemove")]
 		[TestCase("TextRemove")]
-		public void NodeTests(string testName) => JsTestsRunner.Run("NodeTests", testName);
+		public void NodeTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("Clone")]
-		public void DocumentFragmentTests(string testName) => JsTestsRunner.Run("DocumentFragmentTests", testName);
+		public void DocumentFragmentTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("AppendScriptTwice")]
 		[TestCase("AppendScriptClone")]
@@ -35,11 +35,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ParseFromHtml")]
 		[TestCase("SetInnerHtml")]
 		[TestCase("TextOfExternal")]
-		public void ScriptTests(string testName) => JsTestsRunner.Run("ScriptTests", testName);
+		public void ScriptTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("Clone")]
 		[TestCase("TextContentIsNull")]
-		public void DocTypeTests(string testName) => JsTestsRunner.Run("DocTypeTests", testName);
+		public void DocTypeTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("CallThisIsObj")]
 		[TestCase("CallThisIsNull")]
@@ -49,7 +49,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("CompareObjectWithWindow")]
 		[TestCase("CompareObjectWithWindowInverted")]
 		[TestCase("CallAndCompareThisIsUndefined")]
-		public void JavaScriptTests(string testName) => JsTestsRunner.Run("JavaScriptTests", testName);
+		public void JavaScriptTests(string testName) => JsTestsRunner.Run(testName);
 		
 		[TestCase("Clone")]
 		[TestCase("TextContent")]
@@ -60,6 +60,10 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ReplaceData")]
 		[TestCase("SubstringData")]
 		[TestCase("LengthTest")]
-		public void CommentTests(string testName) => JsTestsRunner.Run("CommentTests", testName);
+		public void CommentTests(string testName) => JsTestsRunner.Run(testName);
+
+		[TestCase("ChildElements")]
+		[TestCase("DefaultEnctype")]
+		public void FormTests(string testName) => JsTestsRunner.Run(testName);
 	}
 }

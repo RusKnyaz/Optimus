@@ -1,12 +1,13 @@
 ﻿using Knyaz.Optimus.Tests.Resources;
 using NUnit.Framework;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
     class JsTestsRunner
     {
-		public static void Run(string fixture, string testName)
+	    public static void Run(string testName, [CallerMemberName] string fixture = null)
 		{
 			var testJs = R.GetString("Knyaz.Optimus.Tests.Resources.JsTests."+fixture+".js");
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -8,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
 	[DomItem]
-	public sealed class HtmlInputElement : HtmlElement, IResettableElement
+	public sealed class HtmlInputElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults
 		{
@@ -20,6 +21,28 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		internal HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input){}
+
+		protected override void BeforeEventDispatch(Event evt)
+		{
+			base.BeforeEventDispatch(evt);
+			
+			if (evt.Type == "click" && !evt.IsDefaultPrevented() && Type == "submit")
+				Form?.RaiseSubmit();
+		}
+		
+		/// <summary>
+		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with.
+		/// </summary>
+		public HtmlFormElement Form => this.FindOwnerForm();
+		
+		/// <summary>
+		/// Gets or sets the 'name' attribute value reflecting the value of the form's name HTML attribute, containing the name of the form.
+		/// </summary>
+		public string Name
+		{
+			get => GetAttribute("name", string.Empty);
+			set => SetAttribute("name", value);
+		}
 
 		/// <summary>
 		/// Specifies whether or not an input field should have autocomplete enabled. Available values: "on"|"off".

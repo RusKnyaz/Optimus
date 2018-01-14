@@ -73,9 +73,16 @@ namespace Knyaz.Optimus.TestingTools
 				var doc = engine.Document;
 				lock (doc)
 				{
-					var elt = doc.GetElementById(id);
-					if (elt != null)
-						return elt;
+					try
+					{
+						var elt = doc.GetElementById(id);
+						if (elt != null)
+							return elt;
+					}
+					catch 
+					{
+						//catch 'collection was changed...'
+					}
 				}
 
 				Thread.Sleep(timespan);
@@ -210,6 +217,14 @@ namespace Knyaz.Optimus.TestingTools
 			{
 				stream.Write(data);
 			}
+		}
+
+		/// <summary>
+		/// Alias for QuerySelectorAll method with element types filtration.
+		/// </summary>
+		public static IEnumerable<T> Get<T>(this Element elt, string query)
+		{
+			return elt.QuerySelectorAll(query).OfType<T>();
 		}
 	}
 }
