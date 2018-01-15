@@ -25,9 +25,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected override void BeforeEventDispatch(Event evt)
 		{
 			base.BeforeEventDispatch(evt);
-			
-			if (evt.Type == "click" && !evt.IsDefaultPrevented() && Type == "submit")
-				Form?.RaiseSubmit();
+
+			if (evt.Type == "click" && !evt.IsDefaultPrevented())
+			{
+				if(Type == "submit")
+					Form?.RaiseSubmit();
+				else if (Type == "checkbox")
+					Checked = !Checked;
+			}
 		}
 		
 		/// <summary>
