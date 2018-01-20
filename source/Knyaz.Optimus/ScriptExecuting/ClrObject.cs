@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Jint.Native;
@@ -167,28 +168,46 @@ namespace Knyaz.Optimus.ScriptExecuting
 				if (eventInfo.Name.ToLower() != propertyName)
 					continue;
 
-				var pars = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
+				var invoke = eventInfo.EventHandlerType.GetMethod("Invoke");
+				var pars = invoke.GetParameters();
+				var settedHandler = new JsValue[1] {JsValue.Null};
 
-				//todo: optimize with expressions
-				var settedHandler = new JsValue[1] { JsValue.Null };
-				var listener0 = (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
-				var listener1 = (Action<object>)(p1 => settedHandler[0].Invoke(this, new JsValue[] {JsValue.FromObject(Engine, p1)}));
-				var listener = pars.Length == 1 ? (Delegate)listener1 : listener0;
+				Delegate listener;
+				
+				if (invoke.ReturnType != typeof(void))
+				{
+					var expr = Expression.Lambda(
+						eventInfo.EventHandlerType, 
+						Expression.Constant(null),
+						pars.Select(p => Expression.Parameter(p.ParameterType, p.Name)));
+					
+					listener = expr.Compile();
 
+
+					/*listener = pars.Length == 1 
+						? (Delegate) (Func<object, object>) (p1 => settedHandler[0].Invoke(this, new [] {JsValue.FromObject(Engine, p1)})) 
+						: (Func<Object>)(() => settedHandler[0].Invoke(this, new JsValue[0]).ToObject());*/
+				}
+				else
+				{
+					listener = pars.Length == 1 
+						? (Delegate) (Action<object>) (p1 => settedHandler[0].Invoke(this, new [] {JsValue.FromObject(Engine, p1)})) 
+						: (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
+				}
+				
 				var getter = new ClrFunctionInstance(Engine, (value, values) => settedHandler[0]);
-				var info = eventInfo;
 				var setter = new ClrFunctionInstance(Engine, (value, values) =>
 				{
 					if (settedHandler[0] != JsValue.Null)
-						info.RemoveEventHandler(Target, listener);
+						eventInfo.RemoveEventHandler(Target, listener);
 
 					settedHandler[0] = values[0];
 					if (settedHandler[0] != JsValue.Null)
-						info.AddEventHandler(Target, listener);
+						eventInfo.AddEventHandler(Target, listener);
 					return values[0];
 				});
 
-				var descriptor =  new PropertyDescriptor(getter, setter);
+				var descriptor = new PropertyDescriptor(getter, setter);
 				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}

@@ -50,8 +50,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Called before the mouse 'click' dispatched.
 		/// </summary>
-		public event Action<Event> OnClick;
-
+		public event Func<Event, bool?> OnClick;
 		
 		/// <summary>
 		/// Gets a CssStyleDeclaration whose value represents the declarations specified in the attribute, if present. 

@@ -38,6 +38,18 @@ namespace Knyaz.Optimus.Dom.Elements
 			else if (GetAttribute(attrName) is string handler)
 				OwnerDocument.HandleNodeScript(evt, handler);
 		}
+		
+		protected void Handle(string attrName, Func<Event, bool?> actionHandler, Event evt)
+		{
+			if (actionHandler != null)
+			{
+				if(actionHandler(evt) == false)
+					evt.PreventDefault();
+			}
+			else if (GetAttribute(attrName) is string handler)
+				OwnerDocument.HandleNodeScript(evt, handler);
+			//todo: default can be prevented from 'attribute' function.
+		}
 
 		/// <summary>
 		/// Returns a collection of the specified node's attributes.
