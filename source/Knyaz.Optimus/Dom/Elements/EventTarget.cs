@@ -85,6 +85,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		public event Action<Event> BeforeEventDispatch;
 
 		/// <summary>
+		/// Called after the event dispatched.
+		/// </summary>
+		public event Action<Event> AfterEventDispatch;
+
+		/// <summary>
 		/// Dispatches an event.
 		/// </summary>
 		/// <param name="evt">The event to be dispatched.</param>
@@ -154,6 +159,9 @@ namespace Knyaz.Optimus.Dom.Elements
 				evt.EventPhase = Event.BUBBLING_PHASE;
 				parentTarget.DispatchEvent(evt);
 			}
+			
+			if(evt.Target == _target)
+				AfterEventDispatch?.Invoke(evt);
 
 			return !evt.Cancelled;
 		}

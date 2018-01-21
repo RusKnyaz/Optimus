@@ -127,9 +127,15 @@ Test("HtmlInputElementTests", {
             i.type='checkbox';
             var l = document.createElement('label');
             l.htmlFor = 'test-input';
+            
+            var div = document.createElement("div");
+            div.id = "testarea";
 
-            document.getElementById('testarea').appendChild(i);
-            document.getElementById('testarea').appendChild(l);
+            div.appendChild(i);
+            div.appendChild(l);
+            
+            document.body.appendChild(div);
+            
             l.click();
             Assert.AreEqual(true, i.checked);
         }
@@ -182,12 +188,12 @@ Test("HtmlInputElementTests", {
             l.addEventListener("click",function(){res+='-label.listener.cap'},true)
 
             var div = document.createElement('div');
+            div.id = "testarea";
             div.addEventListener("click",function(){res+='-div.listener.bub'},false)
             div.addEventListener("click",function(){res+='-div.listener.cap'},true)
             div.appendChild(i);
             div.appendChild(l);
-            document.getElementById("testarea").appendChild(div);
-
+            document.body.appendChild(div);
             l.click();
             Assert.AreEqual(
                 "-div.listener.cap"+
@@ -219,11 +225,13 @@ Test("HtmlInputElementTests", {
             l.addEventListener("click",function(){res+='-label.listener.cap'},true)
 
             var div = document.createElement('div');
+            div.id = "testarea";
             div.addEventListener("click",function(){res+='-div.listener.bub'},false)
             div.addEventListener("click",function(){res+='-div.listener.cap'},true)
             div.appendChild(i);
             div.appendChild(l);
-            document.getElementById("testarea").appendChild(div);
+            
+            document.body.appendChild(div);
 
             l.click();
             Assert.AreEqual(
@@ -234,7 +242,7 @@ Test("HtmlInputElementTests", {
                 "-div.listener.bub",
                 res);
             
-            -div.listener.cap-label.onclick-label.listener.bub-label.listener.cap-div.listener.bub"
+            Assert.AreEqual(false, i.checked);
         }
     }
 

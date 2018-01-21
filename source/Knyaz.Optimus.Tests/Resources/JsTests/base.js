@@ -14,6 +14,8 @@ function Run(fixtureName, testName) {
         return "Test not found: " + testName;
     try {
         test.run();
+        var ta = document.getElementById("testarea");
+        if(ta != null) ta.remove();
     }
     catch (error){
         return error;

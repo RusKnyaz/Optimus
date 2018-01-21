@@ -260,6 +260,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.IFrame:return new HtmlIFrameElement(this);
 				case TagsNames.Html:return new HtmlHtmlElement(this);
 				case TagsNames.Col: return new HtmlTableColElement(this);
+				case TagsNames.Label: return new HtmlLabelElement(this);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);

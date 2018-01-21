@@ -48,5 +48,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 	    [TestCase("LabelClickEventsOrderInDocument")]
 	    [TestCase("LabelClickEventsOrderInDocumentPreventDefault")]
 	    public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(testName);
+	    
+	    [TestCase("Control")]
+	    [TestCase("ControlInDocument")]
+	    public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(testName);
     }
 }
