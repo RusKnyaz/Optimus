@@ -44,6 +44,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 	    [TestCase("UncheckInHandler")]
 	    [TestCase("UncheckInHandlerAndPreventDefault")]
 	    [TestCase("CheckInHandlerAndPreventDefault")]
+	    [TestCase("LabelClickEventsOrder")]
+	    [TestCase("LabelClickEventsOrderInDocument")]
+	    [TestCase("LabelClickEventsOrderInDocumentPreventDefault")]
 	    public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(testName);
     }
 }

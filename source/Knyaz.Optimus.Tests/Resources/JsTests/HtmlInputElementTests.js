@@ -133,5 +133,109 @@ Test("HtmlInputElementTests", {
             l.click();
             Assert.AreEqual(true, i.checked);
         }
+    },
+    "LabelClickEventsOrder":{
+        run:function () {
+            var res = "";
+
+            var i = document.createElement('input');
+            i.id='test-input';
+            i.type='checkbox';
+            i.onclick=function(e){res+="-input.onclick"};
+            i.addEventListener("click",function(){res+='-input.listener.bub'},false)
+            i.addEventListener("click",function(){res+='-input.listener.cap'},true)
+            var l = document.createElement('label');
+            l.htmlFor = 'test-input';
+            l.onclick=function(){res+='-label.onclick'};
+            l.addEventListener("click",function(){res+='-label.listener.bub'},false)
+            l.addEventListener("click",function(){res+='-label.listener.cap'},true)
+
+            var div = document.createElement('div');
+            div.addEventListener("click",function(){res+='-div.listener.bub'},false)
+            div.addEventListener("click",function(){res+='-div.listener.cap'},true)
+            div.appendChild(i);
+            div.appendChild(l);
+
+            l.click();
+            Assert.AreEqual(
+                "-div.listener.cap"+
+                "-label.onclick"+
+                "-label.listener.bub"+
+                "-label.listener.cap"+
+                "-div.listener.bub",res);
+        }
+    },
+    "LabelClickEventsOrderInDocument":{
+        run:function () {
+            var res = "";
+
+            var i = document.createElement('input');
+            i.id='test-input';
+            i.type='checkbox';
+            i.onclick=function(e){res+="-input.onclick"};
+            i.addEventListener("click",function(){res+='-input.listener.bub'},false)
+            i.addEventListener("click",function(){res+='-input.listener.cap'},true)
+            var l = document.createElement('label');
+            l.htmlFor = 'test-input';
+            l.onclick=function(){res+='-label.onclick'};
+            l.addEventListener("click",function(){res+='-label.listener.bub'},false)
+            l.addEventListener("click",function(){res+='-label.listener.cap'},true)
+
+            var div = document.createElement('div');
+            div.addEventListener("click",function(){res+='-div.listener.bub'},false)
+            div.addEventListener("click",function(){res+='-div.listener.cap'},true)
+            div.appendChild(i);
+            div.appendChild(l);
+            document.getElementById("testarea").appendChild(div);
+
+            l.click();
+            Assert.AreEqual(
+                "-div.listener.cap"+
+                "-label.onclick"+
+                "-label.listener.bub"+
+                "-label.listener.cap"+
+                "-div.listener.bub"+
+                "-div.listener.cap"+
+                "-input.onclick"+
+                "-input.listener.bub"+
+                "-input.listener.cap"+
+                "-div.listener.bub",res);
+        }
+    },
+    "LabelClickEventsOrderInDocumentPreventDefault":{
+        run:function () {
+            var res = "";
+
+            var i = document.createElement('input');
+            i.id='test-input';
+            i.type='checkbox';
+            i.onclick=function(e){res+="-input.onclick"};
+            i.addEventListener("click",function(){res+='-input.listener.bub'},false)
+            i.addEventListener("click",function(){res+='-input.listener.cap'},true)
+            var l = document.createElement('label');
+            l.htmlFor = 'test-input';
+            l.onclick=function(e){res+='-label.onclick';e.preventDefault()};
+            l.addEventListener("click",function(){res+='-label.listener.bub'},false)
+            l.addEventListener("click",function(){res+='-label.listener.cap'},true)
+
+            var div = document.createElement('div');
+            div.addEventListener("click",function(){res+='-div.listener.bub'},false)
+            div.addEventListener("click",function(){res+='-div.listener.cap'},true)
+            div.appendChild(i);
+            div.appendChild(l);
+            document.getElementById("testarea").appendChild(div);
+
+            l.click();
+            Assert.AreEqual(
+                "-div.listener.cap"+
+                "-label.onclick"+
+                "-label.listener.bub"+
+                "-label.listener.cap"+
+                "-div.listener.bub",
+                res);
+            
+            -div.listener.cap-label.onclick-label.listener.bub-label.listener.cap-div.listener.bub"
+        }
     }
+
 });
