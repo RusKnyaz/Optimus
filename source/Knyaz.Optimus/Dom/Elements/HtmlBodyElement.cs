@@ -19,9 +19,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Additional handling of 'onload' event.
 		/// </summary>
-		protected override void BeforeEventDispatch(Event evt)
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			base.BeforeEventDispatch(evt);
+			base.CallDirectEventSubscribers(evt);
 
 			if (evt.Type == "load")
 				Handle("onload", OnLoad, evt);

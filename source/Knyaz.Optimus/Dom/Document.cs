@@ -406,9 +406,9 @@ namespace Knyaz.Optimus.Dom
 			NodeInserted?.Invoke(newChild);
 		}
 
-		protected override void BeforeEventDispatch(Event obj)
+		protected override void CallDirectEventSubscribers(Event obj)
 		{
-			base.BeforeEventDispatch(obj);
+			base.CallDirectEventSubscribers(obj);
 
 			if (obj.Type == "DOMNodeInserted")
 			{

@@ -20,9 +20,9 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlElement(Document ownerDocument, string tagName): base(ownerDocument, tagName)	{}
 
-		protected override void BeforeEventDispatch(Event evt)
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			base.BeforeEventDispatch(evt);
+			base.CallDirectEventSubscribers(evt);
 			
 			if (evt.Type == "click")
 				Handle("onclick", OnClick, evt);

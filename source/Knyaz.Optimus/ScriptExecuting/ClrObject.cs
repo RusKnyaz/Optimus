@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
+using Jint.Parser.Ast;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
@@ -33,6 +34,13 @@ namespace Knyaz.Optimus.ScriptExecuting
 			//todo: use static prototypes
 			Prototype = new ClrPrototype(engine, obj.GetType(), _converter);
 			Extensible = true;
+		}
+
+		private JsValue Convert(Object obj)
+		{
+			JsValue res = JsValue.Null;
+			_converter.TryConvert(obj, out res);
+			return res;
 		}
 
 		public override PropertyDescriptor GetOwnProperty(string propertyName)
@@ -176,17 +184,13 @@ namespace Knyaz.Optimus.ScriptExecuting
 				
 				if (invoke.ReturnType != typeof(void))
 				{
-					var expr = Expression.Lambda(
-						eventInfo.EventHandlerType, 
-						Expression.Constant(null),
-						pars.Select(p => Expression.Parameter(p.ParameterType, p.Name)));
-					
-					listener = expr.Compile();
-
-
-					/*listener = pars.Length == 1 
-						? (Delegate) (Func<object, object>) (p1 => settedHandler[0].Invoke(this, new [] {JsValue.FromObject(Engine, p1)})) 
-						: (Func<Object>)(() => settedHandler[0].Invoke(this, new JsValue[0]).ToObject());*/
+					if (pars.Length == 1 && pars[0].ParameterType == typeof(Event))
+					{
+						listener = (Func<Event, bool?>)(
+							e => (bool?)settedHandler[0].Invoke(this, new []{Convert(e)}).ToObject());
+					}
+					else
+						throw new NotImplementedException(); //todo: build and compile the Expression.
 				}
 				else
 				{

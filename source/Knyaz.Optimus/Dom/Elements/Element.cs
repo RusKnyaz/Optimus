@@ -27,10 +27,12 @@ namespace Knyaz.Optimus.Dom.Elements
 			};
 
 			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
+			EventTarget.CallDirectEventSubscribers += x => CallDirectEventSubscribers(x);
 			EventTarget.AfterEventDispatch += x => AfterEventDispatch(x);
 		}
 
-		protected virtual void BeforeEventDispatch(Event obj) {}
+		protected virtual void BeforeEventDispatch(Event evt) {}
+		protected virtual void CallDirectEventSubscribers(Event obj) {}
 		protected virtual void AfterEventDispatch(Event obj) {}
 
 		protected void Handle(string attrName, Action<Event> actionHandler, Event evt)
