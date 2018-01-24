@@ -31,6 +31,26 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("TableCreatedBodies")]
 		[TestCase("TableWrongTBody")]
 		[TestCase("SetInnerHtmlText")]
-		public void ElementTests(string testName) => JsTestsRunner.Run(testName, "ElementTests");
-	}
+		public void ElementTests(string testName) => JsTestsRunner.Run(testName);
+
+	    [TestCase("InputChangeCheckedOnClick")]
+	    [TestCase("InputCheckChangingPrevented")]
+	    [TestCase("PreventDefaultDoesNotStopPropogation")]
+	    [TestCase("PreventInCaptureEventListener")]
+	    [TestCase("PreventInBubbleEventListener")]
+	    [TestCase("DefaultActionOrder")]
+	    [TestCase("InputCheckChangingPreventedByReturnValue")]
+	    [TestCase("ClickOnLabel")]
+	    [TestCase("UncheckInHandler")]
+	    [TestCase("UncheckInHandlerAndPreventDefault")]
+	    [TestCase("CheckInHandlerAndPreventDefault")]
+	    [TestCase("LabelClickEventsOrder")]
+	    [TestCase("LabelClickEventsOrderInDocument")]
+	    [TestCase("LabelClickEventsOrderInDocumentPreventDefault")]
+	    public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(testName);
+	    
+	    [TestCase("Control")]
+	    [TestCase("ControlInDocument")]
+	    public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(testName);
+    }
 }

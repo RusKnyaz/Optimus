@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
+using Jint.Parser.Ast;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
@@ -32,6 +34,13 @@ namespace Knyaz.Optimus.ScriptExecuting
 			//todo: use static prototypes
 			Prototype = new ClrPrototype(engine, obj.GetType(), _converter);
 			Extensible = true;
+		}
+
+		private JsValue Convert(Object obj)
+		{
+			JsValue res = JsValue.Null;
+			_converter.TryConvert(obj, out res);
+			return res;
 		}
 
 		public override PropertyDescriptor GetOwnProperty(string propertyName)
@@ -167,28 +176,42 @@ namespace Knyaz.Optimus.ScriptExecuting
 				if (eventInfo.Name.ToLower() != propertyName)
 					continue;
 
-				var pars = eventInfo.EventHandlerType.GetMethod("Invoke").GetParameters();
+				var invoke = eventInfo.EventHandlerType.GetMethod("Invoke");
+				var pars = invoke.GetParameters();
+				var settedHandler = new JsValue[1] {JsValue.Null};
 
-				//todo: optimize with expressions
-				var settedHandler = new JsValue[1] { JsValue.Null };
-				var listener0 = (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
-				var listener1 = (Action<object>)(p1 => settedHandler[0].Invoke(this, new JsValue[] {JsValue.FromObject(Engine, p1)}));
-				var listener = pars.Length == 1 ? (Delegate)listener1 : listener0;
-
+				Delegate listener;
+				
+				if (invoke.ReturnType != typeof(void))
+				{
+					if (pars.Length == 1 && pars[0].ParameterType == typeof(Event))
+					{
+						listener = (Func<Event, bool?>)(
+							e => (bool?)settedHandler[0].Invoke(this, new []{Convert(e)}).ToObject());
+					}
+					else
+						throw new NotImplementedException(); //todo: build and compile the Expression.
+				}
+				else
+				{
+					listener = pars.Length == 1 
+						? (Delegate) (Action<object>) (p1 => settedHandler[0].Invoke(this, new [] {JsValue.FromObject(Engine, p1)})) 
+						: (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
+				}
+				
 				var getter = new ClrFunctionInstance(Engine, (value, values) => settedHandler[0]);
-				var info = eventInfo;
 				var setter = new ClrFunctionInstance(Engine, (value, values) =>
 				{
 					if (settedHandler[0] != JsValue.Null)
-						info.RemoveEventHandler(Target, listener);
+						eventInfo.RemoveEventHandler(Target, listener);
 
 					settedHandler[0] = values[0];
 					if (settedHandler[0] != JsValue.Null)
-						info.AddEventHandler(Target, listener);
+						eventInfo.AddEventHandler(Target, listener);
 					return values[0];
 				});
 
-				var descriptor =  new PropertyDescriptor(getter, setter);
+				var descriptor = new PropertyDescriptor(getter, setter);
 				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}

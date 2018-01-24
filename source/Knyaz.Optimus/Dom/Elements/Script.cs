@@ -77,9 +77,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		public event Action<Event> OnLoad;
 		public event Action<Event> OnError;
 		
-		protected override void BeforeEventDispatch(Event evt)
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			base.BeforeEventDispatch(evt);
+			base.CallDirectEventSubscribers(evt);
 
 			switch (evt.Type)
 			{

@@ -83,6 +83,16 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Called before the event dispatched.
 		/// </summary>
 		public event Action<Event> BeforeEventDispatch;
+		
+		/// <summary>
+		/// Call element's event handlers attached using attribute or property (like 'onclick' and etc.).
+		/// </summary>
+		public event Action<Event> CallDirectEventSubscribers;
+
+		/// <summary>
+		/// Called after the event dispatched.
+		/// </summary>
+		public event Action<Event> AfterEventDispatch;
 
 		/// <summary>
 		/// Dispatches an event.
@@ -100,6 +110,8 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 
 			var parentTarget = _getParent();
+
+			BeforeEventDispatch?.Invoke(evt);
 
 			if (evt.EventPhase == Event.CAPTURING_PHASE)
 			{
@@ -133,7 +145,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				//direct subscribed event handlers (from attributes or element properties like div.onclick
 				evt.CurrentTarget = _target;
-				BeforeEventDispatch?.Invoke(evt);
+				CallDirectEventSubscribers?.Invoke(evt);
 				if (evt.IsPropagationStopped())
 					return !evt.Cancelled;
 
@@ -154,6 +166,9 @@ namespace Knyaz.Optimus.Dom.Elements
 				evt.EventPhase = Event.BUBBLING_PHASE;
 				parentTarget.DispatchEvent(evt);
 			}
+			
+			if(evt.Target == _target)
+				AfterEventDispatch?.Invoke(evt);
 
 			return !evt.Cancelled;
 		}

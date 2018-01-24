@@ -22,14 +22,33 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input){}
 
+		private bool _prevChecked;
+
 		protected override void BeforeEventDispatch(Event evt)
 		{
 			base.BeforeEventDispatch(evt);
 			
-			if (evt.Type == "click" && !evt.IsDefaultPrevented() && Type == "submit")
-				Form?.RaiseSubmit();
+			if (evt.Type == "click" && Type == "checkbox")
+			{
+				_prevChecked = Checked;
+				Checked = !_prevChecked;
+			}
 		}
-		
+
+		protected override void AfterEventDispatch(Event evt)
+		{
+			base.AfterEventDispatch(evt);
+
+			if (evt.Type == "click")
+			{
+				if (Type == "checkbox" && evt.IsDefaultPrevented())
+					Checked = _prevChecked;
+
+				if (Type == "submit" && !evt.IsDefaultPrevented())
+					Form?.RaiseSubmit();
+			}
+		}
+
 		/// <summary>
 		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with.
 		/// </summary>

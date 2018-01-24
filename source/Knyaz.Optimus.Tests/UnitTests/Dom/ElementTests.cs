@@ -282,10 +282,18 @@ namespace Knyaz.Optimus.Tests.Dom
 			var d2 = document.CreateElement("div") as HtmlElement;
 			d2.Id = "B";
 			d1.AppendChild(d2);
-			d1.OnClick += e => sequence.Add("d1 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d1.OnClick += e =>
+			{
+				sequence.Add("d1 attr - " + e.EventPhase + ((HtmlElement) e.CurrentTarget).Id);
+				return null;
+			};
 			d1.AddEventListener("click", e => sequence.Add("d1 bubbling - " + e.EventPhase+((HtmlElement)e.CurrentTarget).Id), false);
 			d1.AddEventListener("click", e => sequence.Add("d1 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
-			d2.OnClick += e => sequence.Add("d2 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d2.OnClick += e =>
+			{
+				sequence.Add("d2 attr - " + e.EventPhase + ((HtmlElement) e.CurrentTarget).Id);
+				return null;
+			};
 			d2.AddEventListener("click", e => sequence.Add("d2 bubbling - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), false);
 			d2.AddEventListener("click", e => sequence.Add("d2 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
 
@@ -305,10 +313,18 @@ namespace Knyaz.Optimus.Tests.Dom
 			var d2 = document.CreateElement("div") as HtmlElement;
 			d2.Id = "B";
 			d1.AppendChild(d2);
-			d1.OnClick += e => sequence.Add("d1 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d1.OnClick += e =>
+			{
+				sequence.Add("d1 attr - " + e.EventPhase + ((HtmlElement) e.CurrentTarget).Id);
+				return false;
+			};
 			d1.AddEventListener("click", e => sequence.Add("d1 bubbling - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), false);
 			d1.AddEventListener("click", e => sequence.Add("d1 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
-			d2.OnClick += e => sequence.Add("d2 attr - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id);
+			d2.OnClick += e =>
+			{
+				sequence.Add("d2 attr - " + e.EventPhase + ((HtmlElement) e.CurrentTarget).Id);
+				return false;
+			};
 			d2.AddEventListener("click", e => sequence.Add("d2 bubbling - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), false);
 			d2.AddEventListener("click", e => sequence.Add("d2 capture - " + e.EventPhase + ((HtmlElement)e.CurrentTarget).Id), true);
 

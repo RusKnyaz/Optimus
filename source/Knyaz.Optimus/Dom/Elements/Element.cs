@@ -27,9 +27,13 @@ namespace Knyaz.Optimus.Dom.Elements
 			};
 
 			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
+			EventTarget.CallDirectEventSubscribers += x => CallDirectEventSubscribers(x);
+			EventTarget.AfterEventDispatch += x => AfterEventDispatch(x);
 		}
 
-		protected virtual void BeforeEventDispatch(Event obj) {}
+		protected virtual void BeforeEventDispatch(Event evt) {}
+		protected virtual void CallDirectEventSubscribers(Event obj) {}
+		protected virtual void AfterEventDispatch(Event obj) {}
 
 		protected void Handle(string attrName, Action<Event> actionHandler, Event evt)
 		{
@@ -37,6 +41,18 @@ namespace Knyaz.Optimus.Dom.Elements
 				actionHandler(evt);
 			else if (GetAttribute(attrName) is string handler)
 				OwnerDocument.HandleNodeScript(evt, handler);
+		}
+		
+		protected void Handle(string attrName, Func<Event, bool?> actionHandler, Event evt)
+		{
+			if (actionHandler != null)
+			{
+				if(actionHandler(evt) == false)
+					evt.PreventDefault();
+			}
+			else if (GetAttribute(attrName) is string handler)
+				OwnerDocument.HandleNodeScript(evt, handler);
+			//todo: default can be prevented from 'attribute' function.
 		}
 
 		/// <summary>

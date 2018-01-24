@@ -260,6 +260,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.IFrame:return new HtmlIFrameElement(this);
 				case TagsNames.Html:return new HtmlHtmlElement(this);
 				case TagsNames.Col: return new HtmlTableColElement(this);
+				case TagsNames.Label: return new HtmlLabelElement(this);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);
@@ -405,9 +406,9 @@ namespace Knyaz.Optimus.Dom
 			NodeInserted?.Invoke(newChild);
 		}
 
-		protected override void BeforeEventDispatch(Event obj)
+		protected override void CallDirectEventSubscribers(Event obj)
 		{
-			base.BeforeEventDispatch(obj);
+			base.CallDirectEventSubscribers(obj);
 
 			if (obj.Type == "DOMNodeInserted")
 			{

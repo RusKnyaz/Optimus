@@ -20,9 +20,9 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlButtonElement(Document ownerDocument) : base(ownerDocument, TagsNames.Button) { }
 
-		protected override void BeforeEventDispatch(Event evt)
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			base.BeforeEventDispatch(evt);
+			base.CallDirectEventSubscribers(evt);
 
 			if (evt.Type == "click" && !evt.IsDefaultPrevented())
 				Form?.RaiseSubmit();

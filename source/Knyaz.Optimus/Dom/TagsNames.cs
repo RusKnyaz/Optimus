@@ -64,6 +64,9 @@
 		/// <summary>IMG</summary>
 		/// <remarks>Image</remarks>
 		public const string Img = "IMG";
+
+		/// <summary>LABEL</summary>
+		public const string Label = "LABEL";
 		
 		/// <summary>LINK</summary>
 		public const string Link = "LINK";
