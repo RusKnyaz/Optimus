@@ -1,0 +1,12 @@
+syntax: glob
+*.dll
+*/bin
+*/obj
+*/packages
+*/.idea
+.vs
+*.orig
+*.sln.*
+*.csproj.*
+*/test-results
+*.suo
