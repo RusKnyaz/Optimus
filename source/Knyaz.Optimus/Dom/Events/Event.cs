@@ -64,7 +64,7 @@ namespace Knyaz.Optimus.Dom.Events
 		/// Creates the new event with the specified type.
 		/// </summary>
 		/// <param name="type"></param>
-		public Event(string type):this()
+		public Event(string type, Document owner):this(owner)
 		{
 			Type = type;
 		}

@@ -139,7 +139,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			var jsFunc = new ClrFuncCtor(_jsEngine, (x) =>
 			{
 				JsValue res;
-				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document), out res);
+				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document), out res);
 				return res.AsObject();
 			});
 
