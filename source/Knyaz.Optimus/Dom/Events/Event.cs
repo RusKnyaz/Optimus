@@ -50,15 +50,14 @@ namespace Knyaz.Optimus.Dom.Events
 		/// <summary>
 		/// The time at which the event was created (in milliseconds, elapsed from the beginning of the current document's lifetime).
 		/// </summary>
-		//todo: fix the the value
-		public DateTime TimeStamp { get; private set; }
+		public int TimeStamp { get; private set; }
 
 		internal bool _stopped;
 		internal bool Cancelled { get; private set; }
 
-		public Event()
+		public Event(Document owner)
 		{
-			TimeStamp = DateTime.Now;
+			TimeStamp = (DateTime.UtcNow - owner.CreatedOn).Milliseconds;
 		}
 
 		/// <summary>

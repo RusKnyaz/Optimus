@@ -9,6 +9,8 @@ namespace Knyaz.Optimus.Dom.Events
 	[DomItem]
 	public class UIEvent : Event
 	{
+		internal UIEvent(Document owner) : base(owner){}
+		
 		public Window View {
 			get;
 			protected set;
@@ -16,5 +18,6 @@ namespace Knyaz.Optimus.Dom.Events
 		/*
 		readonly    attribute long    detail;*/
 		//todo: complete
+		
 	}
 }
