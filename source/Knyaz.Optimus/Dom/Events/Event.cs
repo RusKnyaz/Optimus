@@ -22,6 +22,11 @@ namespace Knyaz.Optimus.Dom.Events
 		public object Target { get; internal set; }
 		
 		/// <summary>
+		/// The original target of the event before any retargetings.
+		/// </summary>
+		public object OriginalTarget { get; internal set; }
+		
+		/// <summary>
 		/// A reference to the currently registered target for the event.
 		/// </summary>
 		public object CurrentTarget { get; internal set; }
