@@ -40,6 +40,8 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	public class Document : Element, IDocument
 	{
+		internal DateTime CreatedOn = DateTime.UtcNow;
+		
 		private Element _body;
 
 		internal Document() : this(null)
@@ -365,22 +367,22 @@ namespace Knyaz.Optimus.Dom
 			{
 				case "event":
 				case "events":
-					return new Event();
+					return new Event(this);
 				case "customevent":
 				case "customevents":
-					return new CustomEvent();
+					return new CustomEvent(this);
 				case "mutationevent":
 				case "mutationevents":
-					return new MutationEvent();
+					return new MutationEvent(this);
 				case "uievent":
 				case "uievents":
-					return new UIEvent();
+					return new UIEvent(this);
 				case "keyboardevent":
 				case "keyboardevents":
-					return new KeyboardEvent();
+					return new KeyboardEvent(this);
 				case "errorevent":
 				case "errorevents":
-					return new ErrorEvent();
+					return new ErrorEvent(this);
 			}
 
 
