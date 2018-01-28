@@ -90,5 +90,50 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with.
 		/// </summary>
 		public HtmlFormElement Form => this.FindOwnerForm();
+
+		/// <summary>
+		/// Gets or sets a string reflecting the URI of a resource that processes information submitted by the button. If specified, this attribute overrides the action attribute of the &lt;form&gt; element that owns this element.
+		/// </summary>
+		public string FormAction
+		{
+			get => GetAttribute("formaction", string.Empty);
+			set => SetAttribute("formaction", value);
+		}
+
+		/// <summary>
+		/// Gets or sets the 'formMethod' attribute reflecting the HTTP method that the browser uses to submit the form. If specified, this attribute overrides the method attribute of the &lt;form&gt; element that owns this element.
+		/// </summary>
+		public string FormMethod
+		{
+			get => GetAttribute("formmethod", string.Empty);
+			set => SetAttribute("formmethod", value);
+		}
+
+		/// <summary>
+		/// Gets or sets the 'formEnctype' attribute reflecting the type of content that is used to submit the form to the server.
+		/// </summary>
+		public string FormEnctype
+		{
+			get => GetAttribute("formenctype", string.Empty);
+			set => SetAttribute("formenctype", value);
+		}
+
+		/// <summary>
+		/// Gets or sets the 'formTarget' attribute reflecting a name or keyword indicating where to display the response that is received after submitting the form.
+		/// </summary>
+		public string FormTarget
+		{
+			get => GetAttribute("formtarget", string.Empty);
+			set => SetAttribute("formtarget", value);
+		}
+
+		/// <summary>
+		/// Is a Boolean indicating whether or not the control should have input focus when the page loads.
+		/// </summary>
+		public bool Autofocus
+		{
+			get => HasAttribute("autofocus");
+			set => SetFlagAttribute("autofocus", value);
+		}
 	}
 }

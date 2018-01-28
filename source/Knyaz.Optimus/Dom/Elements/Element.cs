@@ -401,6 +401,14 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		protected void SetFlagAttribute(string name, bool value)
+		{
+			if(value)
+				SetAttribute(name,name);
+			else
+				RemoveAttribute(name);
+		}
+
 		/// <summary>
 		/// Parses the given string text as HTML or XML and inserts the resulting nodes into the tree in the position given by the position argument, as follows:
 		///"beforebegin" - Before the element itself.

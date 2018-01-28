@@ -34,5 +34,20 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			_button.Assert(b => b.Disabled == false);
 		}
+
+		[TestCase("<button id=b autofocus></button>", true)]
+		[TestCase("<button id=b autofocus=1></button>", true)]
+		[TestCase("<button id=b autofocus=true></button>", true)]
+		[TestCase("<button id=b autofocus=false></button>", true)]
+		[TestCase("<button id=b></button>", false)]
+		public void Autofocus(string html, bool expectedAutofocus)
+		{
+			var doc = new Document();
+			var container = doc.CreateElement("div");
+			container.InnerHTML = html;
+			((HtmlButtonElement)container.FirstChild)
+				.Assert(button => 
+					button.Autofocus == expectedAutofocus);
+		}
 	}
 }
