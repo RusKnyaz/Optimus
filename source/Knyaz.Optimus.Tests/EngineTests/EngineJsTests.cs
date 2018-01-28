@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -1016,7 +1015,7 @@ dispatchEvent(evt);");
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/sub",
 					"<form method=get action='download'></form>")
-				.Resource("http://site.net/sub/download", "<div id=d></div>");
+				.Resource("http://site.net/sub/download", "<div id=d></div>", "image/png");
 			
 			var engine = new Engine(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/sub").Wait();
@@ -1024,6 +1023,24 @@ dispatchEvent(evt);");
 			engine.Document.Get<HtmlFormElement>("form").First().Submit();
 			
 			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/sub");
+		}
+
+		[Test]
+		public void OverrideSubmitActionInButton()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form action='/login'><button id=b formAction='/logout'></button></form>")
+				.Resource("http://site.net/login", "<div id=d>login</div>")
+				.Resource("http://site.net/logout", "<div id=d>logout</div>");
+			
+			var engine = new Engine(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+			
+			engine.Document.Get<HtmlButtonElement>("button").First().Click();
+			
+			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/logout");
+			Assert.AreEqual("logout", engine.WaitId("d").InnerHTML);
 		}
 
 		[Test]

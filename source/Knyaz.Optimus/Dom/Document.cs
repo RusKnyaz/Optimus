@@ -394,7 +394,7 @@ namespace Knyaz.Optimus.Dom
 		public event Action<Node> NodeInserted;
 		public event Action<Node, Node> NodeRemoved;
 		public event Action<Node, Exception> OnNodeException;
-		internal event Action<HtmlFormElement> OnFormSubmit;
+		internal event Action<HtmlFormElement, HtmlElement> OnFormSubmit;
 
 		internal void HandleNodeRemoved(Node parent, Node node) => NodeRemoved?.Invoke(parent, node);
 
@@ -420,8 +420,8 @@ namespace Knyaz.Optimus.Dom
 		internal void HandleNodeEventException(Node node, Exception exception) => 
 			OnNodeException?.Invoke(node, exception);
 
-		internal void HandleFormSubmit(HtmlFormElement htmlFormElement) => 
-			OnFormSubmit?.Invoke(htmlFormElement);
+		internal void HandleFormSubmit(HtmlFormElement htmlFormElement, HtmlElement submitElement) => 
+			OnFormSubmit?.Invoke(htmlFormElement, submitElement);
 
 		public string CompatMode => ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat";
 

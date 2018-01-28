@@ -36,8 +36,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			if (evt.Type == "submit")
 			{
 				Handle("onsubmit", OnSubmit, evt);
-				if(!evt.IsDefaultPrevented())
-					Submit();
+				if (!evt.IsDefaultPrevented())
+				{
+					OwnerDocument.HandleFormSubmit(this, evt.OriginalTarget as HtmlElement);
+				}
 			}
 		}
 
@@ -157,12 +159,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Submits the form to the server.
 		/// </summary>
-		public void Submit() => OwnerDocument.HandleFormSubmit(this);
+		public void Submit() => OwnerDocument.HandleFormSubmit(this, null);
 
 		
-		internal void RaiseSubmit()
+		internal void RaiseSubmit(HtmlElement submitElement)
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
+			evt.OriginalTarget = submitElement;
 			evt.InitEvent("submit", true, true);
 			DispatchEvent(evt);
 		}

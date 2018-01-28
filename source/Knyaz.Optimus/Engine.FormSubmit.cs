@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
@@ -9,35 +10,57 @@ namespace Knyaz.Optimus
 	partial class Engine
 	{
 		// todo: rewrite and complete the stuff
-		private async void OnFormSubmit(HtmlFormElement form)
+		private async void OnFormSubmit(HtmlFormElement form, HtmlElement submitElement)
 		{
-			if (string.IsNullOrEmpty(form.Action))
-				return;
+			var method = form.Method;
+			var action = form.Action;
+			var enctype = form.Enctype;
+			var target = form.Target;
+			
+			if (submitElement is HtmlButtonElement button)
+			{
+				if (!string.IsNullOrEmpty(button.FormMethod))
+					method = button.FormMethod;
 
+				if (!string.IsNullOrEmpty(button.FormAction))
+					action = button.FormAction;
+				
+				if (!string.IsNullOrEmpty(button.FormEnctype))
+					enctype = button.FormEnctype;
+				
+				if (!string.IsNullOrEmpty(button.FormTarget))
+					target = button.FormTarget;
+			}
+			
+			if (string.IsNullOrEmpty(action))
+				return;
+			
 			var dataElements = form.Elements.OfType<IFormElement>().Where(x => !string.IsNullOrEmpty(x.Name));
 
-			var replaceSpaces = form.Method != "post" || form.Enctype != "multipart/form-data";
+			var replaceSpaces = method != "post" || enctype != "multipart/form-data";
 			
 			var data = string.Join("&", dataElements.Select(x => 
 				x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
 			));
 
-			if(form.Enctype == "application/x-www-form-urlencoded")
+			if(enctype == "application/x-www-form-urlencoded")
 			{
 				data = System.Uri.EscapeUriString(data);
 			}
 
-			var isGet = form.Method == "get";
+			var isGet = method == "get";
+			
+			var url = isGet 
+				? action.Split('?')[0] + (string.IsNullOrEmpty(data) ? "" : "?"+data) 
+				: action;
 
-			var url = isGet ? form.Action.Split('?')[0]+"?"+data : form.Action;
-
-			if (form.Action != "about:blank")
+			if (action != "about:blank")
 			{
 				var document = new Document(Window);
 
 				HtmlIFrameElement targetFrame;
 				if (!string.IsNullOrEmpty(form.Target) &&
-				    (targetFrame = Document.GetElementsByName(form.Target).FirstOrDefault() as HtmlIFrameElement) != null)
+				    (targetFrame = Document.GetElementsByName(target).FirstOrDefault() as HtmlIFrameElement) != null)
 				{
 					targetFrame.ContentDocument = document;
 				}

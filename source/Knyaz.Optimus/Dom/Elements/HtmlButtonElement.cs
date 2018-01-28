@@ -25,7 +25,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			base.CallDirectEventSubscribers(evt);
 
 			if (evt.Type == "click" && !evt.IsDefaultPrevented())
-				Form?.RaiseSubmit();
+				Form?.RaiseSubmit(evt.Target as HtmlElement);
 		}
 
 		/// <summary>
