@@ -1,4 +1,6 @@
-﻿using Knyaz.Optimus.Dom.Events;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Knyaz.Optimus.Dom.Events;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -135,5 +137,17 @@ namespace Knyaz.Optimus.Dom.Elements
 			get => HasAttribute("autofocus");
 			set => SetFlagAttribute("autofocus", value);
 		}
+		
+		/// <summary>
+		/// Gets a collection containing the &lt;label&gt; elements associated with the &lt;button&gt; element.
+		/// </summary>
+		public IReadOnlyCollection<HtmlLabelElement> Labels =>
+			string.IsNullOrEmpty(Id) 
+				? Enumerable.Empty<HtmlLabelElement>().ToList().AsReadOnly()
+				: OwnerDocument.GetElementsByName("label")
+					.OfType<HtmlLabelElement>()
+					.Where(x => x.HtmlFor == Id)
+					.ToList()
+					.AsReadOnly();
 	}
 }

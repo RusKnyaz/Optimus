@@ -49,5 +49,15 @@ namespace Knyaz.Optimus.Tests.Dom
 				.Assert(button => 
 					button.Autofocus == expectedAutofocus);
 		}
+
+		[Test]
+		public void Labels()
+		{
+			var doc = new Document();
+			doc.Write("<button id=b></button><label for=b>label1</label><label for=b>label2</label>");
+
+			var button = (HtmlButtonElement)doc.GetElementById("b");
+			Assert.AreEqual(2, button.Labels.Count);
+		}
 	}
 }
