@@ -144,7 +144,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		public IReadOnlyCollection<HtmlLabelElement> Labels =>
 			string.IsNullOrEmpty(Id) 
 				? Enumerable.Empty<HtmlLabelElement>().ToList().AsReadOnly()
-				: OwnerDocument.GetElementsByName("label")
+				: OwnerDocument.GetElementsByTagName("label")
 					.OfType<HtmlLabelElement>()
 					.Where(x => x.HtmlFor == Id)
 					.ToList()
