@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.Dom.Elements;
+﻿using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
 using Moq;
@@ -50,7 +51,8 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void UnbubblableEvent()
 		{
-			var evt = new Event();
+			var doc = new Document();
+			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", false, false);
 
 			_child.DispatchEvent(evt);
@@ -63,7 +65,8 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void RootEvent()
 		{
-			var evt = new Event();
+			var doc = new Document();
+			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", true, true);
 			_root.DispatchEvent(evt);
 			_handlers.Verify(x => x.OnRootBubble(evt), Times.Once());

@@ -18,16 +18,18 @@ namespace Knyaz.Optimus.Dom
 	{
 		private readonly IResourceProvider _resourceProvider;
 		private readonly Func<object> _syncObj;
+		private readonly Document _owner;
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
 		private string _data;
 		private int _readyState;
 		
-		internal XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj)
+		internal XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj, Document owner)
 		{
 			_resourceProvider = resourceProvider;
 			_syncObj = syncObj;
+			_owner = owner;
 			ReadyState = UNSENT;
 		}
 
@@ -244,7 +246,7 @@ namespace Knyaz.Optimus.Dom
 		{
 			if (OnLoad != null)
 			{
-				var evt = new ProgressEvent("load");
+				var evt = new ProgressEvent("load", _owner);
 				evt.InitProgressEvent(true, (ulong) _data.Length, (ulong) _data.Length);
 				lock (_syncObj())
 					OnLoad(evt);

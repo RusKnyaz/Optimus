@@ -226,7 +226,7 @@ window.clearTimeout(timer);"));
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
 
-			var client = new XmlHttpRequest(engine.ResourceProvider, () => this);
+			var client = new XmlHttpRequest(engine.ResourceProvider, () => this, engine.Document);
 
 			client.OnReadyStateChange += () =>
 				{
