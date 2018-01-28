@@ -34,12 +34,16 @@ namespace Knyaz.Optimus.Tests
 		{
 			public IRequest CreateRequest(string url) => new HttpRequest("GET", url);
 			
-			Dictionary<string, HttpResponse> _resources = new Dictionary<string, HttpResponse>();
+			Dictionary<string, IResource> _resources = new Dictionary<string, IResource>();
+			
+			private HttpResponse _response404 = new HttpResponse(HttpStatusCode.NotFound, Stream.Null, "");
 
 			public Task<IResource> SendRequestAsync(IRequest request)
 			{
 				History.Add(request as HttpRequest);
-				return Task.Run(() => (IResource)_resources[request.Url]);
+				return Task.Run(() => 
+					_resources.ContainsKey(request.Url) ? _resources[request.Url] 
+					: _response404); 
 			}
 
 			public SpecResourceProvider Resource(string url, string data, string resourceType = "text/html")
