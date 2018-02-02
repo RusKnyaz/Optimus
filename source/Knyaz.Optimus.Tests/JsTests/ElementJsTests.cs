@@ -32,6 +32,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("TableWrongTBody")]
 		[TestCase("SetInnerHtmlText")]
 		[TestCase("AppendAttributeThrows")]
+		[TestCase("TextElementDispatchesEvent")]
 		public void ElementTests(string testName) => JsTestsRunner.Run(testName);
 
 	    [TestCase("InputChangeCheckedOnClick")]

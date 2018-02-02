@@ -41,6 +41,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			if(node == this)
 				throw new InvalidOperationException();
+			
+			if(node is Attr)
+				throw new InvalidOperationException();
 
 			if (node is DocumentFragment)
 			{

@@ -245,5 +245,20 @@
                 div.appendChild(at);    
             })
         }
+    },
+    "TextElementDispatchesEvent":{
+        run:function () {
+            var result = "";
+            var div = document.createElement("div");
+            var txt = document.createTextNode("T");
+            div.appendChild(txt);
+            var evt = document.createEvent("Event");
+            evt.initEvent("click", true, true);
+            div.onclick = function () {
+                result = evt.target.data;
+            }
+            txt.dispatchEvent(evt);
+            Assert.AreEqual("T", result);
+        }
     }
 });
