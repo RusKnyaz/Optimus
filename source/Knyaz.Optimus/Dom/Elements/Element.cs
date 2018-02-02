@@ -16,6 +16,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	public abstract class Element : Node, IElement
 	{
 		private readonly TokenList _classList = null;
+		private readonly List<Node> _childNodes = new List<Node>();
 
 		internal Element(Document ownerDocument) : base(ownerDocument)
 		{
@@ -25,16 +26,69 @@ namespace Knyaz.Optimus.Dom.Elements
 			_classList.Changed += () => {
 				ClassName = string.Join(" ", _classList);
 			};
-
-			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
-			EventTarget.CallDirectEventSubscribers += x => CallDirectEventSubscribers(x);
-			EventTarget.AfterEventDispatch += x => AfterEventDispatch(x);
 		}
 
-		protected virtual void BeforeEventDispatch(Event evt) {}
-		protected virtual void CallDirectEventSubscribers(Event obj) {}
-		protected virtual void AfterEventDispatch(Event obj) {}
+		public override IList<Node> ChildNodes => _childNodes; 
+		
+		public override Node RemoveChild(Node node)
+		{
+			ChildNodes.Remove(node);
+			OwnerDocument?.HandleNodeRemoved(this, node);
+			return node;
+		}
 
+		public override Node AppendChild(Node node)
+		{
+			if(node == this)
+				throw new InvalidOperationException();
+
+			if (node is DocumentFragment)
+			{
+				foreach (var child in node.ChildNodes.ToList())
+				{
+					AppendChild(child);
+				}
+			}
+			else
+			{
+				UnattachFromParent(node);
+				ChildNodes.Add(node);
+				RegisterNode(node);
+			}
+			return node;
+		}
+		
+		public override Node InsertBefore(Node newChild, Node refNode)
+		{
+			UnattachFromParent(newChild);
+			if (refNode == null)
+				ChildNodes.Add(newChild);
+			else
+				ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
+			RegisterNode(newChild);
+			return newChild;
+		}
+		
+		public override Node ReplaceChild(Node newChild, Node oldChild)
+		{
+			InsertBefore(newChild, oldChild);
+			RemoveChild(oldChild);
+			return newChild;
+		}
+		
+		public override bool HasChildNodes => ChildNodes.Count > 0;
+		
+		/// <summary>
+		/// Gets the node's first child in the tree, or null if the node has no children. If the node is a Document, it returns the first node in the list of its direct children.
+		/// </summary>
+		public override Node FirstChild => ChildNodes.FirstOrDefault();
+
+		/// <summary>
+		/// Gets the last child of the node. If its parent is an element, then the child is generally an element node, a text node, or a comment node. It returns null if there are no child elements.
+		/// </summary>
+		public override Node LastChild => ChildNodes.LastOrDefault();
+		
+		
 		protected void Handle(string attrName, Action<Event> actionHandler, Event evt)
 		{
 			if (actionHandler != null)

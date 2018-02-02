@@ -90,7 +90,6 @@ namespace Knyaz.Optimus.Dom
 
 			AppendChild(DocumentElement);
 
-			EventTarget = new EventTarget(this, () => window, () => this);
 			DefaultView = window;
 
 			ReadyState = DocumentReadyStates.Loading;

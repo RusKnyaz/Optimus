@@ -236,5 +236,14 @@
             div.innerHTML = "abc";
             Assert.AreEqual("abc", div.innerHTML);
         }
-    }    
+    },
+    "AppendAttributeThrows":{
+        run:function () {
+            var at = document.createAttribute("dd");
+            var div = document.createElement('div');
+            Assert.Throws(function ()  {
+                div.appendChild(at);    
+            })
+        }
+    }
 });
