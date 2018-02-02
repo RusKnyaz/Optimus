@@ -60,6 +60,15 @@ Test("CommentTests", {
             var com = document.createComment("Some comment");
             Assert.AreEqual(12, com.length);
         }
-    }
+    },
+    "AppendChildThrows":{
+        run:function(){
+            var com = document.createComment("T");
+            var div = document.createElement("div");
+            Assert.Throws(function (){
+                com.appendChild(div);
+            } );
+        }
+    }    
     
 });

@@ -324,7 +324,14 @@ namespace Knyaz.Optimus.ScriptExecuting
 				}
 			}
 
-			return _internalFunc.Call(thisObject, arguments);
+			try
+			{
+				return _internalFunc.Call(thisObject, arguments);
+			}
+			catch (Exception ex)
+			{
+				throw new JavaScriptException(JsValue.FromObject(Engine, ex.Message));
+			}
 		}
 	}
 	

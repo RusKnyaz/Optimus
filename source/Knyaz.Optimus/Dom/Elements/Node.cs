@@ -18,22 +18,25 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <inheritdoc cref="INode"/>
 	public abstract class Node : INode, IEventTarget
 	{
-		protected EventTarget EventTarget;
+		private readonly EventTarget  EventTarget;
 		internal NodeSources Source;
 
-		protected Node(Document ownerDocument)
+		protected Node(Document ownerDocument = null)
 		{
 			_ownerDocument = ownerDocument;
-			ChildNodes = new List<Node>();
-			EventTarget = new EventTarget(this, () => ParentNode?.EventTarget, () => OwnerDocument ?? this as Document);
-		}
-
-		protected Node()
-		{
-			ChildNodes = new List<Node>();
 			NodeType = _NODE;
-			EventTarget = new EventTarget(this, () => ParentNode?.EventTarget, () => OwnerDocument ?? this as Document);
+			EventTarget = new EventTarget(this, () => 
+					this is Document doc ? (IEventTarget)doc.DefaultView : ParentNode?.EventTarget, 
+				() => OwnerDocument ?? this as Document);
+			
+			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
+			EventTarget.CallDirectEventSubscribers += x => CallDirectEventSubscribers(x);
+			EventTarget.AfterEventDispatch += x => AfterEventDispatch(x);
 		}
+		
+		protected virtual void BeforeEventDispatch(Event evt) {}
+		protected virtual void CallDirectEventSubscribers(Event obj) {}
+		protected virtual void AfterEventDispatch(Event obj) {}
 
 		private Document _ownerDocument;
 
@@ -43,33 +46,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			set { }
 		}
 
-		internal virtual void SetOwner(Document doc)
-		{
-			_ownerDocument = doc;
-			foreach (var childNode in ChildNodes)
-				childNode.SetOwner(doc);
-		}
+		internal virtual void SetOwner(Document doc) => _ownerDocument = doc;
 
-		public virtual Node AppendChild(Node node)
-		{
-			if(node == this)
-				throw new InvalidOperationException();
-
-			if (node is DocumentFragment)
-			{
-				foreach (var child in node.ChildNodes.ToList())
-				{
-					AppendChild(child);
-				}
-			}
-			else
-			{
-				UnattachFromParent(node);
-				ChildNodes.Add(node);
-				RegisterNode(node);
-			}
-			return node;
-		}
+		public virtual Node AppendChild(Node node) => throw new NotSupportedException();
 
 		protected void RegisterNode(Node node)
 		{
@@ -91,25 +70,21 @@ namespace Knyaz.Optimus.Dom.Elements
 			newChild.DispatchEvent(evt);
 		}
 
-		private void UnattachFromParent(Node node) => node.ParentNode?.ChildNodes.Remove(node);
+		protected void UnattachFromParent(Node node) => node.ParentNode?.ChildNodes.Remove(node);
 
+		private static readonly List<Node> emptyList = new List<Node>(0); 
 		
 		/// <summary>
 		/// Gets a live collection of child nodes of the given element.
 		/// </summary>
-		public IList<Node> ChildNodes { get; }
+		public virtual IList<Node> ChildNodes => emptyList;
 
 		/// <summary>
 		/// Removes a child node from the DOM.
 		/// </summary>
 		/// <param name="node">The node to remove.</param>
 		/// <returns>The removed node.</returns>
-		public Node RemoveChild(Node node)
-		{
-			ChildNodes.Remove(node);
-			OwnerDocument?.HandleNodeRemoved(this, node);
-			return node;
-		}
+		public virtual Node RemoveChild(Node node) => throw new NotSupportedException();
 
 		/// <summary>
 		/// Inserts a node before the reference node as a child of a specified parent node. 
@@ -120,21 +95,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="newChild"></param>
 		/// <param name="refNode"></param>
 		/// <returns></returns>
-		public Node InsertBefore(Node newChild, Node refNode)
-		{
-			UnattachFromParent(newChild);
-			if (refNode == null)
-				ChildNodes.Add(newChild);
-			else
-				ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
-			RegisterNode(newChild);
-			return newChild;
-		}
+		public virtual Node InsertBefore(Node newChild, Node refNode) =>
+			throw new NotSupportedException();
 
 		/// <summary>
 		/// Indicating whether the current Node has child nodes or not.
 		/// </summary>
-		public bool HasChildNodes { get { return ChildNodes.Count > 0; } }
+		public virtual bool HasChildNodes => false;
 
 		/// <summary>
 		/// Replaces one child node of the specified node with another.
@@ -142,22 +109,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="newChild">The node to be added.</param>
 		/// <param name="oldChild">The node to be removed</param>
 		/// <returns>The removed node.</returns>
-		public Node ReplaceChild(Node newChild, Node oldChild)
-		{
-			InsertBefore(newChild, oldChild);
-			RemoveChild(oldChild);
-			return newChild;
-		}
+		public virtual Node ReplaceChild(Node newChild, Node oldChild) =>
+			throw new NotSupportedException();
 
 		/// <summary>
 		/// Gets the node's first child in the tree, or null if the node has no children. If the node is a Document, it returns the first node in the list of its direct children.
 		/// </summary>
-		public Node FirstChild => ChildNodes.FirstOrDefault();
+		public virtual Node FirstChild => null;
 
 		/// <summary>
 		/// Gets the last child of the node. If its parent is an element, then the child is generally an element node, a text node, or a comment node. It returns null if there are no child elements.
 		/// </summary>
-		public Node LastChild => ChildNodes.LastOrDefault();
+		public virtual Node LastChild => null;
 
 		/// <summary>
 		/// Gets the node immediately following the specified one in its parent's childNodes list, or null if the specified node is the last node in that list.
@@ -170,9 +133,8 @@ namespace Knyaz.Optimus.Dom.Elements
 					return null;
 
 				var idx = ParentNode.ChildNodes.IndexOf(this);
-				if (idx == ParentNode.ChildNodes.Count - 1)
-					return null;
-				return ParentNode.ChildNodes[idx + 1];
+				return idx == ParentNode.ChildNodes.Count - 1 ? null 
+					: ParentNode.ChildNodes[idx + 1];
 			}
 		}
 

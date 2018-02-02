@@ -6,7 +6,7 @@
 	/// </summary>
 	public abstract class CharacterData : Node
 	{
-		internal CharacterData(Document owner) => SetOwner(owner);
+		internal CharacterData(Document owner):base(owner){}
 
 		/// <summary>
 		/// The text of this node.

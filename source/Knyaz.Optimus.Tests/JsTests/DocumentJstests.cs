@@ -60,6 +60,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ReplaceData")]
 		[TestCase("SubstringData")]
 		[TestCase("LengthTest")]
+		[TestCase("AppendChildThrows")]
 		public void CommentTests(string testName) => JsTestsRunner.Run(testName);
 
 		[TestCase("ChildElements")]
