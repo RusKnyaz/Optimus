@@ -136,20 +136,29 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return val;
 			});
 			
-			var jsFunc = new ClrFuncCtor(_jsEngine, (x) =>
-			{
-				JsValue res;
-				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document), out res);
+			var eventCtor =new ClrFuncCtor(_jsEngine, args => {
+				var evt = _engine.Document.CreateEvent("Event");
+				var opts = args.Length > 1 ? args[1].AsObject() : null;
+				var canCancel = opts != null && !opts.Get("cancelable").IsUndefined() && opts.Get("cancelable").AsBoolean();
+				var canBubble = opts != null && !opts.Get("bubbles").IsUndefined() && opts.Get("bubbles").AsBoolean();
+				evt.InitEvent(args[0].AsString(), canBubble, canCancel);
+				_typeConverter.TryConvert(evt, out var res);
+				return res.AsObject();
+			}); 
+			_jsEngine.Global.FastAddProperty("Event", eventCtor, false, false, false);
+			
+			var xmlHttpReqCtor = new ClrFuncCtor(_jsEngine, x => {
+				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document), out var res);
 				return res.AsObject();
 			});
 
-			jsFunc.FastAddProperty("UNSENT", new JsValue(0), false, false, false);
-			jsFunc.FastAddProperty("OPENED", new JsValue(1), false, false, false);
-			jsFunc.FastAddProperty("HEADERS_RECEIVED", new JsValue(2), false, false, false);
-			jsFunc.FastAddProperty("LOADING", new JsValue(3), false, false, false);
-			jsFunc.FastAddProperty("DONE", new JsValue(4),false,false,false );
+			xmlHttpReqCtor.FastAddProperty("UNSENT", new JsValue(0), false, false, false);
+			xmlHttpReqCtor.FastAddProperty("OPENED", new JsValue(1), false, false, false);
+			xmlHttpReqCtor.FastAddProperty("HEADERS_RECEIVED", new JsValue(2), false, false, false);
+			xmlHttpReqCtor.FastAddProperty("LOADING", new JsValue(3), false, false, false);
+			xmlHttpReqCtor.FastAddProperty("DONE", new JsValue(4),false,false,false );
 
-			_jsEngine.Global.FastAddProperty("XMLHttpRequest", jsFunc, false, false, false);
+			_jsEngine.Global.FastAddProperty("XMLHttpRequest", xmlHttpReqCtor, false, false, false);
 		}
 
 		private bool ToBoolean(JsValue x)

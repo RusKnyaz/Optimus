@@ -45,7 +45,7 @@ namespace Knyaz.Optimus.Dom.Events
 		/// <summary>
 		/// Indicates whether the event is cancelable.
 		/// </summary>
-		public bool Cancellable { get; private set; }
+		public bool Cancelable { get; private set; }
 		
 		/// <summary>
 		/// The time at which the event was created (in milliseconds, elapsed from the beginning of the current document's lifetime).
@@ -53,9 +53,9 @@ namespace Knyaz.Optimus.Dom.Events
 		public int TimeStamp { get; private set; }
 
 		internal bool _stopped;
-		internal bool Cancelled { get; private set; }
+		internal bool Canceled { get; private set; }
 
-		public Event(Document owner)
+		internal Event(Document owner)
 		{
 			TimeStamp = (DateTime.UtcNow - owner.CreatedOn).Milliseconds;
 		}
@@ -64,7 +64,7 @@ namespace Knyaz.Optimus.Dom.Events
 		/// Creates the new event with the specified type.
 		/// </summary>
 		/// <param name="type"></param>
-		public Event(string type, Document owner):this(owner)
+		internal Event(string type, Document owner):this(owner)
 		{
 			Type = type;
 		}
@@ -81,11 +81,11 @@ namespace Knyaz.Optimus.Dom.Events
 		/// </summary>
 		public void PreventDefault()
 		{
-			if (Cancellable)
-				Cancelled = true;
+			if (Cancelable)
+				Canceled = true;
 		}
 
-		internal bool IsDefaultPrevented() => Cancelled;
+		internal bool IsDefaultPrevented() => Canceled;
 
 		/// <summary>
 		/// Initializes the value of an Event created. If the event has already being dispatched, this method does nothing.
@@ -96,7 +96,7 @@ namespace Knyaz.Optimus.Dom.Events
 		public void InitEvent(string type, bool canBubble, bool canCancel)
 		{
 			Type = type;
-			Cancellable = canCancel;
+			Cancelable = canCancel;
 			Bubbles = canBubble;
 		}
 

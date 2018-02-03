@@ -120,7 +120,7 @@ namespace Knyaz.Optimus.Dom.Elements
 					parentTarget.DispatchEvent(evt);
 
 					if (evt.IsPropagationStopped())
-						return !evt.Cancelled;
+						return !evt.Canceled;
 				}
 
 				if (!isOriginalTarget)
@@ -128,7 +128,7 @@ namespace Knyaz.Optimus.Dom.Elements
 					NotifyListeners(evt, GetCapturingListeners);
 
 					if (evt.IsPropagationStopped())
-						return !evt.Cancelled;
+						return !evt.Canceled;
 				}
 			}
 
@@ -138,7 +138,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 			else if(evt.EventPhase == Event.CAPTURING_PHASE)
 			{
-				return !evt.Cancelled;
+				return !evt.Canceled;
 			}
 
 			if (evt.EventPhase == Event.AT_TARGET || evt.EventPhase == Event.BUBBLING_PHASE)
@@ -147,18 +147,18 @@ namespace Knyaz.Optimus.Dom.Elements
 				evt.CurrentTarget = _target;
 				CallDirectEventSubscribers?.Invoke(evt);
 				if (evt.IsPropagationStopped())
-					return !evt.Cancelled;
+					return !evt.Canceled;
 
 				NotifyListeners(evt, GetBubblingListeners);
 				if (evt.IsPropagationStopped())
-					return !evt.Cancelled;
+					return !evt.Canceled;
 			}
 
 			if (isOriginalTarget)
 			{
 				NotifyListeners(evt, GetCapturingListeners);
 				if (evt.IsPropagationStopped())
-					return !evt.Cancelled;
+					return !evt.Canceled;
 			}
 
 			if (evt.Bubbles && !evt.IsPropagationStopped() && parentTarget != null && evt.Bubbles)
@@ -170,7 +170,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			if(evt.Target == _target)
 				AfterEventDispatch?.Invoke(evt);
 
-			return !evt.Cancelled;
+			return !evt.Canceled;
 		}
 
 		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listenersFn)
