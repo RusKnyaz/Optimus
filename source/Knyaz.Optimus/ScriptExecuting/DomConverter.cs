@@ -67,33 +67,24 @@ namespace Knyaz.Optimus.ScriptExecuting
 				}
 			}
 
-			var stringValue = value as string;
-			if (value is string)
+			switch (value)
 			{
-				result = new JsValue(stringValue);
-				return true;
+				case string stringValue:
+					result = new JsValue(stringValue);
+					return true;
+				case double d:
+					result = new JsValue(d);
+					return true;
+				case bool b:
+					result = new JsValue(b);
+					return true;
 			}
 
-			if (value is double)
-			{
-				result = new JsValue((double)value);
-				return true;
-			}
-
-			if (value is bool)
-			{
-				result = new JsValue((bool)value);
-				return true;
-			}
-		
 			result = JsValue.Null;
 			return false;
 		}
 
-		protected Jint.Engine Engine
-		{
-			get { return _getEngine(); }
-		}
+		protected Jint.Engine Engine => _getEngine();
 
 		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsValue)
 		{

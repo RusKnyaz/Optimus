@@ -66,5 +66,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ChildElements")]
 		[TestCase("DefaultEnctype")]
 		public void FormTests(string testName) => JsTestsRunner.Run(testName);
+		
+		[TestCase("EventConstructor")]
+		[TestCase("EventConstructorWithInit")]
+		public void EventTests(string testName) => JsTestsRunner.Run(testName);
 	}
 }
