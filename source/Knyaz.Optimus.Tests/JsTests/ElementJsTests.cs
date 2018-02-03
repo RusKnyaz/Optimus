@@ -54,5 +54,14 @@ namespace Knyaz.Optimus.Tests.JsTests
 	    [TestCase("Control")]
 	    [TestCase("ControlInDocument")]
 	    public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(testName);
+
+	    [TestCase("Form")]
+	    [TestCase("NestedOptgroups")]
+	    [TestCase("SetLabelSetsAttribute")]
+	    [TestCase("GetLabelGetsAttributeIfExists")]
+	    [TestCase("GetLabelGetsTextIfThereIsNoAttribute")]
+		[TestCase("GetLabelWhenAttributeIsEmpty")]
+	    [TestCase("DivInOptionSkipped")]
+		public void HtmlOptionElementTests(string testName) => JsTestsRunner.Run(testName);
     }
 }

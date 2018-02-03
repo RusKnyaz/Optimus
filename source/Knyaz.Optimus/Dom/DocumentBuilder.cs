@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Jint.Parser.Ast;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
 using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
@@ -26,8 +27,7 @@ namespace Knyaz.Optimus.Dom
 		{
 			foreach (var htmlNode in parse)
 			{
-				var tag = htmlNode as HtmlElement;
-				if (tag != null && tag.Name.ToLowerInvariant() == "html")
+				if (htmlNode is HtmlElement tag && tag.Name.ToLowerInvariant() == "html")
 				{
 					foreach (var child in tag.Children)
 					{
@@ -52,7 +52,11 @@ namespace Knyaz.Optimus.Dom
 			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements));
 		}
 
-		private static IEnumerable<IHtmlNode> BuildInternal(Node node, IEnumerable<IHtmlNode> htmlNodes, NodeSources source = NodeSources.DocumentBuilder, bool root = false)
+		private static IEnumerable<IHtmlNode> BuildInternal(
+			Node node, 
+			IEnumerable<IHtmlNode> htmlNodes, 
+			NodeSources source = NodeSources.DocumentBuilder, 
+			bool root = false)
 		{
 			var extruded = new List<IHtmlNode>();
 
@@ -94,8 +98,16 @@ namespace Knyaz.Optimus.Dom
 					continue;
 				}
 				
+				//skip child handling for nodes that not accepted children.
 				if (currentNode is Script)
 					continue;
+
+				if (currentNode is HtmlOptionElement option)
+				{
+					var innerText = htmlNode.ExtractText();
+					option.Text += innerText;
+					continue;
+				}
 
 				if (htmlElement == null)
 					continue;
@@ -167,7 +179,22 @@ namespace Knyaz.Optimus.Dom
 		private static void SetAttributes(IHtmlElement htmlElement, Element elem)
 		{
 			foreach (var attribute in htmlElement.Attributes)
+			{
 				elem.SetAttribute(attribute.Key, attribute.Value);
+
+				if (attribute.Key == "selected" && elem is HtmlOptionElement option)
+				{
+					option.DefaultSelected = true;
+				}
+			}
 		}
+	}
+	
+	static class IHtmlNodeExtension
+	{
+		public static string ExtractText(this IHtmlNode node) =>
+			node is IHtmlText text ? text.Value
+			: node is IHtmlElement elt ? string.Join("", elt.Children.Select(ExtractText))
+			: string.Empty;
 	}
 }
