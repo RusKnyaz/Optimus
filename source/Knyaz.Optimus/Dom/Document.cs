@@ -262,6 +262,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Html:return new HtmlHtmlElement(this);
 				case TagsNames.Col: return new HtmlTableColElement(this);
 				case TagsNames.Label: return new HtmlLabelElement(this);
+				case TagsNames.OptGroup: return new HtmlOptGroupElement(this);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);

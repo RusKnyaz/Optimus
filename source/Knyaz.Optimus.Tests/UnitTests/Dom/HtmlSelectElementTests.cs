@@ -27,11 +27,12 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void AddingNonOptionsDeprecatedTest()
+		public void AddingNonOption()
 		{
 			_select.AppendChild(_document.CreateElement("div"));
-			Assert.AreEqual(0, _select.Length);
-			Assert.AreEqual(0, _select.ChildNodes.Count);
+			_select.Assert(select => select.Length == 0 &&
+			                         select.ChildNodes.Count == 1 &&
+			                         select.Options.Length == 0);
 		}
 
 		[Test]

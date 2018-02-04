@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -20,10 +21,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public override Node AppendChild(Node node)
 		{
-			if (!(node is HtmlOptionElement option))
-				return node;
-
-			if (node.ChildNodes.Count == 0 && !Multiple)
+			if (node is HtmlOptionElement option && node.ChildNodes.Count == 0 && !Multiple)
 				SelectedOptions.Add(option);
 
 			return base.AppendChild(node);
@@ -69,7 +67,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// The number of &lt;option&gt; elements in this select element.
 		/// </summary>
-		public int Length => ChildNodes.Count;
+		public int Length => ChildNodes.OfType<HtmlOptionElement>().Count();
 
 		/// <summary>
 		/// Gets an options collection of this select element.
@@ -117,6 +115,11 @@ namespace Knyaz.Optimus.Dom.Elements
 				SelectedOptions.Add(Options[value]);
 			}
 		}
+		
+		/// <summary>
+		/// Is a <see cref="HtmlFormElement"/> reflecting the form that this button is associated with.
+		/// </summary>
+		public HtmlFormElement Form => this.FindOwnerForm();
 	}
 
 	/// <summary>
@@ -128,6 +131,9 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlOptionsCollection(HtmlSelectElement owner) => _owner = owner;
 
+		private IEnumerable<HtmlOptionElement> Options =>
+			_owner.ChildNodes.Flat(x => x.ChildNodes).OfType<HtmlOptionElement>();
+		
 		public int Length
 		{
 			get => _owner.Length;
@@ -146,7 +152,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		public HtmlOptionElement Item(int index) => (HtmlOptionElement)_owner.ChildNodes[index];
+		public HtmlOptionElement Item(int index) => Options.ElementAtOrDefault(index);
 
 		/// <summary>
 		/// Searches the specific node with the given name. Returns null if no such named node exists.
@@ -155,8 +161,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public HtmlOptionElement NamedItem(string name)
 		{
-			return _owner.ChildNodes.OfType<HtmlOptionElement>().FirstOrDefault(x => x.Id == name)
-			       ?? _owner.ChildNodes.OfType<HtmlOptionElement>().FirstOrDefault(x => x.Name == name);
+			return Options.FirstOrDefault(x => x.Id == name)
+			       ?? Options.FirstOrDefault(x => x.Name == name);
 		}
 
 		/// <summary>
@@ -174,7 +180,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public IEnumerator<HtmlOptionElement> GetEnumerator() => _owner.ChildNodes.OfType<HtmlOptionElement>().GetEnumerator();
+		public IEnumerator<HtmlOptionElement> GetEnumerator() => Options.GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}

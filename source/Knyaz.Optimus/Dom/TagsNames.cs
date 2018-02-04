@@ -78,6 +78,9 @@
 		/// <summary>NAV</summary>
 		public const string Nav = "NAV";
 		
+		/// <summary>OPTGROUP</summary>
+		public const string OptGroup = "OPTGROUP";
+		
 		/// <summary>OPTION</summary>
 		public const string Option = "OPTION";
 
