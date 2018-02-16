@@ -16,7 +16,13 @@
     <RepositoryUrl>https://bitbucket.org/RusKnyaz/optimus/src</RepositoryUrl>
     <RepositoryType>mercurial</RepositoryType>
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
-    <PackageReleaseNotes>NetCore and NetStandard assemblies added.</PackageReleaseNotes>
+    <PackageReleaseNotes>
+- New methods and properties of HtmlButtonElement, HtmlInputElement, HtmlOptionElement, HtmlOptionGroupElement;
+- Fixed events propogation and handling
+- Downgraded Jint to stable version
+- Fixed 'this' value inside event handlers.
+- Other API changes and bug fixes.
+</PackageReleaseNotes>
     <PackageTags>headless web browser</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
