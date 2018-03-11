@@ -213,8 +213,6 @@ namespace Knyaz.Optimus.Html
 
 			var text = new StringBuilder();
 
-			var tagsStack = new Stack<string>();
-
 			while (!reader.EndOfStream)
 			{
 				text.Append(ReadWhile(reader, x => x != '<'));
@@ -224,7 +222,7 @@ namespace Knyaz.Optimus.Html
 				var next = (char) reader.Peek();
 
 				//todo: check if we still needed for the stack of tags names
-				if (tagsStack.Count > 0 && next == '/') //probably end of tag
+				if (next == '/') //probably end of tag
 				{
 					reader.Read();
 					var closedTagName = ReadWhile(reader, x => x != '>');
@@ -237,7 +235,6 @@ namespace Knyaz.Optimus.Html
 					yield return new HtmlChunk { Type = HtmlChunk.Types.TagEnd, Value = closedTagName };
 
 					reader.Read();
-					tagsStack.Pop();
 					continue;
 				}
 				else if (char.IsLetter(next)) //start of tag
@@ -281,10 +278,6 @@ namespace Knyaz.Optimus.Html
 							{
 								yield return new HtmlChunk { Type = HtmlChunk.Types.Text, Value = HtmlDecode(ReadToPhrase(reader, "</textarea>")) };
 								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
-							}
-							else
-							{
-								tagsStack.Push(tagName.ToLowerInvariant());
 							}
 							break;
 						}
