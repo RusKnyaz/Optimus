@@ -7,7 +7,7 @@ namespace Knyaz.Optimus.Html
 	{
 		internal static IEnumerable<IHtmlNode> Parse(System.IO.Stream stream)
 		{
-			using(var enumerator = HtmlReader.Read(stream).GetEnumerator())
+			using(var enumerator = FixHtml(HtmlReader.Read(stream)).GetEnumerator())
 			{
 				//todo: try to get rid of fake element
 				var rootElem = new HtmlElement();
@@ -15,6 +15,30 @@ namespace Knyaz.Optimus.Html
 				while (ParseElement(rootElem, enumerator) == ParseResult.Ok){}
 
 				return rootElem.Children;
+			}
+		}
+
+		private static IEnumerable<HtmlChunk> FixHtml(IEnumerable<HtmlChunk> html)
+		{
+			var tags = new List<string>();
+			foreach (var chunk in html)
+			{
+				if(chunk.Type == HtmlChunk.Types.TagStart)
+					tags.Add(chunk.Value);
+				else if (chunk.Type == HtmlChunk.Types.TagEnd)
+				{
+					int idx;
+					for(idx = tags.Count -1; idx>=0;idx--)
+						if (StringComparer.InvariantCultureIgnoreCase.Equals(tags[idx], chunk.Value))
+							break;
+
+					if (idx >= 0)
+						tags.RemoveRange(idx, tags.Count - idx);
+					else
+						continue;
+				}
+
+				yield return chunk;
 			}
 		}
 
