@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Tests.Html
 	[TestFixture]
 	public class HtmlParserTests
 	{
-		private IEnumerable<IHtmlNode> Parse(string str)
+		private static IEnumerable<IHtmlNode> Parse(string str)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(str)))
 			{
@@ -51,10 +51,10 @@ namespace Knyaz.Optimus.Tests.Html
 
 			elem.Assert(e =>
 				e.Name == "head" && 
-				(Enumerable.First<IHtmlNode>(e.Children) as HtmlText).Value == "\n\n\t" &&
-				(Enumerable.Skip<IHtmlNode>(e.Children, 1).First() as HtmlElement).Name == "script");
+				(e.Children.First() as HtmlText).Value == "\n\n\t" &&
+				(e.Children.Skip(1).First() as HtmlElement).Name == "script");
 		}
-
+		
 		[Test]
 		public void Text()
 		{
@@ -125,6 +125,8 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<select><option>1<option>2</select>", "<select><option>1</option><option>2</option></select>")]
 		[TestCase("<select><optgroup><option>1<option>2<optgroup><option>3</select", 
 		          "<select><optgroup><option>1</option><option>2</option></optgroup><optgroup><option>3</option></optgroup></select>")]
+		[TestCase("<div></div></ul><div></div>", "<div></div><div></div>", Description = "Sckip  unexpected end tag.")]
+		[TestCase("<div>A</ul>B</div>", "<div>AB</div>",  Description = "Skip unexpected end tag and preserve text.")]
 		public void OptionalEndTagTests(string sourceHtml, string expectedHtml)
 		{
 			var elems = Parse(sourceHtml);
@@ -132,6 +134,7 @@ namespace Knyaz.Optimus.Tests.Html
 			Assert.AreEqual(expectedHtml, result);
 		}
 
+		
 		static string ElemToString(IHtmlElement arg)
 		{
 			var sb = new StringBuilder();
