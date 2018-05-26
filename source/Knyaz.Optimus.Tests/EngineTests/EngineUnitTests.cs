@@ -219,7 +219,7 @@ window.clearTimeout(timer);"));
 			var log = engine.Console.ToList();
 			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("2", log[0]);
+			Assert.AreEqual(2d, log[0]);
 		}
 
 		[Test]
@@ -382,7 +382,7 @@ function reqListener () {
 }
 		var oReq = new XMLHttpRequest();
 		oReq.onload = reqListener;
-		oReq.open('get', 'data.txt', true);
+		oReq.open('get', 'data.txt', false);
 		oReq.send();</script></html>")
 				.Resource("http://localhost/data.txt", "data!");
 
