@@ -187,5 +187,17 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var loggedUser = engine.WaitSelector("a.user.active").FirstOrDefault();
 			Assert.IsNotNull(loggedUser);
 		}
+
+		[Test]
+		public void MyUserAgent()
+		{
+			var engine = new Engine();
+			engine.OpenUrl("http://whatsmyuseragent.org/").Wait();
+			var uaDiv = (HtmlDivElement)engine.WaitSelector("div.user-agent").FirstOrDefault();
+			var ua = uaDiv?.TextContent;
+			Assert.IsNotNull(ua);
+			System.Console.Write(ua);
+			Assert.IsTrue(ua.Contains("Optimus"));
+		}
 	}
 }

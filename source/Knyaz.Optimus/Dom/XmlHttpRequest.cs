@@ -59,6 +59,7 @@ namespace Knyaz.Optimus.Dom
 		{
 			_request = (HttpRequest)_resourceProvider.CreateRequest(_linkProvider.MakeUri(url));
 			_request.Method = method;
+			_request.Headers["User-Agent"] = _owner?.DefaultView?.Navigator?.UserAgent;
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;

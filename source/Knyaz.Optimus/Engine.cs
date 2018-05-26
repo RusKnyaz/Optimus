@@ -25,7 +25,7 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Simplified resources access (sum of ResourceProvider and LinkProvider).
 		/// </summary>
-		private CommonResourceProvider _commonResourceProvider;
+		private readonly CommonResourceProvider _commonResourceProvider;
 		
 		/// <summary>
 		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
@@ -61,7 +61,7 @@ namespace Knyaz.Optimus
 		public Engine(IResourceProvider resourceProvider)
 		{
 			ResourceProvider = resourceProvider;
-			_commonResourceProvider = new CommonResourceProvider(resourceProvider, LinkProvider);
+			_commonResourceProvider = new CommonResourceProvider(resourceProvider, LinkProvider, () => Window.Navigator.UserAgent);
 			Console = new Console();
 			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
 			ScriptExecutor = new ScriptExecutor(this);

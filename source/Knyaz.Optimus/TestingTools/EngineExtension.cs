@@ -8,6 +8,7 @@ using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.Environment;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -226,5 +227,30 @@ namespace Knyaz.Optimus.TestingTools
 		{
 			return elt.QuerySelectorAll(query).OfType<T>();
 		}
+
+		public static Engine UseKnownUserAgent(this Engine engine, KnownUserAgents agent)
+		{
+			var ua = agent == KnownUserAgents.Linux_Chromium ? "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/66.0.3359.139 Chrome/66.0.3359.139 Safari/537.36"
+				: agent == KnownUserAgents.Windows_Firefox ? "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0"
+				: agent == KnownUserAgents.IOs_Firefox ? "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0"
+				: agent == KnownUserAgents.Andrpoid_Chrome ? "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36"
+				: throw new ArgumentException("agent");
+
+			return engine.UseCustomUserAgent(ua);
+		}
+
+		public static Engine UseCustomUserAgent(this Engine engine, string userAgent)
+		{
+			((Navigator) engine.Window.Navigator).UserAgent = userAgent;
+			return engine;
+		}
+	}
+
+	public enum KnownUserAgents
+	{
+		Linux_Chromium,
+		Windows_Firefox,
+		IOs_Firefox,
+		Andrpoid_Chrome
 	}
 }

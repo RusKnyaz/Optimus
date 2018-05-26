@@ -34,7 +34,11 @@ namespace Knyaz.Optimus.Environment
 
 			InnerWidth = 1024;
 			InnerHeight = 768;
-			Navigator = new Navigator();
+			Navigator = new Navigator()
+			{
+				UserAgent =
+					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
+			};
 			History = new History(engine);
 			Location = new Location(engine, History);
 
