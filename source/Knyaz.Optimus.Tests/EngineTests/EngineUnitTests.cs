@@ -2,6 +2,7 @@
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
 using Moq;
@@ -215,11 +216,10 @@ window.clearTimeout(timer);"));
 		public void GetElementsByTagName()
 		{
 			var engine = new Engine();
-			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			var log = engine.Console.ToList();
 			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
-			Assert.AreEqual("2", log[0]);
+			Assert.AreEqual(2d, log[0]);
 		}
 
 		[Test]
@@ -309,12 +309,7 @@ window.clearTimeout(timer);"));
 		public void AppendScriptAsInnerHtml()
 		{
 			var engine = new Engine();
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-			{
-				log.Add(o == null ? "<null>" : o.ToString());
-				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-			};
+			var log = engine.Console.ToConsole().ToList();
 			engine.Load("<html><head></head><body></body></html>");
 			engine.Document.Body.InnerHTML = "<script>console.log('HI');</script>";
 			Assert.AreEqual(new[]{"HI"}, log);
@@ -348,14 +343,62 @@ window.clearTimeout(timer);"));
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			
 			var engine = new Engine(resourceProvider);
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-			{
-				log.Add(o == null ? "<null>" : o.ToString());
-				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-			};
+			var log = engine.Console.ToConsole().ToList();
 
 			engine.OpenUrl(url).Wait();
+			
+			Assert.AreEqual(new[]{"ok"}, log);
+		}
+		
+		[Test]
+		public void SetUpUserAgent()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "<html><script src='sc.js'/></html>")
+				.Resource("http://localhost/sc.js", "console.log(navigator.userAgent);");
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider).UseCustomUserAgent("My favorite browser");
+
+			var log = engine.Console.ToList();
+
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(new[]{"My favorite browser"}, log);
+			Assert.AreEqual(2, httpResourceProvider.History.Count);
+			Assert.AreEqual("My favorite browser", httpResourceProvider.History[0].Headers["User-Agent"]);
+			Assert.AreEqual("My favorite browser", httpResourceProvider.History[1].Headers["User-Agent"]);
+		}
+
+		[Test]
+		public void XmlHttpRequestUserAgent()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", @"<html><script>
+		
+function reqListener () {
+		console.log(this.responseText);
+}
+		var oReq = new XMLHttpRequest();
+		oReq.onload = reqListener;
+		oReq.open('get', 'data.txt', false);
+		oReq.send();</script></html>")
+				.Resource("http://localhost/data.txt", "data!");
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+			((Navigator)engine.Window.Navigator).UserAgent = "My favorite browser";
+
+			var log = engine.Console.ToList();
+
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(new[]{"data!"}, log);
+			Assert.AreEqual(2, httpResourceProvider.History.Count);
+			Assert.AreEqual("My favorite browser", httpResourceProvider.History[0].Headers["User-Agent"]);
+			Assert.AreEqual("My favorite browser", httpResourceProvider.History[1].Headers["User-Agent"]);
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace Knyaz.Optimus.Environment
 		public bool OnLine{get { return true; }}
 		public string Platform{get { return ".NET"; /*todo*/ }}
 		public string Product { get { return "Optimus"; } }
-		public string UserAgent{get { return "Optimus"; /*todo*/ }}
+		public string UserAgent { get; internal set; }
 
 		public string Language => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
 

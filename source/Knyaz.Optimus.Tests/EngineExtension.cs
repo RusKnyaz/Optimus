@@ -31,7 +31,13 @@ namespace Knyaz.Optimus.Tests
 			return engine;
 		}
 
-		public static List<object> AttachLog(this Console console)
+		public static Console ToConsole(this Console console)
+		{
+			console.OnLog += o => System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			return console;
+		}
+
+		public static List<object> ToList(this Console console)
 		{
 			var log = new List<object>();
 			console.OnLog += x => log.Add(x);

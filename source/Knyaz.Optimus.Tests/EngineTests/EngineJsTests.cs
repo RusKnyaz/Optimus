@@ -228,7 +228,9 @@ document.head.appendChild(s);";
 console.log(navigator != null);
 console.log(navigator.userAgent);");
 
-			CollectionAssert.AreEqual(new object[] {true, "Optimus"}, _log);
+			Assert.AreEqual(2, _log.Count);
+			Assert.AreEqual(true, _log[0]);
+			Assert.IsTrue(_log[1].ToString().Contains("Optimus"));
 		}
 
 		[Test]
@@ -333,7 +335,7 @@ console.log(style['width']);");
 			Mock.Get(resourceProvider).SetupGet(x => x.CookieContainer).Returns(cookie);
 			
 			var engine = new Engine(resourceProvider);
-			var log = engine.Console.AttachLog();
+			var log = engine.Console.ToList();
 			engine.OpenUrl("http://todosoft.org").Wait();
 			
 			Thread.Sleep(5000);
@@ -907,7 +909,7 @@ dispatchEvent(evt);");
 				</form><script>document.getElementById(""b"").click();</script></body></html>");
 			
 			var engine = new Engine(resourceProvider);
-			var log = engine.Console.AttachLog();
+			var log = engine.Console.ToList();
 			engine.OpenUrl("http://site.net/").Wait();
 			Assert.AreEqual(new[]{"onclick", "onsubmit"}, log);
 		}
@@ -922,7 +924,7 @@ dispatchEvent(evt);");
 				</form><script>document.getElementById(""b"").click();</script></body></html>");
 			
 			var engine = new Engine(resourceProvider);
-			var log = engine.Console.AttachLog();
+			var log = engine.Console.ToList();
 			engine.OpenUrl("http://site.net/").Wait();
 			Assert.AreEqual(new[]{"onclick"}, log);
 		}
