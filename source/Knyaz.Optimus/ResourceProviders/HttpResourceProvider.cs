@@ -23,7 +23,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			_cookies = cookies;
 		}
 
-		public IRequest CreateRequest(string url)
+		public IRequest CreateRequest(Uri url)
 		{
 			return new HttpRequest("GET", url);
 		}
@@ -55,7 +55,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		private HttpRequestMessage MakeWebRequest(HttpRequest request)
 		{
-			var u = new Uri(request.Url);
+			var u = request.Url;
 			var resultRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
 
 			if (request.Data != null && resultRequest.Method.Method != "GET")
@@ -86,13 +86,13 @@ namespace Knyaz.Optimus.ResourceProviders
 	public class HttpRequest : IRequest
 	{
 		public string Method;
-		public string Url { get; set; }
+		public Uri Url { get; set; }
 		public Dictionary<string, string> Headers;
 		public int Timeout { get; set; }
 
 		public byte[] Data;
 
-		public HttpRequest(string method, string url)
+		public HttpRequest(string method, Uri url)
 		{
 			Headers = new Dictionary<string, string>();
 			Method = method;
@@ -101,7 +101,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public override int GetHashCode()
 		{
-			return ((Url ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
+			return ((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
 		}
 
 		public override bool Equals(object obj)
@@ -119,7 +119,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 	public interface IRequest
 	{
-		string Url { get; }
+		Uri Url { get; }
 	}
 
 	public class HttpResponse : IResource

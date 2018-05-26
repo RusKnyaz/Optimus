@@ -70,7 +70,7 @@ namespace Knyaz.Optimus
 					Document = document;
 				}
 
-				var request = ResourceProvider.CreateRequest(url);
+				var request = ResourceProvider.CreateRequest(LinkProvider.MakeUri(url));
 				if (!isGet && request is HttpRequest httpRequest)
 				{
 					//todo: use right encoding and enctype

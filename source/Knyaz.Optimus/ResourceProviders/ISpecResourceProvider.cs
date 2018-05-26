@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.ResourceProviders
         /// <summary>
         /// Creates resource request.
         /// </summary>
-        IRequest CreateRequest(string url);
+        IRequest CreateRequest(Uri url);
         
         /// <summary>
         /// Requests resource.
@@ -26,14 +26,9 @@ namespace Knyaz.Optimus.ResourceProviders
     public interface IResourceProvider : ISpecResourceProvider
     {
         /// <summary>
-        /// Root path.
-        /// </summary>
-        string Root { get; set; }
-        
-        /// <summary>
         /// Called on request send.
         /// </summary>
-        event Action<string> OnRequest;
+        event Action<Uri> OnRequest;
         
         /// <summary>
         /// Called on request handled and data received.

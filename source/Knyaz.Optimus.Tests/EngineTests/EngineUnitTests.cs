@@ -32,8 +32,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void GenerateContent()
 		{
-			_resourceProvider.Resource("test.js", "var elem = document.getElementById('content');elem.innerHTML = 'Hello';");
-			_engine.Load("<html><head><script src='test.js' defer/></head><body><div id='content'></div></body></html>");
+			_resourceProvider
+				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id='content'></div></body></html>")
+				.Resource("http://localhost/test.js", "var elem = document.getElementById('content');elem.innerHTML = 'Hello';");
+
+			_engine.OpenUrl("http://localhost").Wait();
+			
 			var contentDiv = _engine.Document.GetElementById("content");
 			Assert.AreEqual("Hello", contentDiv.InnerHTML);
 			Assert.AreEqual(1, contentDiv.ChildNodes.Count);
@@ -45,15 +49,17 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void DomManipulation()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>();
-			resourceProvider.Resource("test.js", "var div = document.createElement('div');" +
+			_resourceProvider
+				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id='content1'></div><div id='content2'></div></body></html")
+				.Resource("http://localhost/test.js", "var div = document.createElement('div');" +
 			                                     "div.setAttribute('id', 'c3');" +
 			                                     "var c2 = document.getElementById('content2');" +
 			                                     "document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);");
-			var engine = new Engine(resourceProvider);
-			engine.Load("<html><head><script src='test.js' defer/></head><body><div id='content1'></div><div id='content2'></div></body></html");
-			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
-			var elem = engine.Document.GetElementById("c3");
+			
+			_engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(3, _engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
+			var elem = _engine.Document.GetElementById("c3");
 			Assert.IsNotNull(elem);
 		}
 
@@ -226,7 +232,7 @@ window.clearTimeout(timer);"));
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
 
-			var client = new XmlHttpRequest(engine.ResourceProvider, () => this, engine.Document);
+			var client = new XmlHttpRequest(engine.ResourceProvider, () => this, engine.Document, engine.LinkProvider);
 
 			client.OnReadyStateChange += () =>
 				{
@@ -325,7 +331,7 @@ window.clearTimeout(timer);"));
 			var engine = new Engine(resourceProvider);
 			engine.OpenUrl(url).Wait();
 			
-			Assert.AreEqual(expectedRoot, resourceProvider.Root);
+			Assert.AreEqual(expectedRoot, engine.LinkProvider.Root);
 		}
 
 		[TestCase("http://a.ru/index.html", "k.js", "http://a.ru/k.js")]

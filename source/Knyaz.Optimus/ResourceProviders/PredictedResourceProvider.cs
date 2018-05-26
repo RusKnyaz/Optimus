@@ -16,22 +16,17 @@ namespace Knyaz.Optimus.ResourceProviders
 		}
 
 		private readonly IResourceProvider _resourceProvider;
-		public string Root
+		
+		public event Action<Uri> OnRequest
 		{
-			get { return _resourceProvider.Root; }
-			set { _resourceProvider.Root = value; }
-		}
-
-		public event Action<string> OnRequest
-		{
-			add { _resourceProvider.OnRequest += value; }
-			remove { _resourceProvider.OnRequest -= value; }
+			add => _resourceProvider.OnRequest += value;
+			remove => _resourceProvider.OnRequest -= value;
 		}
 
 		public event EventHandler<ReceivedEventArguments> Received
 		{
-			add { _resourceProvider.Received += value; }
-			remove { _resourceProvider.Received -= value; }
+			add => _resourceProvider.Received += value;
+			remove => _resourceProvider.Received -= value;
 		}
 
 		public Task<IResource> SendRequestAsync(IRequest req) => 
@@ -39,9 +34,9 @@ namespace Knyaz.Optimus.ResourceProviders
 			? preloaded
 			: _resourceProvider.SendRequestAsync(req);
 
-		public IRequest CreateRequest(string path) => _resourceProvider.CreateRequest(path);
+		public IRequest CreateRequest(Uri path) => _resourceProvider.CreateRequest(path);
 
-		public void Preload(string uri)
+		public void Preload(Uri uri)
 		{
 			var request = _resourceProvider.CreateRequest(uri);
 

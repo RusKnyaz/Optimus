@@ -35,8 +35,10 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		private Engine CreateEngine(string body, string js)
 		{
-			_resourceProvider.Resource("test.js", js);
-			_engine.Load("<html><head><script src='test.js' defer/></head><body>" + body + "</body></html>");
+			_resourceProvider
+				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body>" + body + "</body></html>")
+				.Resource("http://localhost/test.js", js);
+			_engine.OpenUrl("http://localhost").Wait();
 			return _engine;
 		}
 
@@ -305,12 +307,12 @@ console.log(style['width']);");
 		[Test]
 		public void SetLocationHref()
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org",
-				Mocks.Page("window.location.href = 'http://todosoft.org/sub';"))
-			                            .Resource("http://todosoft.org/sub",
-				                            Mocks.Page("console.log(window.location.href);console.log(window.location.protocol);"));
+			var resourceProvider = 
+				Mocks.ResourceProvider("http://todosoft.org",Mocks.Page("window.location.href = 'http://todosoft.org/sub';"))
+			   .Resource("http://todosoft.org/sub", Mocks.Page("console.log(window.location.href);console.log(window.location.protocol);"));
+			
 			var engine = new Engine(resourceProvider);
-			engine.OpenUrl("http://todosoft.org");
+			engine.OpenUrl("http://todosoft.org").Wait();
 
 			Thread.Sleep(1000);
 //todo:			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.org"), Times.Once());
@@ -473,7 +475,7 @@ script.onload = function(){ console.log(this.someData); };
 			document.head.appendChild(script); ";
 
 			var engine = new Engine(
-				Mocks.ResourceProvider("script.js", "console.log('in new script');")
+				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');")
 					.Resource("http://localhost", Mocks.Page(script)));
 			var log = new List<string>();
 			engine.Console.OnLog += o => {
@@ -573,17 +575,21 @@ console.log(arr[0]);");
 		[Test]
 		public void DocumentBody()
 		{
-			_resourceProvider.Resource("test.js",
+			_resourceProvider
+				.Resource("http://localhost", "<html><head><script src='test.js'/></head><body>HI</body></html>")
+				.Resource("http://localhost/test.js",
 				"document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
-			_engine.Load("<html><head><script src='test.js'/></head><body>HI</body></html>");
+			_engine.OpenUrl("http://localhost").Wait();
 			CollectionAssert.AreEqual(new[] {"hi"}, _log);
 		}
 
 		[Test]
 		public void Splice()
 		{
-			_resourceProvider.Resource("test.js", "var x = [1,2,3]; x.splice(1,0,4);console.log(x);");
-			_engine.Load("<html><head><script src='test.js'/></head><body>HI</body></html>");
+			_resourceProvider
+				.Resource("http://localhost","<html><head><script src='test.js'/></head><body>HI</body></html>")
+				.Resource("http://localhost/test.js", "var x = [1,2,3]; x.splice(1,0,4);console.log(x);");
+			_engine.OpenUrl("http://localhost").Wait();
 			CollectionAssert.AreEqual(new[] {1, 4, 2, 3}, _log[0] as object[]);
 		}
 
@@ -819,10 +825,12 @@ dispatchEvent(evt);");
 		[Test]
 		public void GetComputedStyle()
 		{
-			_resourceProvider.Resource("test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
+			_resourceProvider
+				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id=d></div></body></html>")
+				.Resource("http://localhost/test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
 												  "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
 			_engine.ComputedStylesEnabled = true;
-			_engine.Load("<html><head><script src='test.js' defer/></head><body>" + "<div id=d></div>" + "</body></html>");
+			_engine.OpenUrl("http://localhost").Wait();
 			CollectionAssert.AreEqual(new[] { "block", "block" }, _log);
 		}
 

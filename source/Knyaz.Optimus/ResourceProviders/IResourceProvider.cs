@@ -5,15 +5,23 @@ namespace Knyaz.Optimus.ResourceProviders
 {
 	public static class ResourceProviderExtension
 	{
-		public static Task<IResource> GetResourceAsync(this IResourceProvider provider, string uri)
+		public static Task<IResource> GetResourceAsync(this IResourceProvider provider, Uri uri) => 
+			provider.SendRequestAsync(provider.CreateRequest(uri));
+	}
+
+	public class CommonResourceProvider
+	{
+		private readonly IResourceProvider _provider;
+		private readonly LinkProvider _linkProvider;
+
+		public CommonResourceProvider(IResourceProvider provider, LinkProvider linkProvider)
 		{
-			if (string.IsNullOrEmpty(uri))
-				throw new ArgumentOutOfRangeException("uri");
-
-			var req = provider.CreateRequest(uri);
-
-			return provider.SendRequestAsync(req);
+			_provider = provider;
+			_linkProvider = linkProvider;
 		}
+		
+		public Task<IResource> GetResourceAsync(string path) => 
+			_provider.SendRequestAsync(_provider.CreateRequest(_linkProvider.MakeUri(path)));
 	}
 
 	public class ReceivedEventArguments : EventArgs

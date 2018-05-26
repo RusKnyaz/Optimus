@@ -21,15 +21,16 @@ namespace Knyaz.Optimus.Dom
 		private readonly IResourceProvider _resourceProvider;
 		private readonly IDocument _document;
 		private readonly IScriptExecutor _scriptExecutor;
+		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
 
 		internal DocumentScripting (
 			Document document, 
 			IScriptExecutor scriptExecutor,
-			IResourceProvider resourceProvider)
+			Func<string,Task<IResource>> getResourceAsyncFn)
 		{
 			_document = document;
 			_scriptExecutor = scriptExecutor;
-			_resourceProvider = resourceProvider;
+			_getResourceAsyncFn = getResourceAsyncFn;
 			document.NodeInserted += OnDocumentNodeInserted;
 			document.DomContentLoaded += OnDocumentDomContentLoaded;
 			document.OnHandleNodeScript += OnHandleNodeScript;
@@ -63,12 +64,12 @@ namespace Knyaz.Optimus.Dom
 
 					if (defer)
 					{
-						_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(LoadAsync(script, _resourceProvider), script));
+						_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(LoadAsync(script, _getResourceAsyncFn), script));
 					}
 					else if (remote)
 					{
 						var task = 
-							LoadAsync(script, _resourceProvider)
+							LoadAsync(script, _getResourceAsyncFn)
 							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
 
 						if (!async)
@@ -83,12 +84,12 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		//todo: revise it. it shouldn't be here.
-		internal static Task LoadAsync(Script script, IResourceProvider resourceProvider)
+		internal static Task LoadAsync(Script script, Func<string, Task<IResource>> getResourceAsyncFn)
 		{
 			if (string.IsNullOrEmpty(script.Src))
 				throw new InvalidOperationException("Src not set.");
 
-			return resourceProvider.GetResourceAsync(script.Src).ContinueWith(
+			return getResourceAsyncFn(script.Src).ContinueWith(
 				resource =>
 				{
 					try

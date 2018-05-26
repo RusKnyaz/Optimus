@@ -1,17 +1,15 @@
-﻿﻿using System;
- using System.Diagnostics;
- using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
 	internal class ResourceProvider : IResourceProvider
 	{
-		public event Action<string> OnRequest;
+		public event Action<Uri> OnRequest;
 		public event EventHandler<ReceivedEventArguments> Received;
 		public CookieContainer CookieContainer { get; } = new CookieContainer();
 
@@ -30,8 +28,6 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		protected ISpecResourceProvider FileResourceProvider { get; private set; }
 		public ISpecResourceProvider HttpResourceProvider { get; private set; }
-
-		public string Root { get; set; }
 
 		private ISpecResourceProvider GetResourceProvider(Uri u)
 		{
@@ -52,34 +48,18 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		public IRequest CreateRequest(string path)
+		public IRequest CreateRequest(Uri uri)
 		{
-			var uri = MakeUri(path);
 			var resourceProvider = GetResourceProvider(uri);
-
-			if (resourceProvider is DataResourceProvider data)
-			{
-				return data.CreateRequest(path);
-			}
-			
-			return resourceProvider.CreateRequest(uri.ToString());
+			return resourceProvider.CreateRequest(uri);
 		}
 		
-		private Uri MakeUri(string uri)
-		{
-			if (uri.Substring(0, 2) == "./")
-				uri = uri.Remove(0, 2);
-
-			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-		}
 
 		public Task<IResource> SendRequestAsync(IRequest req)
 		{
 			OnRequest?.Invoke(req.Url);
 
-			var u = UriHelper.GetUri(Root, req.Url);
-
-			var provider = GetResourceProvider(u);
+			var provider = GetResourceProvider(req.Url);
 
 			return provider.SendRequestAsync(req).ContinueWith(t =>
 					{
@@ -94,14 +74,11 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		class DataResourceProvider : ISpecResourceProvider
 		{
-			public IRequest CreateRequest(string url)
-			{
-				return new DataRequest(url);
-			}
+			public IRequest CreateRequest(Uri url) => new DataRequest(url);
 
 			public Task<IResource> SendRequestAsync(IRequest request)
 			{
-				var uri = request.Url;
+				var uri = request.Url.ToString();
 				var data = uri.Substring(5);
 				var type = new string(data.TakeWhile(c => c != ',').ToArray());
 				var content = data.Substring(type.Length);
@@ -112,12 +89,8 @@ namespace Knyaz.Optimus.ResourceProviders
 
 			class DataRequest : IRequest
 			{
-				public DataRequest(string url)
-				{
-					Url = url;
-				}
-
-				public string Url { get; private set; }
+				public DataRequest(Uri url) => Url = url;
+				public Uri Url { get; }
 			}
 		}		
 	}

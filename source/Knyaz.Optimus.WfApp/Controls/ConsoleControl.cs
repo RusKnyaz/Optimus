@@ -104,11 +104,11 @@ namespace Knyaz.Optimus.WfApp.Controls
 			Log("Executing: " + (script.Src ?? script.Id ?? "..."));
 		}
 
-		private void ResourceProviderOnOnRequest(string s)
+		private void ResourceProviderOnOnRequest(Uri s)
 		{
 			if (!LogInfo)
 				return;
-			Log("Request: " + s);
+			Log("Request: " + s.ToString());
 		}
 
 		private void ResourceProviderOnReceived(object sender, ReceivedEventArguments args)

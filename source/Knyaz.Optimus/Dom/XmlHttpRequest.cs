@@ -19,17 +19,19 @@ namespace Knyaz.Optimus.Dom
 		private readonly IResourceProvider _resourceProvider;
 		private readonly Func<object> _syncObj;
 		private readonly Document _owner;
+		private readonly LinkProvider _linkProvider;
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
 		private string _data;
 		private int _readyState;
 		
-		internal XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj, Document owner)
+		internal XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj, Document owner, LinkProvider linkProvider)
 		{
 			_resourceProvider = resourceProvider;
 			_syncObj = syncObj;
 			_owner = owner;
+			_linkProvider = linkProvider;
 			ReadyState = UNSENT;
 		}
 
@@ -55,7 +57,7 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="password">The password to use for authentication purposes.</param>
 		public void Open(string method, string url, bool? async = null, string username = null, string password = null)
 		{
-			_request = (HttpRequest)_resourceProvider.CreateRequest(url);
+			_request = (HttpRequest)_resourceProvider.CreateRequest(_linkProvider.MakeUri(url));
 			_request.Method = method;
 			_async = async ?? true;
 			//todo: username, password

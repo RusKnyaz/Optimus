@@ -13,14 +13,14 @@ namespace Knyaz.Optimus.ResourceProviders
 		/// <summary>
 		/// Creates resource request.
 		/// </summary>
-		public IRequest CreateRequest(string url) => new FileRequest(url);
+		public IRequest CreateRequest(Uri url) => new FileRequest(url);
 
 		/// <summary>
 		/// Requests file resource..
 		/// </summary>
 		public Task<IResource> SendRequestAsync(IRequest request)
 		{
-			var uri = new Uri(request.Url);
+			var uri = request.Url;
 
 			var fielInfo = new FileInfo(uri.AbsolutePath);
 
@@ -51,8 +51,8 @@ namespace Knyaz.Optimus.ResourceProviders
 
 	class FileRequest : IRequest
 	{
-		public FileRequest(string url) => Url = url;
+		public FileRequest(Uri url) => Url = url;
 
-		public string Url { get; }
+		public Uri Url { get; }
 	}
 }
