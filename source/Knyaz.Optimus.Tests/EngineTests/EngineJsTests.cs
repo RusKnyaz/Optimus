@@ -228,7 +228,9 @@ document.head.appendChild(s);";
 console.log(navigator != null);
 console.log(navigator.userAgent);");
 
-			CollectionAssert.AreEqual(new object[] {true, "Optimus"}, _log);
+			Assert.AreEqual(2, _log.Count);
+			Assert.AreEqual(true, _log[0]);
+			Assert.IsTrue(_log[1].ToString().Contains("Optimus"));
 		}
 
 		[Test]

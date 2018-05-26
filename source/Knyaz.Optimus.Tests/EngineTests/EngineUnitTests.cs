@@ -216,8 +216,7 @@ window.clearTimeout(timer);"));
 		public void GetElementsByTagName()
 		{
 			var engine = new Engine();
-			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			var log = engine.Console.ToList();
 			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual("2", log[0]);

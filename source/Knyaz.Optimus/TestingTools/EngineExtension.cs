@@ -228,6 +228,9 @@ namespace Knyaz.Optimus.TestingTools
 			return elt.QuerySelectorAll(query).OfType<T>();
 		}
 
+		/// <summary>
+		/// Setup user agent name to be one from the know list.
+		/// </summary>
 		public static Engine UseKnownUserAgent(this Engine engine, KnownUserAgents agent)
 		{
 			var ua = agent == KnownUserAgents.Linux_Chromium ? "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/66.0.3359.139 Chrome/66.0.3359.139 Safari/537.36"
@@ -239,6 +242,9 @@ namespace Knyaz.Optimus.TestingTools
 			return engine.UseCustomUserAgent(ua);
 		}
 
+		/// <summary>
+		/// Setup user agent name value that avaliable in js (navigator.userAgent) and sent within http request headers.
+		/// </summary>
 		public static Engine UseCustomUserAgent(this Engine engine, string userAgent)
 		{
 			((Navigator) engine.Window.Navigator).UserAgent = userAgent;
