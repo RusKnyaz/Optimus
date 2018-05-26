@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using Knyaz.Optimus.ResourceProviders;
 using NUnit.Framework;
 using Knyaz.Optimus.Tests.Resources;
+using Moq;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -27,31 +28,34 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void RequireEmbededLib()
 		{
-			var resourceProvider = Mocks.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});");
-
-			var engine = new Engine(resourceProvider);
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine(o ?? "<null>");
-				log.Add(o.ToString());
-			};
-
 			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
+			
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://root.ru", "<html><head><script> " + requireJs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>")
+				.Resource("http://root.ru/data.js", "define(function(){console.log('dependency'); return 'val';});");
 
-			engine.Load("<html><head><script> " + requireJs + " </script><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
-			System.Threading.Thread.Sleep(5000);
-			//todo: Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
+			var log = OpenUrlAndGetLog("http://root.ru", resourceProvider);
+			
 			CollectionAssert.AreEqual(new[]{"dependency", "main", "val"}, log);
 		}
 
 		[Test]
 		public void Require()
 		{
-			var resourceProvider = Mocks
-				.ResourceProvider("./data.js", "define(function(){console.log('dependency'); return 'val';});")
-				.Resource("require.js", requireJs);
+			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
+			
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://root.ru", "<html><head><script src='require.js'/><script>" + script + "</script></head><body><div id='uca'></div></body></html>")
+				.Resource("http://root.ru/data.js", "define(function(){console.log('dependency'); return 'val';});")
+				.Resource("http://root.ru/require.js", requireJs);
 
+			var log = OpenUrlAndGetLog("http://root.ru", resourceProvider);
+
+			CollectionAssert.AreEqual(new[] { "dependency", "main", "val" }, log);
+		}
+		
+		private static List<string> OpenUrlAndGetLog(string url, IResourceProvider resourceProvider)
+		{
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
 			engine.Console.OnLog += o =>
@@ -60,12 +64,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 				log.Add(o.ToString());
 			};
 
-			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
-
-			engine.Load("<html><head><script src='require.js'/><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.OpenUrl(url).Wait();
 			System.Threading.Thread.Sleep(5000);
-//todo:			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("./data.js"), Times.Once);
-			CollectionAssert.AreEqual(new[] { "dependency", "main", "val" }, log);
+			return log;
 		}
 	}
 }

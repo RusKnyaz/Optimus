@@ -26,10 +26,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[TestCase(false, ExpectedResult = "")]
 		public string JQueryIdSelectorInDeferScript(bool defer)
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>().Resource("test.js", "$('#uca').html('zaza');");
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://localhost", "<html><head><script> " + R.JQueryJs + " </script><script src='test.js' "+ (defer?"defer":"") + "/></head><body><div id='uca'></div></body></html>")
+				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
 			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog +=o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script src='test.js' "+ (defer?"defer":"") + "/></head><body><div id='uca'></div></body></html>");
+			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
 			return ucaDiv.InnerHTML;
 		}
@@ -37,10 +39,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void JQueryIdSelectorIn()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>().Resource("test.js", "$('#uca').html('zaza');");
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://localhost", "<html><head><script> " + R.JQueryJs + " </script><script src='test.js'/></head><body><div id='uca'></div></body></html>")
+				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
 			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script src='test.js'/></head><body><div id='uca'></div></body></html>");
+			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
 			Assert.AreEqual("", ucaDiv.InnerHTML);
 		}
@@ -48,9 +52,10 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void Post()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>();
-			resourceProvider.Resource("test.js", "$.post('http://localhost/data').done(function(x){console.log(x);});");
-			resourceProvider.Resource("http://localhost/data", "OK");
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://localhost", "<html><head><script> " + R.JQueryJs + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>")
+				.Resource("http://localhost/test.js", "$.post('http://localhost/data').done(function(x){console.log(x);});")
+				.Resource("http://localhost/data", "OK");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -60,10 +65,11 @@ namespace Knyaz.Optimus.Tests.EngineTests
 				log.Add(o.ToString());
 			};
 
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>");
+			engine.OpenUrl("http://localhost");
 			System.Threading.Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[]{"OK"}, log);
 		}
+		
 
 		[Test]
 		public void JQueryCreate()

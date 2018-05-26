@@ -20,16 +20,22 @@ namespace Knyaz.Optimus
 	{
 		private Document _document;
 		private Uri _uri;
+		internal LinkProvider LinkProvider = new LinkProvider();
+		
+		/// <summary>
+		/// Simplified resources access (sum of ResourceProvider and LinkProvider).
+		/// </summary>
+		private CommonResourceProvider _commonResourceProvider;
 		
 		/// <summary>
 		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
 		/// </summary>
-		public IResourceProvider ResourceProvider { get; private set; }
+		public IResourceProvider ResourceProvider { get; }
 		
 		/// <summary>
 		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
 		/// </summary>
-		public IScriptExecutor ScriptExecutor { get; private set; }
+		public IScriptExecutor ScriptExecutor { get; }
 		
 		/// <summary>
 		/// Glues Document and ScriptExecutor.
@@ -45,21 +51,22 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Gets the current Window object.
 		/// </summary>
-   		public Window Window { get; private set; }
+   	public Window Window { get; private set; }
 
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
 		public Engine() : this(new PredictedResourceProvider(new ResourceProvider())) { }
 
-   		public Engine(IResourceProvider resourceProvider)
-   		{
-   			ResourceProvider = resourceProvider;
-   			Console = new Console();
-   			Window = new Window(() => Document, this, (url, name, opts)=> OnWindowOpen?.Invoke(url, name, opts));
-   			ScriptExecutor = new ScriptExecutor(this);
-   			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
-   		}
+		public Engine(IResourceProvider resourceProvider)
+		{
+			ResourceProvider = resourceProvider;
+			_commonResourceProvider = new CommonResourceProvider(resourceProvider, LinkProvider);
+			Console = new Console();
+			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
+			ScriptExecutor = new ScriptExecutor(this);
+			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+		}
 
 		/// <summary>
 		/// Occurs when window.open method called.
@@ -96,7 +103,7 @@ namespace Knyaz.Optimus
 				
 				if (_document != null)
 				{
-					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
+					Scripting = new DocumentScripting (_document, ScriptExecutor,_commonResourceProvider.GetResourceAsync);
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
 					
@@ -152,10 +159,9 @@ namespace Knyaz.Optimus
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
 			Document = new Document(Window);
-			
-			ResourceProvider.Root = GetRoot(Uri);
+			LinkProvider.Root = GetRoot(Uri);
 
-			var response = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
+			var response = await _commonResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
 			LoadFromResponse(Document, response);
 		}
 
@@ -217,26 +223,26 @@ namespace Knyaz.Optimus
 
 			if (ResourceProvider is PredictedResourceProvider resourceProvider)
 			{
-				foreach (var script in html.OfType<Html.IHtmlElement>()
-					.Flat(x => x.Children.OfType<Html.IHtmlElement>())
+				foreach (var src in html.OfType<IHtmlElement>()
+					.Flat(x => x.Children.OfType<IHtmlElement>())
 					.Where(x => x.Name == "script" && x.Attributes.ContainsKey("src"))
 					.Select(x => x.Attributes["src"])
 					.Where(x => !string.IsNullOrEmpty(x))
 					)
 				{
-					resourceProvider.Preload(script);
+					resourceProvider.Preload(LinkProvider.MakeUri(src));
 				}
 
 				if (ComputedStylesEnabled)
 				{
-					foreach (var script in html.OfType<IHtmlElement>()
+					foreach (var src in html.OfType<IHtmlElement>()
 					.Flat(x => x.Children.OfType<IHtmlElement>())
 					.Where(x => x.Name == "link" && x.Attributes.ContainsKey("href") &&
 					            (!x.Attributes.ContainsKey("type") || x.Attributes["type"] == "text/css"))
 					.Select(x => x.Attributes["href"])
 					.Where(x => !string.IsNullOrEmpty(x)))
 					{
-						resourceProvider.Preload(script);
+						resourceProvider.Preload(LinkProvider.MakeUri(src));
 					}
 				}
 			}
@@ -276,7 +282,7 @@ namespace Knyaz.Optimus
 
 		private void EnableDocumentStyling()
 		{
-			Styling = new DocumentStyling(_document, ResourceProvider);
+			Styling = new DocumentStyling(_document, _commonResourceProvider.GetResourceAsync);
 			Styling.LoadDefaultStyles();
 		}
 

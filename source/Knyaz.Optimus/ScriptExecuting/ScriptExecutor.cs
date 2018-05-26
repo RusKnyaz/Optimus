@@ -148,7 +148,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_jsEngine.Global.FastAddProperty("Event", eventCtor, false, false, false);
 			
 			var xmlHttpReqCtor = new ClrFuncCtor(_jsEngine, x => {
-				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document), out var res);
+				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document, engine.LinkProvider), out var res);
 				return res.AsObject();
 			});
 

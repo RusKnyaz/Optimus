@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.Dom.Interfaces;
@@ -14,14 +15,13 @@ namespace Knyaz.Optimus.Dom.Css
 	internal class DocumentStyling : IDisposable
 	{
 		private readonly Document _document;
-		private readonly IResourceProvider _resourceProvider;
-
+		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
 		public int Version = 0;
 
-		public DocumentStyling(Document document, IResourceProvider resourceProvider)
+		public DocumentStyling(Document document, Func<string, Task<IResource>> getResourceAsyncFn)
 		{
 			_document = document;
-			_resourceProvider = resourceProvider;
+			_getResourceAsyncFn = getResourceAsyncFn;
 			document.NodeInserted += OnNodeInserted;
 			_document.StyleSheets.Changed += OnStyleChanged;
 		}
@@ -45,38 +45,30 @@ namespace Knyaz.Optimus.Dom.Css
 		    }
 		}
 
-	    private void HandleNode(INode node)
-	    {
-            var txt = node as Text;
-            if (txt != null)
-            {
-                var styleElt = node.ParentNode as HtmlStyleElement;
-                if (styleElt != null && !string.IsNullOrWhiteSpace(txt.Data))
-                {
-                    //todo: chech type
-                    var type = !string.IsNullOrEmpty(styleElt.Type) ? styleElt.Type : "text/css";
-                    var media = !string.IsNullOrEmpty(styleElt.Media) ? styleElt.Type : "all";
-                    AddStyleToDocument(new StringReader(txt.Data));
-                }
-            }
+		private void HandleNode(INode node)
+		{
+			if (node is Text txt && node.ParentNode is HtmlStyleElement styleElt && !string.IsNullOrWhiteSpace(txt.Data))
+			{
+				//todo: chech type
+				var type = !string.IsNullOrEmpty(styleElt.Type) ? styleElt.Type : "text/css";
+				var media = !string.IsNullOrEmpty(styleElt.Media) ? styleElt.Type : "all";
+				AddStyleToDocument(new StringReader(txt.Data));
+			}
 
-            var linkElt = node as HtmlLinkElement;
-            if (linkElt != null && linkElt.Rel == "stylesheet" && _resourceProvider != null)
-            {
-                //todo: check type
-                var request = _resourceProvider.CreateRequest(linkElt.Href);
-                var task = _resourceProvider.SendRequestAsync(request);
-                task.Wait();
-                using (var reader = new StreamReader(task.Result.Stream))
-                    AddStyleToDocument(reader);
-            }
-        }
+			if (node is HtmlLinkElement linkElt && linkElt.Rel == "stylesheet" && _getResourceAsyncFn != null)
+			{
+				//todo: check type
+				var task = _getResourceAsyncFn(linkElt.Href);
+				task.Wait();
+				using (var reader = new StreamReader(task.Result.Stream))
+					AddStyleToDocument(reader);
+			}
+		}
 
 		//Get imported css
 		private TextReader GetImport(string url)
 		{
-			var req = _resourceProvider.CreateRequest(url);
-			var task = _resourceProvider.SendRequestAsync(req);
+			var task = _getResourceAsyncFn(url);
 			task.Wait();
 			var stream = task.Result.Stream;
 			return new StreamReader(stream);

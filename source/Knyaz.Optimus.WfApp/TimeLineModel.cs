@@ -16,18 +16,18 @@ namespace Knyaz.Optimus.WfApp
 		/// <returns></returns>
 		public static Action SubscribeTimeLine(this Engine engine, Action<TimePoint> action)
 		{
-			var requestHandler = (Action<string>)(s => action(new TimePoint
+			var requestHandler = (Action<Uri>)(s => action(new TimePoint
 			{
 				DateTime = DateTime.Now,
 				EventType = TimeLineEvents.Request,
-				ResourceId = s
+				ResourceId = s.ToString()
 			}));
 
-			var receivedHandler = (Action<string>)(s => action(new TimePoint
+			var receivedHandler = (Action<Uri>)(s => action(new TimePoint
 			{
 				DateTime = DateTime.Now,
 				EventType = TimeLineEvents.Received,
-				ResourceId = s
+				ResourceId = s.ToString()
 			}));
 
 			var beforeScriptExecute = (Action<Script>)(s =>

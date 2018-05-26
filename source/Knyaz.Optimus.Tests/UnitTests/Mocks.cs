@@ -11,12 +11,23 @@ namespace Knyaz.Optimus.Tests
 {
 	internal static class Mocks
 	{
-		public static IResourceProvider ResourceProvider(string url, string data)
+		public static IResourceProvider ResourceProvider(string path, string data)
+		{
+			var url = new Uri(path, UriKind.RelativeOrAbsolute);
+			return Mock.Of<IResourceProvider>().Resource(url, data);
+		}
+		
+		public static IResourceProvider ResourceProvider(Uri url, string data)
 		{
 			return Mock.Of<IResourceProvider>().Resource(url, data);
 		}
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, string data)
+		{
+			return resourceProvider.Resource(new Uri(url, UriKind.RelativeOrAbsolute), data);
+		}
+
+		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, string data)
 		{
 			var request = new HttpRequest("GET", url);
 
@@ -32,9 +43,9 @@ namespace Knyaz.Optimus.Tests
 
 		public class SpecResourceProvider : ISpecResourceProvider
 		{
-			public IRequest CreateRequest(string url) => new HttpRequest("GET", url);
+			public IRequest CreateRequest(Uri url) => new HttpRequest("GET", url);
 			
-			Dictionary<string, IResource> _resources = new Dictionary<string, IResource>();
+			Dictionary<Uri, IResource> _resources = new Dictionary<Uri, IResource>();
 			
 			private HttpResponse _response404 = new HttpResponse(HttpStatusCode.NotFound, Stream.Null, "");
 
@@ -48,12 +59,14 @@ namespace Knyaz.Optimus.Tests
 
 			public SpecResourceProvider Resource(string url, string data, string resourceType = "text/html")
 			{
-				_resources[url] =  new HttpResponse(
+				var uri = new Uri(url, UriKind.RelativeOrAbsolute); 
+				
+				_resources[uri] =  new HttpResponse(
 					HttpStatusCode.OK, 
 					new MemoryStream(Encoding.UTF8.GetBytes(data)), 
 					null, 
 					resourceType, 
-					new Uri(url, UriKind.RelativeOrAbsolute));
+					uri);
 
 				return this;
 			}
