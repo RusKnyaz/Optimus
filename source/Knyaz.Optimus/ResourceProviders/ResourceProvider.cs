@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
@@ -26,8 +24,9 @@ namespace Knyaz.Optimus.ResourceProviders
 			FileResourceProvider = fileResourceProvider;
 		}
 
-		protected ISpecResourceProvider FileResourceProvider { get; private set; }
-		public ISpecResourceProvider HttpResourceProvider { get; private set; }
+		private ISpecResourceProvider DataResourceProvider { get; } = new DataResourceProvider();
+		protected ISpecResourceProvider FileResourceProvider { get; }
+		public ISpecResourceProvider HttpResourceProvider { get; }
 
 		private ISpecResourceProvider GetResourceProvider(Uri u)
 		{
@@ -42,7 +41,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					return FileResourceProvider;
 				case "data://": //mono
 				case "data:":
-					return new DataResourceProvider();
+					return DataResourceProvider;
 				default:
 					throw new Exception("Unsupported scheme: " + scheme);
 			}
@@ -71,28 +70,6 @@ namespace Knyaz.Optimus.ResourceProviders
 						return t.Result;
 					});
 		}
-
-		class DataResourceProvider : ISpecResourceProvider
-		{
-			public IRequest CreateRequest(Uri url) => new DataRequest(url);
-
-			public Task<IResource> SendRequestAsync(IRequest request)
-			{
-				var uri = request.Url.ToString();
-				var data = uri.Substring(5);
-				var type = new string(data.TakeWhile(c => c != ',').ToArray());
-				var content = data.Substring(type.Length);
-				return
-					Task.Run(
-						() => (IResource)new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
-			}
-
-			class DataRequest : IRequest
-			{
-				public DataRequest(Uri url) => Url = url;
-				public Uri Url { get; }
-			}
-		}		
 	}
 
 	public class Response : IResource
