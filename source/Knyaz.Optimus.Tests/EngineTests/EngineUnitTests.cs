@@ -400,5 +400,36 @@ function reqListener () {
 			Assert.AreEqual("My favorite browser", httpResourceProvider.History[0].Headers["User-Agent"]);
 			Assert.AreEqual("My favorite browser", httpResourceProvider.History[1].Headers["User-Agent"]);
 		}
+
+		[Test]
+		public void LoadScriptFromBase64()
+		{
+			var scriptCode = System.Convert.ToBase64String( System.Text.Encoding.UTF8.GetBytes("console.log('hi');"));
+			
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", $"<html><script src='data:text/javascript;base64,{scriptCode}'/></html>");
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+
+			var log = engine.Console.ToList();
+			
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(new []{"hi"}, log);
+		}
+
+		[Test]
+		public void LoadPageFromBase64()
+		{
+			var htmlCode = System.Convert.ToBase64String( System.Text.Encoding.UTF8.GetBytes("<html><body>HELLO</body></html>"));
+			
+			var engine = new Engine();
+
+			engine.OpenUrl($"data:text/html;base64,{htmlCode}").Wait();
+			
+			Assert.AreEqual("HELLO", engine.Document.Body.TextContent);
+		}
 	}
 }
