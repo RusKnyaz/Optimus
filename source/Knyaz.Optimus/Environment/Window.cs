@@ -186,10 +186,10 @@ namespace Knyaz.Optimus.Environment
 		public void Dispose() => _timers.Dispose();
 
 		/// <summary>
-		/// Loads the specified resource into the browsing context (window, <iframe> or tab) with the specified name.
+		/// Loads the specified resource into the browsing context (window, &lt;iframe&gt; or tab) with the specified name.
 		/// </summary>
 		/// <param name="url">The URL of the resource to be loaded.</param>
-		/// <param name="windowName">The name of the browsing context (window, <iframe> or tab) into which to load the specified resource.</param>
+		/// <param name="windowName">The name of the browsing context (window, &lt;iframe&gt; or tab) into which to load the specified resource.</param>
 		/// <param name="features">The comma-separated list of window features given with their corresponding values in the form "name=value"</param>
 		public void Open(string url = null, string windowName = null, string features = null) => 
 			_openWindow(url, windowName, features);

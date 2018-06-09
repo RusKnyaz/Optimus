@@ -104,7 +104,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary>
-		/// Gets the index of the first selected <option> element. The value -1 indicates no element is selected.
+		/// Gets the index of the first selected &lt;option&gt; element. The value -1 indicates no element is selected.
 		/// </summary>
 		public long SelectedIndex
 		{

@@ -835,7 +835,7 @@
 		}
 
 		/// <summary>
-		/// Gets or sets 'outline-style' css property. <see cref="ICss2Properties.Outline"/> for more details.
+		/// Gets or sets 'outline-style' css property.
 		/// </summary>
 		public string OutlineStyle
 		{
@@ -844,7 +844,7 @@
 		}
 
 		/// <summary>
-		/// Gets or sets 'outline-width' css property. <see cref="ICss2Properties.Outline"/> for more details.
+		/// Gets or sets 'outline-width' css property.
 		/// </summary>
 		public string OutlineWidth
 		{

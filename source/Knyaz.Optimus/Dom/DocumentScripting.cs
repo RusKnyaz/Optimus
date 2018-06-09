@@ -18,7 +18,6 @@ namespace Knyaz.Optimus.Dom
 	public class DocumentScripting : IDisposable
 	{
 		private readonly Queue<Tuple<Task, Script>> _unresolvedDelayedResources;
-		private readonly IResourceProvider _resourceProvider;
 		private readonly IDocument _document;
 		private readonly IScriptExecutor _scriptExecutor;
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;

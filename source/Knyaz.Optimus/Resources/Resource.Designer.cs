@@ -61,26 +61,7 @@ namespace Knyaz.Optimus.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to /* This Source Code Form is subject to the terms of the Mozilla Public
-        /// * License, v. 2.0. If a copy of the MPL was not distributed with this
-        /// * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-        ///
-        ///@namespace url(http://www.w3.org/1999/xhtml); /* set default namespace to HTML */
-        ///@namespace xul url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
-        ///
-        ////* bidi */
-        ///
-        ///[dir] {
-        ///  unicode-bidi: isolate;
-        ///}
-        ///[dir=&quot;rtl&quot;] {
-        ///  direction: rtl;
-        ///}
-        ///[dir=&quot;ltr&quot;] {
-        ///  direction: ltr;
-        ///}
-        ///
-        ///bdi:d [rest of string was truncated]&quot;;.
+        /// default css style
         /// </summary>
         internal static string moz_default {
             get {
