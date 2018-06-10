@@ -128,17 +128,6 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		internal void RunScripts(IEnumerable<Script> scripts)
-		{
-			//todo: what we should do if some script changes ChildNodes?
-			//todo: optimize (create queue of not executed scripts);
-			foreach (var script in scripts.ToArray())
-			{
-				if (script.Executed || string.IsNullOrEmpty(script.Text)) continue;
-				ExecuteScript(script);
-			}
-		}
-
 		private void ExecuteScript(Script script)
 		{
 			if (script.Executed)

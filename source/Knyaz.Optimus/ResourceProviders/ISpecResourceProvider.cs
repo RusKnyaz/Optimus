@@ -4,6 +4,12 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+    public interface IRequest
+    {
+        Uri Url { get; }
+    }
+
+    
     /// <summary>
     /// Allows to get resources like files, html pages and etc (dependes on implementation).
     /// </summary>
