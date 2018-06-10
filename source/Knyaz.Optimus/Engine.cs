@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
@@ -56,7 +57,7 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine() : this(new PredictedResourceProvider(new ResourceProvider())) { }
+		public Engine() : this(new ResourceProviderBuilder().UsePrediction().Http().Build()) { }
 
 		public Engine(IResourceProvider resourceProvider)
 		{
@@ -89,6 +90,7 @@ namespace Knyaz.Optimus
 
 				if (Scripting != null)
 				{
+					
 					Scripting.Dispose();
 					Scripting = null;
 				}
@@ -160,7 +162,6 @@ namespace Knyaz.Optimus
 			
 			Document = new Document(Window);
 			LinkProvider.Root = GetRoot(Uri);
-
 			var response = await _commonResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
 			LoadFromResponse(Document, response);
 		}

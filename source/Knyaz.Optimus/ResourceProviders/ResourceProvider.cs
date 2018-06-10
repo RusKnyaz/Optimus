@@ -9,18 +9,14 @@ namespace Knyaz.Optimus.ResourceProviders
 	{
 		public event Action<Uri> OnRequest;
 		public event EventHandler<ReceivedEventArguments> Received;
-		public CookieContainer CookieContainer { get; } = new CookieContainer();
-
-		public ResourceProvider()
-		{
-			HttpResourceProvider = new HttpResourceProvider(CookieContainer);
-			FileResourceProvider = new FileResourceProvider();
-		}
+		
+		public CookieContainer CookieContainer { get; } 
 
 		public ResourceProvider(ISpecResourceProvider httpResourceProvider,
 			ISpecResourceProvider fileResourceProvider)
 		{
 			HttpResourceProvider = httpResourceProvider;
+			CookieContainer = (httpResourceProvider as HttpResourceProvider)?.CookieContainer;
 			FileResourceProvider = fileResourceProvider;
 		}
 

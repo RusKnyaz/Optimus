@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
@@ -198,6 +200,19 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.IsNotNull(ua);
 			System.Console.Write(ua);
 			Assert.IsTrue(ua.Contains("Optimus"));
+		}
+
+		[Test]
+		public void ProxyTest()
+		{
+			var resourceProvider = new ResourceProviderBuilder()
+				.Http(x => x.Proxy(new WebProxy("88.146.227.247", 8080)))
+				.Build();
+
+			var engine = new Engine(resourceProvider);
+
+			engine.OpenUrl("https://rutracker.org").Wait();
+			System.Console.WriteLine(engine.Document.DocumentElement.InnerHTML);
 		}
 	}
 }

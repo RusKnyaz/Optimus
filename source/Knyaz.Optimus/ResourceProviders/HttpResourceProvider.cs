@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
@@ -16,28 +15,36 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// </summary>
 	class HttpResourceProvider : ISpecResourceProvider
 	{
-		private readonly CookieContainer _cookies;
+		private readonly Func<HttpRequest, HttpClient> _getClientFn;
 
-		public HttpResourceProvider(CookieContainer cookies)
+		public readonly CookieContainer CookieContainer;
+
+		public HttpResourceProvider(CookieContainer cookies, WebProxy proxy)
 		{
-			_cookies = cookies;
+			CookieContainer = cookies;
+			
+			_getClientFn = req => new HttpClient(new HttpClientHandler
+			{
+				CookieContainer = cookies,
+				Proxy = proxy,
+				UseProxy = proxy != null
+			})
+			{
+				Timeout = req.Timeout > 0
+				? TimeSpan.FromMilliseconds(req.Timeout)
+				: Timeout.InfiniteTimeSpan
+			};
 		}
 
-		public IRequest CreateRequest(Uri url)
-		{
-			return new HttpRequest("GET", url);
-		}
+		public IRequest CreateRequest(Uri url) => new HttpRequest("GET", url);
 
 		private async Task<IResource> SendRequestEx(IRequest request)
 		{
 			var httpRequest = request as HttpRequest;
 
 			var req = MakeWebRequest(httpRequest);
-			var timeout = httpRequest != null && httpRequest.Timeout > 0
-				? TimeSpan.FromMilliseconds(httpRequest.Timeout)
-				: Timeout.InfiniteTimeSpan;
-
-			using (var client = new HttpClient(new HttpClientHandler {CookieContainer = _cookies}) {Timeout = timeout})
+			
+			using (var client = _getClientFn(httpRequest))
 			using (var response = await client.SendAsync(req))
 			using (var content = response.Content)
 			{
@@ -46,7 +53,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					response.StatusCode,
 					new MemoryStream(result),
 					content.Headers.ToString(),
-					content.Headers.ContentType != null ? content.Headers.ContentType.ToString() : null,
+					content.Headers.ContentType?.ToString(),
 					response.RequestMessage.RequestUri);
 			}
 		}
@@ -79,17 +86,14 @@ namespace Knyaz.Optimus.ResourceProviders
 
 			return resultRequest;
 		}
-
-		
 	}
 
 	public class HttpRequest : IRequest
 	{
 		public string Method;
-		public Uri Url { get; set; }
-		public Dictionary<string, string> Headers;
+		public Uri Url { get; }
+		public readonly Dictionary<string, string> Headers;
 		public int Timeout { get; set; }
-
 		public byte[] Data;
 
 		public HttpRequest(string method, Uri url)
@@ -99,32 +103,25 @@ namespace Knyaz.Optimus.ResourceProviders
 			Url = url;
 		}
 
-		public override int GetHashCode()
-		{
-			return ((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
-		}
+		public override int GetHashCode() => 
+			((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
 
-		public override bool Equals(object obj)
-		{
-			var other = obj as HttpRequest;
-			if (other == null)
-				return false;
-
-			return Url == other.Url &&
-			       Method == other.Method &&
-			       Headers.Count == other.Headers.Count &&
-			       Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]));
-		}
-	}
-
-	public interface IRequest
-	{
-		Uri Url { get; }
+		public override bool Equals(object obj) => 
+			obj is HttpRequest other 
+		    && Url == other.Url 
+		    && Method == other.Method 
+		    && Headers.Count == other.Headers.Count 
+		    && Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]));
 	}
 
 	public class HttpResponse : IResource
 	{
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, string headers, string contentType, Uri uri)
+		public HttpResponse(
+			HttpStatusCode statusCode, 
+			Stream stream, 
+			string headers, 
+			string contentType = ResourceTypes.Html, 
+			Uri uri = null)
 		{
 			StatusCode = statusCode;
 			Stream = stream;
@@ -133,13 +130,10 @@ namespace Knyaz.Optimus.ResourceProviders
 			Uri = uri;
 		}
 
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, string headers)
-			:this(statusCode, stream, headers, ResourceTypes.Html, null) { }
-
-		public HttpStatusCode StatusCode { get; private set; }
-		public string Headers { get; private set; }
-		public string Type { get; private set; }
-		public Stream Stream { get; private set; }
-		public Uri Uri { get; private set; }
+		public HttpStatusCode StatusCode { get; }
+		public string Headers { get; }
+		public string Type { get; }
+		public Stream Stream { get; }
+		public Uri Uri { get; }
 	}
 }
