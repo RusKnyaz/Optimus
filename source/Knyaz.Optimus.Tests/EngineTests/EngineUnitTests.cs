@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -402,6 +401,41 @@ function reqListener () {
 			Assert.AreEqual(2, httpResourceProvider.History.Count);
 			Assert.AreEqual("My favorite browser", httpResourceProvider.History[0].Headers["User-Agent"]);
 			Assert.AreEqual("My favorite browser", httpResourceProvider.History[1].Headers["User-Agent"]);
+		}
+
+		[TestCase("{\"data\":\"hello\"}", "hello")]
+		[TestCase("hello", null)]//bad json
+		public void XmlHttpRequestJson(string json, string expectedMsg)
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", @"<html><script>
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'data.json', true);
+	xhr.responseType = 'json';
+	xhr.onload = function () {
+		if (xhr.readyState === xhr.DONE) {
+			if (xhr.status === 200) {
+				console.log(xhr.response == null ? null : xhr.response.data);
+				var div = document.createElement('div');
+				div.id='finished';
+				document.body.appendChild(div);
+			}
+		}
+	};
+	xhr.send(null);</script></html>")
+				.Resource("http://localhost/data.json", json);
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+			((Navigator)engine.Window.Navigator).UserAgent = "My favorite browser";
+
+			var log = engine.Console.ToList();
+
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.IsNotNull(engine.WaitId("finished"));
+			Assert.AreEqual(new[]{expectedMsg}, log);
 		}
 
 		[Test]

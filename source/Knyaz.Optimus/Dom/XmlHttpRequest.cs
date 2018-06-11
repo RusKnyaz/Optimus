@@ -28,13 +28,17 @@ namespace Knyaz.Optimus.Dom
 		private Stream _stream;
 		private int _readyState;
 		
-		internal XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj, Document owner, LinkProvider linkProvider)
+		internal XmlHttpRequest(IResourceProvider resourceProvider, 
+			Func<object> syncObj, Document owner, 
+			LinkProvider linkProvider,
+			Func<Stream,object> parseJsonFn = null)
 		{
 			_resourceProvider = resourceProvider;
 			_syncObj = syncObj;
 			_owner = owner;
 			_linkProvider = linkProvider;
 			ReadyState = UNSENT;
+			_parseJsonFn = parseJsonFn;
 		}
 
 		/// <summary>
@@ -183,6 +187,7 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		private object _responseObj = null;
+		private Func<Stream,object> _parseJsonFn;
 
 		/// <summary>
 		/// Gets the response object of the type specified by ResponseType property.
@@ -200,6 +205,15 @@ namespace Knyaz.Optimus.Dom
 					var doc = new Document();
 					DocumentBuilder.Build(doc, _stream);
 					return doc;
+				case "json":
+					try
+					{
+						return _parseJsonFn(_stream);
+					}
+					catch
+					{
+						return null;
+					}
 				default:
 					return _stream.ReadToEnd();
 			}
