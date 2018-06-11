@@ -40,7 +40,7 @@ namespace Knyaz.Optimus.Environment
 					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
 			};
 			History = new History(engine);
-			Location = new Location(engine, History);
+			Location = new Location(History, () => engine.Uri, s => engine.OpenUrl(s));
 
 			_timers = new WindowTimers(getSyncObj);
 			_timers.OnException += exception =>

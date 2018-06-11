@@ -17,7 +17,7 @@ namespace Knyaz.Optimus
 	/// <summary>
 	/// The web engine that allows you you to load html pages, execute JavaScript and get live DOM.
 	/// </summary>
-	public partial class Engine: IEngine, IDisposable
+	public partial class Engine: IDisposable
 	{
 		private Document _document;
 		private Uri _uri;
@@ -152,7 +152,7 @@ namespace Knyaz.Optimus
 		/// Creates new <see cref="Document"/> and loads it from specified path (http or file).
 		/// </summary>
 		/// <param name="path">The string which represents Uri of the document to be loaded.</param>
-		public async Task OpenUrl(string path)
+		public async Task<Page> OpenUrl(string path)
 		{
 			//todo: stop unfinished ajax requests or drop their results
 			Window.Timers.ClearAll();
@@ -163,7 +163,12 @@ namespace Knyaz.Optimus
 			Document = new Document(Window);
 			LinkProvider.Root = GetRoot(Uri);
 			var response = await _commonResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
+			
 			LoadFromResponse(Document, response);
+
+			return response is HttpResponse httpResponse
+				? new HttpPage(Document, httpResponse.StatusCode)
+				: new Page(Document);
 		}
 
 		private string GetRoot(Uri uri)
@@ -291,12 +296,6 @@ namespace Knyaz.Optimus
 		/// Gets the current media settings (used in computed styles evaluation).
 		/// </summary>
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
-	}
-
-	public interface IEngine
-	{
-		Uri Uri {get;}
-		Task OpenUrl(string url);
 	}
 
 	public class ResponseEventArags : EventArgs

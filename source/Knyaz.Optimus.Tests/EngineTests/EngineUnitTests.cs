@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Environment;
@@ -430,6 +433,17 @@ function reqListener () {
 			engine.OpenUrl($"data:text/html;base64,{htmlCode}").Wait();
 			
 			Assert.AreEqual("HELLO", engine.Document.Body.TextContent);
+		}
+
+		[Test]
+		public async Task NotFoundHttpStatusCode()
+		{
+			var resourceProvider = new ResourceProvider(Mocks.HttpResourceProvider(), null);
+			var engine = new Engine(resourceProvider);
+
+			var result = await engine.OpenUrl("http://some.site") as HttpPage;
+
+			Assert.AreEqual(HttpStatusCode.NotFound, result.HttpStatusCode);
 		}
 	}
 }
