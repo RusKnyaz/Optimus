@@ -19,7 +19,9 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public readonly CookieContainer CookieContainer;
 
-		public HttpResourceProvider(CookieContainer cookies, WebProxy proxy)
+		public HttpResourceProvider(CookieContainer cookies, 
+			WebProxy proxy,
+			AuthenticationHeaderValue auth)
 		{
 			CookieContainer = cookies;
 			
@@ -27,12 +29,13 @@ namespace Knyaz.Optimus.ResourceProviders
 			{
 				CookieContainer = cookies,
 				Proxy = proxy,
-				UseProxy = proxy != null
+				UseProxy = proxy != null,
 			})
 			{
 				Timeout = req.Timeout > 0
 				? TimeSpan.FromMilliseconds(req.Timeout)
-				: Timeout.InfiniteTimeSpan
+				: Timeout.InfiniteTimeSpan,
+				DefaultRequestHeaders = {Authorization = auth}
 			};
 		}
 
@@ -57,7 +60,7 @@ namespace Knyaz.Optimus.ResourceProviders
 					response.RequestMessage.RequestUri);
 			}
 		}
-
+		
 		public Task<IResource> SendRequestAsync(IRequest request) => SendRequestEx(request);
 
 		private HttpRequestMessage MakeWebRequest(HttpRequest request)
