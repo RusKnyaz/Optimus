@@ -443,7 +443,7 @@ function reqListener () {
 
 			var result = await engine.OpenUrl("http://some.site") as HttpPage;
 
-			Assert.AreEqual(HttpStatusCode.NotFound, result.StatusCode);
+			Assert.AreEqual(HttpStatusCode.NotFound, result.HttpStatusCode);
 		}
 	}
 }

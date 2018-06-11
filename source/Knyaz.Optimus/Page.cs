@@ -11,9 +11,9 @@ namespace Knyaz.Optimus
 
     public class HttpPage : Page
     {
-        public HttpStatusCode StatusCode { get; }
+        public HttpStatusCode HttpStatusCode { get; }
 
         internal HttpPage(Document document, HttpStatusCode statusCode) : base(document) =>
-            StatusCode = statusCode;
+            HttpStatusCode = statusCode;
     }
 }
