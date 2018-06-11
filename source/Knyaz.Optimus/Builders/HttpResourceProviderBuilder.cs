@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
@@ -9,8 +11,19 @@ namespace Knyaz.Optimus.ResourceProviders
     {
         private CookieContainer _cookieContainer;
         private WebProxy _proxy;
+        private AuthenticationHeaderValue _auth;
 
-
+        /// <summary>
+        /// setup basic athorization login/password
+        /// </summary>
+        /// <returns></returns>
+        public HttpResourceProviderBuilder Basic(string userName, string password)
+        {
+            _auth = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(
+                System.Text.Encoding.ASCII.GetBytes($"{userName}:{password}")));
+            return this;
+        }
+        
         public HttpResourceProviderBuilder Cookies(CookieContainer cookieContainer)
         {
             _cookieContainer = cookieContainer;
@@ -25,7 +38,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
         internal HttpResourceProvider Build()
         {
-            return new HttpResourceProvider(_cookieContainer ?? new CookieContainer(), _proxy);
+            return new HttpResourceProvider(_cookieContainer ?? new CookieContainer(), _proxy, _auth);
         }
     }
 }
