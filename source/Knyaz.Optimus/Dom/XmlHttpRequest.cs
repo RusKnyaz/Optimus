@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Xml.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
@@ -23,7 +25,7 @@ namespace Knyaz.Optimus.Dom
 		private HttpRequest _request;
 		private bool _async;
 		private HttpResponse _response;
-		private string _data;
+		private Stream _stream;
 		private int _readyState;
 		
 		internal XmlHttpRequest(IResourceProvider resourceProvider, Func<object> syncObj, Document owner, LinkProvider linkProvider)
@@ -106,6 +108,8 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
+		private Document _responseXml = null;
+		
 		/// <summary>
 		/// Gets a Document containing the HTML or XML retrieved by the request.
 		/// </summary>
@@ -115,18 +119,26 @@ namespace Knyaz.Optimus.Dom
 			{
 				if (ReadyState != DONE)
 					return null;
+
+				if (_responseXml != null)
+					return _responseXml;
+
+				if (ResponseType == "document")
+					return (Document) Response;
+
+				if (ResponseType == "")
+					return null;
 				
-				//todo: take into account content type.
-				var doc = new Document();
-				DocumentBuilder.Build(doc, new MemoryStream(Encoding.UTF8.GetBytes(_data)));
-				return doc;
+				throw new Exception("The value is only accessible if the object's 'responseType' is '' or 'document'");
 			}
 		}
 
 		/// <summary>
 		/// Gets the response to the request as text, or null if the request was unsuccessful or has not yet been sent.
 		/// </summary>
-		public string ResponseText => _data;
+		public string ResponseText => 
+			ResponseType == "text" || ResponseType == "" ? (string)Response
+			: throw new Exception("Failed to read the 'responseText' property from 'XMLHttpRequest': The value is only accessible if the object's 'responseType' is '' or 'text'");
 
 		/// <summary>
 		/// Sets the value of an HTTP request header. You must call SetRequestHeader() after Open(), but before Send().
@@ -169,11 +181,34 @@ namespace Knyaz.Optimus.Dom
 				return _response.StatusCode.ToString();
 			}
 		}
-		
+
+		private object _responseObj = null;
+
 		/// <summary>
-		/// Gets the response type.
+		/// Gets the response object of the type specified by ResponseType property.
 		/// </summary>
-		public string ResponseType { get; }
+		public object Response => _responseObj ?? (_responseObj = ParseResponse());
+
+		private object ParseResponse()
+		{
+			switch (ResponseType)
+			{
+				case "arraybuffer":
+					using (var reader = new BinaryReader(_stream))
+						return new ArrayBuffer(reader.ReadBytes((int)_stream.Length));
+				case "document":
+					var doc = new Document();
+					DocumentBuilder.Build(doc, _stream);
+					return doc;
+				default:
+					return _stream.ReadToEnd();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the response type.
+		/// </summary>
+		public string ResponseType { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Gets the numerical standard HTTP status code of the response of the XMLHttpRequest.
@@ -199,15 +234,14 @@ namespace Knyaz.Optimus.Dom
 				try
 				{
 					_response = (HttpResponse) await _resourceProvider.SendRequestAsync(_request);
-					//todo: convert response according to specified responseType.
-					_data = _response.Stream.ReadToEnd();
+					_stream = _response.Stream;
 				}
 				catch (AggregateException a)
 				{
 					var web = a.Flatten().InnerExceptions.OfType<WebException>().FirstOrDefault();
 					if (web != null)
 					{
-						_data = web.Response.GetResponseStream().ReadToEnd();
+						_stream = web.Response.GetResponseStream();
 					}
 				}
 				catch (WebException w)
@@ -233,7 +267,7 @@ namespace Knyaz.Optimus.Dom
 					var t = _resourceProvider.SendRequestAsync(_request);
 					t.Wait();
 					_response = (HttpResponse)t.Result;
-					_data = _response.Stream.ReadToEnd();
+					_stream = _response.Stream;
 				}
 				catch
 				{
@@ -250,7 +284,7 @@ namespace Knyaz.Optimus.Dom
 			if (OnLoad != null)
 			{
 				var evt = new ProgressEvent("load", _owner);
-				evt.InitProgressEvent(true, (ulong) _data.Length, (ulong) _data.Length);
+				evt.InitProgressEvent(true, (ulong) _stream.Length, (ulong) _stream.Length);
 				lock (_syncObj())
 					OnLoad(evt);
 			}

@@ -11,23 +11,25 @@ namespace Knyaz.Optimus.Tests
 {
 	internal static class Mocks
 	{
+		public static IResourceProvider ResourceProvider(string path, byte[] data)
+		{
+			var url = new Uri(path, UriKind.RelativeOrAbsolute);
+			return Mock.Of<IResourceProvider>().Resource(url, data);
+		}
+		
 		public static IResourceProvider ResourceProvider(string path, string data)
 		{
 			var url = new Uri(path, UriKind.RelativeOrAbsolute);
 			return Mock.Of<IResourceProvider>().Resource(url, data);
 		}
 		
-		public static IResourceProvider ResourceProvider(Uri url, string data)
-		{
-			return Mock.Of<IResourceProvider>().Resource(url, data);
-		}
+		public static IResourceProvider ResourceProvider(Uri url, string data) => 
+			Mock.Of<IResourceProvider>().Resource(url, data);
 
-		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, string data)
-		{
-			return resourceProvider.Resource(new Uri(url, UriKind.RelativeOrAbsolute), data);
-		}
+		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, string data) => 
+			resourceProvider.Resource(new Uri(url, UriKind.RelativeOrAbsolute), data);
 
-		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, string data)
+		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, byte[] data)
 		{
 			var request = new HttpRequest("GET", url);
 
@@ -35,9 +37,12 @@ namespace Knyaz.Optimus.Tests
 				.Setup(x => x.CreateRequest(url)).Returns(request);
 			Mock.Get(resourceProvider)
 				.Setup(x => x.SendRequestAsync(request))
-				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(Encoding.UTF8.GetBytes(data)), null)));
+				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(data), null)));
 			return resourceProvider;
 		}
+
+		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, string data) =>
+			resourceProvider.Resource(url, Encoding.UTF8.GetBytes(data));
 
 		public static SpecResourceProvider HttpResourceProvider() => new SpecResourceProvider();
 

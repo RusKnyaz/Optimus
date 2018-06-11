@@ -143,9 +143,16 @@ namespace Knyaz.Optimus.TestingTools
 			var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
 			{
-				var elt = document.GetElementById(id);
-				if (elt != null)
-					return elt;
+				try
+				{
+					var elt = document.GetElementById(id);
+					if (elt != null)
+						return elt;
+				}
+				catch (InvalidOperationException)
+				{
+					//skip 'Collection was modified'
+				}
 
 				Thread.Sleep(timespan);
 			}
