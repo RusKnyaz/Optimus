@@ -10,13 +10,17 @@ namespace Knyaz.Optimus.Environment
 	[DomItem]
 	public class Location
 	{
-		private readonly IEngine _engine;
 		private readonly IHistory _history;
+		private readonly Func<Uri> _getUri;
+		private readonly Action<string> _openUri;
 
-		internal Location(IEngine engine, IHistory history)
+		private Uri Uri => _getUri();
+
+		internal Location(IHistory history, Func<Uri> getUri, Action<string> openUri)
 		{
-			_engine = engine;
 			_history = history;
+			_getUri = getUri;
+			_openUri = openUri;
 		}
 
 		/// <summary>
@@ -24,8 +28,8 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Href
 		{
-			get => _engine.Uri.OriginalString;
-			set => _engine.OpenUrl(value);
+			get => Uri.OriginalString;
+			set => _openUri(value);
 		}
 
 		/// <summary>
@@ -33,16 +37,16 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Hash
 		{
-			get => _engine.Uri.Fragment;
+			get => Uri.Fragment;
 			set
 			{
 				var hash = string.IsNullOrEmpty(value)
 					? string.Empty
 					: value.StartsWith("#") ? value : "#" + value;
 
-				var splt = _engine.Uri.OriginalString.Split('#');
+				var splt = _getUri().OriginalString.Split('#');
 				//todo: do not reopen page, modify history
-				_engine.OpenUrl(splt[0] + hash);
+				_openUri(splt[0] + hash);
 			}
 		}
 
@@ -51,12 +55,12 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Host
 		{
-			get => _engine.Uri.Authority;
+			get => Uri.Authority;
 			set
 			{
 				var parts = value.Split(':');
-				var builder = new UriBuilder(_engine.Uri){ Host = parts[0], Port = parts.Length > 1 ? int.Parse(parts[1]) : 80};
-				_engine.OpenUrl(builder.Uri.ToString());
+				var builder = new UriBuilder(Uri){ Host = parts[0], Port = parts.Length > 1 ? int.Parse(parts[1]) : 80};
+				_openUri(builder.Uri.ToString());
 			}
 		}
 		
@@ -65,8 +69,8 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Hostname
 		{
-			get => _engine.Uri.Host;
-			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) {Host = value}.Uri.ToString());
+			get => Uri.Host;
+			set => _openUri(new UriBuilder(Uri) {Host = value}.Uri.ToString());
 		}
 		
 		/// <summary>
@@ -74,8 +78,8 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Origin
 		{
-			get => _engine.Uri.GetLeftPart(UriPartial.Authority);
-			set => _engine.OpenUrl(new UriBuilder(new Uri(value)){Path = _engine.Uri.PathAndQuery,Fragment = _engine.Uri.Fragment.TrimStart('#')}.ToString());
+			get => Uri.GetLeftPart(UriPartial.Authority);
+			set => _openUri(new UriBuilder(new Uri(value)){Path = Uri.PathAndQuery,Fragment = Uri.Fragment.TrimStart('#')}.ToString());
 		}
 
 		/// <summary>
@@ -83,14 +87,14 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Pathname
 		{
-			get => _engine.Uri.PathAndQuery;
+			get => Uri.PathAndQuery;
 			set
 			{
 				var u = new Uri(new Uri(Origin), value);
-				var ub = new UriBuilder(u.ToString()) {Fragment = _engine.Uri.Fragment.TrimStart('#')};
+				var ub = new UriBuilder(u.ToString()) {Fragment = Uri.Fragment.TrimStart('#')};
 				if (ub.Uri.IsDefaultPort)
 					ub.Port = -1;
-				_engine.OpenUrl(ub.ToString());
+				_openUri(ub.ToString());
 			}
 		}
 
@@ -99,8 +103,8 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public int Port
 		{
-			get => _engine.Uri.Port;
-			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) {Port = value}.Uri.ToString());
+			get => Uri.Port;
+			set => _openUri(new UriBuilder(Uri) {Port = value}.Uri.ToString());
 		}
 
 		/// <summary>
@@ -108,8 +112,8 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Protocol
 		{
-			get => _engine.Uri.Scheme + ":";
-			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) { Scheme = value }.Uri.ToString());
+			get => Uri.Scheme + ":";
+			set => _openUri(new UriBuilder(Uri) { Scheme = value }.Uri.ToString());
 		}
 
 		/// <summary>
@@ -117,8 +121,8 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public string Search
 		{
-			get => _engine.Uri.Query;
-			set => _engine.OpenUrl(new UriBuilder(_engine.Uri) {Query = value}.Uri.ToString());
+			get => Uri.Query;
+			set => _openUri(new UriBuilder(Uri) {Query = value}.Uri.ToString());
 		}
 		
 		/// <summary>
@@ -147,9 +151,6 @@ namespace Knyaz.Optimus.Environment
 		/// Reloads the resource from the current URL.
 		/// </summary>
 		/// <param name="force">If <c>true</c>, the page to be reloaded from the server. Othervise, the engine may reload the page from its cache.</param>
-		public void Reload(bool force = false)
-		{
-			_engine.OpenUrl(_engine.Uri.ToString());
-		}
+		public void Reload(bool force = false) => _openUri(Uri.ToString());
 	}
 }

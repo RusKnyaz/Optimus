@@ -10,10 +10,7 @@ namespace Knyaz.Optimus.Tests.Environment
 		Location CreateLocation(string href)
 		{
 			var uri = new Uri(href);
-			var engine = new Mock<IEngine>();
-			engine.SetupGet(x => x.Uri).Returns(() => uri);
-			engine.Setup(x => x.OpenUrl(It.IsAny<string>())).Callback<string>(x => uri = new Uri(x));
-			return new Location(engine.Object, null);
+			return new Location(null, () => uri, s => uri=new Uri(s));
 		}
 
 		[TestCase("http://localhost:8080/sub/index.html?a=b#part", "http:")]
