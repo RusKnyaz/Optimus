@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors.Specialized;
@@ -9,6 +10,7 @@ using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.Dom.Interfaces;
 using System.Linq;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -146,9 +148,16 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return res.AsObject();
 			}); 
 			_jsEngine.Global.FastAddProperty("Event", eventCtor, false, false, false);
+
+			Func<Stream, object> parseJsonFn = s =>
+			{
+				var json = s.ReadToEnd();
+				var result = _jsEngine.Json.Parse(null, new[] {new JsValue(json)});
+				return result;
+			};
 			
 			var xmlHttpReqCtor = new ClrFuncCtor(_jsEngine, x => {
-				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document, engine.LinkProvider), out var res);
+				_typeConverter.TryConvert(new XmlHttpRequest(_engine.ResourceProvider, () => _engine.Document, _engine.Document, engine.LinkProvider, parseJsonFn), out var res);
 				return res.AsObject();
 			});
 

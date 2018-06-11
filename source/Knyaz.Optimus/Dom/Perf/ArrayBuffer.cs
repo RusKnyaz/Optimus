@@ -9,6 +9,8 @@ namespace Knyaz.Optimus.Dom.Perf
 	public class ArrayBuffer
 	{
 		readonly internal byte[] Data;
+		
+		internal ArrayBuffer(byte[] data) => Data = data;
 
 		/// <summary>
 		/// Creates new instance of <see cref="ArrayBuffer"/>
