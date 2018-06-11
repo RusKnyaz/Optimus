@@ -63,20 +63,26 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			System.Console.WriteLine("Score: " + tagWithValue.InnerHTML);
 			Thread.Sleep(500);
 
-			foreach (var category in ("parsing elements form location output input communication webrtc interaction " +
-			                         "performance security history offline storage files streams video audio responsive " +
-			                         "canvas webgl animation components other").Split(' '))
+			foreach (var category in ("parsing elements form location output input communication " +
+			                          "interaction performance security offline " +
+			                          "storage files streams video audio responsive " +
+			                         "canvas animation components scripting other").Split(' '))
 			{
-				try
+				var headerRow = engine.Document.WaitId($"head-{category}");
+				if (headerRow == null)
 				{
-					System.Console.WriteLine(category + ": " +
-					                         engine.Document.GetElementById("head-" + category).GetElementsByTagName("span")[0]
-						                         .InnerHTML);
+					System.Console.WriteLine($"Header of {category} not found");
+					continue;
 				}
-				catch (Exception)
+
+				var scoreElement = engine.WaitSelector($"#head-{category} span").FirstOrDefault();
+				if (scoreElement == null)
 				{
-					System.Console.WriteLine(category + " not found");
+					System.Console.WriteLine($"Score of {category} category not found.");
+					continue;
 				}
+					
+				System.Console.WriteLine(category + ": " + scoreElement.InnerHTML);
 			}
 		}
 
