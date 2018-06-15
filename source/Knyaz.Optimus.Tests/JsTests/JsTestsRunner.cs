@@ -20,7 +20,13 @@ namespace Knyaz.Optimus.Tests.JsTests
 			engine.Console.OnLog += o => {
 				Debug.WriteLine(o.ToString());
 			};
-			var res = engine.ScriptExecutor.Evaluate("text/javascript", @"Run('"+fixture+"', '" + testName + "');");
+
+			object res;
+			lock (engine.Document)
+			{
+				res = engine.ScriptExecutor.Evaluate("text/javascript",
+					@"Run('" + fixture + "', '" + testName + "');");
+			}
 
 			if (res != null)
 				Assert.Fail(res.ToString());

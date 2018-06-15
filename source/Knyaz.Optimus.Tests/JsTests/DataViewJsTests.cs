@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using Knyaz.Optimus.Tests.Resources;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
