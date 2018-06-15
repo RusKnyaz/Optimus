@@ -1067,5 +1067,44 @@ dispatchEvent(evt);");
 			
 			Assert.False(engine.Document.Get<HtmlFormElement>("form").Any());
 		}
+
+		[Test]
+		public void SetTimeoutArguments()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"setTimeout(function(a,b){" +
+				"	console.log(a);" +
+				"	console.log(b);" +
+				"	document.body.innerHTML='<div id=d></div>';" +
+				"}, 1, 2, 'x');" +
+				"</script></html>");
+
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.OpenUrl("http://localhost").Wait();
+			Assert.IsNotNull(engine.WaitId("d"));
+			Assert.AreEqual(new object[]{2, "x"}, log);
+		}
+
+		[Test]
+		public void SetIntervalArguments()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"var id = setInterval(function(a,b){" +
+				"	clearInterval(id);" +
+				"	console.log(a);" +
+				"	console.log(b);" +
+				"	document.body.innerHTML='<div id=d></div>';" +
+				"}, 10, 2, 'x');" +
+				"</script></html>");
+
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.OpenUrl("http://localhost").Wait();
+			Assert.IsNotNull(engine.WaitId("d"));
+			Assert.AreEqual(new object[]{2, "x"}, log);
+		}
 	}
 }
