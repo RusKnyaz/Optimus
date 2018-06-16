@@ -69,6 +69,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		
 		[TestCase("EventConstructor")]
 		[TestCase("EventConstructorWithInit")]
+		[TestCase("AddEventListenerCallOnce")]
+		[TestCase("AddEventListenerPassiveTrue")]
+		[TestCase("AddEventListenerPassiveFalse")]
+		[TestCase("AddEventListenerCaptureOptionTrue")]
+		[TestCase("AddEventListenerCaptureOptionFalse")]
 		public void EventTests(string testName) => JsTestsRunner.Run(testName);
 	}
 }
