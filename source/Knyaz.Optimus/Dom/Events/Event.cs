@@ -54,6 +54,7 @@ namespace Knyaz.Optimus.Dom.Events
 
 		internal bool _stopped;
 		internal bool Canceled { get; private set; }
+		internal bool PreventDefaultDeprecated { get; set; }
 
 		internal Event(Document owner)
 		{
@@ -82,7 +83,7 @@ namespace Knyaz.Optimus.Dom.Events
 		/// </summary>
 		public void PreventDefault()
 		{
-			if (Cancelable)
+			if (Cancelable && !PreventDefaultDeprecated)
 				Canceled = true;
 		}
 

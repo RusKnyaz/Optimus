@@ -250,15 +250,56 @@ namespace Knyaz.Optimus.Dom.Elements
 		public const ushort NOTATION_NODE = 12;
 		#endregion
 
+		/// <summary>
+		/// Registers new event handler.
+		/// </summary>
+		/// <param name="type">The type name of the event.</param>
+		/// <param name="listener">The event handler.</param>
+		/// <param name="options">An options object that specifies characteristics about the event listener. </param>
+		public void AddEventListener(string type, Action<Event> listener, EventListenerOptions options) =>
+			EventTarget.AddEventListener(type, listener, options);
+
+		/// <summary>
+		/// Registers new event handler in 'bubbling' order.
+		/// </summary>
+		/// <param name="type">The type name of the event.</param>
+		/// <param name="listener">The event handler.</param>
 		public void AddEventListener(string type, Action<Event> listener) =>
 			EventTarget.AddEventListener(type,  listener);
 
+		/// <summary>
+		/// Registers new event handler.
+		/// </summary>
+		/// <param name="type">The type name of the event.</param>
+		/// <param name="listener">The event handler.</param>
+		/// <param name="useCapture">If <c>true</c> the handler invoked in 'capturing' order, 
+		/// othervise in the handler invoked in 'bubbling' order.</param>
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
 			EventTarget.AddEventListener(type, listener, useCapture);
 
+		/// <summary>
+		/// Removes previously registered event handler from 'bubbling' order handlers list.
+		/// </summary>
+		/// <param name="type">The type name of event.</param>
+		/// <param name="listener">The handler to be removed.</param>
 		public void RemoveEventListener(string type, Action<Event> listener) =>
 			EventTarget.RemoveEventListener(type, listener);
+		
+		/// <summary>
+		/// Removes previously registered event handler.
+		/// </summary>
+		/// <param name="type">The type name of event.</param>
+		/// <param name="listener">The handler to be removed.</param>
+		/// <param name="options">The options with which the listener was added.</param>
+		public void RemoveEventListener(string type, Action<Event> listener, EventListenerOptions options) =>
+			EventTarget.RemoveEventListener(type, listener, options);
 
+		/// <summary>
+		/// Removes previously registered event handler.
+		/// </summary>
+		/// <param name="type">The type name of event.</param>
+		/// <param name="listener">The handler to be removed.</param>
+		/// <param name="useCapture">The invocation order to be handler removed from.</param>
 		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture) =>
 			EventTarget.RemoveEventListener(type, listener, useCapture);
 
