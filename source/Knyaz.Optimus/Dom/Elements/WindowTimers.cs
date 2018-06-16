@@ -26,9 +26,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		/// <param name="handler"></param>
 		/// <param name="timeout"></param>
-		/// <param name="ctx">The data object passed to callback function.</param>
+		/// <param name="ctx">The data objects passed to callback function.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action<object> handler, int timeout, object ctx)
+		public int SetTimeout(Action<object[]> handler, int timeout, object[] ctx)
 		{
 			var timer = new TimeoutTimer(t =>
 				{
@@ -61,7 +61,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="handler"></param>
 		/// <param name="timeout"></param>
 		/// <returns></returns>
-		public int SetInterval(Action handler, int timeout)
+		public int SetInterval(Action<object[]> handler, int timeout, object[] data)
 		{
 			ManualResetEvent stoppedSignal = new ManualResetEvent(false);
 			bool stopped = false;
@@ -95,7 +95,7 @@ namespace Knyaz.Optimus.Dom.Elements
 					{
 						if (!stopped)
 						{
-							handler();
+							handler(data);
 						}
 						else
 						{

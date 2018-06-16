@@ -14,9 +14,9 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		INavigator Navigator { get; }
 		IHistory History { get; }
 
-		int SetTimeout(Action<object> handler, double? delay, object ctx);
+		int SetTimeout(Action<object[]> handler, double? delay, params object[] data);
 		void ClearTimeout(int handle);
-		int SetInterval(Action handler, double? delay);
+		int SetInterval(Action<object[]> handler, double? delay, params object[] data);
 		void ClearInterval(int handle);
 
 		ICssStyleDeclaration GetComputedStyle(IElement element);

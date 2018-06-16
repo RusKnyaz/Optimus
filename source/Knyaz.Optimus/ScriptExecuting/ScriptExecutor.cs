@@ -118,7 +118,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				if (x.Length == 0)
 					return JsValue.Undefined;
-				var res= engine.Window.SetTimeout(_typeConverter.ConvertDelegate<object>(@this, x[0]), x.Length > 1 ? x[1].AsNumber() : 1, x.Length > 2 ? x[2].ToObject() : null);
+				var handler = _typeConverter.ConvertDelegateArrayArguments(@this, x[0]);
+				var timeout = x.Length > 1 ? x[1].AsNumber() : 1;
+				var data = x.Length > 2 ? x.Skip(2).ToArray() : null;
+				var res = engine.Window.SetTimeout(handler, timeout, data);
 				return new JsValue(res);
 			});
 
@@ -126,7 +129,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				if (x.Length == 0)
 					return JsValue.Undefined;
-				var res = engine.Window.SetInterval(_typeConverter.ConvertDelegate(x[0], @this), x.Length > 1 ? x[1].AsNumber() : 1);
+				var handler = _typeConverter.ConvertDelegateArrayArguments(@this, x[0]);
+				var interval = x.Length > 1 ? x[1].AsNumber() : 1;
+				var data = x.Length > 2 ? x.Skip(2).ToArray() : null;
+				var res = engine.Window.SetInterval(handler, interval, data);
 				return new JsValue(res);
 			});
 
