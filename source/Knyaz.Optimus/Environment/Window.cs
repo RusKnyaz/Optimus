@@ -94,11 +94,11 @@ namespace Knyaz.Optimus.Environment
 		/// Sets a timer which executes a function or specified piece of code once after the timer expires.
 		/// </summary>
 		/// <param name="handler"></param>
-		/// <param name="delay"></param>
-		/// <param name="ctx"></param>
+		/// <param name="delay">The time, in milliseconds, the timer should wait before the specified function or code is executed. If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, as soon as possible. </param>
+		/// <param name="data">Variables to be passed to the handler.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action<object> handler, double? delay, object ctx) =>
-			_timers.SetTimeout(handler, (int)(delay ?? 1), ctx);
+		public int SetTimeout(Action<object[]> handler, double? delay, params object[] data) =>
+			_timers.SetTimeout(handler, (int)(delay ?? 1), data);
 
 		/// <summary>
 		/// Cancels a timeout previously established by calling <see cref="SetTimeout"/>.
@@ -110,8 +110,8 @@ namespace Knyaz.Optimus.Environment
 		/// Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
 		/// </summary>
 		/// <returns>It returns an interval ID which uniquely identifies the interval, so you can remove it later by calling <see cref="ClearInterval"/></returns>
-		public int SetInterval(Action handler, double? delay) =>
-			_timers.SetInterval(handler, (int)(delay ?? 1));
+		public int SetInterval(Action<object[]> handler, double? delay, params object[] data) =>
+			_timers.SetInterval(handler, (int)(delay ?? 1), data);
 
 		/// <summary>
 		/// Cancels a timed, repeating action which was previously established by a call to <see cref="Window.SetInterval"/>.

@@ -78,6 +78,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 				case bool b:
 					result = new JsValue(b);
 					return true;
+				case JsValue js: result = js;
+					return true;
 			}
 
 			result = JsValue.Null;
@@ -86,9 +88,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		protected Jint.Engine Engine => _getEngine();
 
-		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsValue)
+		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsFunc)
 		{
-			var callable = jsValue.AsObject() as ICallable;
+			var callable = jsFunc.AsObject() as ICallable;
 			Action<T> handler = null;
 			if (callable != null)
 			{
@@ -101,19 +103,29 @@ namespace Knyaz.Optimus.ScriptExecuting
 			}
 			return handler;
 		}
-
-		public Action ConvertDelegate(JsValue jsValue, JsValue @this)
+		
+		/// <summary>
+		/// Converts js function to c# delegate with convertion array to arguments
+		/// </summary>
+		public Action<object[]> ConvertDelegateArrayArguments(JsValue @this, JsValue jsFunc)
 		{
-			var callable = jsValue.AsObject() as ICallable;
-			Action handler = null;
+			var callable = jsFunc.AsObject() as ICallable;
+			Action<object[]> handler = null;
 			if (callable != null)
 			{
-				handler = (Action)_delegatesCache.GetValue(callable, 
-					key => (Action)(() => key.Call(@this, new JsValue[0])
-				));
+				handler = (Action<object[]>)_delegatesCache.GetValue(callable, key => 
+					(Action<object[]>)(e =>
+				{
+					var args = e == null ? new JsValue[0] 
+						: e.Select(x => { TryConvert(x, out var val); return val;}).ToArray();
+					
+					key.Call(@this, args);
+				}));
 			}
 			return handler;
 		}
+		
+		
 
 		readonly ConditionalWeakTable<ICallable, object> _delegatesCache = new ConditionalWeakTable<ICallable, object>();
 	}

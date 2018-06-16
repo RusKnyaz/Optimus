@@ -1084,7 +1084,7 @@ dispatchEvent(evt);");
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.IsNotNull(engine.WaitId("d"));
-			Assert.AreEqual(new object[]{2, "x"}, log);
+			Assert.AreEqual(new object[]{2d, "x"}, log);
 		}
 
 		[Test]
@@ -1093,18 +1093,18 @@ dispatchEvent(evt);");
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
 				"var id = setInterval(function(a,b){" +
-				"	clearInterval(id);" +
 				"	console.log(a);" +
 				"	console.log(b);" +
 				"	document.body.innerHTML='<div id=d></div>';" +
-				"}, 10, 2, 'x');" +
+				"	clearInterval(id);" +
+				"}, 100, 2, 'x');" +
 				"</script></html>");
 
 			var engine = new Engine(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.IsNotNull(engine.WaitId("d"));
-			Assert.AreEqual(new object[]{2, "x"}, log);
+			Assert.AreEqual(new object[]{2d, "x"}, log);
 		}
 	}
 }
