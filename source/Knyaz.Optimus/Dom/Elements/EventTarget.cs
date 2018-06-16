@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
 
@@ -12,8 +13,8 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		private readonly object _target;
 		private readonly Func<IEventTarget> _getParent;
-		readonly Dictionary<string, List<Action<Event>>> _bubblingListeners = new Dictionary<string, List<Action<Event>>>();
-		readonly Dictionary<string, List<Action<Event>>> _capturingListeners = new Dictionary<string, List<Action<Event>>>();
+		readonly Dictionary<string, List<Listener>> _bubblingListeners = new Dictionary<string, List<Listener>>();
+		readonly Dictionary<string, List<Listener>> _capturingListeners = new Dictionary<string, List<Listener>>();
 
 		private Func<object> _getLockObject;
 
@@ -38,39 +39,58 @@ namespace Knyaz.Optimus.Dom.Elements
 			_getLockObject = getLockObject;
 		}
 
-		List<Action<Event>> GetBubblingListeners(string type) =>
-			_bubblingListeners.ContainsKey(type) ? _bubblingListeners[type] : (_bubblingListeners[type] = new List<Action<Event>>());
+		List<Listener> GetBubblingListeners(string type) =>
+			_bubblingListeners.ContainsKey(type) ? _bubblingListeners[type] : (_bubblingListeners[type] = new List<Listener>());
 
-		List<Action<Event>> GetCapturingListeners(string type) =>
-			_capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Action<Event>>());
+		List<Listener> GetCapturingListeners(string type) =>
+			_capturingListeners.ContainsKey(type) ? _capturingListeners[type] : (_capturingListeners[type] = new List<Listener>());
 
 		/// <summary>
 		/// Registers new event handler.
 		/// </summary>
 		/// <param name="type">The type name of the event.</param>
-		/// <param name="listener">The event handler.</param>
+		/// <param name="handler">The event handler.</param>
+		/// <param name="options">An options object that specifies characteristics about the event listener. </param>
+		public void AddEventListener(string type, Action<Event> handler, EventListenerOptions options)
+		{
+			if (handler == null)
+				return;
+			var listenersList = options.Capture ? GetCapturingListeners(type) : GetBubblingListeners(type);
+			if (listenersList.Any(x => x.Handler == handler))//do not add listener twice
+				return;
+			listenersList.Add(new Listener {Handler = handler, Options = options});
+		}
+
+		public void RemoveEventListener(string type, Action<Event> listener, EventListenerOptions options) =>
+			RemoveEventListener(type, listener, options.Capture);
+
+		private static EventListenerOptions CaptureOptions = new EventListenerOptions {Capture = true};
+		private static EventListenerOptions BubbleOptions = new EventListenerOptions();
+		
+		/// <summary>
+		/// Registers new event handler.
+		/// </summary>
+		/// <param name="type">The type name of the event.</param>
+		/// <param name="handler">The event handler.</param>
 		/// <param name="useCapture">If <c>true</c> the handler invoked in 'capturing' order, 
 		/// othervise in the handler invoked in 'bubbling' order.</param>
-		public void AddEventListener(string type, Action<Event> listener, bool useCapture = false)
-		{
-			if (listener == null)
-				return;
-			
-			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Add(listener);
-		}
+		public void AddEventListener(string type, Action<Event> handler, bool useCapture = false) =>
+			AddEventListener(type, handler, useCapture ? CaptureOptions : BubbleOptions);
 
 		/// <summary>
 		/// Removes previously registered event handler.
 		/// </summary>
 		/// <param name="type">The type name of event.</param>
-		/// <param name="listener">The handler to be removed.</param>
+		/// <param name="handler">The handler to be removed.</param>
 		/// <param name="useCapture">The invocation order to be handler removed from.</param>
-		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture = false)
+		public void RemoveEventListener(string type, Action<Event> handler, bool useCapture = false)
 		{
-			if (listener == null)
+			if (handler == null)
 				return;
-			
-			(useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type)).Remove(listener);	
+
+			var list = useCapture ? GetCapturingListeners(type) : GetBubblingListeners(type);
+
+			list.RemoveAll(x => x.Handler == handler);
 		}
 		
 
@@ -173,7 +193,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			return !evt.Canceled;
 		}
 
-		private void NotifyListeners(Event evt, Func<string, IList<Action<Event>>> listenersFn)
+		private void NotifyListeners(Event evt, Func<string, IList<Listener>> listenersFn)
 		{
 			evt.CurrentTarget = _target;
 			lock (_getLockObject())
@@ -183,16 +203,32 @@ namespace Knyaz.Optimus.Dom.Elements
 				for(var i = 0;i< listeners.Count;i++)
 				{
 					var listener = listeners[i];
+					if (listener.Options != null && listener.Options.Passive)
+						evt.PreventDefaultDeprecated = true;
+
 					try
 					{
-						listener(evt);
+						listener.Handler(evt);
 					}
 					catch (Exception e)
 					{
 						HandlerException?.Invoke(e);
 					}
+					finally
+					{
+						evt.PreventDefaultDeprecated = false;
+					}
+
+					if (listener.Options != null && listener.Options.Once)
+						RemoveEventListener(evt.Type, listener.Handler, listener.Options);
 				}
 			}
+		}
+
+		class Listener
+		{
+			public Action<Event> Handler;
+			public EventListenerOptions Options;
 		}
 	}
 }

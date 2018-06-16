@@ -71,5 +71,28 @@ Test("EventTests", {
             childDiv.click();
             Assert.AreEqual("-child--parent-", result);
         }
+    },
+    "AddEventListenerTwice":{
+        run:function () {
+            var div = document.createElement("div");
+            var counter = 0;
+            var handler = function () { counter++;}
+            div.addEventListener("click", handler);
+            div.addEventListener("click", handler);
+            div.click();
+            Assert.AreEqual(1, counter);
+        }
+    },
+    "AddEventListenerTwiceAndRemove":{
+        run:function () {
+            var div = document.createElement("div");
+            var counter = 0;
+            var handler = function () { counter++;}
+            div.addEventListener("click", handler);
+            div.addEventListener("click", handler);
+            div.removeEventListener("click", handler);
+            div.click();
+            Assert.AreEqual(0, counter);
+        }
     }
 });

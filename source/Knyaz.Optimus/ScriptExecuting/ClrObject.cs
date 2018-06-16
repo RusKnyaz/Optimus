@@ -289,15 +289,35 @@ namespace Knyaz.Optimus.ScriptExecuting
 				var eventName = arguments[0].AsString();
 				var handler = _clrObject.ConvertDelegate<Event>(thisObject, arguments[1]);
 
-				var capture = arguments.Length > 2 && arguments[2].AsBoolean();
-
 				if ((thisObject.AsObject() as ClrObject)?.Target is IEventTarget et)
 				{
-					if (add)
-						et.AddEventListener(eventName, handler, capture);
-					else
-						et.RemoveEventListener(eventName, handler, capture);
+					if (arguments.Length <= 2 || arguments[2].IsBoolean())
+					{
+						var capture = arguments.Length > 2 && arguments[2].AsBoolean();
 
+						if (add)
+							et.AddEventListener(eventName, handler, capture);
+						else
+							et.RemoveEventListener(eventName, handler, capture);
+					}
+					else
+					{
+						var optionsJs = arguments[2].AsObject();
+
+						bool GetBool(JsValue val) => val.IsBoolean() && val.AsBoolean();
+
+						var options = new EventListenerOptions {
+							Capture = GetBool(optionsJs.Get("capture")),
+							Passive = GetBool(optionsJs.Get("passive")),
+							Once = GetBool(optionsJs.Get("once"))
+						};
+						
+						if(add)
+							et.AddEventListener(eventName, handler, options);
+						else
+							et.RemoveEventListener(eventName, handler, options);
+					}
+					
 					return JsValue.Undefined;
 				}
 			}

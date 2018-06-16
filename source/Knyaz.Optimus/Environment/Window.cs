@@ -119,12 +119,15 @@ namespace Knyaz.Optimus.Environment
 		/// <param name="handle">The interval ID to be cancelled.</param>
 		public void ClearInterval(int handle) => _timers.ClearTimeout(handle);
 
+		public void AddEventListener(string type, Action<Event> listener, EventListenerOptions options) =>
+			_eventTarget.AddEventListener(type, listener, options);
+		
 		/// <summary>
-		/// Ddds the specified EventListener-compatible object to the list of event listeners for the specified event type on the EventTarget on which it is called. 
+		/// Adds the specified EventListener-compatible object to the list of event listeners for the specified event type on the EventTarget on which it is called. 
 		/// </summary>
 		/// <param name="type">A string representing the event type to listen for.</param>
 		/// <param name="listener">Event handler.</param>
-		/// <param name="useCapture">indicating whether events of this type will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree.</param>
+		/// <param name="useCapture">Indicates whether events of this type will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree.</param>
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
 			_eventTarget.AddEventListener(type, listener, useCapture);
 
@@ -133,6 +136,15 @@ namespace Knyaz.Optimus.Environment
 		/// </summary>
 		public void RemoveEventListener(string type, Action<Event> listener, bool useCapture) =>
 			_eventTarget.RemoveEventListener(type, listener, useCapture);
+		
+		/// <summary>
+		/// Removes previously registered event handler.
+		/// </summary>
+		/// <param name="type">The type name of event.</param>
+		/// <param name="listener">The handler to be removed.</param>
+		/// <param name="options">The options with which the listener was added.</param>
+		public void RemoveEventListener(string type, Action<Event> listener, EventListenerOptions options) =>
+			_eventTarget.RemoveEventListener(type, listener, options);
 
 		/// <summary>
 		/// Dispatches an Event at the specified EventTarget, invoking the affected EventListeners in the appropriate order.

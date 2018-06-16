@@ -74,6 +74,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AddEventListenerPassiveFalse")]
 		[TestCase("AddEventListenerCaptureOptionTrue")]
 		[TestCase("AddEventListenerCaptureOptionFalse")]
+		[TestCase("AddEventListenerTwice")]
+		[TestCase("AddEventListenerTwiceAndRemove")]
 		public void EventTests(string testName) => JsTestsRunner.Run(testName);
 	}
 }
