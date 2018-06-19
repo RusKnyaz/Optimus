@@ -5,9 +5,6 @@ using System.Net;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Dom.Interfaces;
-using Knyaz.Optimus.Environment;
-using Knyaz.Optimus.ResourceProviders;
 using Moq;
 using NUnit.Framework;
 
@@ -326,10 +323,17 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void AddDocType()
 		{
-			var doc = new Document();
-			var dt = doc.Implementation.CreateDocumentType("HTML", "", "");
-			doc.AppendChild(dt);
+			var impl = new DomImplementation();
+			var dt = impl.CreateDocumentType("HTML", "", "");
+			var doc = impl.CreateDocument("http://www.w3.org/1999/xhtml", "html", dt);
 			Assert.AreEqual(doc, dt.OwnerDocument);
+		}
+
+		public void AddChildTwiceDeprecated()
+		{
+			var doc = new Document();
+			doc.AppendChild(doc.CreateElement("div"));
+			Assert.Throws<DOMException>(() => doc.AppendChild(doc.CreateElement("span")));
 		}
 
 		[Test]

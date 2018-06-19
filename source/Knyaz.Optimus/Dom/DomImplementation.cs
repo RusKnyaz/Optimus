@@ -9,8 +9,10 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	[DomItem]
 	public class DomImplementation
-    {
-		internal DomImplementation() { }
+	{
+		internal DomImplementation()
+		{
+		}
 
 		/// <summary>
 		/// Creates a new HTML <see cref="Document"/>.
@@ -18,12 +20,12 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="title">Is a string containing the title to give the new HTML document.</param>
 		[JsName("createHTMLDocument")]
 		public Document CreateHtmlDocument(string title = "")
-	    {
-			var doc = new Document() { Title = title };
-		    var docType = CreateDocumentType("html", string.Empty, string.Empty);
-		    doc.AppendChild(docType);
-		    return doc;
-	    } 
+		{
+			var docType = CreateDocumentType("html", string.Empty, string.Empty);
+			var doc = CreateDocument("http://www.w3.org/1999/xhtml", "html", docType);
+			doc.Title = title;
+			return doc;
+		}
 
 		/// <summary>
 		/// Creates a DocumentType object.
@@ -44,13 +46,20 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="namespaceURI">Is a string containing the namespace URI of the document to be created, or null if the document doesn't belong to one.</param>
 		/// <param name="qualifiedNameStr">Is a string containing the qualified name, that is an optional prefix and colon plus the local root element name, of the document to be created.</param>
 		/// <param name="documentType">Is the DocumentType of the document to be created.</param>
-		public Document CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType)
+		public Document CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType = null)
 		{
+			if(qualifiedNameStr == null)
+				throw new ArgumentNullException(nameof(qualifiedNameStr));
+			
+			/*The HTML namespace is: http://www.w3.org/1999/xhtml
+			The MathML namespace is: http://www.w3.org/1998/Math/MathML
+			The SVG namespace is: http://www.w3.org/2000/svg
+			The XLink namespace is: http://www.w3.org/1999/xlink
+			The XML namespace is: http://www.w3.org/XML/1998/namespace
+			The XMLNS namespace is: http://www.w3.org/2000/xmlns/*/
+			
 			//todo: we have to do something with namespaceURI and qualifiedNameStr fields.
-			var doc = new Document();
-			if (documentType != null)
-				doc.AppendChild(documentType);
-			return doc;
+			return new Document(namespaceURI, qualifiedNameStr, documentType, null);
 		}
 	}
 }

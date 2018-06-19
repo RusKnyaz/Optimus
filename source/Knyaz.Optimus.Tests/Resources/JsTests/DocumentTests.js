@@ -5,6 +5,7 @@
             Assert.AreEqual("NewDoc", doc.title);
             Assert.IsNotNull(doc.doctype);
             Assert.IsNotNull(doc.body);
+            Assert.IsNotNull(doc.documentElement);
             Assert.AreEqual("html", doc.doctype.name);
             Assert.AreEqual("", doc.doctype.publicId);
             Assert.AreEqual("", doc.doctype.systemId);
@@ -19,10 +20,11 @@
             
         }
     },
-    "ImplementationCreateDocumentWithDocType": {
+    "ImplementationCreateDocumentWithDocTypeSvg": {
         run: function () {
             var dt = document.implementation.createDocumentType("svg:svg", "-//W3C//DTD SVG 1.1//EN", "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd");
             var doc = document.implementation.createDocument("http://www.w3.org/2000/svg", "svg:svg", dt);
+            Assert.AreEqual("<svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\"/>", doc.documentElement.outerHTML);
             Assert.AreEqual("http://www.w3.org/2000/svg", doc.documentElement.namespaceURI);
             Assert.AreEqual(dt, doc.doctype);
         }
