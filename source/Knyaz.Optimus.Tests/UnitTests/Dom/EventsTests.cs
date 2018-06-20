@@ -47,7 +47,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var document = new Document();
 			var x = document.CreateElement("div");
 			x.AddEventListener("DOMNodeInserted", e => called = true, false);
-			document.AppendChild(x);
+			document.Body.AppendChild(x);
 			Assert.IsTrue(called);
 		}
 

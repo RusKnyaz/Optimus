@@ -44,7 +44,7 @@ namespace Knyaz.Optimus.Dom
 		
 		private Element _body;
 
-		internal Document() : this(null)
+		internal Document(IWindow window = null) : this("http://www.w3.org/1999/xhtml","html", null, window)
 		{
 			ReadyState = DocumentReadyStates.Loading;
 		}
@@ -72,27 +72,75 @@ namespace Knyaz.Optimus.Dom
 				CookieContainer.Add(cookie);
 			}
 		}
-
+		
 		/// <summary>
 		/// Creates new <sse cref="Document"/> instance.
 		/// </summary>
 		/// <param name="window">The Window object ot be associated with the document. Can be null.</param>
-		public Document(IWindow window) : base(null)
+		internal Document(string namespaceUri, string qualifiedNameStr, DocType docType, IWindow window) : base(null)
 		{
 			Implementation = new DomImplementation();
 
 			StyleSheets = new StyleSheetsList();
 			NodeType = DOCUMENT_NODE;
 
-			DocumentElement = CreateElement(TagsNames.Html);
-			DocumentElement.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
-			DocumentElement.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
+			if(docType != null)
+				AppendChild(docType);
 
-			AppendChild(DocumentElement);
+			var root = CreateElementNs(namespaceUri, qualifiedNameStr);
+			AppendChild(root);
+			root.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
+			root.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
 
 			DefaultView = window;
 
 			ReadyState = DocumentReadyStates.Loading;
+		}
+
+		public override Node AppendChild(Node node)
+		{
+			if (ChildNodes.Count == 0)
+			{
+				if (node is DocType docType)
+				{
+					DocType = docType;
+					return base.AppendChild(docType);
+				}
+				else
+				{
+					DocumentElement = (Element) node;
+					return base.AppendChild(node);
+				}
+			}
+			else if (ChildNodes.Count == 1)
+			{
+				if (DocType == null)
+				{
+					throw new DOMException(DOMException.Codes.HierarchyRequestError,
+						"Only one child node allowed for the document.");
+				}
+				else 
+				{
+					DocumentElement = (Element) node;
+					return base.AppendChild(node);
+				}
+			}
+			else
+			{
+				throw new DOMException(DOMException.Codes.HierarchyRequestError,
+					"Only one child node allowed for the document.");
+			}
+		}
+
+		public override Node RemoveChild(Node node)
+		{
+			if (node == DocType)
+				DocType = null;
+
+			if (node == DocumentElement)
+				DocumentElement = null;
+			
+			return base.RemoveChild(node);
 		}
 
 		/// <summary>
@@ -108,7 +156,7 @@ namespace Knyaz.Optimus.Dom
 		/// Returns first DocType element in document.
 		/// </summary>
 		[JsName("doctype")]
-		public DocType DocType => ChildNodes.OfType<DocType>().FirstOrDefault();
+		public DocType DocType { get; set; }
 
 		/// <summary>
 		/// Return this document's DOMimplementation object.
@@ -123,7 +171,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Gets the Document Element of the document (the &lt;html&gt; element)
 		/// </summary>
-		public Element DocumentElement { get; }
+		public Element DocumentElement { get; private set; }
 
 		/// <summary>
 		/// Gets the (loading) status of the document.
@@ -216,6 +264,14 @@ namespace Knyaz.Optimus.Dom
 				DispatchEvent(evt);	
 			}
 		}
+
+		public Element CreateElementNs(string namespaceUri, string qualifiedName)
+		{
+			var elt = CreateElement(qualifiedName);
+			elt.NamespaceUri = namespaceUri;
+			return elt;
+		}
+		
 
 		/// <summary>
 		/// Creates an Element node.

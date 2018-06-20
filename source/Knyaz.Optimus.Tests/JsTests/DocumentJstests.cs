@@ -7,7 +7,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 	{
 		[TestCase("ImplementationCreateHtmlDocument")]
 		[TestCase("ImplementationCreateDocumentType")]
-		[TestCase("ImplementationCreateDocumentWithDocType", Ignore = "To be implemented (#1369)")]
+		[TestCase("ImplementationCreateDocumentWithDocTypeSvg")]
+		[TestCase("ImplementationCreateDocumentWithoutDocType")]
 		[TestCase("RemoveDocType")]
 		[TestCase("TextContentIsNull")]
 		[TestCase("DefaultViewIsWindow")]

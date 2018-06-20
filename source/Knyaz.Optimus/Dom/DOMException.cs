@@ -167,7 +167,7 @@ namespace Knyaz.Optimus.Dom
 			NotAllowedError
 		}
 
-		internal DOMException(Codes code)
+		internal DOMException(Codes code, string message = null):base(message)
 		{
 			_code = code;
 			Name = Enum.GetName(typeof(Codes), code);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -45,6 +46,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			get { return _ownerDocument; }
 			set { }
 		}
+		
+		[JsName("namespaceURI")]
+		public string NamespaceUri { get; internal set; }
 
 		internal virtual void SetOwner(Document doc) => _ownerDocument = doc;
 

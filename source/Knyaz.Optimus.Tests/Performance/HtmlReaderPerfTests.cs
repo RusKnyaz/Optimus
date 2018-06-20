@@ -39,7 +39,7 @@ namespace Knyaz.Optimus.Tests.Performance
 				c += Read(html).Count;
 			}
 			sw.Stop();
-			System.Console.WriteLine("Read {0} chunks from {2}*100 chars, elsaped {1} ms", c, sw.ElapsedMilliseconds,
+			System.Console.WriteLine("Read {0} chunks from {2}*100 chars, elapsed {1} ms", c, sw.ElapsedMilliseconds,
 				R.Large_Html.Length);
 		}
 
