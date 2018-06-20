@@ -10,6 +10,8 @@ namespace Knyaz.Optimus.Dom
 	[DomItem]
 	public class DomImplementation
 	{
+		internal static DomImplementation Instance = new DomImplementation();
+		
 		internal DomImplementation()
 		{
 		}

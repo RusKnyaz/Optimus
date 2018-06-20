@@ -84,14 +84,11 @@ namespace Knyaz.Optimus.Dom
 			StyleSheets = new StyleSheetsList();
 			NodeType = DOCUMENT_NODE;
 
-			DocType = docType;
+			if(docType != null)
+				AppendChild(docType);
 
-			var root = CreateElement(qualifiedNameStr);
-			//todo: use createElementNs
-			if(namespaceUri != null)
-				root.SetAttribute("xlmns", namespaceUri);
+			var root = CreateElementNs(namespaceUri, qualifiedNameStr);
 			AppendChild(root);
-			
 			root.AppendChild(Head = (Head)CreateElement(TagsNames.Head));
 			root.AppendChild(Body = (HtmlBodyElement)CreateElement(TagsNames.Body));
 
@@ -133,6 +130,17 @@ namespace Knyaz.Optimus.Dom
 				throw new DOMException(DOMException.Codes.HierarchyRequestError,
 					"Only one child node allowed for the document.");
 			}
+		}
+
+		public override Node RemoveChild(Node node)
+		{
+			if (node == DocType)
+				DocType = null;
+
+			if (node == DocumentElement)
+				DocumentElement = null;
+			
+			return base.RemoveChild(node);
 		}
 
 		/// <summary>
@@ -256,6 +264,14 @@ namespace Knyaz.Optimus.Dom
 				DispatchEvent(evt);	
 			}
 		}
+
+		public Element CreateElementNs(string namespaceUri, string qualifiedName)
+		{
+			var elt = CreateElement(qualifiedName);
+			elt.NamespaceUri = namespaceUri;
+			return elt;
+		}
+		
 
 		/// <summary>
 		/// Creates an Element node.

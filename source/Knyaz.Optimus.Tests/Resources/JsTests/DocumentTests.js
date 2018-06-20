@@ -11,6 +11,13 @@
             Assert.AreEqual("", doc.doctype.systemId);
         }
     },
+    "ImplementationCreateDocumentWithoutDocType":{
+        run: function() {
+            var doc = document.implementation.createDocument("http://www.w3.org/1999/xhtml", "html");
+            Assert.IsNull(doc.doctype);
+            Assert.AreEqual("html", doc.documentElement.tagName.toLowerCase());
+        }
+    },
     "ImplementationCreateDocumentType": {
         run: function() {
             var dt = document.implementation.createDocumentType("svg:svg", "-//W3C//DTD SVG 1.1//EN", "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd");
@@ -24,7 +31,6 @@
         run: function () {
             var dt = document.implementation.createDocumentType("svg:svg", "-//W3C//DTD SVG 1.1//EN", "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd");
             var doc = document.implementation.createDocument("http://www.w3.org/2000/svg", "svg:svg", dt);
-            Assert.AreEqual("<svg:svg xmlns:svg=\"http://www.w3.org/2000/svg\"/>", doc.documentElement.outerHTML);
             Assert.AreEqual("http://www.w3.org/2000/svg", doc.documentElement.namespaceURI);
             Assert.AreEqual(dt, doc.doctype);
         }
