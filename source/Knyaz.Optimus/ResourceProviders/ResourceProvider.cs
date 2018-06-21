@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+	/// <summary>
+	/// Redirects requests to resource provider that connected with specified protocol. 
+	/// </summary>
 	internal class ResourceProvider : IResourceProvider
 	{
 		public event Action<Uri> OnRequest;
@@ -12,19 +15,19 @@ namespace Knyaz.Optimus.ResourceProviders
 		
 		public CookieContainer CookieContainer { get; } 
 
-		public ResourceProvider(ISpecResourceProvider httpResourceProvider,
-			ISpecResourceProvider fileResourceProvider)
+		public ResourceProvider(IResourceProvider httpResourceProvider,
+			IResourceProvider fileResourceProvider)
 		{
 			HttpResourceProvider = httpResourceProvider;
 			CookieContainer = (httpResourceProvider as HttpResourceProvider)?.CookieContainer;
 			FileResourceProvider = fileResourceProvider;
 		}
 
-		private ISpecResourceProvider DataResourceProvider { get; } = new DataResourceProvider();
-		protected ISpecResourceProvider FileResourceProvider { get; }
-		public ISpecResourceProvider HttpResourceProvider { get; }
+		private IResourceProvider DataResourceProvider { get; } = new DataResourceProvider();
+		protected IResourceProvider FileResourceProvider { get; }
+		public IResourceProvider HttpResourceProvider { get; }
 
-		private ISpecResourceProvider GetResourceProvider(Uri u)
+		private IResourceProvider GetResourceProvider(Uri u)
 		{
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
 

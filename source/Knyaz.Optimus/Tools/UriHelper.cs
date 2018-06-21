@@ -5,6 +5,9 @@ namespace Knyaz.Optimus.Tools
 {
 	internal static class UriHelper
 	{
+		public static Uri GetUri(string uri) =>
+			new Uri(uri, IsAbsolete(uri) ? UriKind.Absolute : UriKind.Relative);
+		
 		public static bool IsAbsolete(string uri) =>
 			!uri.StartsWith("/") && (
 				uri.StartsWith("http://") || uri.StartsWith("https://") || uri.StartsWith("file://") ||

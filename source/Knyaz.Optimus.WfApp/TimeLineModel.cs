@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.WfApp
 {
@@ -112,8 +113,8 @@ namespace Knyaz.Optimus.WfApp
 				});
 			});
 
-			engine.ResourceProvider.OnRequest += requestHandler;
-			engine.ResourceProvider.OnRequest += receivedHandler;
+			((DocumentResourceProvider)engine.ResourceProvider).OnRequest += requestHandler;
+			((DocumentResourceProvider)engine.ResourceProvider).OnRequest += receivedHandler;
 			curScripting = engine.Scripting;
 			engine.DocumentChanged += documentChanged;
 
@@ -123,8 +124,8 @@ namespace Knyaz.Optimus.WfApp
 
 			return () =>
 			{
-				engine.ResourceProvider.OnRequest -= requestHandler;
-				engine.ResourceProvider.OnRequest -= receivedHandler;
+				((DocumentResourceProvider)engine.ResourceProvider).OnRequest -= requestHandler;
+				((DocumentResourceProvider)engine.ResourceProvider).OnRequest -= receivedHandler;
 				engine.DocumentChanged -= documentChanged;
 				engine.Window.Timers.OnExecuting -= timerExecuting;
 				engine.Window.Timers.OnExecuted -= timerExecuted;

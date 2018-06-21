@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.Tests.UnitTests.ResourceProviders
 		public void HttpRequest()
 		{
 			var request = Mock.Of<IRequest>(x => x.Url == new Uri("http://google.com"));
-			var httpMock = new Mock<ISpecResourceProvider>();
+			var httpMock = new Mock<IResourceProvider>();
 			httpMock.Setup(x => x.CreateRequest(It.IsAny<Uri>())).Returns(request);
 			var target = new ResourceProvider(httpMock.Object, null);
 

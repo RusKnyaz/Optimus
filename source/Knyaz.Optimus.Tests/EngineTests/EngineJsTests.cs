@@ -331,9 +331,6 @@ console.log(style['width']);");
 					       "window.location.href = 'http://todosoft.org/sub';"))
 				.Resource("http://todosoft.org/sub", Mocks.Page("console.log(document.cookie);"));
 
-			var cookie = new CookieContainer();
-			Mock.Get(resourceProvider).SetupGet(x => x.CookieContainer).Returns(cookie);
-			
 			var engine = new Engine(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://todosoft.org").Wait();

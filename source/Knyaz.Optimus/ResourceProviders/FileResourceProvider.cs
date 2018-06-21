@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// <summary>
 	/// Allows to request files content from file system.
 	/// </summary>
-	class FileResourceProvider : ISpecResourceProvider
+	class FileResourceProvider : IResourceProvider
 	{
 		/// <summary>
 		/// Creates resource request.

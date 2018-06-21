@@ -46,7 +46,7 @@ namespace Knyaz.Optimus.Tests
 
 		public static SpecResourceProvider HttpResourceProvider() => new SpecResourceProvider();
 
-		public class SpecResourceProvider : ISpecResourceProvider
+		public class SpecResourceProvider : IResourceProvider
 		{
 			public IRequest CreateRequest(Uri url) => new HttpRequest("GET", url);
 			

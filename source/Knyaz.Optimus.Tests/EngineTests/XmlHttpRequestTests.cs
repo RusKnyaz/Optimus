@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var sync = new Object();
 			var resourceProvider = Mocks.ResourceProvider("http://data", new byte[] {10, 1, 0});
-			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, new LinkProvider());
+			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null);
 
 			xhr.Open("GET", "http://data", false);
 			xhr.ResponseType = "arraybuffer";
@@ -68,7 +68,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var sync = new Object();
 			var resourceProvider = Mocks.ResourceProvider("http://data", data);
-			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, new LinkProvider());
+			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null);
 
 			xhr.Open("GET", "http://data", false);
 			xhr.ResponseType = type;

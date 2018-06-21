@@ -17,18 +17,6 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		private readonly IResourceProvider _resourceProvider;
 		
-		public event Action<Uri> OnRequest
-		{
-			add => _resourceProvider.OnRequest += value;
-			remove => _resourceProvider.OnRequest -= value;
-		}
-
-		public event EventHandler<ReceivedEventArguments> Received
-		{
-			add => _resourceProvider.Received += value;
-			remove => _resourceProvider.Received -= value;
-		}
-
 		public Task<IResource> SendRequestAsync(IRequest req) => 
 			_preloadedResources.TryRemove(req, out var preloaded)
 			? preloaded
@@ -48,7 +36,5 @@ namespace Knyaz.Optimus.ResourceProviders
 		}
 
 		public void Clear() => _preloadedResources.Clear();
-
-		public CookieContainer CookieContainer => _resourceProvider.CookieContainer;
 	}
 }

@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// <summary>
 	/// Allows to request web resources. 
 	/// </summary>
-	class HttpResourceProvider : ISpecResourceProvider
+	class HttpResourceProvider : IResourceProvider
 	{
 		private readonly Func<HttpRequest, HttpClient> _getClientFn;
 

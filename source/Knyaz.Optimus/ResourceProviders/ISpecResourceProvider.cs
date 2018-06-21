@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.ResourceProviders
     /// <summary>
     /// Allows to get resources like files, html pages and etc (dependes on implementation).
     /// </summary>
-    public interface ISpecResourceProvider
+    public interface IResourceProvider
     {
         /// <summary>
         /// Creates resource request.
@@ -26,21 +26,9 @@ namespace Knyaz.Optimus.ResourceProviders
         Task<IResource> SendRequestAsync(IRequest request);
     }
     
-    /// <summary>
-    /// Allows to get resources like files, html pages and etc.
-    /// </summary>
-    public interface IResourceProvider : ISpecResourceProvider
+    public static class ResourceProviderExtension
     {
-        /// <summary>
-        /// Called on request send.
-        /// </summary>
-        event Action<Uri> OnRequest;
-        
-        /// <summary>
-        /// Called on request handled and data received.
-        /// </summary>
-        event EventHandler<ReceivedEventArguments> Received;
-
-        CookieContainer CookieContainer { get; }
+        public static Task<IResource> GetResourceAsync(this IResourceProvider provider, Uri uri) => 
+            provider.SendRequestAsync(provider.CreateRequest(uri));
     }
 }

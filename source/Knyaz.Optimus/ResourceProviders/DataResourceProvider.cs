@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// <summary>
 	/// Gets the data from url like "data:..."
 	/// </summary>
-	class DataResourceProvider : ISpecResourceProvider
+	class DataResourceProvider : IResourceProvider
 	{
 		public IRequest CreateRequest(Uri url) => new DataRequest(url);
 
