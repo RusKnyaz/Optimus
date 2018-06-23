@@ -16,32 +16,30 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	[TestFixture]
 	public class EngineUnitTests
 	{
-		private IResourceProvider _resourceProvider;
-		private Engine _engine;
-
-		[SetUp]
-		public void SetUp()
-		{
-			_resourceProvider = Mock.Of<IResourceProvider>();
-			_engine = new Engine(_resourceProvider);
-		}
 
 		[Test]
 		public void EmptyHtml()
 		{
-			_engine.Load("<html></html>");
+			var engine = new Engine(Mock.Of<IResourceProvider>());
+			engine.Load("<html></html>");
+		}
+		
+		private Engine Load(IResourceProvider resourceProvider)
+		{
+			var engine = new Engine(resourceProvider);
+			engine.OpenUrl("http://localhost").Wait();
+			return engine;
 		}
 		
 		[Test]
 		public void GenerateContent()
 		{
-			_resourceProvider
+			var engine = Load(Mock.Of<IResourceProvider>()
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id='content'></div></body></html>")
-				.Resource("http://localhost/test.js", "var elem = document.getElementById('content');elem.innerHTML = 'Hello';");
+				.Resource("http://localhost/test.js", "var elem = document.getElementById('content');elem.innerHTML = 'Hello';"));
 
-			_engine.OpenUrl("http://localhost").Wait();
 			
-			var contentDiv = _engine.Document.GetElementById("content");
+			var contentDiv = engine.Document.GetElementById("content");
 			Assert.AreEqual("Hello", contentDiv.InnerHTML);
 			Assert.AreEqual(1, contentDiv.ChildNodes.Count);
 			var text = contentDiv.ChildNodes[0] as Text;
@@ -52,17 +50,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void DomManipulation()
 		{
-			_resourceProvider
+			var engine = Load(Mock.Of<IResourceProvider>()
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id='content1'></div><div id='content2'></div></body></html")
 				.Resource("http://localhost/test.js", "var div = document.createElement('div');" +
 			                                     "div.setAttribute('id', 'c3');" +
 			                                     "var c2 = document.getElementById('content2');" +
-			                                     "document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);");
+			                                     "document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);"));
 			
-			_engine.OpenUrl("http://localhost").Wait();
-			
-			Assert.AreEqual(3, _engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
-			var elem = _engine.Document.GetElementById("c3");
+			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
+			var elem = engine.Document.GetElementById("c3");
 			Assert.IsNotNull(elem);
 		}
 
@@ -79,9 +75,10 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void GetAttribute()
 		{
+			var engine = new Engine(Mock.Of<IResourceProvider>());
 			string attr = null;
-			_engine.Console.OnLog += o => attr = o.ToString();
-			_engine.Load(Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
+			engine.Console.OnLog += o => attr = o.ToString();
+			engine.Load(Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
 				"<span id='content1'></span>"));
 			Assert.AreEqual("content1", attr);
 		}
@@ -227,8 +224,7 @@ window.clearTimeout(timer);"));
 		[Test]
 		public void Ajax()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>();
-			resourceProvider.Resource("http://localhost/unicorn.xml", "hello");
+			var resourceProvider = Mock.Of<IResourceProvider>().Resource("http://localhost/unicorn.xml", "hello");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();

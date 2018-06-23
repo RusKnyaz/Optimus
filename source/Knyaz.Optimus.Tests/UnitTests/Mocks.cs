@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -31,13 +32,12 @@ namespace Knyaz.Optimus.Tests
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, byte[] data)
 		{
-			var request = new Request("GET", url);
+			var resource= (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(data), null);
 
-			Mock.Get(resourceProvider)
-				.Setup(x => x.SendRequestAsync(request))
-				.Returns(() =>Task.Run(() => 
-					(IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(data), null)));
-			return resourceProvider;
+			var rpMock = new Mock<IResourceProvider>();
+			rpMock.Setup(x => x.SendRequestAsync(It.IsAny<Request>()))
+				.Returns<Request>(x => x.Url == url ? Task.Run(() => resource) : resourceProvider.SendRequestAsync(x));
+			return rpMock.Object;
 		}
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, string data) =>
@@ -47,8 +47,6 @@ namespace Knyaz.Optimus.Tests
 
 		public class SpecResourceProvider : IResourceProvider
 		{
-			public Request CreateRequest(Uri url) => new Request("GET", url);
-			
 			Dictionary<Uri, IResource> _resources = new Dictionary<Uri, IResource>();
 			
 			private HttpResponse _response404 = new HttpResponse(HttpStatusCode.NotFound, Stream.Null, "");
