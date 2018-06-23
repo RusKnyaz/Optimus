@@ -22,8 +22,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[SetUp]
 		public void SetUp()
 		{
-			_resourceProvider = Mock.Of<IResourceProvider>();
-			_resourceProvider.Resource("http://localhost", "<html></html>");//default blank page
+			_resourceProvider = Mock.Of<IResourceProvider>().Resource("http://localhost", "<html></html>");//default blank page
 			_engine = new Engine(_resourceProvider);
 		}
 

@@ -22,7 +22,7 @@ namespace Knyaz.Optimus.ResourceProviders
         }
 
         public override int GetHashCode() => 
-            ((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
+            ((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ (Headers == null ? 0 : Headers.Count);
 
         public override bool Equals(object obj) => 
             obj is Request other 
