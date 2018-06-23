@@ -113,8 +113,8 @@ namespace Knyaz.Optimus.WfApp
 				});
 			});
 
-			((DocumentResourceProvider)engine.ResourceProvider).OnRequest += requestHandler;
-			((DocumentResourceProvider)engine.ResourceProvider).OnRequest += receivedHandler;
+			((NotifyingResourceProvider)engine.ResourceProvider).OnRequest += requestHandler;
+			((NotifyingResourceProvider)engine.ResourceProvider).OnRequest += receivedHandler;
 			curScripting = engine.Scripting;
 			engine.DocumentChanged += documentChanged;
 
@@ -124,8 +124,8 @@ namespace Knyaz.Optimus.WfApp
 
 			return () =>
 			{
-				((DocumentResourceProvider)engine.ResourceProvider).OnRequest -= requestHandler;
-				((DocumentResourceProvider)engine.ResourceProvider).OnRequest -= receivedHandler;
+				((NotifyingResourceProvider)engine.ResourceProvider).OnRequest -= requestHandler;
+				((NotifyingResourceProvider)engine.ResourceProvider).OnRequest -= receivedHandler;
 				engine.DocumentChanged -= documentChanged;
 				engine.Window.Timers.OnExecuting -= timerExecuting;
 				engine.Window.Timers.OnExecuted -= timerExecuted;

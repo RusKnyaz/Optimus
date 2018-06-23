@@ -11,14 +11,9 @@ namespace Knyaz.Optimus.ResourceProviders
 	class FileResourceProvider : IResourceProvider
 	{
 		/// <summary>
-		/// Creates resource request.
-		/// </summary>
-		public IRequest CreateRequest(Uri url) => new FileRequest(url);
-
-		/// <summary>
 		/// Requests file resource..
 		/// </summary>
-		public Task<IResource> SendRequestAsync(IRequest request)
+		public Task<IResource> SendRequestAsync(Request request)
 		{
 			var uri = request.Url;
 
@@ -47,12 +42,5 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public string Type { get; private set; }
 		public Stream Stream { get; private set; }
-	}
-
-	class FileRequest : IRequest
-	{
-		public FileRequest(Uri url) => Url = url;
-
-		public Uri Url { get; }
 	}
 }

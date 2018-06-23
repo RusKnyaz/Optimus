@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Net;
+﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
 	internal class PredictedResourceProvider : IResourceProvider
 	{
-		private readonly ConcurrentDictionary<IRequest, Task<IResource>> _preloadedResources
-        			= new ConcurrentDictionary<IRequest, Task<IResource>>();
+		private readonly ConcurrentDictionary<Request, Task<IResource>> _preloadedResources
+        			= new ConcurrentDictionary<Request, Task<IResource>>();
 
 		public PredictedResourceProvider(IResourceProvider resourceProvider)
 		{
@@ -17,17 +15,14 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		private readonly IResourceProvider _resourceProvider;
 		
-		public Task<IResource> SendRequestAsync(IRequest req) => 
+		public Task<IResource> SendRequestAsync(Request req) => 
 			_preloadedResources.TryRemove(req, out var preloaded)
 			? preloaded
 			: _resourceProvider.SendRequestAsync(req);
 
-		public IRequest CreateRequest(Uri path) => _resourceProvider.CreateRequest(path);
 
-		public void Preload(Uri uri)
+		public void Preload(Request request)
 		{
-			var request = _resourceProvider.CreateRequest(uri);
-
 			if (_preloadedResources.ContainsKey(request))
 				return;
 

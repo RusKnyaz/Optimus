@@ -10,9 +10,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// </summary>
 	class DataResourceProvider : IResourceProvider
 	{
-		public IRequest CreateRequest(Uri url) => new DataRequest(url);
-
-		public Task<IResource> SendRequestAsync(IRequest request)
+		public Task<IResource> SendRequestAsync(Request request)
 		{
 			var url = request.Url;
 			return Task.Run(() => GetDataFromUrl(url));
@@ -23,12 +21,6 @@ namespace Knyaz.Optimus.ResourceProviders
 			var data = uri.GetUriData();
 			
 			return new Response(data.Type, new MemoryStream(data.Data));
-		}
-
-		class DataRequest : IRequest
-		{
-			public DataRequest(Uri url) => Url = url;
-			public Uri Url { get; }
 		}
 	}
 }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,7 +13,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// </summary>
 	class HttpResourceProvider : IResourceProvider
 	{
-		private readonly Func<HttpRequest, HttpClient> _getClientFn;
+		private readonly Func<Request, HttpClient> _getClientFn;
 
 		public readonly CookieContainer CookieContainer;
 
@@ -39,15 +37,11 @@ namespace Knyaz.Optimus.ResourceProviders
 			};
 		}
 
-		public IRequest CreateRequest(Uri url) => new HttpRequest("GET", url);
-
-		private async Task<IResource> SendRequestEx(IRequest request)
+		private async Task<IResource> SendRequestEx(Request request)
 		{
-			var httpRequest = request as HttpRequest;
-
-			var req = MakeWebRequest(httpRequest);
+			var req = MakeWebRequest(request);
 			
-			using (var client = _getClientFn(httpRequest))
+			using (var client = _getClientFn(request))
 			using (var response = await client.SendAsync(req))
 			using (var content = response.Content)
 			{
@@ -61,9 +55,9 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 		
-		public Task<IResource> SendRequestAsync(IRequest request) => SendRequestEx(request);
+		public Task<IResource> SendRequestAsync(Request request) => SendRequestEx(request);
 
-		private HttpRequestMessage MakeWebRequest(HttpRequest request)
+		private HttpRequestMessage MakeWebRequest(Request request)
 		{
 			var u = request.Url;
 			var resultRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
@@ -89,32 +83,6 @@ namespace Knyaz.Optimus.ResourceProviders
 
 			return resultRequest;
 		}
-	}
-
-	public class HttpRequest : IRequest
-	{
-		public string Method;
-		public Uri Url { get; }
-		public readonly Dictionary<string, string> Headers;
-		public int Timeout { get; set; }
-		public byte[] Data;
-
-		public HttpRequest(string method, Uri url)
-		{
-			Headers = new Dictionary<string, string>();
-			Method = method;
-			Url = url;
-		}
-
-		public override int GetHashCode() => 
-			((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
-
-		public override bool Equals(object obj) => 
-			obj is HttpRequest other 
-		    && Url == other.Url 
-		    && Method == other.Method 
-		    && Headers.Count == other.Headers.Count 
-		    && Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]));
 	}
 
 	public class HttpResponse : IResource

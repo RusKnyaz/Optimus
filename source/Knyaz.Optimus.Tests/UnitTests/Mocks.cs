@@ -31,13 +31,12 @@ namespace Knyaz.Optimus.Tests
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, byte[] data)
 		{
-			var request = new HttpRequest("GET", url);
+			var request = new Request("GET", url);
 
 			Mock.Get(resourceProvider)
-				.Setup(x => x.CreateRequest(url)).Returns(request);
-			Mock.Get(resourceProvider)
 				.Setup(x => x.SendRequestAsync(request))
-				.Returns(() =>Task.Run(() => (IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(data), null)));
+				.Returns(() =>Task.Run(() => 
+					(IResource)new HttpResponse(HttpStatusCode.OK, new MemoryStream(data), null)));
 			return resourceProvider;
 		}
 
@@ -48,15 +47,15 @@ namespace Knyaz.Optimus.Tests
 
 		public class SpecResourceProvider : IResourceProvider
 		{
-			public IRequest CreateRequest(Uri url) => new HttpRequest("GET", url);
+			public Request CreateRequest(Uri url) => new Request("GET", url);
 			
 			Dictionary<Uri, IResource> _resources = new Dictionary<Uri, IResource>();
 			
 			private HttpResponse _response404 = new HttpResponse(HttpStatusCode.NotFound, Stream.Null, "");
 
-			public Task<IResource> SendRequestAsync(IRequest request)
+			public Task<IResource> SendRequestAsync(Request request)
 			{
-				History.Add(request as HttpRequest);
+				History.Add(request);
 				return Task.Run(() => 
 					_resources.ContainsKey(request.Url) ? _resources[request.Url] 
 					: _response404); 
@@ -76,7 +75,7 @@ namespace Knyaz.Optimus.Tests
 				return this;
 			}
 
-			public List<HttpRequest> History = new List<HttpRequest>();
+			public List<Request> History = new List<Request>();
 		}
 
 		public static string Page(string script)

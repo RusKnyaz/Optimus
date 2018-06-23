@@ -234,7 +234,7 @@ window.clearTimeout(timer);"));
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
 
-			var client = new XmlHttpRequest(engine.ResourceProvider, () => this, engine.Document);
+			var client = new XmlHttpRequest(engine.ResourceProvider, () => this, engine.Document, (u,m) => engine.CreateRequest(u,m));
 
 			client.OnReadyStateChange += () =>
 				{
@@ -249,7 +249,7 @@ window.clearTimeout(timer);"));
 			client.Open("GET", "http://localhost/unicorn.xml", false);
 			client.Send();
 			
-			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once());
 			CollectionAssert.AreEqual(new[]{"hello"}, log);
 		}
 

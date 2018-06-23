@@ -46,14 +46,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		public IRequest CreateRequest(Uri uri)
-		{
-			var resourceProvider = GetResourceProvider(uri);
-			return resourceProvider.CreateRequest(uri);
-		}
-		
-
-		public Task<IResource> SendRequestAsync(IRequest req)
+		public Task<IResource> SendRequestAsync(Request req)
 		{
 			OnRequest?.Invoke(req.Url);
 

@@ -1,12 +1,36 @@
 ﻿using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-    public interface IRequest
+    public class Request
     {
-        Uri Url { get; }
+        public string Method;
+        public Uri Url { get; }
+        public readonly Dictionary<string, string> Headers;
+        public int Timeout { get; set; }
+        public byte[] Data;
+
+        public Request(Uri url) => Url = url;
+
+        public Request(string method, Uri url) : this(url)
+        {
+            Headers = new Dictionary<string, string>();
+            Method = method;
+        }
+
+        public override int GetHashCode() => 
+            ((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ Headers.Count;
+
+        public override bool Equals(object obj) => 
+            obj is Request other 
+            && Url == other.Url 
+            && Method == other.Method 
+            && ((Headers == null && other.Headers == null)
+            || (Headers.Count == other.Headers.Count 
+            && Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]))));
     }
 
     
@@ -16,19 +40,8 @@ namespace Knyaz.Optimus.ResourceProviders
     public interface IResourceProvider
     {
         /// <summary>
-        /// Creates resource request.
-        /// </summary>
-        IRequest CreateRequest(Uri url);
-        
-        /// <summary>
         /// Requests resource.
         /// </summary>
-        Task<IResource> SendRequestAsync(IRequest request);
-    }
-    
-    public static class ResourceProviderExtension
-    {
-        public static Task<IResource> GetResourceAsync(this IResourceProvider provider, Uri uri) => 
-            provider.SendRequestAsync(provider.CreateRequest(uri));
+        Task<IResource> SendRequestAsync(Request request);
     }
 }

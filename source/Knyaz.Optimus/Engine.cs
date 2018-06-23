@@ -38,7 +38,7 @@ namespace Knyaz.Optimus
 		/// </summary>
 		public DocumentScripting Scripting	{get; private set;}
 		internal DocumentStyling Styling { get; private set; }
-
+	
 		/// <summary>
 		/// Gets the browser's console object.
 		/// </summary>
@@ -47,10 +47,11 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Gets the current Window object.
 		/// </summary>
-   	public Window Window { get; private set; }
+		public Window Window { get; private set; }
 		
 		CookieContainer _cookieContainer = new CookieContainer();
 
+		
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
@@ -60,7 +61,7 @@ namespace Knyaz.Optimus
 				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http(h => h.Cookies(_cookieContainer))
 					.Build();
 			
-			ResourceProvider = new DocumentResourceProvider(resourceProvider, LinkProvider, () => Window.Navigator.UserAgent);
+			ResourceProvider = resourceProvider;
 			
 			Console = new Console();
 			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
@@ -104,7 +105,8 @@ namespace Knyaz.Optimus
 				
 				if (_document != null)
 				{
-					Scripting = new DocumentScripting (_document, ScriptExecutor, s => ResourceProvider.GetResourceAsync(UriHelper.GetUri(s)));
+					Scripting = new DocumentScripting (_document, ScriptExecutor, 
+						s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
 					
@@ -162,8 +164,8 @@ namespace Knyaz.Optimus
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
 			Document = new Document(Window);
-			LinkProvider.Root = GetRoot(Uri);
-			var response = await ResourceProvider.GetResourceAsync(Uri);
+			LinkProvider.Root = Uri.GetRoot();
+			var response = await ResourceProvider.SendRequestAsync(CreateRequest(path));
 			
 			LoadFromResponse(Document, response);
 
@@ -172,18 +174,13 @@ namespace Knyaz.Optimus
 				: new Page(Document);
 		}
 
-		
-
-		private string GetRoot(Uri uri)
+		internal Request CreateRequest(string uri, string method = "GET")
 		{
-			var root =Uri.GetLeftPart(UriPartial.Path);
-			var ur = new Uri(root);
-			if (ur.PathAndQuery != null && !ur.PathAndQuery.Contains('.') && ur.PathAndQuery.Last() != '/')
-				return root + "/";
-
-			return root;
+			var req = new Request(method, LinkProvider.MakeUri(uri));
+			req.Headers["User-Agent"] = Window.Navigator.UserAgent;
+			return req;
 		}
-
+		
 		/// <summary>
 		/// Occurs before the document being loaded from response. 
 		/// Can be used to handle non-html response types.
@@ -239,7 +236,7 @@ namespace Knyaz.Optimus
 					.Where(x => !string.IsNullOrEmpty(x))
 					)
 				{
-					resourceProvider.Preload(LinkProvider.MakeUri(src));
+					resourceProvider.Preload(CreateRequest(src));
 				}
 
 				if (ComputedStylesEnabled)
@@ -251,7 +248,7 @@ namespace Knyaz.Optimus
 					.Select(x => x.Attributes["href"])
 					.Where(x => !string.IsNullOrEmpty(x)))
 					{
-						resourceProvider.Preload(LinkProvider.MakeUri(src));
+						resourceProvider.Preload(CreateRequest(src));
 					}
 				}
 			}
@@ -291,7 +288,7 @@ namespace Knyaz.Optimus
 
 		private void EnableDocumentStyling()
 		{
-			Styling = new DocumentStyling(_document, s => ResourceProvider.GetResourceAsync(UriHelper.GetUri(s)));
+			Styling = new DocumentStyling(_document, s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
 			Styling.LoadDefaultStyles();
 		}
 
