@@ -5,30 +5,34 @@ namespace Knyaz.Optimus.ResourceProviders
 {
 	public class NotifyingResourceProvider : IResourceProvider
 	{
+		private readonly Action<Request> _onRequest;
+		private readonly Action<ReceivedEventArguments> _onRespnose;
 		private readonly IResourceProvider _provider;
 		
-		public NotifyingResourceProvider(IResourceProvider provider)
+		public NotifyingResourceProvider(IResourceProvider provider, 
+			Action<Request> onRequest, 
+			Action<ReceivedEventArguments> onResponse)
 		{
+			_onRequest = onRequest;
+			_onRespnose = onResponse;
 			_provider = provider;
 		}
 
 		public Task<IResource> SendRequestAsync(Request request)
 		{
-			OnRequest?.Invoke(request.Url);
-
-			return _provider.SendRequestAsync(request).ContinueWith(t =>
+			_onRequest?.Invoke(request);
+			
+			return _onRespnose == null ? _provider.SendRequestAsync(request)
+				: _provider.SendRequestAsync(request).ContinueWith(t =>
 			{
 				try
 				{
-					Received?.Invoke(this, new ReceivedEventArguments(request, t.Result));
+					_onRespnose(new ReceivedEventArguments(request, t.Result));
 				}
 				catch { }
 				return t.Result;
 			});
 		}
-
-		public event Action<Uri> OnRequest;
-		public event EventHandler<ReceivedEventArguments> Received;
 	}
 
 	public class ReceivedEventArguments : EventArgs

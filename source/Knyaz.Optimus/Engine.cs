@@ -42,32 +42,40 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Gets the browser's console object.
 		/// </summary>
-		public Console Console { get; private set; }
+		public Console Console { get; }
 		
 		/// <summary>
 		/// Gets the current Window object.
 		/// </summary>
-		public Window Window { get; private set; }
-		
-		CookieContainer _cookieContainer = new CookieContainer();
+		public Window Window { get; }
+
+		readonly CookieContainer _cookieContainer;
 
 		
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine(IResourceProvider resourceProvider = null)
+		public Engine(IResourceProvider resourceProvider = null, CookieContainer cookieContainer = null)
 		{
+			if(cookieContainer == null)
+				cookieContainer = new CookieContainer();
+			
 			if (resourceProvider == null)
-				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http(h => h.Cookies(_cookieContainer))
+				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http(h => h.Cookies(cookieContainer))
+					.Notify(request => OnRequest?.Invoke(request), response => OnResponse?.Invoke(response))
 					.Build();
 			
 			ResourceProvider = resourceProvider;
+			_cookieContainer = cookieContainer;
 			
 			Console = new Console();
 			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
 		}
+
+		public event Action<Request> OnRequest;
+		public event Action<ReceivedEventArguments> OnResponse;
 
 		/// <summary>
 		/// Occurs when window.open method called.

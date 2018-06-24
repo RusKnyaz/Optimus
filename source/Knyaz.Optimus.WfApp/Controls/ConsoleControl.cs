@@ -27,8 +27,8 @@ namespace Knyaz.Optimus.WfApp.Controls
 				if (_engine != null)
 				{
 					_engine.Console.OnLog -= ConsoleOnOnLog;
-					((NotifyingResourceProvider)_engine.ResourceProvider).OnRequest -= ResourceProviderOnOnRequest;
-					((NotifyingResourceProvider)_engine.ResourceProvider).Received -= ResourceProviderOnReceived;
+					_engine.OnRequest -= ResourceProviderOnOnRequest;
+					_engine.OnResponse -= ResourceProviderOnReceived;
 					_engine.Window.OnAlert -= OnAlert;
 
 					_engine.Scripting.ScriptExecutionError -= DocumentOnScriptExecutionError;
@@ -39,8 +39,8 @@ namespace Knyaz.Optimus.WfApp.Controls
 				if (_engine != null)
 				{
 					_engine.Console.OnLog += ConsoleOnOnLog;
-					((NotifyingResourceProvider)_engine.ResourceProvider).OnRequest += ResourceProviderOnOnRequest;
-					((NotifyingResourceProvider)_engine.ResourceProvider).Received += ResourceProviderOnReceived;
+					_engine.OnRequest += ResourceProviderOnOnRequest;
+					_engine.OnResponse += ResourceProviderOnReceived;
 					_engine.Window.OnAlert += OnAlert;
 					Document = _engine.Document;
 					_engine.DocumentChanged += OnDocumentChanged;
@@ -104,18 +104,18 @@ namespace Knyaz.Optimus.WfApp.Controls
 			Log("Executing: " + (script.Src ?? script.Id ?? "..."));
 		}
 
-		private void ResourceProviderOnOnRequest(Uri s)
+		private void ResourceProviderOnOnRequest(Request s)
 		{
 			if (!LogInfo)
 				return;
-			Log("Request: " + s.ToString());
+			Log($"Request: {s.Url}");
 		}
 
-		private void ResourceProviderOnReceived(object sender, ReceivedEventArguments args)
+		private void ResourceProviderOnReceived(ReceivedEventArguments args)
 		{
 			if (!LogInfo)
 				return;
-			Log("Received: " + args.Request.Url);
+			Log($"Received: {args.Request.Url}");
 		}
 
 		private void ConsoleOnOnLog(object o)
