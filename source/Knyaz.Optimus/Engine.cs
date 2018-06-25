@@ -55,18 +55,15 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine(IResourceProvider resourceProvider = null, CookieContainer cookieContainer = null)
+		public Engine(IResourceProvider resourceProvider = null)
 		{
-			if(cookieContainer == null)
-				cookieContainer = new CookieContainer();
-			
 			if (resourceProvider == null)
-				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http(h => h.Cookies(cookieContainer))
+				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
 					.Notify(request => OnRequest?.Invoke(request), response => OnResponse?.Invoke(response))
 					.Build();
 			
 			ResourceProvider = resourceProvider;
-			_cookieContainer = cookieContainer;
+			_cookieContainer = new CookieContainer();
 			
 			Console = new Console();
 			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));

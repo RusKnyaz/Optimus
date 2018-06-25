@@ -15,17 +15,11 @@ namespace Knyaz.Optimus.ResourceProviders
 	{
 		private readonly Func<Request, HttpClient> _getClientFn;
 
-		public readonly CookieContainer CookieContainer;
-
-		public HttpResourceProvider(CookieContainer cookies, 
-			WebProxy proxy,
-			AuthenticationHeaderValue auth)
+		public HttpResourceProvider(WebProxy proxy, AuthenticationHeaderValue auth)
 		{
-			CookieContainer = cookies;
-			
 			_getClientFn = req => new HttpClient(new HttpClientHandler
 			{
-				CookieContainer = cookies,
+				CookieContainer = req.Cookies,
 				Proxy = proxy,
 				UseProxy = proxy != null,
 			})

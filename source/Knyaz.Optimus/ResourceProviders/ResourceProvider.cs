@@ -10,16 +10,10 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// </summary>
 	internal class ResourceProvider : IResourceProvider
 	{
-		public event Action<Uri> OnRequest;
-		public event EventHandler<ReceivedEventArguments> Received;
-		
-		public CookieContainer CookieContainer { get; } 
-
 		public ResourceProvider(IResourceProvider httpResourceProvider,
 			IResourceProvider fileResourceProvider)
 		{
 			HttpResourceProvider = httpResourceProvider;
-			CookieContainer = (httpResourceProvider as HttpResourceProvider)?.CookieContainer;
 			FileResourceProvider = fileResourceProvider;
 		}
 
@@ -48,19 +42,9 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public Task<IResource> SendRequestAsync(Request req)
 		{
-			OnRequest?.Invoke(req.Url);
-
 			var provider = GetResourceProvider(req.Url);
 
-			return provider.SendRequestAsync(req).ContinueWith(t =>
-					{
-						try
-						{
-							Received?.Invoke(this, new ReceivedEventArguments(req, t.Result));
-						}
-						catch { }
-						return t.Result;
-					});
+			return provider.SendRequestAsync(req);
 		}
 	}
 

@@ -1031,8 +1031,8 @@ dispatchEvent(evt);");
 			
 			engine.Document.Get<HtmlButtonElement>("button").First().Click();
 			
-			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/logout");
 			Assert.AreEqual("logout", engine.WaitId("d").InnerHTML);
+			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/logout");
 		}
 
 		[Test]

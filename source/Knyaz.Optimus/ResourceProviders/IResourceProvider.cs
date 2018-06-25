@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
@@ -12,6 +13,7 @@ namespace Knyaz.Optimus.ResourceProviders
         public readonly Dictionary<string, string> Headers;
         public int Timeout { get; set; }
         public byte[] Data;
+        public CookieContainer Cookies;
 
         public Request(Uri url) => Url = url;
 
