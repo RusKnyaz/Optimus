@@ -183,6 +183,7 @@ namespace Knyaz.Optimus
 		{
 			var req = new Request(method, LinkProvider.MakeUri(uri));
 			req.Headers["User-Agent"] = Window.Navigator.UserAgent;
+			req.Cookies = _cookieContainer;
 			return req;
 		}
 		

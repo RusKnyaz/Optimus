@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
@@ -463,6 +466,36 @@ function reqListener () {
 			engine.OpenUrl($"data:text/html;base64,{htmlCode}").Wait();
 			
 			Assert.AreEqual("HELLO", engine.Document.Body.TextContent);
+		}
+
+		[Test]
+		public void SendCookies()
+		{
+			var index = "<html><head><script>document.cookie = 'name=ivan'</script><script src='test.js'/>";
+			var script = "console.log(document.cookie)";
+			
+			var requests = new List<Request>();
+
+			var resourceProvider = Mock.Of<IResourceProvider>();
+			Mock.Get(resourceProvider).Setup(x => x.SendRequestAsync(It.IsAny<Request>()))
+				.Returns<Request>(req =>
+				{
+					requests.Add(req);
+					return Task.Run(() =>
+						req.Url.ToString() == "http://localhost/"
+							? new Response("text/html", new MemoryStream(Encoding.UTF8.GetBytes(index)))
+							: req.Url.ToString() == "http://localhost/test.js"
+								? new Response("text/html", new MemoryStream(Encoding.UTF8.GetBytes(script)))
+								: (IResource) null);
+				});
+
+			var engine = new Engine(resourceProvider);
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(2, requests.Count, "requests count");
+			Assert.IsNotNull(requests[1].Cookies);
+			Assert.AreEqual(1, requests[1].Cookies.Count);
+			Assert.AreEqual("ivan", requests[1].Cookies.GetCookies(new Uri("http://localhost/"))["name"].Value);
 		}
 
 		[Test]
