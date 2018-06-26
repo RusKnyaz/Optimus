@@ -43,7 +43,7 @@ namespace Knyaz.Optimus.WfApp.Controls
 				try
 				{
 					Cursor.Current = Cursors.WaitCursor;
-					await Engine.OpenUrl(textBoxUrl.Text);
+					new Thread(() => Engine.OpenUrl(textBoxUrl.Text)).Start();
 					Cursor.Current = DefaultCursor;
 				}
 				catch (Exception ex)

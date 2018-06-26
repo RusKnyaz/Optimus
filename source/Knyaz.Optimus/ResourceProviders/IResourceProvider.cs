@@ -33,7 +33,12 @@ namespace Knyaz.Optimus.ResourceProviders
             && ((Headers == null && other.Headers == null)
             || (Headers.Count == other.Headers.Count 
             && Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]))));
-    }
+
+		public override string ToString()
+		{
+			return Method + " " + Url.ToString();
+		}
+	}
 
     
     /// <summary>
