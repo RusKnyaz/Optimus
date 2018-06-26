@@ -233,7 +233,7 @@ namespace Knyaz.Optimus
 
 			var html = HtmlParser.Parse(stream).ToList();
 
-			if (ResourceProvider is PredictedResourceProvider resourceProvider)
+			if (ResourceProvider is IPredictedResourceProvider resourceProvider)
 			{
 				foreach (var src in html.OfType<IHtmlElement>()
 					.Flat(x => x.Children.OfType<IHtmlElement>())

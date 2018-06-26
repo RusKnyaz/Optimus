@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	internal class PredictedResourceProvider : IResourceProvider
+	internal class PredictedResourceProvider : IPredictedResourceProvider
 	{
 		private readonly ConcurrentDictionary<Request, Task<IResource>> _preloadedResources
         			= new ConcurrentDictionary<Request, Task<IResource>>();
@@ -31,5 +31,10 @@ namespace Knyaz.Optimus.ResourceProviders
 		}
 
 		public void Clear() => _preloadedResources.Clear();
+	}
+
+	public interface IPredictedResourceProvider : IResourceProvider
+	{
+		void Preload(Request request);
 	}
 }

@@ -47,7 +47,7 @@ namespace Knyaz.Optimus.ResourceProviders
 				resourceProvider = new NotifyingResourceProvider(resourceProvider, _onRequset, _onResponse);
             
 			return _usePrediction
-				? (IResourceProvider) new PredictedResourceProvider(resourceProvider)
+				? new PredictedResourceProvider(resourceProvider)
 				: resourceProvider;
 		}
 	}

@@ -508,5 +508,30 @@ function reqListener () {
 
 			Assert.AreEqual(HttpStatusCode.NotFound, result.HttpStatusCode);
 		}
+
+		[Test]
+		public void PreloadResourceUsingPredictedResourceProvider()
+		{
+			var prerequests = new List<Request>();
+			var index = "<html><head><script src='test.js'/>";
+			var script = "console.log('hi')";
+			
+			var resourceProvider = Mock.Of<IPredictedResourceProvider>();
+			Mock.Get(resourceProvider).Setup(x => x.SendRequestAsync(It.IsAny<Request>()))
+				.Returns<Request>(req => Task.Run(() =>
+					req.Url.ToString() == "http://localhost/"
+						? new Response("text/html", new MemoryStream(Encoding.UTF8.GetBytes(index)))
+						: req.Url.ToString() == "http://localhost/test.js"
+							? new Response("text/html", new MemoryStream(Encoding.UTF8.GetBytes(script)))
+							: (IResource) null));
+			
+			Mock.Get(resourceProvider).Setup(x => x.Preload(It.IsAny<Request>())).Callback<Request>(req => prerequests.Add(req));
+			
+			var engine = new Engine(resourceProvider);
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(1, prerequests.Count);
+			Assert.Greater(prerequests[0].Headers.Count, 0);
+		}
 	}
 }
