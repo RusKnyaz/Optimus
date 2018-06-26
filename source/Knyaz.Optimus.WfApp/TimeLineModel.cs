@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.WfApp
 {
@@ -16,18 +17,18 @@ namespace Knyaz.Optimus.WfApp
 		/// <returns></returns>
 		public static Action SubscribeTimeLine(this Engine engine, Action<TimePoint> action)
 		{
-			var requestHandler = (Action<Uri>)(s => action(new TimePoint
+			var requestHandler = (Action<Request>)(s => action(new TimePoint
 			{
 				DateTime = DateTime.Now,
 				EventType = TimeLineEvents.Request,
-				ResourceId = s.ToString()
+				ResourceId = s.Url.ToString()
 			}));
 
-			var receivedHandler = (Action<Uri>)(s => action(new TimePoint
+			var receivedHandler = (Action<ReceivedEventArguments>)(s => action(new TimePoint
 			{
 				DateTime = DateTime.Now,
 				EventType = TimeLineEvents.Received,
-				ResourceId = s.ToString()
+				ResourceId = s.Request.Url.ToString()
 			}));
 
 			var beforeScriptExecute = (Action<Script>)(s =>
@@ -112,8 +113,8 @@ namespace Knyaz.Optimus.WfApp
 				});
 			});
 
-			engine.ResourceProvider.OnRequest += requestHandler;
-			engine.ResourceProvider.OnRequest += receivedHandler;
+			engine.OnRequest += requestHandler;
+			engine.OnResponse += receivedHandler;
 			curScripting = engine.Scripting;
 			engine.DocumentChanged += documentChanged;
 
@@ -123,8 +124,8 @@ namespace Knyaz.Optimus.WfApp
 
 			return () =>
 			{
-				engine.ResourceProvider.OnRequest -= requestHandler;
-				engine.ResourceProvider.OnRequest -= receivedHandler;
+				engine.OnRequest -= requestHandler;
+				engine.OnResponse -= receivedHandler;
 				engine.DocumentChanged -= documentChanged;
 				engine.Window.Timers.OnExecuting -= timerExecuting;
 				engine.Window.Timers.OnExecuted -= timerExecuted;

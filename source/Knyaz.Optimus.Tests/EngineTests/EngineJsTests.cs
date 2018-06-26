@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
@@ -15,37 +14,41 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	public class EngineJsTests
 	{
 		private List<object> _log;
-		private Engine _engine;
-		private IResourceProvider _resourceProvider;
+		private List<string> _alerts = new List<string>();
 
-		[SetUp]
-		public void SetUp()
-		{
-			_log = new List<object>();
-			_resourceProvider = Mock.Of<IResourceProvider>();
-			_engine = new Engine(_resourceProvider);
-			_engine.Console.OnLog += _log.Add;
-		}
 
 		private Engine CreateEngineWithScript(string js)
 		{
-			_engine.Load("<html><head><script>" + js + "</script></head></html>");
-			return _engine;
+			return Load("<html><head><script>" + js + "</script></head></html>");
 		}
 
-		private Engine CreateEngine(string body, string js)
+		private Engine Load(IResourceProvider resourceProvider)
 		{
-			_resourceProvider
-				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body>" + body + "</body></html>")
-				.Resource("http://localhost/test.js", js);
-			_engine.OpenUrl("http://localhost").Wait();
-			return _engine;
+			var engine = new Engine(resourceProvider);
+			_log = engine.Console.ToList();
+			engine.Window.OnAlert += msg => _alerts.Add(msg);
+			engine.OpenUrl("http://localhost").Wait();
+			return engine;
+		}
+		
+		private Engine Load(string html) => Load(Mock.Of<IResourceProvider>()
+			.Resource("http://localhost", html));
+
+		private Engine Load(string body, string js)
+		{
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://localhost", "<html>"+(js != null ? "<head><script src='test.js' defer/></head>" : "")+"<body>" + body + "</body></html>");
+			
+			if(js != null)
+				resourceProvider = resourceProvider.Resource("http://localhost/test.js", js);
+
+			return Load(resourceProvider);
 		}
 
 		[Test]
 		public void StoreValueInElement()
 		{
-			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
 e.someVal = 'x';
 console.log(e.someVal == 'x');
@@ -58,7 +61,7 @@ console.log(e2.someVal == 'x');");
 		[Test]
 		public void PassElementValueToClr()
 		{
-			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
 e.someVal = 'x';
 console.log(e.someVal);");
@@ -69,7 +72,7 @@ console.log(e.someVal);");
 		[Test]
 		public void SetInnerHtml()
 		{
-			var engine = CreateEngine("<div id='d'></div>",
+			var engine = Load("<div id='d'></div>",
 				@"var e = document.getElementById('d');
 console.log(e.hasChildNodes);
 e.innerHTML = '<h1>1</h1><h2>2</h2><h3>3</h3>';
@@ -80,7 +83,7 @@ console.log(e.hasChildNodes);");
 		[Test]
 		public void NodeTest()
 		{
-			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
 console.log(e != null);
 console.log(e == document.getElementById('d'));
@@ -100,7 +103,7 @@ console.log(e.getAttribute('id'));");
 		[Test]
 		public void NodeAddEventListenerTest()
 		{
-			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
 console.log(e.addEventListener != null);
 console.log(e.removeEventListener != null);
@@ -116,7 +119,7 @@ e.dispatchEvent(ev);");
 		[Test]
 		public void EventSubscribeTests()
 		{
-			var engine = CreateEngine("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
+			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
 var handler = function(){console.log('click');};
 e.onclick = handler;
@@ -176,7 +179,7 @@ console.log(e.appendChild != null);");
 		[Test]
 		public void GetElementsByTagName()
 		{
-			var engine = CreateEngine("<div id='d'></div><div></div><span></span>",
+			var engine = Load("<div id='d'></div><div></div><span></span>",
 				@"var elems = document.body.getElementsByTagName('div');
 console.log(elems.length);");
 
@@ -186,7 +189,7 @@ console.log(elems.length);");
 		[Test]
 		public void ChildNodes()
 		{
-			var engine = CreateEngine("<div id='d'></div><div></div><span></span>",
+			var engine = Load("<div id='d'></div><div></div><span></span>",
 				@"var elems = document.body.childNodes;
 console.log(elems.length);
 console.log(elems[0] != null);");
@@ -236,7 +239,7 @@ console.log(navigator.userAgent);");
 		[Test]
 		public void SetChildNode()
 		{
-			var engine = CreateEngine("<div id='a'><span></span></div>",
+			var engine = Load("<div id='a'><span></span></div>",
 				@"var d = document.getElementById('a');
 d.childNodes[0] = document.createElement('p');
 console.log(d.childNodes[0].tagName);");
@@ -248,7 +251,7 @@ console.log(d.childNodes[0].tagName);");
 		[Test]
 		public void StyleOfCustom()
 		{
-			var engine = CreateEngine("<span id='content1' style='width:100pt; heigth:100pt'></span>",
+			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
 				@"var style = document.createElement('bootstrap').style;
 console.log(style ? 'ok' : 'null');");
 			CollectionAssert.AreEqual(new[] {"ok"}, _log);
@@ -257,7 +260,7 @@ console.log(style ? 'ok' : 'null');");
 		[Test]
 		public void StyleRead()
 		{
-			var engine = CreateEngine("<span id='content1' style='width:100pt; heigth:100pt'></span>",
+			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
 				@"var style = document.getElementById('content1').style;
 console.log(style.getPropertyValue('width'));
 console.log(style[0]);
@@ -269,7 +272,7 @@ console.log(style['width']);");
 		[Test]
 		public void StyleWrite()
 		{
-			var engine = CreateEngine("<span id='content1' style='width:100pt; heigth:100pt'></span>",
+			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
 				@"var style = document.getElementById('content1').style;
 style['width'] = '200pt';
 console.log(style['width']);");
@@ -280,19 +283,14 @@ console.log(style['width']);");
 		[Test]
 		public void Location()
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org",
-				Mocks.Page("console.log(window.location.href);console.log(window.location.protocol);"));
-			var engine = new Engine(resourceProvider);
-			engine.Console.OnLog += x => _log.Add(x.ToString());
-			engine.OpenUrl("http://todosoft.org");
-			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[] {"http://todosoft.org/", "http:"}, _log);
+			Load("","console.log(window.location.href);console.log(window.location.protocol);");
+			CollectionAssert.AreEqual(new[] {"http://localhost/", "http:"}, _log);
 		}
 
 		[Test]
 		public void HistoryExist()
 		{
-			var engine = CreateEngine("", @"console.log(history != null);console.log(window.history != null);");
+			var engine = Load("", @"console.log(history != null);console.log(window.history != null);");
 			engine.Console.OnLog += x => _log.Add(x.ToString());
 			
 			CollectionAssert.AreEqual(new[] { true, true }, _log);
@@ -301,7 +299,7 @@ console.log(style['width']);");
 		[Test]
 		public void HistoryPushState()
 		{
-			var engine = CreateEngine("",@"window.history.pushState(null, null, 'a.html');");
+			var engine = Load("",@"window.history.pushState(null, null, 'a.html');");
 
 			Assert.AreEqual("http://localhost/a.html", engine.Uri.AbsoluteUri);
 		}
@@ -331,9 +329,6 @@ console.log(style['width']);");
 					       "window.location.href = 'http://todosoft.org/sub';"))
 				.Resource("http://todosoft.org/sub", Mocks.Page("console.log(document.cookie);"));
 
-			var cookie = new CookieContainer();
-			Mock.Get(resourceProvider).SetupGet(x => x.CookieContainer).Returns(cookie);
-			
 			var engine = new Engine(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://todosoft.org").Wait();
@@ -346,7 +341,7 @@ console.log(style['width']);");
 		[Test]
 		public void XmlHttpRequestCtor()
 		{
-			CreateEngine("", @"var xhr = new XMLHttpRequest();
+			Load("", @"var xhr = new XMLHttpRequest();
 console.log(xhr.UNSENT);
 console.log(xhr.OPENED);
 console.log(xhr.HEADERS_RECEIVED);
@@ -365,8 +360,8 @@ console.log(xhr.readyState);");
 		[Test]
 		public void Ajax()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>();
-			resourceProvider.Resource("http://localhost/unicorn.xml", "hello");
+			var resourceProvider = Mock.Of<IResourceProvider>()
+				.Resource("http://localhost/unicorn.xml", "hello");
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
@@ -391,7 +386,7 @@ client.send();"));
 
 			Thread.Sleep(1000);
 
-			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<HttpRequest>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once());
 			CollectionAssert.AreEqual(new[] {"1", "4", "200", "hello"}, log);
 		}
 
@@ -493,7 +488,7 @@ script.onload = function(){ console.log(this.someData); };
 		[Test]
 		public void InstanceOfHtmlElement()
 		{
-			var engine = CreateEngine("<div id='d'></div>",
+			var engine = Load("<div id='d'></div>",
 				@"
 console.log(document.body instanceof String);
 console.log(document.body instanceof Element);
@@ -505,7 +500,7 @@ console.log(document.body instanceof HTMLElement);");
 		[Test]
 		public void AttributesTest()
 		{
-			var engine = CreateEngine("<div id='d'></div>",
+			var engine = Load("<div id='d'></div>",
 				@"
 console.log(document.getElementById('d').attributes['id'].name);
 console.log(document.getElementById('d').attributes[0].name);");
@@ -516,7 +511,7 @@ console.log(document.getElementById('d').attributes[0].name);");
 		[Test, Description("The sample come from jquer source code")]
 		public void PushApply()
 		{
-			var engine = CreateEngine("<div></div>", @"var arr = [];
+			var engine = Load("<div></div>", @"var arr = [];
 var push = arr.push;
 var slice = arr.slice;
 var preferredDoc = document;
@@ -531,7 +526,7 @@ console.log(arr[ preferredDoc.childNodes.length ].nodeType);");
 		[Test]
 		public void ArrayPush()
 		{
-			var engine = CreateEngine("<div></div>", @"var arr = [];
+			var engine = Load("<div></div>", @"var arr = [];
 arr.push('x');
 console.log(arr.length);");
 			CollectionAssert.AreEqual(new object[] {1}, _log);
@@ -540,7 +535,7 @@ console.log(arr.length);");
 		[Test]
 		public void SliceCall()
 		{
-			var engine = CreateEngine("<div></div>", @"var arr = ['a'];
+			var engine = Load("<div></div>", @"var arr = ['a'];
 console.log(arr.slice().length);
 console.log([].slice.call(arr).length);");
 			CollectionAssert.AreEqual(new object[] {1, 1}, _log);
@@ -549,7 +544,7 @@ console.log([].slice.call(arr).length);");
 		[Test]
 		public void ChildNodesSlice()
 		{
-			var engine = CreateEngine("<div></div>", @"
+			var engine = Load("<div></div>", @"
 console.log(document.body.childNodes.length);
 console.log([].slice.call(document.body.childNodes).length);");
 			CollectionAssert.AreEqual(new object[] {1, 1}, _log);
@@ -558,7 +553,7 @@ console.log([].slice.call(document.body.childNodes).length);");
 		[Test]
 		public void ResizeArray()
 		{
-			var engine = CreateEngine("<div></div>", @"var arr = [];
+			var engine = Load("<div></div>", @"var arr = [];
 arr.length = 8;
 console.log(arr.length);");
 			CollectionAssert.AreEqual(new object[] {8}, _log);
@@ -567,7 +562,7 @@ console.log(arr.length);");
 		[Test]
 		public void ShiftArray()
 		{
-			var engine = CreateEngine("<div></div>", @"var arr = [1,2];
+			var engine = Load("<div></div>", @"var arr = [1,2];
 arr.shift();
 console.log(arr[0]);");
 			CollectionAssert.AreEqual(new object[] {2}, _log);
@@ -577,41 +572,32 @@ console.log(arr[0]);");
 		[Test]
 		public void DocumentBody()
 		{
-			_resourceProvider
-				.Resource("http://localhost", "<html><head><script src='test.js'/></head><body>HI</body></html>")
-				.Resource("http://localhost/test.js",
-				"document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
-			_engine.OpenUrl("http://localhost").Wait();
+			Load("HI", "document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
 			CollectionAssert.AreEqual(new[] {"hi"}, _log);
 		}
 
 		[Test]
 		public void Splice()
 		{
-			_resourceProvider
-				.Resource("http://localhost","<html><head><script src='test.js'/></head><body>HI</body></html>")
-				.Resource("http://localhost/test.js", "var x = [1,2,3]; x.splice(1,0,4);console.log(x);");
-			_engine.OpenUrl("http://localhost").Wait();
+			Load("HI", "var x = [1,2,3]; x.splice(1,0,4);console.log(x);");
 			CollectionAssert.AreEqual(new[] {1, 4, 2, 3}, _log[0] as object[]);
 		}
 
 		[Test]
 		public void GetElementsByClassName()
 		{
-
-			_engine.Load("<html><body>" +
-				"<div class='a' id='d1'></div>" +
-				"<div class = 'b' id = 'd2'></div>" +
-				"<div class='a b' id='d3'></div><script>console.log(document.getElementsByClassName('a').length);</script></body></html>");
-
+			Load("<html><body>" +
+			     "<div class='a' id='d1'></div>" +
+			     "<div class = 'b' id = 'd2'></div>" +
+			     "<div class='a b' id='d3'></div><script>console.log(document.getElementsByClassName('a').length);</script></body></html>");
+			
 			CollectionAssert.AreEqual(new[] {2}, _log);
 		}
 
 		[Test]
 		public void GetElementsByClassNameToString()
 		{
-			_engine.Load(
-				"<html><head><script>console.log(document.getElementsByClassName.toString());</script></head><body></body></html>");
+			Load("<html><head><script>console.log(document.getElementsByClassName.toString());</script></head><body></body></html>");
 
 			CollectionAssert.AreEqual(new[] {"function getElementsByClassName() { [native code] }"}, _log);
 		}
@@ -619,16 +605,14 @@ console.log(arr[0]);");
 		[Test]
 		public void SetTimeout()
 		{
-			_engine.Load(
-				"<html><head><script>var x = setTimeout(function(){ console.log('called');});</script></head><body></body></html>");
+			Load("<html><head><script>var x = setTimeout(function(){ console.log('called');});</script></head><body></body></html>");
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "called" }, _log);
 		}
 		[Test]
 		public void ClearTimeout()
 		{
-			_engine.Load(
-				"<html><head><script>var x = setTimeout(function(){ console.log('called');}, 100);clearTimeout(x);</script></head><body></body></html>");
+			Load("<html><head><script>var x = setTimeout(function(){ console.log('called');}, 100);clearTimeout(x);</script></head><body></body></html>");
 			Thread.Sleep(100);
 			CollectionAssert.AreEqual(new object[0], _log);
 		}
@@ -636,8 +620,7 @@ console.log(arr[0]);");
 		[Test]
 		public void SetInterval()
 		{
-			_engine.Load(
-				"<html><head><script>var x = setInterval(function(){ console.log('called'); clearInterval(x);});</script></head><body></body></html>");
+			Load("<html><head><script>var x = setInterval(function(){ console.log('called'); clearInterval(x);});</script></head><body></body></html>");
 			Thread.Sleep(100);
 			CollectionAssert.AreEqual(new[]{"called"}, _log);
 		}
@@ -645,14 +628,13 @@ console.log(arr[0]);");
 		[Test]
 		public void ClearInterval()
 		{
-			_engine.Load(
-				"<html><head><script>var x = setInterval(function(){}, 1000); clearInterval(x);</script></head><body></body></html>");
+			Load("<html><head><script>var x = setInterval(function(){}, 1000); clearInterval(x);</script></head><body></body></html>");
 		}
 
 		[Test]
 		public void ResponseHeadersRegEx()
 		{
-			_engine.Load(@"<html><head><script>
+			Load(@"<html><head><script>
 var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
 var headersString = 'X-AspNetMvc-Version: 4.0\nX-Powered-By: ASP.NET\n\n';
 while ( match = rheaders.exec( headersString ) ) { 
@@ -670,7 +652,7 @@ console.log(match[ 2 ]);
 		[Test]
 		public void ResponseHeadersRegExBug()
 		{
-			_engine.Load(@"<html><head><script>
+			Load(@"<html><head><script>
 var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
 var headersString = 'X-AspNetMvc-Version: 4.0\r\nX-Powered-By: ASP.NET\r\n\r\n';
 while ( match = rheaders.exec( headersString ) ) { 
@@ -690,7 +672,7 @@ console.log(match[ 2 ]);
 		[Test]
 		public void ShiftMatchResult()
 		{
-			var engine = CreateEngine("<div></div>",
+			var engine = Load("<div></div>",
 				@"var match = /quick\s(brown).+?(jumps)/ig.exec('The Quick Brown Fox Jumps Over The Lazy Dog');
 match.shift();
 console.log(match[0]);");
@@ -700,30 +682,28 @@ console.log(match[0]);");
 		[Test]
 		public void AlertTest()
 		{
-			string alert = null;
-			_engine.Window.OnAlert += s => { alert = s; };
-			CreateEngine("<div></div>", @"alert('HI');");
-			Assert.AreEqual("HI", alert);
+			Load("<div></div>", @"alert('HI');");
+			Assert.AreEqual(new[]{"HI"}, _alerts);
 		}
 
 		[Test]
 		public void GlobalFuncEquality()
 		{
-			CreateEngine("<div></div>", @"console.log(alert == alert);console.log(setInterval == setInterval);");
+			Load("<div></div>", @"console.log(alert == alert);console.log(setInterval == setInterval);");
 			CollectionAssert.AreEqual(new object[] {true, true}, _log);
 		}
 
 		[Test]
 		public void ClrFuncEquality()
 		{
-			CreateEngine("<div id=d></div>", @"var d = document.getElementById('d');  console.log(d.appendChild == d.appendChild);");
+			Load("<div id=d></div>", @"var d = document.getElementById('d');  console.log(d.appendChild == d.appendChild);");
 			CollectionAssert.AreEqual(new object[] { true }, _log);
 		}
 
 		[Test]
 		public void WindowApi()
 		{
-			CreateEngine("<div></div>", @"console.log(window.setTimeout != null);
+			Load("<div></div>", @"console.log(window.setTimeout != null);
 console.log(window.clearTimeout != null);
 console.log(window.addEventListener != null);
 console.log(window.removeEventListener != null);
@@ -737,7 +717,7 @@ console.log(window.clearInterval != null);");
 		[Test]
 		public void WindowAddEventListener()
 		{
-			CreateEngine("<div id=d></div>", @"
+			Load("<div id=d></div>", @"
 var listener = function(){console.log('ok');};
 addEventListener('click', listener, true);
 var evt = document.createEvent('Event');
@@ -750,7 +730,7 @@ dispatchEvent(evt);");
 		[Test]
 		public void WindowAddEventListenerNotBoolArg()
 		{
-			CreateEngine("<div id=d></div>", @"
+			Load("<div id=d></div>", @"
 var listener = function(){console.log('ok');};
 addEventListener('click', listener, 1);
 var evt = document.createEvent('Event');
@@ -763,7 +743,7 @@ dispatchEvent(evt);");
 		[Test]
 		public void WindowRemoveEventListener()
 		{
-			CreateEngine("<div id=d></div>", @"
+			Load("<div id=d></div>", @"
 var listener = function(){console.log('ok');};
 addEventListener('click', listener, true);
 removeEventListener('click', listener, true);
@@ -777,21 +757,21 @@ dispatchEvent(evt);");
 		[Test]
 		public void SelectZeroLength()
 		{
-			CreateEngine("<select id=s></select>", "console.log(document.getElementById('s').length);");
+			Load("<select id=s></select>", "console.log(document.getElementById('s').length);");
 			CollectionAssert.AreEqual(new []{0.0}, _log);
 		}
 
 		[Test]
 		public void SelectLength()
 		{
-			CreateEngine("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
+			Load("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
 			CollectionAssert.AreEqual(new[] { 1.0 }, _log);
 		}
 
 		[Test]
 		public void SelectOptionsItem()
 		{
-			CreateEngine("<select id=s><option id=X/></select>", "console.log(document.getElementById('s').options.Item(0).Id);" +
+			Load("<select id=s><option id=X/></select>", "console.log(document.getElementById('s').options.Item(0).Id);" +
 																 "console.log(document.getElementById('s').options[0].Id);");
 			CollectionAssert.AreEqual(new[] { "X","X" }, _log);
 		}
@@ -799,47 +779,49 @@ dispatchEvent(evt);");
 		[Test]
 		public void ApplyToJsFunc()
 		{
-			CreateEngine("", "function log(x){console.log(x);} log.apply(console, ['asd']);");
+			Load("", "function log(x){console.log(x);} log.apply(console, ['asd']);");
 			CollectionAssert.AreEqual(new[] { "asd" }, _log);
 		}
 
 		[Test]
 		public void ApplyToClrFunc()
 		{
-			CreateEngine("", "console.log.apply(console, ['asd']);");
+			Load("", "console.log.apply(console, ['asd']);");
 			CollectionAssert.AreEqual(new[] { "asd" }, _log);
 		}
 
 		[Test]
 		public void Self()
 		{
-			CreateEngine("", "console.log(self == window);");
+			Load("", "console.log(self == window);");
 			CollectionAssert.AreEqual(new[] { true }, _log);
 		}
 
 		[Test]
 		public void OverrideSelf()
 		{
-			CreateEngine("", "self = 'a'; console.log(self);");
+			Load("", "self = 'a'; console.log(self);");
 			CollectionAssert.AreEqual(new[] { "a" }, _log);
 		}
 
 		[Test]
 		public void GetComputedStyle()
 		{
-			_resourceProvider
+			var resourceProvider = Mock.Of<IResourceProvider>()
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id=d></div></body></html>")
 				.Resource("http://localhost/test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
-												  "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
-			_engine.ComputedStylesEnabled = true;
-			_engine.OpenUrl("http://localhost").Wait();
-			CollectionAssert.AreEqual(new[] { "block", "block" }, _log);
+				 				                                       "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.ComputedStylesEnabled = true;
+			engine.OpenUrl("http://localhost").Wait();
+			CollectionAssert.AreEqual(new[] { "block", "block" }, log);
 		}
 
 		[Test]
 		public void SetStyleNumericValue()
 		{
-			CreateEngine("<div id=d></div>", 
+			Load("<div id=d></div>", 
 				"var d = document.getElementById('d');" +
 				"d.style['zoom'] = 1;" +
 				"console.log(d.style['zoom'] == 1);" +
@@ -851,14 +833,14 @@ dispatchEvent(evt);");
 		[Test]
 		public void UndefinedTest()
 		{
-			CreateEngine("", "var data; if(data !== undefined) {console.log('a');}else{console.log('b');}");
+			Load("", "var data; if(data !== undefined) {console.log('a');}else{console.log('b');}");
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
 
 		[Test]
 		public void OnLoad()
 		{
-			_engine.Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad()'></body></html>");
+			Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad()'></body></html>");
 			
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
@@ -866,7 +848,7 @@ dispatchEvent(evt);");
 		[Test]
 		public void CompareWithThis()
 		{
-			CreateEngine("<div></div>", @"console.log({}===this);");
+			Load("<div></div>", @"console.log({}===this);");
 			CollectionAssert.AreEqual(new object[] {false}, _log);
 		}
 
@@ -1049,8 +1031,8 @@ dispatchEvent(evt);");
 			
 			engine.Document.Get<HtmlButtonElement>("button").First().Click();
 			
-			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/logout");
 			Assert.AreEqual("logout", engine.WaitId("d").InnerHTML);
+			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/logout");
 		}
 
 		[Test]

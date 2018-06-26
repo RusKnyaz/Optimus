@@ -24,11 +24,6 @@ namespace Knyaz.Optimus
 		internal LinkProvider LinkProvider = new LinkProvider();
 		
 		/// <summary>
-		/// Simplified resources access (sum of ResourceProvider and LinkProvider).
-		/// </summary>
-		private readonly CommonResourceProvider _commonResourceProvider;
-		
-		/// <summary>
 		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
 		/// </summary>
 		public IResourceProvider ResourceProvider { get; }
@@ -43,31 +38,41 @@ namespace Knyaz.Optimus
 		/// </summary>
 		public DocumentScripting Scripting	{get; private set;}
 		internal DocumentStyling Styling { get; private set; }
-
+	
 		/// <summary>
 		/// Gets the browser's console object.
 		/// </summary>
-		public Console Console { get; private set; }
+		public Console Console { get; }
 		
 		/// <summary>
 		/// Gets the current Window object.
 		/// </summary>
-   	public Window Window { get; private set; }
+		public Window Window { get; }
 
+		readonly CookieContainer _cookieContainer;
+
+		
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine() : this(new ResourceProviderBuilder().UsePrediction().Http().Build()) { }
-
-		public Engine(IResourceProvider resourceProvider)
+		public Engine(IResourceProvider resourceProvider = null)
 		{
+			if (resourceProvider == null)
+				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
+					.Notify(request => OnRequest?.Invoke(request), response => OnResponse?.Invoke(response))
+					.Build();
+			
 			ResourceProvider = resourceProvider;
-			_commonResourceProvider = new CommonResourceProvider(resourceProvider, LinkProvider, () => Window.Navigator.UserAgent);
+			_cookieContainer = new CookieContainer();
+			
 			Console = new Console();
 			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
 		}
+
+		public event Action<Request> OnRequest;
+		public event Action<ReceivedEventArguments> OnResponse;
 
 		/// <summary>
 		/// Occurs when window.open method called.
@@ -105,11 +110,12 @@ namespace Knyaz.Optimus
 				
 				if (_document != null)
 				{
-					Scripting = new DocumentScripting (_document, ScriptExecutor,_commonResourceProvider.GetResourceAsync);
+					Scripting = new DocumentScripting (_document, ScriptExecutor, 
+						s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
 					
-					Document.CookieContainer = ResourceProvider.CookieContainer;
+					Document.CookieContainer = _cookieContainer;
 
 					if (_computedStylesEnabled)
 					{
@@ -120,6 +126,8 @@ namespace Knyaz.Optimus
 				DocumentChanged?.Invoke();
 			}
 		}
+		
+		
 
 		private void OnNodeException(Node node, Exception exception) =>
 			Console.Log("Node event handler exception: " + exception.Message);
@@ -161,8 +169,8 @@ namespace Knyaz.Optimus
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
 			Document = new Document(Window);
-			LinkProvider.Root = GetRoot(Uri);
-			var response = await _commonResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
+			LinkProvider.Root = Uri.GetRoot();
+			var response = await ResourceProvider.SendRequestAsync(CreateRequest(path));
 			
 			LoadFromResponse(Document, response);
 
@@ -171,16 +179,14 @@ namespace Knyaz.Optimus
 				: new Page(Document);
 		}
 
-		private string GetRoot(Uri uri)
+		internal Request CreateRequest(string uri, string method = "GET")
 		{
-			var root =Uri.GetLeftPart(UriPartial.Path);
-			var ur = new Uri(root);
-			if (ur.PathAndQuery != null && !ur.PathAndQuery.Contains('.') && ur.PathAndQuery.Last() != '/')
-				return root + "/";
-
-			return root;
+			var req = new Request(method, LinkProvider.MakeUri(uri));
+			req.Headers["User-Agent"] = Window.Navigator.UserAgent;
+			req.Cookies = _cookieContainer;
+			return req;
 		}
-
+		
 		/// <summary>
 		/// Occurs before the document being loaded from response. 
 		/// Can be used to handle non-html response types.
@@ -227,7 +233,7 @@ namespace Knyaz.Optimus
 
 			var html = HtmlParser.Parse(stream).ToList();
 
-			if (ResourceProvider is PredictedResourceProvider resourceProvider)
+			if (ResourceProvider is IPredictedResourceProvider resourceProvider)
 			{
 				foreach (var src in html.OfType<IHtmlElement>()
 					.Flat(x => x.Children.OfType<IHtmlElement>())
@@ -236,7 +242,7 @@ namespace Knyaz.Optimus
 					.Where(x => !string.IsNullOrEmpty(x))
 					)
 				{
-					resourceProvider.Preload(LinkProvider.MakeUri(src));
+					resourceProvider.Preload(CreateRequest(src));
 				}
 
 				if (ComputedStylesEnabled)
@@ -248,7 +254,7 @@ namespace Knyaz.Optimus
 					.Select(x => x.Attributes["href"])
 					.Where(x => !string.IsNullOrEmpty(x)))
 					{
-						resourceProvider.Preload(LinkProvider.MakeUri(src));
+						resourceProvider.Preload(CreateRequest(src));
 					}
 				}
 			}
@@ -288,7 +294,7 @@ namespace Knyaz.Optimus
 
 		private void EnableDocumentStyling()
 		{
-			Styling = new DocumentStyling(_document, _commonResourceProvider.GetResourceAsync);
+			Styling = new DocumentStyling(_document, s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
 			Styling.LoadDefaultStyles();
 		}
 

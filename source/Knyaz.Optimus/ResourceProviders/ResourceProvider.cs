@@ -5,26 +5,23 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+	/// <summary>
+	/// Redirects requests to resource provider that connected with specified protocol. 
+	/// </summary>
 	internal class ResourceProvider : IResourceProvider
 	{
-		public event Action<Uri> OnRequest;
-		public event EventHandler<ReceivedEventArguments> Received;
-		
-		public CookieContainer CookieContainer { get; } 
-
-		public ResourceProvider(ISpecResourceProvider httpResourceProvider,
-			ISpecResourceProvider fileResourceProvider)
+		public ResourceProvider(IResourceProvider httpResourceProvider,
+			IResourceProvider fileResourceProvider)
 		{
 			HttpResourceProvider = httpResourceProvider;
-			CookieContainer = (httpResourceProvider as HttpResourceProvider)?.CookieContainer;
 			FileResourceProvider = fileResourceProvider;
 		}
 
-		private ISpecResourceProvider DataResourceProvider { get; } = new DataResourceProvider();
-		protected ISpecResourceProvider FileResourceProvider { get; }
-		public ISpecResourceProvider HttpResourceProvider { get; }
+		private IResourceProvider DataResourceProvider { get; } = new DataResourceProvider();
+		protected IResourceProvider FileResourceProvider { get; }
+		public IResourceProvider HttpResourceProvider { get; }
 
-		private ISpecResourceProvider GetResourceProvider(Uri u)
+		private IResourceProvider GetResourceProvider(Uri u)
 		{
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
 
@@ -43,28 +40,11 @@ namespace Knyaz.Optimus.ResourceProviders
 			}
 		}
 
-		public IRequest CreateRequest(Uri uri)
+		public Task<IResource> SendRequestAsync(Request req)
 		{
-			var resourceProvider = GetResourceProvider(uri);
-			return resourceProvider.CreateRequest(uri);
-		}
-		
-
-		public Task<IResource> SendRequestAsync(IRequest req)
-		{
-			OnRequest?.Invoke(req.Url);
-
 			var provider = GetResourceProvider(req.Url);
 
-			return provider.SendRequestAsync(req).ContinueWith(t =>
-					{
-						try
-						{
-							Received?.Invoke(this, new ReceivedEventArguments(req, t.Result));
-						}
-						catch { }
-						return t.Result;
-					});
+			return provider.SendRequestAsync(req);
 		}
 	}
 

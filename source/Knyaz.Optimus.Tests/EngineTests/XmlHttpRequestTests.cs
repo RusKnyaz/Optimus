@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Security.Cryptography;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
@@ -14,7 +16,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var sync = new Object();
 			var resourceProvider = Mocks.ResourceProvider("http://data", new byte[] {10, 1, 0});
-			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, new LinkProvider());
+			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, (s, s1) => new Request(s1, UriHelper.GetUri(s)));
 
 			xhr.Open("GET", "http://data", false);
 			xhr.ResponseType = "arraybuffer";
@@ -68,7 +70,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var sync = new Object();
 			var resourceProvider = Mocks.ResourceProvider("http://data", data);
-			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, new LinkProvider());
+			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, (s, s1) => new Request(s1, UriHelper.GetUri(s)));
 
 			xhr.Open("GET", "http://data", false);
 			xhr.ResponseType = type;

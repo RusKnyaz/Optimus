@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Xml.Linq;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
+// ReSharper disable InconsistentNaming
 
 namespace Knyaz.Optimus.Dom
 {
@@ -16,13 +16,15 @@ namespace Knyaz.Optimus.Dom
 	/// https://xhr.spec.whatwg.org/
 	/// </summary>
 	[DomItem]
-	public class XmlHttpRequest 
+	public class XmlHttpRequest
 	{
+		private readonly Func<Stream,object> _parseJsonFn;
+		private readonly Func<string, string, Request> _requestFn;
 		private readonly IResourceProvider _resourceProvider;
 		private readonly Func<object> _syncObj;
 		private readonly Document _owner;
-		private readonly LinkProvider _linkProvider;
-		private HttpRequest _request;
+		private Request _request;
+		private object _responseObj = null;
 		private bool _async;
 		private HttpResponse _response;
 		private Stream _stream;
@@ -30,13 +32,13 @@ namespace Knyaz.Optimus.Dom
 		
 		internal XmlHttpRequest(IResourceProvider resourceProvider, 
 			Func<object> syncObj, Document owner, 
-			LinkProvider linkProvider,
+			Func<string, string, Request> requestFn,
 			Func<Stream,object> parseJsonFn = null)
 		{
 			_resourceProvider = resourceProvider;
 			_syncObj = syncObj;
 			_owner = owner;
-			_linkProvider = linkProvider;
+			_requestFn = requestFn;
 			ReadyState = UNSENT;
 			_parseJsonFn = parseJsonFn;
 		}
@@ -63,9 +65,7 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="password">The password to use for authentication purposes.</param>
 		public void Open(string method, string url, bool? async = null, string username = null, string password = null)
 		{
-			_request = (HttpRequest)_resourceProvider.CreateRequest(_linkProvider.MakeUri(url));
-			_request.Method = method;
-			_request.Headers["User-Agent"] = _owner?.DefaultView?.Navigator?.UserAgent;
+			_request = _requestFn(url, method);
 			_async = async ?? true;
 			//todo: username, password
 			ReadyState = OPENED;
@@ -186,9 +186,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private object _responseObj = null;
-		private Func<Stream,object> _parseJsonFn;
-
+		
 		/// <summary>
 		/// Gets the response object of the type specified by ResponseType property.
 		/// </summary>

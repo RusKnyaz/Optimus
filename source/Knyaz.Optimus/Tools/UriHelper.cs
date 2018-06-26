@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace Knyaz.Optimus.Tools
 {
 	internal static class UriHelper
 	{
+		public static Uri GetUri(string uri) =>
+			new Uri(uri, IsAbsolete(uri) ? UriKind.Absolute : UriKind.Relative);
+		
 		public static bool IsAbsolete(string uri) =>
 			!uri.StartsWith("/") && (
 				uri.StartsWith("http://") || uri.StartsWith("https://") || uri.StartsWith("file://") ||
@@ -30,6 +34,16 @@ namespace Knyaz.Optimus.Tools
 				: Encoding.UTF8.GetBytes(content);
 			
 			return  new UriData{Type = type[0], Data = encodedContent};
+		}
+
+		internal static string GetRoot(this Uri uri)
+		{
+			var root = uri.GetLeftPart(UriPartial.Path);
+			var ur = new Uri(root);
+			if (ur.PathAndQuery != null && !ur.PathAndQuery.Contains('.') && ur.PathAndQuery.Last() != '/')
+				return root + "/";
+
+			return root;
 		}
 	}
 	

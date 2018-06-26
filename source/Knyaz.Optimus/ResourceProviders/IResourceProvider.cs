@@ -1,49 +1,54 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	public static class ResourceProviderExtension
-	{
-		public static Task<IResource> GetResourceAsync(this IResourceProvider provider, Uri uri) => 
-			provider.SendRequestAsync(provider.CreateRequest(uri));
-	}
+    public class Request
+    {
+        public string Method;
+        public Uri Url { get; }
+        public readonly Dictionary<string, string> Headers;
+        public int Timeout { get; set; }
+        public byte[] Data;
+        public CookieContainer Cookies;
 
-	public class CommonResourceProvider
-	{
-		private readonly IResourceProvider _provider;
-		private readonly LinkProvider _linkProvider;
-		private readonly Func<string> _userAgentFn;
+        public Request(Uri url) => Url = url;
 
-		public CommonResourceProvider(IResourceProvider provider, LinkProvider linkProvider, Func<string> userAgentFn)
+        public Request(string method, Uri url) : this(url)
+        {
+            Headers = new Dictionary<string, string>();
+            Method = method;
+        }
+
+        public override int GetHashCode() => 
+            ((Url?.ToString() ?? "<null>") + "()" + (Method ?? "<null>")).GetHashCode() ^ (Headers == null ? 0 : Headers.Count);
+
+        public override bool Equals(object obj) => 
+            obj is Request other 
+            && Url == other.Url 
+            && Method == other.Method 
+            && ((Headers == null && other.Headers == null)
+            || (Headers.Count == other.Headers.Count 
+            && Headers.Keys.All(k => other.Headers.ContainsKey(k) && Headers[k].Equals(other.Headers[k]))));
+
+		public override string ToString()
 		{
-			_provider = provider;
-			_linkProvider = linkProvider;
-			_userAgentFn = userAgentFn;
-		}
-
-		public Task<IResource> GetResourceAsync(string path)
-		{
-			var req = _provider.CreateRequest(_linkProvider.MakeUri(path));
-			if (req is HttpRequest httpReq)
-			{
-				var ua = _userAgentFn?.Invoke();
-				if(ua != null)
-					httpReq.Headers["User-Agent"] = ua;
-			}
-			return _provider.SendRequestAsync(req);
-		}
-	}
-
-	public class ReceivedEventArguments : EventArgs
-	{
-		public readonly IRequest Request;
-		public readonly IResource Resource;
-
-		public ReceivedEventArguments(IRequest request, IResource resource)
-		{
-			Request = request;
-			Resource = resource;
+			return Method + " " + Url.ToString();
 		}
 	}
+
+    
+    /// <summary>
+    /// Allows to get resources like files, html pages and etc (dependes on implementation).
+    /// </summary>
+    public interface IResourceProvider
+    {
+        /// <summary>
+        /// Requests resource.
+        /// </summary>
+        Task<IResource> SendRequestAsync(Request request);
+    }
 }

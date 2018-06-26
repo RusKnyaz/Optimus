@@ -12,14 +12,13 @@ namespace Knyaz.Optimus.Tests.UnitTests.ResourceProviders
 		[Test]
 		public void HttpRequest()
 		{
-			var request = Mock.Of<IRequest>(x => x.Url == new Uri("http://google.com"));
-			var httpMock = new Mock<ISpecResourceProvider>();
-			httpMock.Setup(x => x.CreateRequest(It.IsAny<Uri>())).Returns(request);
+			var request = new Request(new Uri("http://google.com"));
+			
+			var httpMock = new Mock<IResourceProvider>();
 			var target = new ResourceProvider(httpMock.Object, null);
 
-			target.GetResourceAsync(new Uri("http://google.com")).Wait();
+			target.SendRequestAsync(request).Wait();
 			
-			httpMock.Verify(x => x.CreateRequest(new Uri("http://google.com")), Times.Once());
 			httpMock.Verify(x => x.SendRequestAsync(request), Times.Once());
 		}
 	}

@@ -14,62 +14,46 @@ namespace Knyaz.Optimus.Tests.ResourceProviders
 		[Test]
 		public void PreloadedResource()
 		{
-			var request = Mock.Of<IRequest>(
-				x=> x.Equals(It.IsAny<object>()) == true &&
-				x.GetHashCode() == 1);
-			
 			var provider = Mock.Of<IResourceProvider>(x =>
-				x.CreateRequest(new Uri(SomeUri)) == request &&
-				x.SendRequestAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
+				x.SendRequestAsync(It.IsAny<Request>()) == new Task<IResource>(() => Mock.Of<IResource>()));
 
 			var target = new PredictedResourceProvider(provider);
-			target.Preload(new Uri(SomeUri));
+			target.Preload(new Request(new Uri(SomeUri)));
 
-			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once);
 
-			target.GetResourceAsync(new Uri(SomeUri));
+			target.SendRequestAsync(new Request(new Uri(SomeUri)));
 
-            Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
+            Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once);
 		}
 
 		[Test]
 		public void GetNonPreloadedResource()
 		{
-			var request = Mock.Of<IRequest>(
-            				x=> x.Equals(It.IsAny<object>()) == true &&
-            				x.GetHashCode() == 1);
-
 			var provider = Mock.Of<IResourceProvider>(x =>
-					x.CreateRequest(new Uri(SomeUri)) == request &&
-					x.SendRequestAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
+					x.SendRequestAsync(It.IsAny<Request>()) == new Task<IResource>(() => Mock.Of<IResource>()));
 
 			var target = new PredictedResourceProvider(provider);
-			target.GetResourceAsync(new Uri(SomeUri));
+			target.SendRequestAsync(new Request(new Uri(SomeUri)));
 
-			Mock.Get(provider).Verify(x => x.CreateRequest(new Uri(SomeUri)), Times.Once);
-			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once);
 		}
 
 		[Test]
 		public void Clear()
 		{
-			var request = Mock.Of<IRequest>(
-				x => x.Equals(It.IsAny<object>()) == true &&
-				     x.GetHashCode() == 1);
-
 			var provider = Mock.Of<IResourceProvider>(x =>
-				x.CreateRequest(new Uri(SomeUri)) == request &&
-				x.SendRequestAsync(It.IsAny<IRequest>()) == new Task<IResource>(() => Mock.Of<IResource>()));
+				x.SendRequestAsync(It.IsAny<Request>()) == new Task<IResource>(() => Mock.Of<IResource>()));
 
 			var target = new PredictedResourceProvider(provider);
-			target.Preload(new Uri(SomeUri));
-			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Once);
+			target.Preload(new Request(new Uri(SomeUri)));
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once);
 
 			target.Clear();
 
-			target.GetResourceAsync(new Uri(SomeUri));
+			target.SendRequestAsync(new Request(new Uri(SomeUri)));
 
-			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<IRequest>()), Times.Exactly(2));
+			Mock.Get(provider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Exactly(2));
 		}
 	}
 }

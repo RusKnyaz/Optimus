@@ -70,12 +70,12 @@ namespace Knyaz.Optimus
 					Document = document;
 				}
 
-				var request = ResourceProvider.CreateRequest(LinkProvider.MakeUri(url));
-				if (!isGet && request is HttpRequest httpRequest)
+				var request = CreateRequest(url);
+				if (!isGet)
 				{
 					//todo: use right encoding and enctype
-					httpRequest.Method = "POST";
-					httpRequest.Data = Encoding.UTF8.GetBytes(data);
+					request.Method = "POST";
+					request.Data = Encoding.UTF8.GetBytes(data);
 				}
 
 				var response = await ResourceProvider.SendRequestAsync(request);
