@@ -46,21 +46,25 @@ namespace Knyaz.Optimus.Dom.Css
 			{
 				var condition = conditions[i].Split(')')[0].Split(':');
 				var property = condition[0].Trim();
-				var value = condition[1].Trim();
 				switch (property)
 				{
 					case "orientation":
-						if((value == "landscape") != curMedia.Landscape)
+						if((condition[1].Trim() == "landscape") != curMedia.Landscape)
 							return false;
 						break;
 					case "min-width":
-						if (int.Parse(new string(value.TakeWhile(x => char.IsDigit(x)).ToArray())) > curMedia.Width)
+						if (int.Parse(new string(condition[1].Trim().TakeWhile(x => char.IsDigit(x)).ToArray())) > curMedia.Width)
 							return false;
 						break;
 					case "max-width":
-						if (int.Parse(new string(value.TakeWhile(x => char.IsDigit(x)).ToArray())) < curMedia.Width)
+						if (int.Parse(new string(condition[1].Trim().TakeWhile(x => char.IsDigit(x)).ToArray())) < curMedia.Width)
 							return false;
 						break;
+					case "transform-3d":
+						if(!curMedia.Transform3D)
+							return false;
+						break;
+					default: return false;
 				}
 			}
 
@@ -73,5 +77,6 @@ namespace Knyaz.Optimus.Dom.Css
 		public string Device = "Screen";
 		public int Width;
 		public bool Landscape;
+		public bool Transform3D;
 	}
 }

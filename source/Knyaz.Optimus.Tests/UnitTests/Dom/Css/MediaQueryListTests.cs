@@ -15,6 +15,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("Screen", 1000, false, "(max-width:200px)", false)]
 		[TestCase("Screen", 100, false, "(min-width:200px)", false)]
 		[TestCase("Screen", 100, false, "(max-width:200px)", true)]
+		[TestCase("Screen", 100, false, "all and (transform-3d), (-webkit-transform-3d)", false)]
 		public void DeviceMatches(string device, int width, bool landscape, string mediaQuery, bool matches)
 		{
 			var mql = new MediaQueryList(mediaQuery, () => new MediaSettings {
