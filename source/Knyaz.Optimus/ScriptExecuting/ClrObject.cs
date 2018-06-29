@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
-using Jint.Parser.Ast;
 using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
-using Jint.Runtime.Environments;
 using Jint.Runtime.Interop;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
@@ -38,18 +35,24 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		private JsValue Convert(Object obj)
 		{
-			JsValue res = JsValue.Null;
+			var res = JsValue.Null;
 			_converter.TryConvert(obj, out res);
 			return res;
 		}
 
 		public override PropertyDescriptor GetOwnProperty(string propertyName)
 		{
-			//todo: check indexers (for example in CssStyleDeclaration)
-			PropertyDescriptor x;
-			if (Properties.TryGetValue(propertyName, out x))
+			if (Properties.TryGetValue(propertyName, out var x))
 				return x;
 
+			x = FindProperty(propertyName);
+			Properties.Add(propertyName, x);
+			return x;
+		}
+		
+		private PropertyDescriptor FindProperty(string propertyName)
+		{
+			//todo: check indexers (for example in CssStyleDeclaration)
 			var pascalCasedPropertyName = char.ToUpperInvariant(propertyName[0]).ToString();
 			if (propertyName.Length > 1)
 			{
@@ -69,7 +72,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (property != null)
 			{
 				var descriptor = new ClrPropertyInfoDescriptor(Engine, property, Target);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -78,9 +80,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (field != null)
 			{
-				var descriptor = new FieldInfoDescriptor(Engine, field, Target);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return new FieldInfoDescriptor(Engine, field, Target);
 			}
 
 			// if no properties were found then look for a method 
@@ -128,7 +128,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (explicitProperties.Length == 1)
 			{
 				var descriptor = new PropertyInfoDescriptor(Engine, explicitProperties[0], Target);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -141,7 +140,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (explicitMethods.Length > 0)
 			{
 				var descriptor = new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, explicitMethods), false, true, false);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -154,7 +152,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (explicitPascalCasedMethods.Length > 0)
 			{
 				var descriptor = new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, explicitPascalCasedMethods), false, true, false);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -212,19 +209,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 				});
 
 				var descriptor = new PropertyDescriptor(getter, setter);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
 			//Look for static fields
 			var staticField = type.GetField(propertyName);
-			if (staticField != null)
+			if (staticField != null && staticField.GetCustomAttribute<JsHiddenAttribute>() == null)
 			{
-				var descriptor = new FieldInfoDescriptor(Engine, staticField, Target);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return new FieldInfoDescriptor(Engine, staticField, Target);
 			}
-
 
 			return PropertyDescriptor.Undefined;
 		}
@@ -237,9 +230,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
 				false, false, false);
 
-			var descriptor = new PropertyDescriptor(func, false, true, false);
-			Properties.Add(propertyName, descriptor);
-			return descriptor;
+			return new PropertyDescriptor(func, false, true, false);
 		}
 		
 		

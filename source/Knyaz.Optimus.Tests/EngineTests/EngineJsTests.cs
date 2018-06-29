@@ -1088,5 +1088,20 @@ dispatchEvent(evt);");
 			Assert.IsNotNull(engine.WaitId("d"));
 			Assert.AreEqual(new object[]{2d, "x"}, log);
 		}
+
+		[Test]
+		public void DomImplementationInstanceIsHidden()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"console.log(document.implementation.instance);" +
+				"console.log(document.implementation.Instance);" +
+				"</script></html>");
+
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.OpenUrl("http://localhost").Wait();
+			Assert.AreEqual(new object[]{null,null}, log);
+		}
 	}
 }
