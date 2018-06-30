@@ -9,6 +9,7 @@ else
 fi
 echo "Starting build of version: $version, fileVersion: $fileversion"
 echo "Step 1. Clean"
+/bin/rm -f perf-test-results/*
 /bin/rm -f source/Knyaz.Optimus.Tests/test-results/*
 /bin/rm -rf source/Knyaz.Optimus/bin/*
 /bin/rm -rf source/Knyaz.Optimus/obj/*
@@ -23,7 +24,12 @@ echo "Step 4. Build Knyaz.Optimus.Tests"
 /usr/bin/dotnet build source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj /p:FrameworkPathOverride=/usr/lib/mono/4.5/ /p:Version=$version /p:FileVersion=$fileversion -c Release -v n
 echo "Step 5. Run tests"
 /usr/bin/dotnet test source/Knyaz.Optimus.Tests/Knyaz.Optimus.Tests.csproj --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/ -f netcoreapp2.0 -r test-results --logger "trx;LogFileName=Optimus.netcore.trx" -c Release
+echo "Step 6. Run performance tests"
+mkdir perf-test-results
+mono source/.nuget/NuGet.exe install NBench.Runner
+mono NBench.Runner.1.0.4/lib/net452/NBench.Runner.exe source/Knyaz.Optimus.Tests/bin/Release/net452/Knyaz.Optimus.Tests.dll output-directory=perf-test-results
+
 if [ "$versionDev" == "r" ] || [ "$versionDev" == "d" ]; then
-	echo "Step 6. Pack nupkg"
+	echo "Step 7. Pack nupkg"
 	/usr/bin/dotnet pack source/Knyaz.Optimus/Knyaz.Optimus.csproj -c Release /p:Version=$version --no-build /p:FrameworkPathOverride=/usr/lib/mono/4.5/
 fi

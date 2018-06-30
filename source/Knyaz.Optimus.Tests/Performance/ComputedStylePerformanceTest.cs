@@ -1,22 +1,18 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Knyaz.Optimus.TestingTools;
-using NUnit.Framework;
+using NBench;
 
 namespace Knyaz.Optimus.Tests.Performance
 {
-	[TestFixture(1000)]
 	public class ComputedStylePerformanceTest
 	{
-		private readonly int _repeats;
+		private Counter _counter;
+		
+		[PerfSetup]
+		public void SetUp(BenchmarkContext ctx) => _counter = ctx.GetCounter("Counter");
 
-		public ComputedStylePerformanceTest(int repeats)
-		{
-			_repeats = repeats;
-			GetComputedStyleTest("", "<div id=test></div>");
-		}
-
+		
 		private Engine Load(string html)
 		{
 			var engine = new Engine() { ComputedStylesEnabled = true };
@@ -27,24 +23,24 @@ namespace Knyaz.Optimus.Tests.Performance
 			return engine;
 		}
 
-		[TestCase("", "<div id=test></div>")] //94
-		[TestCase(@".a span > strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")] //112
-		[TestCase(@"strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")] //15
-		[TestCase(@"strong {font-family:""Arial""} .a string {font-family:""Curier New""}", "<div class a><span><strong id=test></strong><span></div>")] //9
-		public void GetComputedStyleTest(string styles, string html)
+		//[TestCase("", "<div id=test></div>")] //94
+		//[TestCase(@".a span > strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")] //112
+		//[TestCase(@"strong {font-family:""Arial""}", "<div class a><span><strong id=test></strong><span></div>")] //15
+//		[TestCase(@"strong {font-family:""Arial""} .a string {font-family:""Curier New""}", "<div class a><span><strong id=test></strong><span></div>")] //9
+		
+		[PerfBenchmark(NumberOfIterations = 3, RunTimeMilliseconds = 1000, RunMode = RunMode.Throughput)]
+		[CounterMeasurement("Counter")]
+		[MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
+		public void GetComputedStyleTest()
 		{
+			var styles = @"strong {font-family:""Arial""} .a string {font-family:""Curier New""}";
+			var html = "<div class a><span><strong id=test></strong><span></div>";
+			
 			var engine = Load("<head><style>" + styles + "</style></head><body>" + html + "</body>");
 			var doc = engine.Document;
 			var elt = doc.GetElementById("test");
-
-			var timer = Stopwatch.StartNew();
-
-			for (int i = 0; i < _repeats; i++)
-			{
-				elt.GetComputedStyle().GetPropertyValue("font-family");
-			}
-			timer.Stop();
-			System.Console.WriteLine(timer.ElapsedMilliseconds);
+			elt.GetComputedStyle().GetPropertyValue("font-family");
+			_counter.Increment();
 		}
 	}
 }

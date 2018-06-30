@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Html
 			using(var enumerator = FixHtml(HtmlReader.Read(stream)).GetEnumerator())
 			{
 				//todo: try to get rid of fake element
-				var rootElem = new HtmlElement();
+				var rootElem = new HtmlElement("root");
 
 				while (ParseElement(rootElem, enumerator) == ParseResult.Ok){}
 
@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.Html
 			}
 		}
 
-		enum ParseResult
+		enum ParseResult : byte
 		{
 			End,
 			BackToParent,
@@ -76,7 +76,7 @@ namespace Knyaz.Optimus.Html
 						if (ClosePrevTag(elem.Name, tagName))
 							return ParseResult.BackToParent;
 
-						var childElem = new HtmlElement() {Name = htmlChunk.Value };
+						var childElem = new HtmlElement(htmlChunk.Value);
 						if (ParseElement(childElem, enumerator) == ParseResult.BackToParent)
 							reread = true;
 						elem.Children.Add(childElem);
@@ -87,7 +87,7 @@ namespace Knyaz.Optimus.Html
 
 						return elem.Name == htmlChunk.Value ? ParseResult.Ok : ParseResult.BackToParent;
 					case HtmlChunk.Types.Text:
-						elem.Children.Add(new HtmlText {Value = htmlChunk.Value});
+						elem.Children.Add(new HtmlText(htmlChunk.Value));
 						break;
 					case HtmlChunk.Types.Comment:
 						elem.Children.Add(new HtmlComment {Text = htmlChunk.Value});
@@ -126,54 +126,26 @@ namespace Knyaz.Optimus.Html
 		public string Text;
 	}
 
-	internal class HtmlElement : IHtmlElement
+	internal sealed class HtmlElement : IHtmlNode
 	{
-		public HtmlElement()
+		public HtmlElement(string name)
 		{
+			Name = name;
 			Attributes = new Dictionary<string, string>();
 			Children = new List<IHtmlNode>();
-			InnerText = string.Empty;
 		}
 
-		public string Name { get; set; }
-
-		public IList<IHtmlNode> Children
-		{
-			get;
-			private set;
-		}
-
-		public IDictionary<string, string> Attributes { get; private set; }
-
-
-		IEnumerable<IHtmlNode> IHtmlElement.Children
-		{
-			get { return this.Children; }
-		}
-
-		public string InnerText { get; set; }
+		public readonly string Name;
+		public readonly IList<IHtmlNode> Children;
+		public readonly IDictionary<string, string> Attributes;
 	}
 
-	interface IHtmlNode
-	{
-		 
-	}
+	interface IHtmlNode{}
 
-	interface IHtmlElement : IHtmlNode
+	sealed class HtmlText : IHtmlNode
 	{
-		IEnumerable<IHtmlNode> Children { get; }
-		string Name { get; }
-		IDictionary<string, string> Attributes { get; }
-	}
-
-	interface IHtmlText : IHtmlNode
-	{
-		string Value { get; }
-	}
-
-	class HtmlText : IHtmlText
-	{
-		public string Value { get; set; }
+		public HtmlText(string value) => Value = value;
+		public readonly string Value;
 	}
 
 	class HtmlParseException : Exception

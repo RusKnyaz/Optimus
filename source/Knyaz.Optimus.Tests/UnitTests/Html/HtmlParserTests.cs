@@ -21,10 +21,10 @@ namespace Knyaz.Optimus.Tests.Html
 		[Test]
 		public void SimpleElement()
 		{
-			var elem = Parse("<p id='8'>Text</p>").Cast<IHtmlElement>().Single();
+			var elem = Parse("<p id='8'>Text</p>").Cast<HtmlElement>().Single();
 
 			Assert.AreEqual("p", elem.Name);
-			Assert.AreEqual("Text", ((IHtmlText) elem.Children.Single()).Value);
+			Assert.AreEqual("Text", ((HtmlText) elem.Children.Single()).Value);
 			Assert.AreEqual(1, elem.Attributes.Count);
 		}
 
@@ -37,17 +37,17 @@ namespace Knyaz.Optimus.Tests.Html
 		//todo: escaped chars
 		public void EmbeddedScript(string html, string scriptText)
 		{
-			var elem = Parse(html).Cast<IHtmlElement>().Single();
+			var elem = Parse(html).Cast<HtmlElement>().Single();
 
 			Assert.AreEqual("script", elem.Name);
-			Assert.AreEqual(scriptText, ((IHtmlText) elem.Children.Single()).Value);
+			Assert.AreEqual(scriptText, ((HtmlText) elem.Children.Single()).Value);
 			Assert.AreEqual(0, elem.Attributes.Count);
 		}
 
 		[Test]
 		public void TextIsNotParent()
 		{
-			var elem = Parse("<head>\r\n\t<script>somecode</script>\r\n</head>").Cast<IHtmlElement>().Single();
+			var elem = Parse("<head>\r\n\t<script>somecode</script>\r\n</head>").Cast<HtmlElement>().Single();
 
 			elem.Assert(e =>
 				e.Name == "head" && 
@@ -62,7 +62,7 @@ namespace Knyaz.Optimus.Tests.Html
 
 			Assert.AreEqual(1, elems.Length);
 			var elem = elems[0];
-			Assert.AreEqual("Hello", ((IHtmlText) elem).Value);
+			Assert.AreEqual("Hello", ((HtmlText) elem).Value);
 		}
 
 		[Test]
@@ -130,12 +130,12 @@ namespace Knyaz.Optimus.Tests.Html
 		public void OptionalEndTagTests(string sourceHtml, string expectedHtml)
 		{
 			var elems = Parse(sourceHtml);
-			var result = string.Join("", elems.OfType<IHtmlElement>().Select(ElemToString));
+			var result = string.Join("", elems.OfType<HtmlElement>().Select(ElemToString));
 			Assert.AreEqual(expectedHtml, result);
 		}
 
 		
-		static string ElemToString(IHtmlElement arg)
+		static string ElemToString(HtmlElement arg)
 		{
 			var sb = new StringBuilder();
 			BuildElemString(arg, sb);
@@ -144,16 +144,13 @@ namespace Knyaz.Optimus.Tests.Html
 
 		static void BuildElemString(IHtmlNode node, StringBuilder sb)
 		{
-			var txtNode = node as IHtmlText;
-			if (txtNode != null)
+			if (node is HtmlText txtNode)
 			{
 				sb.Append(txtNode.Value);
 				return;
 			}
 
-			var elem = node as IHtmlElement;
-
-			if (elem != null)
+			if (node is HtmlElement elem)
 			{
 				sb.Append('<');
 				sb.Append(elem.Name);
