@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Jint.Parser.Ast;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
 using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
-using IHtmlElement = Knyaz.Optimus.Html.IHtmlElement;
 
 namespace Knyaz.Optimus.Dom
 {
@@ -79,7 +77,7 @@ namespace Knyaz.Optimus.Dom
 					continue;
 				}
 				
-				var htmlElement = htmlNode as IHtmlElement;
+				var htmlElement = htmlNode as HtmlElement;
 
 				var htmlHtmlElt = currentNode as HtmlHtmlElement;
 				if (htmlHtmlElt != null && (htmlElement == null || (
@@ -91,7 +89,7 @@ namespace Knyaz.Optimus.Dom
 					currentNode = currentNode.OwnerDocument.Body;
 				}
 				
-				if (htmlNode is IHtmlText txt)
+				if (htmlNode is HtmlText txt)
 				{
 					var c = currentNode.OwnerDocument.CreateTextNode(txt.Value);
 					c.Source = source;
@@ -177,7 +175,7 @@ namespace Knyaz.Optimus.Dom
 			return extruded;
 		}
 
-		private static void SetAttributes(IHtmlElement htmlElement, Element elem)
+		private static void SetAttributes(HtmlElement htmlElement, Element elem)
 		{
 			foreach (var attribute in htmlElement.Attributes)
 			{
@@ -194,8 +192,8 @@ namespace Knyaz.Optimus.Dom
 	static class IHtmlNodeExtension
 	{
 		public static string ExtractText(this IHtmlNode node) =>
-			node is IHtmlText text ? text.Value
-			: node is IHtmlElement elt ? string.Join("", elt.Children.Select(ExtractText))
+			node is HtmlText text ? text.Value
+			: node is HtmlElement elt ? string.Join("", elt.Children.Select(ExtractText))
 			: string.Empty;
 	}
 }

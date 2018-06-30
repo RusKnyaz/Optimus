@@ -25,7 +25,7 @@ namespace Knyaz.Optimus.Tests.Performance
 		public static Stream BalancedHtml => new MemoryStream(BalancedHtmlBytes);
 		public static Stream AttributesHtml => new MemoryStream(AttributesHtmlBytes);
 		
-		public static Stream LargeHtml = typeof(HtmlReaderPerfTests).Assembly.GetManifestResourceStream(
+		public static Stream LargeHtml = typeof(TestData).Assembly.GetManifestResourceStream(
 			"Knyaz.Optimus.Tests.Resources.Large_Html.txt");
 		
 		private static string GenerateHtml(int deep, int attrs, int count)

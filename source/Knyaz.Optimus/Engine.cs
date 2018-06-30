@@ -11,6 +11,7 @@ using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
+using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
 
 namespace Knyaz.Optimus
 {
@@ -235,8 +236,8 @@ namespace Knyaz.Optimus
 
 			if (ResourceProvider is IPredictedResourceProvider resourceProvider)
 			{
-				foreach (var src in html.OfType<IHtmlElement>()
-					.Flat(x => x.Children.OfType<IHtmlElement>())
+				foreach (var src in html.OfType<HtmlElement>()
+					.Flat(x => x.Children.OfType<HtmlElement>())
 					.Where(x => x.Name == "script" && x.Attributes.ContainsKey("src"))
 					.Select(x => x.Attributes["src"])
 					.Where(x => !string.IsNullOrEmpty(x))
@@ -247,8 +248,8 @@ namespace Knyaz.Optimus
 
 				if (ComputedStylesEnabled)
 				{
-					foreach (var src in html.OfType<IHtmlElement>()
-					.Flat(x => x.Children.OfType<IHtmlElement>())
+					foreach (var src in html.OfType<HtmlElement>()
+					.Flat(x => x.Children.OfType<HtmlElement>())
 					.Where(x => x.Name == "link" && x.Attributes.ContainsKey("href") &&
 					            (!x.Attributes.ContainsKey("type") || x.Attributes["type"] == "text/css"))
 					.Select(x => x.Attributes["href"])
