@@ -69,6 +69,7 @@ namespace Knyaz.Optimus.Dom
 				if (htmlNode is HtmlDocType docType)
 				{
 					//todo: may be it's wrong to assume the doctype element placed before html in source document
+					//todo: fill doctype attributes.
 					currentNode.OwnerDocument.InsertBefore(new DocType(), currentNode.OwnerDocument.DocumentElement);
 				}
 

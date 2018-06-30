@@ -42,11 +42,13 @@
     <EmbeddedResource Include="Resources\template.js" />
     <EmbeddedResource Include="Resources\text.js" />
     <EmbeddedResource Include="Resources\ya.js" />
+    <EmbeddedResource Include="Resources\Large_Html.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Jint" Version="2.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="Moq" Version="4.7.142" />
+    <PackageReference Include="NBench" Version="1.0.4" />
     <PackageReference Include="NUnit" Version="3.9.0" />
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
