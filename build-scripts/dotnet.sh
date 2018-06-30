@@ -9,7 +9,7 @@ else
 fi
 echo "Starting build of version: $version, fileVersion: $fileversion"
 echo "Step 1. Clean"
-/bin/rm -f perf-test-results
+/bin/rm -f perf-test-results/*
 /bin/rm -f source/Knyaz.Optimus.Tests/test-results/*
 /bin/rm -rf source/Knyaz.Optimus/bin/*
 /bin/rm -rf source/Knyaz.Optimus/obj/*
