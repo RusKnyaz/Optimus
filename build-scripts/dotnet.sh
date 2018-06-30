@@ -27,7 +27,7 @@ echo "Step 5. Run tests"
 echo "Step 6. Run performance tests"
 mkdir perf-test-results
 mono source/.nuget/NuGet.exe install NBench.Runner
-mono NBench.Runner.1.0.4/lib/net452/NBench.Runner.exe source/Knyaz.Optimus.Tests/bin/Release/net452/Knyaz.Optimus.Test.dll output-directory=perf-test-results
+mono NBench.Runner.1.0.4/lib/net452/NBench.Runner.exe source/Knyaz.Optimus.Tests/bin/Release/net452/Knyaz.Optimus.Tests.dll output-directory=perf-test-results
 
 if [ "$versionDev" == "r" ] || [ "$versionDev" == "d" ]; then
 	echo "Step 7. Pack nupkg"
