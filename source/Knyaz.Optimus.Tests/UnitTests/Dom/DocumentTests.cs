@@ -342,7 +342,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var doc = new Document();
 			var body = doc.CreateElement("body");
 			body.InnerHTML = "ABC";
-			doc.Body = (HtmlElement)body;
+			doc.Body = (HtmlBodyElement)body;
 			Assert.AreEqual("<HEAD></HEAD><BODY>ABC</BODY>", doc.DocumentElement.InnerHTML);
 			
 		}

@@ -12,8 +12,11 @@ namespace Knyaz.Optimus.Dom.Css
 	public class CssStyleRule : CssRule
 	{
 		internal event Action SelectorChanged;
-
 		private string _selectorText;
+		private CssSelector[] _selectors = null;
+		
+		internal CssStyleRule(CssStyleSheet parentStyleSheet) : base(parentStyleSheet) =>
+			Style = new CssStyleDeclaration(this);
 
 		/// <summary>
 		/// Gets the textual representation of the selector for this rule.
@@ -31,15 +34,17 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 		}
 
-		private CssSelector[] _selectors = null;
-
+		
 		/// <summary>
 		/// Gets the parent CSSStyleDeclaration object for the rule.
 		/// </summary>
 		public CssStyleDeclaration Style { get; private set; }
-
-		internal CssStyleRule(CssStyleSheet parentStyleSheet) : base(parentStyleSheet) =>
-			Style = new CssStyleDeclaration(this);
+		
+		public override string CssText 
+		{
+			get { return SelectorText + Style; }
+			set { }
+		}
 
 		internal CssSelector[] Selectors => _selectors ?? (_selectors =
 			                                    SelectorText.Split(',')

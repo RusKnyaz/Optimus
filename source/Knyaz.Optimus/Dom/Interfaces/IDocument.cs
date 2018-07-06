@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		void Write(string text);
 		Event CreateEvent(string type);
 		Head Head { get; }
-		Element Body { get; set; }
+		HtmlBodyElement Body { get; set; }
 		Comment CreateComment(string data);
 		Text CreateTextNode(string data);
 		DocumentFragment CreateDocumentFragment();

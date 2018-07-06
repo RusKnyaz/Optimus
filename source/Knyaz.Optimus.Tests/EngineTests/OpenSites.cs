@@ -18,7 +18,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		[TestCase("http://okkamtech.com")]
 		[TestCase("http://ya.ru")]
-		[TestCase("http://redmine.todosoft.org")]
+		[TestCase("http://redmine.todosoft.ru")]
+		[TestCase("http://todosoft.ru")]
 		[TestCase("http://google.com")]
 		[TestCase("https://html5test.com")]
 		public void OpenUrl(string url)
