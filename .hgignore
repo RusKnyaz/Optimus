@@ -3,7 +3,8 @@ syntax: glob
 */bin
 */obj
 */packages
-*/.idea
+**/.idea
+**/.nuget
 .vs
 *.orig
 *.sln.*

@@ -421,5 +421,11 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			return _importants.Contains(propertyName) ? Css.ImportantValue : string.Empty;
 		}
+
+		public override string ToString()
+		{
+			var props = string.Join(";", _properties.Keys.OfType<string>().Select(x => x + ":"+_properties[x] + (_importants.Contains(x) ? " !important" : "")));
+			return "{" + props + "}";
+		}
 	}
 }

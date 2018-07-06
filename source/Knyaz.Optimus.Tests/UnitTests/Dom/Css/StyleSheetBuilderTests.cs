@@ -65,5 +65,20 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	    {
 		    var ss = Build(css);
 	    }
+
+	    [TestCase("body{background-color:red}")]
+	    [TestCase("body{background-color:red !important}")]
+	    [TestCase("@media all and (min-width:100px) {div{color:red} span{color:green}}")]
+	    public void CssText(string css) => Build(css).Assert(x => 
+		    x.CssRules.Count == 1 &&
+		    x.CssRules[0].CssText == css);
+
+	    [Test]
+	    public void SetCssTextHaveNoEffect()
+	    {
+		    var styleSheet = Build("body{background-color:red}");
+		    styleSheet.CssRules[0].CssText = "body{background-color:green}";
+		    Assert.AreEqual("body{background-color:red}", styleSheet.CssRules[0].CssText);
+	    }
     }
 }

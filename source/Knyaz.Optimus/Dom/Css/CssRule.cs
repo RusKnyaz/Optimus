@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Knyaz.Optimus.Dom.Css
+﻿namespace Knyaz.Optimus.Dom.Css
 {
 	/// <summary>
 	/// The CssRule is the abstract base interface for any type of CSS statement. This includes both rule sets and at-rules. 
@@ -9,16 +7,22 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	public class CssRule
 	{
+		private string _cssText;
+
 		internal CssRule(CssStyleSheet parentStyleSheet)
 		{
 			ParentStyleSheet = parentStyleSheet;
 		}
-		
+
 		/// <summary>
 		/// Gets or sets parsable textual representation of the rule. 
 		/// This reflects the current state of the rule and not its initial value.
 		/// </summary>
-		public string CssText { get; set; }
+		public virtual string CssText
+		{
+			get => _cssText;
+			set { }
+		}
 
 
 		/// <summary>

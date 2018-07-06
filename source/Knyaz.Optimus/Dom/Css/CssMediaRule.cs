@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -12,7 +13,6 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			Media = new MediaList(cssText);
 			CssRules = new List<CssRule>();
-			CssText = cssText;
 		}
 
 		/// <summary>
@@ -43,6 +43,12 @@ namespace Knyaz.Optimus.Dom.Css
 		public int InsertRule(string rule, int index)
 		{
 			throw new NotImplementedException();
+		}
+
+		public override string CssText
+		{
+			get => "@"+ Media.MediaText + " {" + string.Join(" ", CssRules.Select(x => x.CssText)) + "}";
+			set{}
 		}
 	}
 }

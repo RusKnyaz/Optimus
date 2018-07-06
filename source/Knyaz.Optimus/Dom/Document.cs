@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.Dom
 	{
 		internal DateTime CreatedOn = DateTime.UtcNow;
 		
-		private Element _body;
+		private HtmlBodyElement _body;
 
 		internal Document(IWindow window = null) : this("http://www.w3.org/1999/xhtml","html", null, window)
 		{
@@ -379,7 +379,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Sets or gets the document's body (the &lt;body&gt; element)
 		/// </summary>
-		public Element Body
+		public HtmlBodyElement Body
 		{
 			get => _body;
 			set
