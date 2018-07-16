@@ -18,6 +18,10 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 
 		[Test]
+		public void EmptyDocumentContainsNoStyleSheets() =>
+			Load("").Document.Assert(doc => doc.StyleSheets.Count == 0);
+
+		[Test]
 		public void ComputedStyleTest()
 		{
 			var engine =

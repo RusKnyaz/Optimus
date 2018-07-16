@@ -47,7 +47,7 @@ namespace Knyaz.Optimus.TestingTools
 			if (document.StyleSheets.SelectMany(x => x.CssRules).Any())
 			{
 				WriteOpenTag(writer, TagsNames.Style);
-				foreach (var styleRule in document.StyleSheets.Skip(1).SelectMany(x => x.CssRules)) //skip default stylesheet
+				foreach (var styleRule in document.StyleSheets.SelectMany(x => x.CssRules)) //skip default stylesheet
 				{
 					writer.Write(styleRule.CssText);
 					//todo: complete

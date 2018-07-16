@@ -11,32 +11,39 @@ namespace Knyaz.Optimus.Dom.Css
 {
 	internal class ComputedCssStyleDeclaration : ICssStyleDeclaration
 	{
+		private readonly CssStyleSheet _defaultStyleSheet;
 		private readonly IElement _elt;
 		private readonly Func<int> _getVersion;
 		private CachedEnumerable<ICssStyleDeclaration> _styles;
 
-		private static IEnumerable<ICssStyleDeclaration> GetStylesFor(IElement elt)
+		private IEnumerable<ICssStyleDeclaration> GetStylesFor(IElement elt)
 		{
-			var htmlElt = elt as HtmlElement;
-			if (htmlElt != null)
+			if (elt is HtmlElement htmlElt)
 				yield return htmlElt.Style;
 
-			foreach (var rule in GetStyleRulesFor(elt)
+			foreach (var rule in GetStyleRulesFor(elt, elt.OwnerDocument.StyleSheets)
 			         .SelectMany(x => x.Selectors.Select(sel => Tuple.Create(sel, x)))
 					 .OrderByDescending(tuple => tuple.Item1.Specifity)
 					 .Select(tuple => tuple.Item2))
 				yield return rule.Style;
+			
+			//default styles is last
+			if (elt is HtmlElement)
+				foreach (var rule in GetStyleRulesFor(elt, Enumerable.Repeat(_defaultStyleSheet,1))
+					.SelectMany(x => x.Selectors.Select(sel => Tuple.Create(sel, x)))
+					.OrderByDescending(tuple => tuple.Item1.Specifity)
+					.Select(tuple => tuple.Item2))
+					yield return rule.Style;
 		}
 
-		private static IEnumerable<CssStyleRule> GetStyleRulesFor(IElement elt)
+		private static IEnumerable<CssStyleRule> GetStyleRulesFor(IElement elt, IEnumerable<CssStyleSheet> styleSheets)
 		{
 			//todo: it would be better to have reversed list, or acces it by index;
 			//todo(2): what about safe enumeration
 
-			foreach (var cssRule in elt.OwnerDocument.StyleSheets.SelectMany(x => x.CssRules).Reverse())
+			foreach (var cssRule in styleSheets.SelectMany(x => x.CssRules).Reverse())
 			{
-				var mediaRule = cssRule as CssMediaRule;
-				if (mediaRule != null)
+				if (cssRule is CssMediaRule mediaRule)
 				{
 					var mediaQuery = mediaRule.Media.MediaText.Substring("media ".Length).Trim();
 					if (elt.OwnerDocument.DefaultView.MatchMedia(mediaQuery).Matches)
@@ -49,17 +56,16 @@ namespace Knyaz.Optimus.Dom.Css
 					}
 				}
 
-				var styleRule = cssRule as CssStyleRule;
-
-				if (styleRule != null && styleRule.IsMatchesSelector(elt))
+				if (cssRule is CssStyleRule styleRule && styleRule.IsMatchesSelector(elt))
 					yield return styleRule;
 			}
 		}
 
 		private int _cachedVersion;
 
-		public ComputedCssStyleDeclaration(IElement elt, Func<int> getVersion)
+		internal ComputedCssStyleDeclaration(CssStyleSheet defaultStyleSheet, IElement elt, Func<int> getVersion)
 		{
+			_defaultStyleSheet = defaultStyleSheet;
 			_elt = elt;
 			_getVersion = getVersion;
 			_styles = new CachedEnumerable<ICssStyleDeclaration>(GetStylesFor(elt));
@@ -111,10 +117,13 @@ namespace Knyaz.Optimus.Dom.Css
 				_styles.Reset();
 			}
 
-			var values = 
+			var values =
 				_styles.Where(x => x.GetPropertyPriority(propertyName) == "important")
-				.Concat(
-				_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
+					.Concat(
+						_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
+				
+
+			//var tmp = values.ToArray();
 
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit" ||
