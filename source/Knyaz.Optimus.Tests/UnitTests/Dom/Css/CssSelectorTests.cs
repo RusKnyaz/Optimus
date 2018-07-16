@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom.Css
@@ -77,6 +78,13 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				Assert.IsFalse(selector.IsMatches(elt), elt.ToString());
 			}
 		}
+
+		[Test]
+		public void AsteriskMatchesBody() =>
+			Load("<html><head><style>*{margin:0px}</style></head><body>HI</body></html>").Document
+				.Assert(doc => 
+					doc.Body.TextContent == "HI" &&
+					doc.Body.GetComputedStyle().GetPropertyValue("margin-left") == "0px");
 
 		[TestCase("*", 0)]
 		[TestCase("li", 1)]

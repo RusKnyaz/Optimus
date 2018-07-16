@@ -78,7 +78,9 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			using (var stream = GetType().Assembly.GetManifestResourceStream("Knyaz.Optimus.Resources.moz_default.css"))
 			using (var reader = new StreamReader(stream))
-				AddStyleToDocument(reader);
+			{
+				_userAgentStyleSheet = StyleSheetBuilder.CreateStyleSheet(reader, GetImport); 
+			}
 		}
 
 		private void AddStyleToDocument(TextReader content)
@@ -88,6 +90,10 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 
 		private Dictionary<IElement, ICssStyleDeclaration> _cache = new Dictionary<IElement, ICssStyleDeclaration>();
+		/// <summary>
+		/// Default styles.
+		/// </summary>
+		private CssStyleSheet _userAgentStyleSheet;
 
 		/// <summary>
 		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain.
@@ -99,7 +105,7 @@ namespace Knyaz.Optimus.Dom.Css
 			if (_cache.ContainsKey(elt))
 				return _cache[elt];
 
-			return _cache[elt] = new ComputedCssStyleDeclaration(elt, () => Version);
+			return _cache[elt] = new ComputedCssStyleDeclaration(_userAgentStyleSheet, elt, () => Version);
 		}
 	}
 }
