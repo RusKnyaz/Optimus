@@ -85,7 +85,9 @@ namespace Knyaz.Optimus.Html
 						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
 							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
 
-						return elem.Name == htmlChunk.Value ? ParseResult.Ok : ParseResult.BackToParent;
+						return
+							string.Equals(elem.Name, htmlChunk.Value, StringComparison.InvariantCultureIgnoreCase) 
+								? ParseResult.Ok : ParseResult.BackToParent;
 					case HtmlChunk.Types.Text:
 						elem.Children.Add(new HtmlText(htmlChunk.Value));
 						break;

@@ -115,6 +115,7 @@ namespace Knyaz.Optimus.Tests.Html
 
 		[TestCase("<tr><tr>", "<tr></tr><tr></tr>")]
 		[TestCase("<table><tr><td><tr></table>", "<table><tr><td></td></tr><tr></tr></table>")]
+		[TestCase("<table><tR><td></table>", "<table><tR><td></td></tR></table>")]
 		[TestCase("<td><td><th><th><td>", "<td></td><td></td><th></th><th></th><td></td>")]
 
 		[TestCase("<table><thead><tr><td><tbody><tr><td></table>", "<table><thead><tr><td></td></tr></thead><tbody><tr><td></td></tr></tbody></table>")]
@@ -132,6 +133,18 @@ namespace Knyaz.Optimus.Tests.Html
 			var elems = Parse(sourceHtml);
 			var result = string.Join("", elems.OfType<HtmlElement>().Select(ElemToString));
 			Assert.AreEqual(expectedHtml, result);
+		}
+
+		[TestCase("<table><tr><td>a</td></tr></table><div>b</div>", TestName = "AllInLowerCase")]
+		[TestCase("<table><tr><td>a</td></TR></table><div>b</div>", TestName = "CloseTagInUpperCase")]
+		[TestCase("<table><tr><td>a</td></tR></table><div>b</div>", TestName = "CloseTagInMixedCase")]
+		[TestCase("<div>a</dIv><div>b</div>", TestName = "DivCloseTagInMixedCase")]
+		[TestCase("<Div>a</dIv><div>b</div>", TestName = "DivOpenAndCloseTagsInMixedCase")]
+		public void DifferentCaseTest(string sourceHtml)
+		{
+			var elems = Parse(sourceHtml);
+			var result = string.Join("", elems.OfType<HtmlElement>().Select(ElemToString));
+			Assert.AreEqual(sourceHtml.ToLower(), result.ToLower());
 		}
 
 		
