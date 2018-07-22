@@ -533,5 +533,58 @@ function reqListener () {
 			Assert.AreEqual(1, prerequests.Count);
 			Assert.Greater(prerequests[0].Headers.Count, 0);
 		}
+
+		[TestCase("data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////")]
+		[TestCase("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAYAAACzzX7wAAAABHNCSVQICAgIfAhkiAAAABZJREFUCJlj/P///38GPIAJnyR1FAAABqwEBGR0hh0AAAAASUVORK5CYII=")]
+		public async Task LoadImageFromData(string url)
+		{
+			var resourceProvider = new ResourceProvider(Mocks.HttpResourceProvider().Resource("http://localhost/",""), null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = url;
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.AreEqual(8, img.NaturalWidth);
+			Assert.AreEqual(4, img.NaturalHeight);
+		}
+
+		[Test]
+		public async Task LoadBmpFromUrl()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "")
+				.Resource("http://localhost/image.bmp",
+					Convert.FromBase64String(
+						"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"),
+					"image/bmp");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.AreEqual(8, img.NaturalWidth);
+			Assert.AreEqual(4, img.NaturalHeight);
+		}
+
+		[Test]
+		public async Task LoadBmpError()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider().Resource("http://localhost/", "");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
+			var errorSignal = new ManualResetEvent(false);
+			img.OnError += evt => { errorSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(errorSignal.WaitOne(1000));
+		}
 	}
 }

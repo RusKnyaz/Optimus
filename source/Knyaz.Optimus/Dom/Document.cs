@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
@@ -40,7 +41,11 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	public class Document : Element, IDocument
 	{
+		//used for event's timestamp.
 		internal DateTime CreatedOn = DateTime.UtcNow;
+
+		//Used in HtmlImageElement for image loading.
+		internal Func<string, Task<IImage>> GetImage;
 		
 		private HtmlBodyElement _body;
 
@@ -319,6 +324,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Col: return new HtmlTableColElement(this);
 				case TagsNames.Label: return new HtmlLabelElement(this);
 				case TagsNames.OptGroup: return new HtmlOptGroupElement(this);
+				case TagsNames.Img: return new HtmlImageElement(this, GetImage);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);

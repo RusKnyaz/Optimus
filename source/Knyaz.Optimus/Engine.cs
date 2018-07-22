@@ -122,6 +122,16 @@ namespace Knyaz.Optimus
 					{
 						EnableDocumentStyling();
 					}
+
+					Document.GetImage = async url =>
+					{
+						var request = CreateRequest(url);
+						var response = await ResourceProvider.SendRequestAsync(request);
+						if(response is HttpResponse httpResponse && httpResponse.StatusCode != HttpStatusCode.OK)
+							throw new Exception("Resource not found");
+							
+						return new Image(response.Type, response.Stream);
+					};
 				}
 
 				DocumentChanged?.Invoke();

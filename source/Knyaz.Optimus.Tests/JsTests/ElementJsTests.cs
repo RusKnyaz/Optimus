@@ -7,7 +7,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 	/// </summary>
 	[TestFixture]
 	public class ElementJsTests
-    {
+	{
 		[TestCase("SetParent")]
 		[TestCase("SetOwnerDocument")]
 		[TestCase("Remove")]
@@ -35,33 +35,40 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("TextElementDispatchesEvent")]
 		public void ElementTests(string testName) => JsTestsRunner.Run(testName);
 
-	    [TestCase("InputChangeCheckedOnClick")]
-	    [TestCase("InputCheckChangingPrevented")]
-	    [TestCase("PreventDefaultDoesNotStopPropogation")]
-	    [TestCase("PreventInCaptureEventListener")]
-	    [TestCase("PreventInBubbleEventListener")]
-	    [TestCase("DefaultActionOrder")]
-	    [TestCase("InputCheckChangingPreventedByReturnValue")]
-	    [TestCase("ClickOnLabel")]
-	    [TestCase("UncheckInHandler")]
-	    [TestCase("UncheckInHandlerAndPreventDefault")]
-	    [TestCase("CheckInHandlerAndPreventDefault")]
-	    [TestCase("LabelClickEventsOrder")]
-	    [TestCase("LabelClickEventsOrderInDocument")]
-	    [TestCase("LabelClickEventsOrderInDocumentPreventDefault")]
-	    public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(testName);
+		[TestCase("InputChangeCheckedOnClick")]
+		[TestCase("InputCheckChangingPrevented")]
+		[TestCase("PreventDefaultDoesNotStopPropogation")]
+		[TestCase("PreventInCaptureEventListener")]
+		[TestCase("PreventInBubbleEventListener")]
+		[TestCase("DefaultActionOrder")]
+		[TestCase("InputCheckChangingPreventedByReturnValue")]
+		[TestCase("ClickOnLabel")]
+		[TestCase("UncheckInHandler")]
+		[TestCase("UncheckInHandlerAndPreventDefault")]
+		[TestCase("CheckInHandlerAndPreventDefault")]
+		[TestCase("LabelClickEventsOrder")]
+		[TestCase("LabelClickEventsOrderInDocument")]
+		[TestCase("LabelClickEventsOrderInDocumentPreventDefault")]
+		public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(testName);
 	    
-	    [TestCase("Control")]
-	    [TestCase("ControlInDocument")]
-	    public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(testName);
+		[TestCase("Control")]
+		[TestCase("ControlInDocument")]
+		public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(testName);
 
-	    [TestCase("Form")]
-	    [TestCase("NestedOptgroups")]
-	    [TestCase("SetLabelSetsAttribute")]
-	    [TestCase("GetLabelGetsAttributeIfExists")]
-	    [TestCase("GetLabelGetsTextIfThereIsNoAttribute")]
+		[TestCase("Form")]
+		[TestCase("NestedOptgroups")]
+		[TestCase("SetLabelSetsAttribute")]
+		[TestCase("GetLabelGetsAttributeIfExists")]
+		[TestCase("GetLabelGetsTextIfThereIsNoAttribute")]
 		[TestCase("GetLabelWhenAttributeIsEmpty")]
-	    [TestCase("DivInOptionSkipped")]
+		[TestCase("DivInOptionSkipped")]
 		public void HtmlOptionElementTests(string testName) => JsTestsRunner.Run(testName);
-    }
+
+	   
+		[TestCase("NoArgumentsCtor")]
+		[TestCase("OneArgumentCtor")]
+		[TestCase("TwoArgumentsCtor")]
+		[TestCase("SetWidthAndHeight")]
+		public void HtmlImageElementTests(string testName) => JsTestsRunner.Run(testName);
+	}
 }
