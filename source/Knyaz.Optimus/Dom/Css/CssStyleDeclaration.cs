@@ -46,8 +46,7 @@ namespace Knyaz.Optimus.Dom.Css
 			}
 			set
 			{
-				int number;
-				if (int.TryParse(name, out number))
+				if (int.TryParse(name, out _))
 					return;
 
 				if (value == null)
@@ -82,10 +81,7 @@ namespace Knyaz.Optimus.Dom.Css
 		/// </summary>
 		/// <param name="idx"></param>
 		/// <returns></returns>
-		public string this[int idx]
-		{
-			get { return idx < 0 || idx >= _properties.Count ? string.Empty : _properties.AllKeys[idx]; }
-		}
+		public string this[int idx] => idx < 0 || idx >= _properties.Count ? string.Empty : _properties.AllKeys[idx];
 
 		/// <summary>
 		/// Retrieves the value of a CSS property if it has been explicitly set within this declaration block.
@@ -160,7 +156,8 @@ namespace Knyaz.Optimus.Dom.Css
 			else if(_importants.Contains(name))
 				_importants.Remove(name);
 
-			_properties[name] = value;
+			_properties[name] = Validate(name, value);
+			
 			HandleComplexProperty(name, value);
 			UpdateCssText();
 		}
@@ -197,7 +194,7 @@ namespace Knyaz.Optimus.Dom.Css
 					SetClockwise(BorderWidthNames, value);
 					break;
 				case Css.BorderStyle:
-					SetClockwise(BorderStyleNames, value);
+					SetClockwise(BorderStyleNames, Validate(Css.BorderStyle, value));
 					break;
 				case Css.BorderColor:
 					SetClockwise(BorderColorNames, value);
@@ -213,11 +210,9 @@ namespace Knyaz.Optimus.Dom.Css
 
 		//Reges to remove spaces around commas
 		private static Regex _normalizeCommas = new Regex("\\s*\\,\\s*", RegexOptions.Compiled);
-		static string[] FontStyles = {"normal", "italic", "oblique", "inherit"};
 		private static string[] FontWeights = {"bold", "bolder", "lighter", "normal", "100", "200", "300","400","500","600","700","800","900"};
-		private static string[] FontVariants = {"normal", "small-caps", "inherit"};
-
-		///<param name="value">[font-style||font-variant||font-weight] font-size [/line-height] font-family | inherit</param>
+		
+		///<param name="value">[font-style", "", "font-variant", "", "font-weight] font-size [/line-height] font-family", "inherit</param>
 		private void SetFont(string value)
 		{
 			var args = _normalizeCommas.Replace(value, ",")
@@ -232,7 +227,7 @@ namespace Knyaz.Optimus.Dom.Css
 			if (args.Length == 1)
 			{
 				//todo: implement
-				//one of caption|icon|menu|message-box|small-caption|status-bar|initial|inherit
+				//one of caption", "icon", "menu", "message-box", "small-caption", "status-bar", "initial", "inherit
 				return;
 			}
 
@@ -265,7 +260,7 @@ namespace Knyaz.Optimus.Dom.Css
 				_properties[Css.FontWeight] = "normal";
 			}
 
-			if (FontVariants.Contains(val))
+			if (FontVariantValidValues.Contains(val))
 			{
 				_properties[Css.FontVariant] = val;
 				i++;
@@ -278,7 +273,7 @@ namespace Knyaz.Optimus.Dom.Css
 				_properties[Css.FontVariant] = "normal";
 			}
 
-			_properties[Css.FontStyle] = FontStyles.Contains(val) ? val : "normal";
+			_properties[Css.FontStyle] = FontStyleValidValues.Contains(val) ? val : "normal";
 		}
 
 
@@ -335,17 +330,7 @@ namespace Knyaz.Optimus.Dom.Css
 				{
 					_properties[prefix + "-width"] = arg;
 				}
-				else if (arg == "none" ||
-				         arg == "hidden" ||
-				         arg == "dotted" ||
-				         arg == "dashed" ||
-				         arg == "solid" ||
-				         arg == "double" ||
-				         arg == "groove" ||
-				         arg == "ridge" ||
-				         arg == "inset" ||
-				         arg == "outset" ||
-				         arg == "inherit")
+				else if (BorderStyleValidValues.Contains(arg))
 				{
 					_properties[prefix + "-style"] = arg;
 				}
@@ -357,7 +342,7 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 
 		static string[] BorderStyleNames =
-			{"border-top-style", "border-right-style", "border-bottom-style", "border-left-style"};
+			{Css.BorderTopStyle, Css.BorderRightStyle, Css.BorderBottomStyle, Css.BorderLeftStyle};
 
 		static string[] BorderWidthNames =
 			{"border-top-width", "border-right-width", "border-bottom-width","border-left-width"};
@@ -367,7 +352,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		static string[] BorderRadiusNames =
 			{"border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"};
-
+		
 		static string[] PaddingNames = {"padding-top", "padding-right", "padding-bottom", "padding-left"};
 		static string[] MarginNames = {"margin-top", "margin-right", "margin-bottom", "margin-left"};
 
