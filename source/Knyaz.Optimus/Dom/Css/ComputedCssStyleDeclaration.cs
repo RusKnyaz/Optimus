@@ -123,8 +123,6 @@ namespace Knyaz.Optimus.Dom.Css
 						_styles.Where(x => x.GetPropertyPriority(propertyName) == string.Empty));
 				
 
-			//var tmp = values.ToArray();
-
 			var res = values.Select(x => x.GetPropertyValue(propertyName)).FirstOrDefault(x => x != null);
 			if(res == "inherit" ||
 				((propertyName == Css.FontSize || propertyName == Css.FontFamily || propertyName == Css.FontStyle

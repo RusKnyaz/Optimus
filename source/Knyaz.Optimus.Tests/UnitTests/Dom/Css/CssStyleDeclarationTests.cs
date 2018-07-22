@@ -120,5 +120,16 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				style.GetPropertyValue("border-bottom-color") == "black" &&
 				style.GetPropertyValue("border-left-color") == "rgb(25, 25, 25)");
 		}
+
+		[TestCase("display:none", "display", ExpectedResult = "none", Description = "Valid lowercase 'display' value")]
+		[TestCase("display:NOne", "display", ExpectedResult ="none", Description = "Valid uppercase 'display' value")]
+		[TestCase("display:abc", "display", ExpectedResult = "", Description = "Invalid 'display' value")]
+		[TestCase("font-style:ITALIC", "font-style", ExpectedResult ="italic", Description = "Valid uppercase 'font-style' value")]
+		[TestCase("font-style:abc", "font-style", ExpectedResult ="", Description = "Invalid 'font-style' value")]
+		[TestCase("border-right-style:dotted", "border-right-style", ExpectedResult ="dotted", Description= "Valid border-right-style")]
+		[TestCase("border-style:punktiren", "border-style", ExpectedResult ="", Description="Invalid 'borderstyle' shorthand property  value.")]
+		[TestCase("border-style:dotted", "border-style", ExpectedResult ="dotted", Description="Valid 'borderstyle' shorthand property  value.")]
+		[TestCase("border-style:dotted", "border-left-style", ExpectedResult ="dotted", Description="Set valid border-left-style via shorthand border-style.")]
+		public string StyleValidation(string css, string propertyName) => Style(css).GetPropertyValue(propertyName);
 	}
 }
