@@ -191,10 +191,24 @@ namespace Knyaz.Optimus.TestingTools
 		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout)
 		{
 			engine.WaitDocumentLoad();
-			var selector = new CssSelector(query);
-            var timespan = 100;
-			var doc = engine.Document;
+			
+			return WaitSelector(engine.Document, query, timeout);
+		}
 
+		/// <summary>
+		/// Freezes the current thread until at least one element that matches the query appears in the document.
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <param name="query"></param>
+		/// <param name="timeout"></param>
+		/// <returns>Matched elements.</returns>
+		public static IEnumerable<IElement> WaitSelector(this Document doc, string query, int timeout = 0)
+		{
+			if (timeout == 0)
+				timeout = DefaultTimeout;
+			
+			var selector = new CssSelector(query);
+			var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
 			{
 				try
@@ -205,11 +219,11 @@ namespace Knyaz.Optimus.TestingTools
 				}
 				catch
 				{
-
 				}
 
 				Thread.Sleep(timespan);
 			}
+
 			return selector.Select(doc);
 		}
 
