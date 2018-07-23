@@ -117,8 +117,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public int Width
 		{
-			get => _width.Value;
-			set => _width.Value = value;
+			get => GetAttribute("width", 0);
+			set => SetAttribute("width", value.ToString());
 		}
 
 		/// <summary>
@@ -126,8 +126,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public int Height
 		{
-			get => _height.Value;
-			set => _height.Value = value;
+			get => GetAttribute("height", 0);
+			set => SetAttribute("height", value.ToString());
 		}
 
 		/// <summary>
