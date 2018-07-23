@@ -15,6 +15,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		private readonly AttributeMappedValue<string> _src;
 		private readonly AttributeMappedValue<string> _alt;
 		private readonly AttributeMappedValue<string> _useMap;
+		private readonly AttributeMappedValue<int> _width;
+		private readonly AttributeMappedValue<int> _height;
 		private readonly AttributeMappedBoolValue _isMap;
 
 		private IImage _loadedImage = null;
@@ -26,6 +28,8 @@ namespace Knyaz.Optimus.Dom.Elements
 			_alt = new AttributeMappedValue<string>(this, "alt");
 			_useMap = new AttributeMappedValue<string>(this, "usemap");
 			_isMap = new AttributeMappedBoolValue(this, "ismap");
+			_width = new AttributeMappedValue<int>(this, "width");
+			_height = new AttributeMappedValue<int>(this, "height");
 		}
 
 		/// <summary>
@@ -69,12 +73,15 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
+		private bool _complete = false;
+
 		private async Task LoadImage(string value)
 		{
 			var wasError = false;
 
 			try
 			{
+				_complete = false;
 				_loadedImage = await _loadImage(value);
 				if (_loadedImage == null)
 				{
@@ -93,7 +100,9 @@ namespace Knyaz.Optimus.Dom.Elements
 				DispatchEvent(errorEvent);
 				wasError = true;
 			}
-
+			
+			_complete = true;
+			
 			if (!wasError)
 			{
 				var loadEvent = OwnerDocument.CreateEvent("Event");
@@ -102,12 +111,39 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public int Width { get; set; }
-		public int Height { get; set; }
 
+		/// <summary>
+		/// Reflects the 'width' HTML attribute, indicating the rendered width of the image in CSS pixels.
+		/// </summary>
+		public int Width
+		{
+			get => _width.Value;
+			set => _width.Value = value;
+		}
+
+		/// <summary>
+		/// Reflects the 'height' HTML attribute, indicating the rendered height of the image in CSS pixels.
+		/// </summary>
+		public int Height
+		{
+			get => _height.Value;
+			set => _height.Value = value;
+		}
+
+		/// <summary>
+		/// The intrinsic width of the image in CSS pixels, if it is available; else, it shows 0.
+		/// </summary>
 		public int NaturalWidth => _loadedImage != null ? _loadedImage.Width : 0;
+		
+		/// <summary>
+		/// The intrinsic height of the image in CSS pixels, if it is available; else, it shows 0.
+		/// </summary>
 		public int NaturalHeight => _loadedImage != null ? _loadedImage.Height : 0;
-		public bool Completed => string.IsNullOrEmpty(Src) || _loadedImage != null;
+		
+		/// <summary>
+		/// Returns a Boolean that is true if the browser has finished fetching the image, whether successful or not. It also shows true, if the image has no src value
+		/// </summary>
+		public bool Complete => string.IsNullOrEmpty(Src) || _complete;
 		
 		/// <summary>
 		/// Fired immediately after an element has been loaded.
