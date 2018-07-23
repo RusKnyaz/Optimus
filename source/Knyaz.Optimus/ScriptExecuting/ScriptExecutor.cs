@@ -144,6 +144,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return val;
 			});
 			
+			//Register Event constructor
 			var eventCtor =new ClrFuncCtor(_jsEngine, args => {
 				var evt = _engine.Document.CreateEvent("Event");
 				var opts = args.Length > 1 ? args[1].AsObject() : null;
@@ -154,6 +155,21 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return res.AsObject();
 			}); 
 			_jsEngine.Global.FastAddProperty("Event", eventCtor, false, false, false);
+
+			//Register Image constructor
+			var imageCtor =new ClrFuncCtor(_jsEngine, args => {
+				var img = (HtmlImageElement)_engine.Document.CreateElement("img");
+				_typeConverter.TryConvert(img, out var res);
+				if (args.Length > 0)
+					img.Width = (int)args[0].AsNumber();
+				
+				if(args.Length > 1)
+					img.Height = (int)args[1].AsNumber();
+
+				return res.AsObject();
+			}); 
+			_jsEngine.Global.FastAddProperty("Image", imageCtor, false, false, false);
+			
 
 			Func<Stream, object> parseJsonFn = s =>
 			{

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
@@ -220,6 +221,18 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			engine.OpenUrl("https://rutracker.org").Wait();
 			System.Console.WriteLine(engine.Document.DocumentElement.InnerHTML);
+		}
+		
+		[Test]
+		public async Task OpenHabr()
+		{
+			var engine = new Engine();
+			engine.OnRequest += request => System.Console.WriteLine(request.Url);
+			engine.OnResponse += arguments => System.Console.WriteLine(arguments.Request.Url);
+			engine.AttachConsole();
+			var page = await engine.OpenUrl("https://habr.com");
+			System.Console.WriteLine(page.Document.InnerHTML);
+			//var logo = page.Document.WaitSelector(".logo-wrapper").First();
 		}
 	}
 }

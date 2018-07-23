@@ -72,6 +72,20 @@ namespace Knyaz.Optimus.Tests
 
 				return this;
 			}
+			
+			public SpecResourceProvider Resource(string url, byte[] data, string resourceType = "text/html")
+			{
+				var uri = new Uri(url, UriKind.RelativeOrAbsolute); 
+				
+				_resources[uri] =  new HttpResponse(
+					HttpStatusCode.OK, 
+					new MemoryStream(data), 
+					null, 
+					resourceType, 
+					uri);
+
+				return this;
+			}
 
 			public List<Request> History = new List<Request>();
 		}

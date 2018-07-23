@@ -19,6 +19,7 @@
     <script src="HtmlLabelElementTests.js"></script>
     <script src="EventTests.js"></script>
     <script src="HtmlOptionElementTests.js"></script>
+    <script src="HtmlImageElementTests.js"></script>
 </head>
 <body>
 </body>
@@ -27,7 +28,7 @@
     document.body.appendChild(table);
     table.style["width"] = "100%";
 
-    table.innerHTML = "<col width=200/><col/><col/>"
+    table.innerHTML = "<col width=200/><col/><col/>";
 
     for (var fixtureName in Tests)  {
         var fixture = Tests[fixtureName];
