@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -585,6 +586,38 @@ function reqListener () {
 			img.OnError += evt => { errorSignal.Set(); };
 			img.Src = "image.bmp";
 			Assert.IsTrue(errorSignal.WaitOne(1000));
+		}
+
+		[Test]
+		public async Task StyleOnLoad()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+@"<html><body></body>
+<script>
+	document.body.onload=function(){console.log('body onload')};
+	var style=document.createElement('style');
+	style.innerHTML='div{border:1px solid red}';
+	var onLoadCalled = false;
+	style.onload=function(){ console.log('style onload')};
+
+	var cnt = document.createElement('div');
+	cnt.appendChild(style);
+
+	console.log('add');
+	document.head.appendChild(style)
+	console.log('added');
+</script>
+
+<script>
+		console.log('script2')
+</script></html>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.IsNotNull(page.Document.GetElementsByTagName("style").FirstOrDefault());
+			Assert.AreEqual(new[]{"add", "added", "script2", "style onload", "body onload"}, log);
 		}
 	}
 }
