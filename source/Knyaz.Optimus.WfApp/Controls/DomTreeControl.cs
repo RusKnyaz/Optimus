@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.WfApp.Tools;
 using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
 namespace Knyaz.Optimus.WfApp.Controls
@@ -143,11 +144,7 @@ namespace Knyaz.Optimus.WfApp.Controls
 			var treeNode = new TreeNode(name) {Tag = node};
 
 
-			Node[] nodes;
-			lock (node.OwnerDocument)
-			{
-				nodes = node.ChildNodes.ToArray();	
-			}
+			var nodes = node.ChildNodes.CopyListThreadSafe();	
 			
 			foreach (var child in nodes.Select(CreateBranch).Where(x => x!=null))
 			{
