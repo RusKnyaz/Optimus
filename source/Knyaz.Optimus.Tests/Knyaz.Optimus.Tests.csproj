@@ -79,4 +79,7 @@
   <ItemGroup>
     <None Remove="test-results\**" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\JsTests\StorageTests.js" />
+  </ItemGroup>
 </Project>

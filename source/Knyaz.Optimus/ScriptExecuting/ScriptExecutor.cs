@@ -70,6 +70,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalGetter("document", () => engine.Document);
 			AddGlobalGetter("history", () => engine.Window.History);
 			AddGlobalGetter("location", () => engine.Window.Location);
+			AddGlobalGetter("sessionStorage", () => engine.Window.SessionStorage);
+			AddGlobalGetter("localStorage", () => engine.Window.LocalStorage);
 			AddGlobalGetter("navigator", () => engine.Window.Navigator);
 			AddGlobalGetter("screen", () => engine.Window.Screen);
 			AddGlobalGetter("innerWidth", () => engine.Window.InnerWidth);

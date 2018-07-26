@@ -78,5 +78,16 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AddEventListenerTwice")]
 		[TestCase("AddEventListenerTwiceAndRemove")]
 		public void EventTests(string testName) => JsTestsRunner.Run(testName);
+
+		[TestCase("SetItem")]
+		[TestCase("SetItemTwice")]
+		[TestCase("RemoveItem")]
+		[TestCase("Clear")]
+		[TestCase("GetAbsentItem")]
+		[TestCase("GetKey")]
+		[TestCase("SetByIndexer")]
+		[TestCase("LocalStorage")]
+		[TestCase("SessionStorage")]
+		public void StorageTests(string testName) => JsTestsRunner.Run(testName);
 	}
 }

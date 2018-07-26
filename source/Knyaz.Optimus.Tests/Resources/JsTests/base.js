@@ -42,9 +42,13 @@ var Assert = {
             throw error;
         }
     },
-    IsNotNull : function (x) {
-        if (x == null)
-            throw "Expected not null";
+    IsNotNull : function (x, message) {
+        if (x == null) {
+            var error = "Expected not null";
+            if (message)
+                error = message + "\r\n" + error;
+            throw error;
+        }
     },
     IsNull : function(x){
         if (x != null)

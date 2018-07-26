@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Tools
 {
@@ -9,7 +10,8 @@ namespace Knyaz.Optimus.Tools
 		int Width { get; }
 		int Height { get; }
 	}
-	
+
+	[DomItem]
 	internal class Image : IImage
 	{
 		private Lazy<Tuple<int, int>> _size; 
