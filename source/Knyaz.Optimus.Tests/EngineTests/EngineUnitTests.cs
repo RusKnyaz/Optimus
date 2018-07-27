@@ -619,5 +619,34 @@ function reqListener () {
 			Assert.IsNotNull(page.Document.GetElementsByTagName("style").FirstOrDefault());
 			Assert.AreEqual(new[]{"add", "added", "script2", "style onload", "body onload"}, log);
 		}
+
+		[Test]
+		public async Task OverrideBodyOnLoadFromScript()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+@"<html><body onload='console.log(""body onload attr"")'></body>
+<script>
+	document.body.onload=function(){console.log('body onload script')};
+</script></html>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.AreEqual(new[]{"body onload script"}, log);
+		}
+
+		[Test]
+		public async Task BodyOnLoad()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+				@"<html><body onload='console.log(""body onload attr"")'></body>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.AreEqual(new[]{"body onload attr"}, log);
+		}
 	}
 }
