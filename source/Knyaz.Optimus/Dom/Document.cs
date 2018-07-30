@@ -217,7 +217,7 @@ namespace Knyaz.Optimus.Dom
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(text)))
 			{
-				DocumentBuilder.Build(this, stream);
+				DocumentBuilder.Build(this, stream, NodeSources.Script);
 			}
 		}
 
