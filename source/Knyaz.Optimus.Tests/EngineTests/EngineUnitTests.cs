@@ -648,5 +648,49 @@ function reqListener () {
 			
 			Assert.AreEqual(new[]{"body onload attr"}, log);
 		}
+
+		[Test]
+		public async Task LinkOnError()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body>
+<script>	
+	document.body.onload=function(){console.log('body onload');};
+	var link = document.createElement('link');
+	link.onload  = function(){console.log('ok')};
+	link.onerror = function(){console.log('link onerror')};
+	link.rel='stylesheet';
+	link.href='mystylesheet.css';
+	document.head.appendChild(link);
+	console.log('added');
+</script>
+</html>");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{"added","link onerror","body onload"}, log);
+		}
+		
+		[Test]
+		public async Task LinkOnLoad()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body>
+<script>	
+	document.body.onload=function(){console.log('body onload');};
+	var link = document.createElement('link');
+	link.onload  = function(){console.log('ok')};
+	link.onerror = function(){console.log('link onerror')};
+	link.rel='stylesheet';
+	link.href='mystylesheet.css';
+	document.head.appendChild(link);
+	console.log('added');
+</script>
+</html>").Resource("http://loc/mystyesheet.css","*{border:1px solid black}");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{"added","ok","body onload"}, log);
+		}
 	}
 }
