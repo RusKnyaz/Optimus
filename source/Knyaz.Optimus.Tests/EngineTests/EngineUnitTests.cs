@@ -17,7 +17,7 @@ using Text = Knyaz.Optimus.Dom.Elements.Text;
 namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
-	public class EngineUnitTests
+	public partial class EngineUnitTests
 	{
 
 		[Test]

@@ -39,16 +39,14 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		public static void Build(Document document, Stream stream)
+		public static void Build(Document document, Stream stream, NodeSources source = NodeSources.DocumentBuilder)
 		{
 			var html = HtmlParser.Parse(stream);
-			Build(document, html);
+			Build(document, html, source);
 		}
 
-		public static void Build(Document document, IEnumerable<IHtmlNode> htmlElements)
-		{
-			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements));
-		}
+		public static void Build(Document document, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder) =>
+			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements), source);
 
 		private static IEnumerable<IHtmlNode> BuildInternal(
 			Node node, 
