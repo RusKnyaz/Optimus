@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.Dom.Elements;
+﻿using System.Collections.Generic;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Interfaces
@@ -89,5 +90,15 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		/// <param name="element">The node to search.</param>
 		/// <returns><c>True</c> if node found, <c>False</c> otherwise.</returns>
 		bool Contains(INode element);
+		
+		/// <summary>
+		/// Returns first descendant element that matches a specified CSS selector(s).
+		/// </summary>
+		IElement QuerySelector(string query);
+
+		/// <summary>
+		/// Returns all descendant elements that matches a specified CSS selector(s).
+		/// </summary>
+		IReadOnlyList<IElement> QuerySelectorAll(string query);
 	}
 }

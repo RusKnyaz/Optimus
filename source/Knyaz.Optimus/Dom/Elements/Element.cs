@@ -523,13 +523,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary>
-		/// Returns the first descendant element that matches a specified CSS selector(s).
+		/// Returns first descendant element that matches a specified CSS selector(s).
 		/// </summary>
 		public virtual IElement QuerySelector(string query) =>
 			((CssSelector) query).Select(this).FirstOrDefault();
 
 		/// <summary>
-		/// Returns all elements in the document that matches a specified CSS selector(s).
+		/// Returns all descendant elements that matches a specified CSS selector(s).
 		/// </summary>
 		public virtual IReadOnlyList<IElement> QuerySelectorAll(string query) =>
 			((CssSelector)query).Select(this).ToList().AsReadOnly();
