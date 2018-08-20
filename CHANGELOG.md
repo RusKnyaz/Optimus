@@ -1,7 +1,21 @@
 # Optimus Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.0] - unreleased
+## [2.1] - 2017-02-16
+
+Fixed bugs and extended DOM API.
+
+### Added
+- Documentation
+- Methods and properties of HtmlButtonElement, HtmlInputElement, HtmlOptionElement
+- HtmlOptionGroupElement
+
+### Changed
+- Fixed events propogation and handling
+- Downgraded Jint to stable version
+- Fixed 'this' value inside event handlers.
+
+## [2.0] - 2017-12-xx
 
 ### Added
 - Netstandard and Netcore support
@@ -12,7 +26,6 @@ All notable changes to this project will be documented in this file.
 - Fixed loading resources from relative path
 - Fixed DOM manipulation methods.
 - Fixed some minor bugs.
-
 
 ## [1.2] 2017-06-xx
 
