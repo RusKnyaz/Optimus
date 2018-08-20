@@ -1,6 +1,25 @@
 # Optimus Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.2] - 2017-08-20
+
+### Added
+- Ability to specify UserAgent
+- Using of web proxies
+- Basic authorization
+- Pre-handling of http requests
+- Status code of opened page
+- Added support of overloads of setTimeout/setInterval with arbitrary count of arguments
+- Added session storage API
+- HtmlImageElement
+
+
+### Changed
+- Fixed bug with decoding of base64 from data: url
+- Fixed agent's styles priority
+- Fixed dead-lock on script execution
+
+
 ## [2.1] - 2017-02-16
 
 Fixed bugs and extended DOM API.
