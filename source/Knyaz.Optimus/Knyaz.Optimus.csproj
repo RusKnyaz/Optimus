@@ -16,7 +16,7 @@
     <RepositoryUrl>https://bitbucket.org/RusKnyaz/optimus/src</RepositoryUrl>
     <RepositoryType>mercurial</RepositoryType>
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
-    <PackageReleaseNotes>NetCore and NetStandard assemblies added.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support of UserAgent, Proxy and BasicAuth. Fixed bugs.</PackageReleaseNotes>
     <PackageTags>headless web browser</PackageTags>
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
