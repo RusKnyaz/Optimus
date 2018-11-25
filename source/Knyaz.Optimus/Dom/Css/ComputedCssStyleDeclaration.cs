@@ -209,10 +209,9 @@ namespace Knyaz.Optimus.Dom.Css
 			var unitIdx = strValue.IndexOf(c => !char.IsDigit(c) && c != '.');
 			if (unitIdx != 0)
 			{
-				var unit = string.Empty;
 				if (unitIdx != -1)
 				{
-					unit = strValue.Substring(unitIdx);
+					var unit = strValue.Substring(unitIdx);
 					strValue = strValue.Substring(0, unitIdx);
 					return new Tuple<float, string>(float.Parse(strValue, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture), unit.ToLowerInvariant());
 				}

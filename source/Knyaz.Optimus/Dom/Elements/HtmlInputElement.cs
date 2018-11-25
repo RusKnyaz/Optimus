@@ -167,7 +167,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			//empty the list of selected files, and then invoke the value sanitization algorithm, if the type attribute's current 
 			//state defines one.
 
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
 		#region . type = number

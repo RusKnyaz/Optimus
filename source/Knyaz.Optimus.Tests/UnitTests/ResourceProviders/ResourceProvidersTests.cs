@@ -1,6 +1,5 @@
 ﻿using System;
 using Knyaz.Optimus.ResourceProviders;
-using Knyaz.Optimus.Tools;
 using Moq;
 using NUnit.Framework;
 

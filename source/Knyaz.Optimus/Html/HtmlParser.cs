@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Html
 {
-	class HtmlParser
+	static class HtmlParser
 	{
 		internal static IEnumerable<IHtmlNode> Parse(System.IO.Stream stream)
 		{

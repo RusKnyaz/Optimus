@@ -77,14 +77,14 @@ namespace Knyaz.Optimus.Dom.Perf
 		{
 			get
 			{
-				if (index < 0 || index >= Length)
+				if (index >= Length)
 					return default(T);
 
 				return GetData((int)index * _bytesPerElement);
 			}
 			set
 			{
-				if (index < 0 || index >= Length)
+				if (index >= Length)
 					return;
 
 				var bytes = GetBytes(value);
@@ -106,7 +106,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		public Int8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Int8Array Subarray(long begin, long? end = null)	=> new Int8Array(GetSub(begin, end));
 		protected override sbyte GetData(int index)	=> (sbyte)_data[index];
-		protected override byte[] GetBytes(sbyte val) => new byte[] { (byte)val };
+		protected override byte[] GetBytes(sbyte val) => new [] { (byte)val };
 		public static string Name => "Int8Array";
 
 		static sbyte FromObject(object val)

@@ -58,8 +58,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Call handler periodically
 		/// </summary>
-		/// <param name="handler"></param>
-		/// <param name="timeout"></param>
+		/// <param name="handler">The callback function.</param>
+		/// <param name="timeout">Time interval in milliseconds between handler calls.</param>
+		/// <param name="data">The arguments to be passed to the handler.</param>
 		/// <returns></returns>
 		public int SetInterval(Action<object[]> handler, int timeout, object[] data)
 		{

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.ResourceProviders;

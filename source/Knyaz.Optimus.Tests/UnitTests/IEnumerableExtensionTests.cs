@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Knyaz.Optimus.Tools;
+﻿using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests
@@ -17,7 +16,7 @@ namespace Knyaz.Optimus.Tests
 		[Test]
 		public void ToListOrNullReturnsList()
 		{
-			var x = new string[] {"ABC"};
+			var x = new [] {"ABC"};
 			Assert.AreEqual(1, x.ToListOrNull().Count);
 		}
 	}

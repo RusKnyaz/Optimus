@@ -108,16 +108,6 @@ namespace Knyaz.Optimus.Dom
 				});
 		}
 
-
-		/// <summary>
-		/// Map attribute to event (onclick->click, etc...)
-		/// </summary>
-		private static IDictionary<string, string> _eventAttr = new Dictionary<string, string>
-		{
-			{"onclick", "click"},
-			{"onload", "load"}
-		};
-
 		void OnDocumentDomContentLoaded (IDocument document)
 		{
 			while (_unresolvedDelayedResources.Count > 0)
@@ -183,17 +173,17 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		/// <summary>
-		/// Faired before running the script.
+		/// Raised before running the script.
 		/// </summary>
 		public event Action<Script> BeforeScriptExecute;
 		
 		/// <summary>
-		/// Faired after running the script.
+		/// Raised after running the script.
 		/// </summary>
 		public event Action<Script> AfterScriptExecute;
 		
 		/// <summary>
-		/// Faired on script execution error.
+		/// Raised on script execution error.
 		/// </summary>
 		public event Action<Script, Exception> ScriptExecutionError;
 

@@ -66,7 +66,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			};
 
 			engine.OpenUrl("http://localhost");
-			System.Threading.Thread.Sleep(1000);
+			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[]{"OK"}, log);
 		}
 		

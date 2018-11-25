@@ -164,7 +164,7 @@ namespace Knyaz.Optimus.Dom
 			if (_response.Headers == null)
 				return "";
 
-			var headersString = _response.Headers.ToString();
+			var headersString = _response.Headers;
 
 			//todo: probably the hack below is no more required due to JINT's reges was fixed.
 			//to fix jquery we should remove \r due to jquery uses .net regex where \r\n is not threated as end line
