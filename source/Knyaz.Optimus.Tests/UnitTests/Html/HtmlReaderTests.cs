@@ -67,6 +67,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("<script>var bar = 2/1 + '/';</script><body></body>", "TagStart:script, Text:var bar = 2/1 + '/';, TagEnd:script, TagStart:body, TagEnd:body")]
 		[TestCase("<script>var bar = (2)/1 + '/';</script><body></body>", "TagStart:script, Text:var bar = (2)/1 + '/';, TagEnd:script, TagStart:body, TagEnd:body")]
 		[TestCase("<div></div></ul><div></div>", "TagStart:div, TagEnd:div, TagEnd:ul, TagStart:div, TagEnd:div", Description = "Unexpected end tag should be recognized.")]
+		[TestCase("<div selected selected selected>", "TagStart:div, AttributeName:selected, AttributeName:selected, AttributeName:selected")]
 		public void ReadString(string source, string expectedChunks)
 		{
 			Assert.AreEqual(expectedChunks, Read(source));
