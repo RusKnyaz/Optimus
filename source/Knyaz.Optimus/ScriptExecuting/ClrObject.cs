@@ -282,10 +282,11 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 				if ((thisObject.AsObject() as ClrObject)?.Target is IEventTarget et)
 				{
-					if (arguments.Length <= 2 || arguments[2].IsBoolean())
+					var capture = false;
+					var optionsJs = arguments.Length > 2 ? arguments[2].ToBooleanOrObject(out capture) : null;
+					
+					if (optionsJs == null)
 					{
-						var capture = arguments.Length > 2 && arguments[2].AsBoolean();
-
 						if (add)
 							et.AddEventListener(eventName, handler, capture);
 						else
@@ -293,8 +294,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 					}
 					else
 					{
-						var optionsJs = arguments[2].AsObject();
-
 						bool GetBool(JsValue val) => val.IsBoolean() && val.AsBoolean();
 
 						var options = new EventListenerOptions {
@@ -337,6 +336,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			try
 			{
+				var maxParams = _methods.Max(x => x.GetParameters().Length);
+
+				if (arguments.Length > maxParams)
+				{
+					var tmp = new JsValue[maxParams];
+					Array.Copy(arguments, 0, tmp, 0, tmp.Length);
+					arguments = tmp;
+				}
+				
 				return _internalFunc.Call(thisObject, arguments);
 			}
 			catch (Exception ex)

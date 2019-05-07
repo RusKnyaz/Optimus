@@ -99,15 +99,59 @@ namespace Knyaz.Optimus.ScriptExecuting
 			AddGlobalAct("clearTimeout", (_, x) => engine.Window.ClearTimeout(x.Length > 0 ? (int)x[0].AsNumber() : -1));
 			AddGlobalAct("dispatchEvent", (_, x) => engine.Window.DispatchEvent(x.Length > 0 ? (Event)x[0].ToObject() : null));
 
-			AddGlobalAct("addEventListener", (@this, x) => engine.Window.AddEventListener(
-				x.Length > 0 ? x[0].AsString() : null,
-				_typeConverter.ConvertDelegate<Event>(@this, x[1]),
-				x.Length > 2 && ToBoolean(x[2])));
+			AddGlobalAct("addEventListener", (@this, x) =>
+			{
+				var capture = false;
+				var optionsJs =
+					x.Length > 2 ? 
+						x[2].ToBooleanOrObject(out capture) : null;
+				
+				if(optionsJs == null)
+					engine.Window.AddEventListener(
+						x.Length > 0 ? x[0].AsString() : null,
+						_typeConverter.ConvertDelegate<Event>(@this, x[1]),
+						capture);
+				else
+				{
+					bool GetBool(JsValue val) => val.IsBoolean() && val.AsBoolean();
 
-			AddGlobalAct("removeEventListener", (@this, x) => engine.Window.RemoveEventListener(
-				x.Length > 0 ? x[0].AsString() : null,
-				_typeConverter.ConvertDelegate<Event>(@this, x[1]),
-				x.Length > 2 && ToBoolean(x[2])));
+					engine.Window.AddEventListener(
+						x.Length > 0 ? x[0].AsString() : null,
+						_typeConverter.ConvertDelegate<Event>(@this, x[1]),
+						new EventListenerOptions {
+							Capture = GetBool(optionsJs.Get("capture")),
+							Passive = GetBool(optionsJs.Get("passive")),
+							Once = GetBool(optionsJs.Get("once"))
+						});
+				}
+			});
+
+			AddGlobalAct("removeEventListener", (@this, x) =>
+			{
+				var capture = false;
+				var optionsJs =
+					x.Length > 2 ? 
+						x[2].ToBooleanOrObject(out capture) : null;
+				
+				if(optionsJs == null)
+					engine.Window.RemoveEventListener(
+						x.Length > 0 ? x[0].AsString() : null,
+						_typeConverter.ConvertDelegate<Event>(@this, x[1]),
+						capture);
+				else
+				{
+					bool GetBool(JsValue val) => val.IsBoolean() && val.AsBoolean();
+					
+					engine.Window.RemoveEventListener(
+						x.Length > 0 ? x[0].AsString() : null,
+						_typeConverter.ConvertDelegate<Event>(@this, x[1]),
+						new EventListenerOptions {
+							Capture = GetBool(optionsJs.Get("capture")),
+							Passive = GetBool(optionsJs.Get("passive")),
+							Once = GetBool(optionsJs.Get("once"))
+						});
+				}
+			});
 
 			AddGlobalFunc("matchMedia", (value, values) =>
 			{
@@ -194,17 +238,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_jsEngine.Global.FastAddProperty("XMLHttpRequest", xmlHttpReqCtor, false, false, false);
 		}
 
-		private bool ToBoolean(JsValue x)
-		{
-			if (x.Type == Types.Boolean)
-				return x.AsBoolean();
-
-			if (x.Type == Types.Number)
-				return x.AsNumber() != 0;
-
-			return x.AsObject() != null;
-		}
-
+	
 		private void AddGlobalFunc(string name, Func<JsValue, JsValue[], JsValue> action)
 		{
 			var jsFunc = new ClrFunctionInstance(_jsEngine, action);

@@ -16,6 +16,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetOnClickAttribute")]
 		[TestCase("SetOnClickAttributePropogation")]
 		[TestCase("EventHandlingOrder")]
+		[TestCase("EventHandlingOrderCapturingString")]
+		[TestCase("EventHandlingOrderCapturingUndefined")]
 		[TestCase("EventListenerParams")]
 		[TestCase("EventHandlerParams")]
 		[TestCase("AttrEventHandlerParams")]
