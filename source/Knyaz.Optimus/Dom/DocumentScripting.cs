@@ -53,7 +53,10 @@ namespace Knyaz.Optimus.Dom
 			if (node is Attr)
 				return;
 
-			foreach (var elt in node.Flatten().OfType<HtmlElement>())
+			//Prevent 'Collection was modified' exception.
+			var tmpChildNodes = node.Flatten().OfType<HtmlElement>().ToArray();
+			
+			foreach (var elt in tmpChildNodes)
 			{
 				if (elt is Script script)
 				{
