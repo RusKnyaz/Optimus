@@ -1,6 +1,5 @@
 ﻿using System;
 using Knyaz.Optimus.Environment;
-using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Environment

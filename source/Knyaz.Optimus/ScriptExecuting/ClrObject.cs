@@ -35,8 +35,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		private JsValue Convert(Object obj)
 		{
-			var res = JsValue.Null;
-			_converter.TryConvert(obj, out res);
+			_converter.TryConvert(obj, out var res);
 			return res;
 		}
 
@@ -282,10 +281,11 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 				if ((thisObject.AsObject() as ClrObject)?.Target is IEventTarget et)
 				{
-					if (arguments.Length <= 2 || arguments[2].IsBoolean())
+					var capture = false;
+					var optionsJs = arguments.Length > 2 ? arguments[2].ToBooleanOrObject(out capture) : null;
+					
+					if (optionsJs == null)
 					{
-						var capture = arguments.Length > 2 && arguments[2].AsBoolean();
-
 						if (add)
 							et.AddEventListener(eventName, handler, capture);
 						else
@@ -293,8 +293,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 					}
 					else
 					{
-						var optionsJs = arguments[2].AsObject();
-
 						bool GetBool(JsValue val) => val.IsBoolean() && val.AsBoolean();
 
 						var options = new EventListenerOptions {
@@ -337,6 +335,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			try
 			{
+				var maxParams = _methods.Max(x => x.GetParameters().Length);
+
+				if (arguments.Length > maxParams)
+				{
+					var tmp = new JsValue[maxParams];
+					Array.Copy(arguments, 0, tmp, 0, tmp.Length);
+					arguments = tmp;
+				}
+				
 				return _internalFunc.Call(thisObject, arguments);
 			}
 			catch (Exception ex)
@@ -354,10 +361,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		public ClrPropertyInfoDescriptor(Jint.Engine engine, PropertyInfo propertyInfo, object item)
 		{
-			this._engine = engine;
-			this._propertyInfo = propertyInfo;
-			this._item = item;
-			this.Writable = new bool?(propertyInfo.CanWrite);
+			_engine = engine;
+			_propertyInfo = propertyInfo;
+			_item = item;
+			Writable = propertyInfo.CanWrite;
 		}
 
 		public override JsValue Value
@@ -379,9 +386,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 					else
 					{
 						obj = jsValue.ToObject();
-						if (obj != null && obj.GetType() != this._propertyInfo.PropertyType)
-							obj = _engine.ClrTypeConverter.Convert(obj, this._propertyInfo.PropertyType,
-								(IFormatProvider) CultureInfo.InvariantCulture);
+						if (obj != null && obj.GetType() != _propertyInfo.PropertyType)
+							obj = _engine.ClrTypeConverter.Convert(obj, _propertyInfo.PropertyType,
+								CultureInfo.InvariantCulture);
 					}
 					_propertyInfo.SetValue(_item, obj, null);
 				}

@@ -49,7 +49,7 @@ namespace Knyaz.Optimus.Dom.Css
 		{
 			if (node is Text txt && node.ParentNode is HtmlStyleElement styleElt && !string.IsNullOrWhiteSpace(txt.Data))
 			{
-				//todo: chech type
+				//todo: check type
 				var type = !string.IsNullOrEmpty(styleElt.Type) ? styleElt.Type : "text/css";
 				var media = !string.IsNullOrEmpty(styleElt.Media) ? styleElt.Type : "all";
 				AddStyleToDocument(new StringReader(txt.Data));

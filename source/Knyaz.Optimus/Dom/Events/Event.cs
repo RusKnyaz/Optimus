@@ -1,6 +1,4 @@
 ﻿using System;
-using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events

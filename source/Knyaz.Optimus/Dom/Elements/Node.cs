@@ -372,10 +372,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			var thisAncestors = new List<Node>();
 			var otherAncestors = new List<Node>();
 
-			for (var p = (Node)this; p != null; p = p.ParentNode )
+			for (var p = this; p != null; p = p.ParentNode )
 				otherAncestors.Add(p);
 
-			for (var p = (Node)node; p != null && !otherAncestors.Contains(p); p = p.ParentNode)
+			for (var p = node; p != null && !otherAncestors.Contains(p); p = p.ParentNode)
 				thisAncestors.Add(p);
 
 			//node placed inside

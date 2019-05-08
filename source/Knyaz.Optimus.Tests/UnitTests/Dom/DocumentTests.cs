@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
-using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom

@@ -10,7 +10,7 @@ using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
 namespace Knyaz.Optimus.Dom
 {
 	//Build document using own parser
-	internal class DocumentBuilder
+	internal static class DocumentBuilder
 	{
 		public static void Build(Node parentNode, string htmlString, NodeSources source = NodeSources.DocumentBuilder)
 		{
@@ -62,7 +62,7 @@ namespace Knyaz.Optimus.Dom
 			{
 				var currentNode = node;
 				
-				if (htmlNode is HtmlDocType docType)
+				if (htmlNode is HtmlDocType)
 				{
 					//todo: may be it's wrong to assume the doctype element placed before html in source document
 					//todo: fill doctype attributes.

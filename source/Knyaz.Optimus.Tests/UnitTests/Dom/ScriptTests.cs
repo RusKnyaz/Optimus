@@ -1,7 +1,6 @@
 ﻿using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 
 namespace Knyaz.Optimus.Tests.Dom
 {

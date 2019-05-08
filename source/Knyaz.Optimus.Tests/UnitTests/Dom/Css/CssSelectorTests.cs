@@ -69,7 +69,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			var matchElts = engine.Document.GetElementsByName("match");
 			foreach (var matchElt in matchElts)
 			{
-				Assert.IsTrue(selector.IsMatches(matchElt), "Have to match: " + matchElt.ToString());
+				Assert.IsTrue(selector.IsMatches(matchElt), "Have to match: " + matchElt);
 			}
 
 			var notMatchElt = engine.Document.GetElementsByName("nomatch");

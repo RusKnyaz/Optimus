@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.Dom.Css
 		
 		public override string CssText 
 		{
-			get { return SelectorText + Style; }
+			get => SelectorText + Style;
 			set { }
 		}
 

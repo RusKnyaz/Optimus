@@ -22,7 +22,7 @@ namespace Knyaz.Optimus
 	{
 		private Document _document;
 		private Uri _uri;
-		internal LinkProvider LinkProvider = new LinkProvider();
+		internal readonly LinkProvider LinkProvider = new LinkProvider();
 		
 		/// <summary>
 		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.

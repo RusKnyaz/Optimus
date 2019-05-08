@@ -7,8 +7,6 @@
 	/// </summary>
 	public class CssRule
 	{
-		private string _cssText;
-
 		internal CssRule(CssStyleSheet parentStyleSheet)
 		{
 			ParentStyleSheet = parentStyleSheet;
@@ -20,7 +18,7 @@
 		/// </summary>
 		public virtual string CssText
 		{
-			get => _cssText;
+			get => null;
 			set { }
 		}
 

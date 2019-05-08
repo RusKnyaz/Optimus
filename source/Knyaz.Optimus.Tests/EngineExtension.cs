@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.Tests
 {

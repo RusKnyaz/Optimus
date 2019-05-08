@@ -36,7 +36,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public override string ToString()
 		{
-			return Method + " " + Url.ToString();
+			return Method + " " + Url;
 		}
 	}
 

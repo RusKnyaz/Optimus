@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 

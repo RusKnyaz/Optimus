@@ -9,13 +9,10 @@
 		{
 			public const string Name = "";
 			public const string Src = "";
-			public const string Srcdoc = "";
 			public const string Width = "";
 			public const string Height = "";
 			public const string Align = "";
-			public const string FrameBorder = "";
 			public const string LongDesc = "";
-			public const string Scrolling = "";
 		}
 
 		internal HtmlIFrameElement(Document ownerDocument) : base(ownerDocument, TagsNames.IFrame)

@@ -1,5 +1,4 @@
-﻿using System;
-using Knyaz.Optimus.Tools;
+﻿using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {

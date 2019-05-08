@@ -53,7 +53,10 @@ namespace Knyaz.Optimus.Dom
 			if (node is Attr)
 				return;
 
-			foreach (var elt in node.Flatten().OfType<HtmlElement>())
+			//Prevent 'Collection was modified' exception.
+			var tmpChildNodes = node.Flatten().OfType<HtmlElement>().ToArray();
+			
+			foreach (var elt in tmpChildNodes)
 			{
 				if (elt is Script script)
 				{
@@ -107,16 +110,6 @@ namespace Knyaz.Optimus.Dom
 					}
 				});
 		}
-
-
-		/// <summary>
-		/// Map attribute to event (onclick->click, etc...)
-		/// </summary>
-		private static IDictionary<string, string> _eventAttr = new Dictionary<string, string>
-		{
-			{"onclick", "click"},
-			{"onload", "load"}
-		};
 
 		void OnDocumentDomContentLoaded (IDocument document)
 		{
@@ -183,17 +176,17 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		/// <summary>
-		/// Faired before running the script.
+		/// Raised before running the script.
 		/// </summary>
 		public event Action<Script> BeforeScriptExecute;
 		
 		/// <summary>
-		/// Faired after running the script.
+		/// Raised after running the script.
 		/// </summary>
 		public event Action<Script> AfterScriptExecute;
 		
 		/// <summary>
-		/// Faired on script execution error.
+		/// Raised on script execution error.
 		/// </summary>
 		public event Action<Script, Exception> ScriptExecutionError;
 

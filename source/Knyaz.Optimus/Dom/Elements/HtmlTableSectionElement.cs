@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Elements

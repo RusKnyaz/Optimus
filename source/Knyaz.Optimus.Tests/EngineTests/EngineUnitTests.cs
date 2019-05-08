@@ -440,7 +440,7 @@ function reqListener () {
 		[Test]
 		public void LoadScriptFromBase64()
 		{
-			var scriptCode = System.Convert.ToBase64String( System.Text.Encoding.UTF8.GetBytes("console.log('hi');"));
+			var scriptCode = Convert.ToBase64String(Encoding.UTF8.GetBytes("console.log('hi');"));
 			
 			var httpResourceProvider = Mocks.HttpResourceProvider()
 				.Resource("http://localhost/", $"<html><script src='data:text/javascript;base64,{scriptCode}'/></html>");
@@ -459,7 +459,7 @@ function reqListener () {
 		[Test]
 		public void LoadPageFromBase64()
 		{
-			var htmlCode = System.Convert.ToBase64String( System.Text.Encoding.UTF8.GetBytes("<html><body>HELLO</body></html>"));
+			var htmlCode = Convert.ToBase64String(Encoding.UTF8.GetBytes("<html><body>HELLO</body></html>"));
 			
 			var engine = new Engine();
 

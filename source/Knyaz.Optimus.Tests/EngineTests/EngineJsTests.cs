@@ -7,6 +7,7 @@ using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -202,12 +203,7 @@ console.log(elems[0] != null);");
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost/module", "console.log('hi from module');");
 			var engine = new Engine(resourceProvider);
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-				{
-					System.Console.WriteLine(o ?? "<null>");
-					log.Add(o.ToString());
-				};
+			var log = engine.Console.ToList();
 
 			var script =
 				@"var s = document.createElement('script');
@@ -222,6 +218,61 @@ document.head.appendChild(s);";
 			Assert.AreEqual(2, log.Count);
 			Assert.AreEqual("load", log[1]);
 			Assert.AreEqual("hi from module", log[0]);
+		}
+
+		[Test]
+		public async Task AddScriptModifyingDom()
+		{
+			var modifyingScript = @"var form = document.body.getElementsByTagName('form')[0];
+			             var div = document.createElement('div')
+			             div.name = 'generatedDiv';
+			             form.appendChild(document.createElement('div'));";
+
+			var accesingScript = @"var div = document.getElementsByName('generatedDiv');
+			                     console.log(div != null);"; 
+			
+			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
+				$"<html><body><form><script>{modifyingScript}</script><script>{accesingScript}</script></form></body></html>");
+			
+			var engine = new Engine(resourceProvider);
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://localhost");
+
+			page.Assert(x => x.Document.Body.GetElementsByTagName("form")[0].ChildNodes.Count == 3);
+			
+			Assert.AreEqual(log, new[]{true});
+		}
+
+		[Test]
+		public async Task AddScriptThatAddsScriptModifyingDom()
+		{
+			var modifyingScript = "var form = document.body.getElementsByTagName('form')[0];" +
+			                      " var div = document.createElement('div');" +
+			                      " div.name = 'generatedDiv';   " +
+			                      "form.appendChild(document.createElement('div'));";
+			
+			var scriptThatAddsScript = 
+				$@"var script = document.createElement('script');
+				script.text = ""{modifyingScript}"";
+				document.body.getElementsByTagName('form')[0].appendChild(script);";
+			
+			var accesingScript = @"var div = document.getElementsByName('generatedDiv');
+			                     console.log(div != null);";
+			
+			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
+				$"<html><body><form><script id=adding>{scriptThatAddsScript}</script><script id=accessing>{accesingScript}</script></form></body></html>");
+			
+			var engine = new Engine(resourceProvider);
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://localhost");
+
+			page.Assert(x => x.Document.Body.GetElementsByTagName("form")[0].ChildNodes.Count == 4);
+			
+			Assert.AreEqual(log, new[]{true});
 		}
 
 		[Test]
@@ -409,12 +460,8 @@ client.send();"));
 		public void AddEmbeddedScriptInsideEmbedded()
 		{
 			var engine = new Engine();
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-				{
-					log.Add(o == null ? "<null>" : o.ToString());
-					System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-				};
+			var log = engine.Console.ToList();
+			
 			engine.Load(Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
 console.log('node added');
@@ -438,12 +485,8 @@ console.log('afterappend');"));
 		{
 			var engine = new Engine(
 				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-				{
-					log.Add(o == null ? "<null>" : o.ToString());
-					System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-				};
+			var log = engine.Console.ToList();
+			
 			engine.Load(Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
 console.log('nodeadded');
@@ -474,11 +517,7 @@ script.onload = function(){ console.log(this.someData); };
 			var engine = new Engine(
 				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');")
 					.Resource("http://localhost", Mocks.Page(script)));
-			var log = new List<string>();
-			engine.Console.OnLog += o => {
-				log.Add(o == null ? "<null>" : o.ToString());
-				System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-			};
+			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 
 			Thread.Sleep(1000);

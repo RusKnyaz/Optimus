@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Html
 {
-	class HtmlParser
+	static class HtmlParser
 	{
 		internal static IEnumerable<IHtmlNode> Parse(System.IO.Stream stream)
 		{
@@ -60,15 +60,17 @@ namespace Knyaz.Optimus.Html
 				switch (htmlChunk.Type)
 				{
 					case HtmlChunk.Types.AttributeName:
-						if (attributeName != null)
-							elem.Attributes.Add(attributeName.ToLowerInvariant(), null);
-						attributeName = htmlChunk.Value.ToLower();
+						//attribute without value followed by attribute
+						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName))
+							elem.Attributes.Add(attributeName, null);
+
+						attributeName = htmlChunk.Value.ToLowerInvariant();
 						break;
 					case HtmlChunk.Types.AttributeValue:
 						if (string.IsNullOrEmpty(attributeName))
 							throw new HtmlParseException("Unexpected attribute value.");
-						if (!elem.Attributes.ContainsKey(attributeName.ToLowerInvariant())) //todo:
-							elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
+						if (!elem.Attributes.ContainsKey(attributeName)) //todo:
+							elem.Attributes.Add(attributeName, htmlChunk.Value);
 						attributeName = null;
 						break;
 					case HtmlChunk.Types.TagStart:
@@ -82,8 +84,8 @@ namespace Knyaz.Optimus.Html
 						elem.Children.Add(childElem);
 						break;
 					case HtmlChunk.Types.TagEnd:
-						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
-							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
+						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName))
+							elem.Attributes.Add(attributeName, string.Empty);
 
 						return
 							string.Equals(elem.Name, htmlChunk.Value, StringComparison.InvariantCultureIgnoreCase) 
