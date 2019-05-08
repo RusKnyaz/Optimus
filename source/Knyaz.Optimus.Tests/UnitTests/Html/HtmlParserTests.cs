@@ -147,7 +147,11 @@ namespace Knyaz.Optimus.Tests.Html
 			Assert.AreEqual(sourceHtml.ToLower(), result.ToLower());
 		}
 
-		
+		[TestCase("<div name=a name=b></div>", Description ="The same attribute occured twice")]
+		[TestCase("<div selected selected selected></div>", Description = "The same attribute without value occurs multiple times")]
+		public void SmokeTests(string html) => Parse(html);
+
+				
 		static string ElemToString(HtmlElement arg)
 		{
 			var sb = new StringBuilder();
