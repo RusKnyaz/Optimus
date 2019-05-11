@@ -153,27 +153,32 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string OuterHTML
 		{
-			get {
+			get 
+			{
 				var sb = new StringBuilder();
 				sb.Append("<");
 				sb.Append(TagName ?? NodeName);
-				if (HasAttributes())
+				lock (OwnerDocument)
 				{
-					foreach (var attribute in Attributes)
+					if (HasAttributes())
 					{
-						sb.Append(" ");
-						sb.Append(attribute.Name);//todo: use invariant name
-						if (attribute.Value != null)
+						foreach (var attribute in Attributes)
 						{
-							sb.Append("=\"");
-							sb.Append(attribute.Value.Replace("\"", "\\\""));
-							sb.Append("\"");
+							sb.Append(" ");
+							sb.Append(attribute.Name); //todo: use invariant name
+							if (attribute.Value != null)
+							{
+								sb.Append("=\"");
+								sb.Append(attribute.Value.Replace("\"", "\\\""));
+								sb.Append("\"");
+							}
 						}
 					}
-				}
-				sb.Append(">");
-				if(true)
+
+					sb.Append(">");
 					sb.Append(InnerHTML);
+				}
+
 				sb.Append("</");
 				sb.Append(TagName);
 				sb.Append(">");
@@ -202,12 +207,19 @@ namespace Knyaz.Optimus.Dom.Elements
 			get
 			{
 				var sb = new StringBuilder();
-				foreach (var child in ChildNodes)
+				lock (OwnerDocument)
 				{
-					switch (child)
+					foreach (var child in ChildNodes)
 					{
-						case Text text:sb.Append(text.Data);break;
-						case Element elem:sb.Append(elem.OuterHTML);break;
+						switch (child)
+						{
+							case Text text:
+								sb.Append(text.Data);
+								break;
+							case Element elem:
+								sb.Append(elem.OuterHTML);
+								break;
+						}
 					}
 				}
 
