@@ -158,7 +158,7 @@ namespace Knyaz.Optimus.Dom.Elements
 				var sb = new StringBuilder();
 				sb.Append("<");
 				sb.Append(TagName ?? NodeName);
-				lock (OwnerDocument)
+				lock ((object)OwnerDocument ?? new object())
 				{
 					if (HasAttributes())
 					{
@@ -207,7 +207,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			get
 			{
 				var sb = new StringBuilder();
-				lock (OwnerDocument)
+				lock ((object)OwnerDocument ?? new object())
 				{
 					foreach (var child in ChildNodes)
 					{
