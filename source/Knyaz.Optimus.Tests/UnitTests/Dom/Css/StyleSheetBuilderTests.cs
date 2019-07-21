@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading;
 using Knyaz.Optimus.Dom.Css;
 using NUnit.Framework;
 
@@ -19,11 +20,14 @@ namespace Knyaz.Optimus.Tests.Dom.Css
                 ((CssStyleRule)styleSheet.CssRules[1]).Style.GetPropertyValue("height") == "100px");
         }
 
-	    [Test]
-	    public void ImportTest()
+	    [TestCase("@import \"a.css\"; div{background-color:red}")]
+	    [TestCase("@import url(a.css); div{background-color:red}")]
+	    [TestCase("@import url(\"a.css\"); div{background-color:red}")]
+	    [TestCase("@import url('a.css'); div{background-color:red}")]
+	    public void ImportTest(string css)
 	    {
 		    var ss = StyleSheetBuilder.CreateStyleSheet(
-			    new StringReader("@import \"a.css\"; div{background-color:red}"), s =>
+			    new StringReader(css), s =>
 				    s == "a.css" ? new StringReader("div{color:green}") : null);
 
 			ss.Assert(styleSheet => 
@@ -35,6 +39,8 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 				((CssStyleRule)styleSheet.CssRules[1]).Style.Length == 1 &&
 				((CssStyleRule)styleSheet.CssRules[1]).Style.GetPropertyValue("background-color") == "red");
 	    }
+
+	    
 
 	    private CssStyleSheet Build(string css)
 	    {
@@ -79,6 +85,23 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		    var styleSheet = Build("body{background-color:red}");
 		    styleSheet.CssRules[0].CssText = "body{background-color:green}";
 		    Assert.AreEqual("body{background-color:red}", styleSheet.CssRules[0].CssText);
+	    }
+
+	    [Test, MaxTime(30000)]
+	    public void EmptyRule()
+	    {
+		    var ss = Build(@"a {}");
+		    Assert.AreEqual(1, ss.CssRules.Count);
+		    Assert.AreEqual(0, ((CssStyleRule)ss.CssRules[0]).Style.Length);
+	    }
+
+	    [Test, MaxTime(30000)]
+	    public void EmptyRuleFollowedBy()
+	    {
+		    var ss = Build(@"a {} b{c:1}");
+		    Assert.AreEqual(2, ss.CssRules.Count);
+		    Assert.AreEqual(0, ((CssStyleRule)ss.CssRules[0]).Style.Length);
+		    Assert.AreEqual(1, ((CssStyleRule)ss.CssRules[1]).Style.Length);
 	    }
     }
 }
