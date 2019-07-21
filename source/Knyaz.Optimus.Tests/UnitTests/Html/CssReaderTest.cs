@@ -19,6 +19,7 @@ namespace Knyaz.Optimus.Tests.Html
 		[TestCase("div{display:inline-block}.a{width:100px;height:100px}", "Selector:div Property:display Value:inline-block Selector:.a Property:width Value:100px Property:height Value:100px")]
 		[TestCase("@media all {div{color:red}}", "Directive:media all Selector:div Property:color Value:red End:")]
 		[TestCase("div {color:red} @media all {span{color:green}}", "Selector:div Property:color Value:red Directive:media all Selector:span Property:color Value:green End:")]
+		[TestCase("a {}", "Selector:a")]
 		public void ReadCss(string css, string result)
 		{
 			var res = CssReader.Read(new StringReader(css)).Select(x => x.Type.ToString()+":"+(x.Data??"")).ToArray();

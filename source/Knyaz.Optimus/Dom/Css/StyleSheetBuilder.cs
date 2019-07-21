@@ -46,8 +46,40 @@ namespace Knyaz.Optimus.Dom.Css
 		private static void Import(CssStyleSheet styleSheet, string import, Func<string, TextReader> getImport)
 		{
 			var url = import.Trim();
-			url = url.Substring(url.IndexOf('"')+1);
-			url = url.Substring(0, url.IndexOf('"'));
+			var urlStartIndex = url.IndexOf('"');
+			
+			if (urlStartIndex >= 0)
+			{
+				var endIndex = url.LastIndexOf('"');
+				if (endIndex == -1)
+					endIndex = url.Length;
+				url = url.Substring(urlStartIndex + 1, endIndex-urlStartIndex-1);
+			}
+			else
+			{
+				urlStartIndex = url.IndexOf('\'');
+
+				if (urlStartIndex >= 0)
+				{
+					var endIndex = url.LastIndexOf('\'');
+					if (endIndex == -1)
+						endIndex = url.Length;
+					url = url.Substring(urlStartIndex + 1, endIndex-urlStartIndex-1);
+				}
+				else 
+				{
+					urlStartIndex = url.IndexOf('(');
+
+					if (urlStartIndex >= 0)
+					{
+						var endIndex = url.LastIndexOf(')');
+						if (endIndex == -1)
+							endIndex = url.Length;
+						url = url.Substring(urlStartIndex + 1, endIndex-urlStartIndex-1);
+					}
+				}
+			}
+
 			var reader = getImport(url);
 			FillStyleSheet(reader, styleSheet, getImport);
 		}
@@ -94,7 +126,8 @@ namespace Knyaz.Optimus.Dom.Css
 
 			var styleRule = new CssStyleRule(styleSheet) { SelectorText = enumerator.Current.Data };
 			rule = styleRule;
-			enumerator.MoveNext();
+			if (!enumerator.MoveNext())
+				return false;
 			return FillStyle(styleRule.Style, enumerator);
 		}
 
