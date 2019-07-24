@@ -10,7 +10,7 @@
     <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <Authors>Konstantin Petukhov</Authors>
     <Company>Knyaz</Company>
-    <PackageLicenseUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/License</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/Home</PackageProjectUrl>
     <PackageIconUrl />
     <RepositoryUrl>https://bitbucket.org/RusKnyaz/optimus/src</RepositoryUrl>
@@ -18,10 +18,8 @@
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
     <PackageReleaseNotes>Added support of UserAgent, Proxy and BasicAuth. Fixed bugs.</PackageReleaseNotes>
     <PackageTags>headless web browser</PackageTags>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <Copyright>Konstantin Petukhov, 2018</Copyright>
+    <Copyright>Konstantin Petukhov, 2019</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -71,5 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
   </ItemGroup>
 </Project>
