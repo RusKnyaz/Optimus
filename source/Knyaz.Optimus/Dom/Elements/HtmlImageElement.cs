@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -161,5 +162,8 @@ namespace Knyaz.Optimus.Dom.Elements
 				case "error":Handle("onerror", OnError, evt);break;
 			}
 		}
+
+		[JsHidden]
+		public IImage ImageData => _loadedImage;
 	}
 }
