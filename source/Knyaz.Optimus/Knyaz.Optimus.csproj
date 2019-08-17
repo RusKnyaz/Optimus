@@ -16,7 +16,6 @@
     <RepositoryUrl>https://bitbucket.org/RusKnyaz/optimus/src</RepositoryUrl>
     <RepositoryType>mercurial</RepositoryType>
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
-    <PackageReleaseNotes>Added support of UserAgent, Proxy and BasicAuth. Fixed bugs.</PackageReleaseNotes>
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>

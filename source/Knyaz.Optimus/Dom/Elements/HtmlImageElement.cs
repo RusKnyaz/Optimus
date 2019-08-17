@@ -33,6 +33,16 @@ namespace Knyaz.Optimus.Dom.Elements
 			_height = new AttributeMappedValue<int>(this, "height");
 		}
 
+		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
+		{
+			base.UpdatePropertyFromAttribute(value, invariantName);
+
+			if (invariantName == "src")
+			{
+				LoadImage(value);
+			}
+		}
+
 		/// <summary>
 		/// Reflects 'alt' attribute value.
 		/// </summary>
@@ -66,18 +76,20 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string Src
 		{
 			get => _src.Value;
-			set
-			{
-				_src.Value = value;
-
-				LoadImage(value);
-			}
+			set => _src.Value = value;
 		}
 
 		private bool _complete = false;
 
 		private async Task LoadImage(string value)
 		{
+			if (string.IsNullOrEmpty(value))
+			{
+				_loadedImage = null;
+				_complete = true;
+				return;
+			}
+			
 			var wasError = false;
 
 			try
@@ -162,7 +174,7 @@ namespace Knyaz.Optimus.Dom.Elements
 				case "error":Handle("onerror", OnError, evt);break;
 			}
 		}
-
+		
 		[JsHidden]
 		public IImage ImageData => _loadedImage;
 	}

@@ -546,6 +546,7 @@ function reqListener () {
 			img.OnLoad += evt => { loadSignal.Set(); };
 			img.Src = url;
 			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.IsTrue(img.Complete);
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
 		}
@@ -590,7 +591,33 @@ function reqListener () {
 
 			var data = new MemoryStream();
 			img.ImageData.Data.CopyTo(data);
+			Assert.IsTrue(img.Complete);
 			Assert.AreEqual(new byte[]{1,2,3,2,1}, data.ToArray());
+		}
+		
+		[Test]
+		public async Task SetAndResetImage()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "")
+				.Resource("http://localhost/image.bmp",
+					Convert.FromBase64String(
+						"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"),
+					"image/bmp");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+
+			img.Src = "";
+			Assert.IsTrue(img.Complete);
+			Assert.AreEqual(0, img.NaturalWidth);
+			Assert.AreEqual(0, img.NaturalHeight);
 		}
 
 		[Test]
