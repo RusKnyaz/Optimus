@@ -1,9 +1,10 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlDivElement : HtmlElement
+	/// <summary>
+	/// Represents &lt;DIV&gt; HTML element.
+	/// </summary>
+	public sealed class HtmlDivElement : HtmlElement
 	{
-		public HtmlDivElement(Document ownerDocument) : base(ownerDocument, TagsNames.Div)
-		{
-		}
+		internal HtmlDivElement(Document ownerDocument) : base(ownerDocument, TagsNames.Div) { }
 	}
 }

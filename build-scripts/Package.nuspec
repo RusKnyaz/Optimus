@@ -1,22 +1,26 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Optimus</id>
+    <id>Knyaz.Optimus</id>
     <version>$version$</version>
-    <authors>TodoSoft</authors>
-    <owners>TodoSoft</owners>
+    <authors>Knyaz</authors>
+	<title>Optimus</title>
+	<projectUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/Home</projectUrl>
+	<licenseUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/License</licenseUrl>
+    <owners>Knyaz</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Optimus web browser engine.</description>
-    <releaseNotes>Optimus</releaseNotes>
+    <description>Optimus is headless Web Browser fully implemented on .net.</description>
+    <releaseNotes>Added stylesheets support.</releaseNotes>
     <copyright>Copyright 2016</copyright>
+	<tags>headless web browser</tags>
 	<dependencies>
 		<group targetFramework="net45">
-		  <dependency id="Newtonsoft.Json" version="8.0.2"/>
-      <dependency id="Jint" version="2.8.0"/>
+          <dependency id="Jint" version="2.10.3"/>
 		</group>
 	</dependencies>
   </metadata>
   <files>
     <file src="Knyaz.Optimus.dll" target="lib/net45"/>
+	<file src="Knyaz.Optimus.xml" target="lib/net45"/>
   </files>
 </package>

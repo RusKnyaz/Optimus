@@ -1,15 +1,14 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// http://www.w3.org/TR/html5/scripting-1.html#the-script-element
+	/// Represents &lt;SCRIPT&gt; element.
 	/// </summary>
-	public class Script : HtmlElement, IDelayedResource, IHtmlScriptElement
+	[DomItem]
+	public sealed class Script : HtmlElement
 	{
 		private readonly AttributeMappedValue<string> _type;
 		private readonly AttributeMappedValue<string> _charset;
@@ -17,15 +16,32 @@ namespace Knyaz.Optimus.Dom.Elements
 		private readonly AttributeMappedBoolValue _async;
 		private readonly AttributeMappedBoolValue _defer;
 
-		public string Charset { get { return _charset.Value; } set { _charset.Value = value; } }
-		public bool Async { get { return _async.Value; } set { _async.Value = value; } }
-		public bool Defer { get { return _defer.Value; } set { _defer.Value = value; } }
-		public string Src { get { return _src.Value; } set { _src.Value = value; } }
-		public string Type { get { return _type.Value; } set { _type.Value = value; }}
+		/// <summary>
+		/// Gets or sets the 'charset' attribute value reflecting the charset attribute.
+		/// </summary>
+		public string Charset {get => _charset.Value;set => _charset.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'async' attribute value.
+		/// </summary>
+		public bool Async { get => _async.Value; set => _async.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'defer' attribute value.
+		/// </summary>
+		public bool Defer { get => _defer.Value;set => _defer.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'src' attirbute representing the address of the external script resource to use. 
+		/// </summary>
+		public string Src { get => _src.Value; set => _src.Value = value;}
+		
+		/// <summary>
+		/// Gets or sets 'type' attribute value representing MIME type of the script.
+		/// </summary>
+		public string Type { get => _type.Value;set => _type.Value = value;}
 
-		public string CrossOrigin { get; set; }
-
-		public Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
+		internal Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
 		{
 			_type = new AttributeMappedValue<string>(this, "type");
 			_charset = new AttributeMappedValue<string>(this, "charset");
@@ -34,88 +50,58 @@ namespace Knyaz.Optimus.Dom.Elements
 			_defer = new AttributeMappedBoolValue(this, "defer");
 		}
 
-		public override string InnerHTML { get; set; }
-
-		public string Text { get { return InnerHTML; } set { InnerHTML = value; } }
-
-		public bool HasDelayedContent { get { return !string.IsNullOrEmpty(Src); } }
-
-		public bool Loaded { get; private set; }
-		public bool Executed { get; set; }
-
-		public event Action OnLoad;
-		public event Action OnError;
-
-		public Task LoadAsync(IResourceProvider resourceProvider)
+		public override string InnerHTML
 		{
-			if (string.IsNullOrEmpty(Src))
-				throw new InvalidOperationException("Src not set.");
-
-			return resourceProvider.GetResourceAsync(Src).ContinueWith(
-				resource =>
-				{
-					try
-					{
-						using (var reader = new StreamReader(resource.Result.Stream))
-						{
-							InnerHTML = reader.ReadToEnd();
-							Loaded = true;
-						}
-					}
-					catch
-					{
-						RaiseError();
-					}
-				});
+			get => Text;
+			set => Text = value;
 		}
 
-		private void RaiseOnLoad()
+		public string Text 
+		{ 
+			get => TextContent ?? "";
+			set => TextContent = value; 
+		}
+
+		internal bool IsExternalScript => !string.IsNullOrEmpty(Src);
+
+		/// <summary>
+		/// Indicates whether the script was executed or not.
+		/// </summary>
+		internal bool Executed { get; set; }
+		internal string Code { get; set; }
+
+		/// <summary>
+		/// Fired immediately after an element has been loaded.
+		/// </summary>
+		public event Action<Event> OnLoad;
+		public event Action<Event> OnError;
+		
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			if (HasDelayedContent)
+			base.CallDirectEventSubscribers(evt);
+
+			switch (evt.Type)
 			{
-				if (OnLoad != null)
-					OnLoad();
-				this.RaiseEvent("load", false, false);
+				case "load":Handle("onload", OnLoad, evt);break;
+				case "error":Handle("onerror", OnError, evt);break;
 			}
 		}
 
-		private void RaiseError()
+		/// <summary>
+		/// Creates new copy of the script node.
+		/// </summary>
+		/// <param name="deep"></param>
+		/// <returns></returns>
+		public override Node CloneNode(bool deep)
 		{
-			lock(OwnerDocument)
-			{
-				if (OnError != null)
-					OnError();
-				this.RaiseEvent("error", false, false);
-			}
+			var node = (Script)base.CloneNode(deep);
+			node.Executed = Executed;
+			return node;
 		}
 
-		public void Execute(IScriptExecutor scriptExecutor)
-		{
-			this.RaiseEvent("BeforeScriptExecute", true, true);
-			scriptExecutor.Execute(Type ?? "text/javascript", Text);
-			Executed = true;
-			this.RaiseEvent("AfterScriptExecute", true, true);
-			RaiseOnLoad();
-		}
-	}
-
-	[DomItem]
-	public interface IHtmlScriptElement
-	{
-		string Src { get; set; }
-        string Type { get;set; }
-		string Charset { get; set; }
-		bool Async { get; set; }
-		bool Defer { get; set; }
-		string CrossOrigin { get;set; }
-		string Text { get; }
-	}
-
-
-	internal interface IDelayedResource
-	{
-		bool Loaded { get; }
-		bool HasDelayedContent { get; }
-		Task LoadAsync(IResourceProvider resourceProvider);
+		/// <summary>
+		/// [Object HTMLScriptElement]
+		/// </summary>
+		public override string ToString() => "[Object HTMLScriptElement]";
 	}
 }

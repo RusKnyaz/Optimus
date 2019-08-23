@@ -1,53 +1,26 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
+	/// <summary>
+	/// Redirects requests to resource provider that connected with specified protocol. 
+	/// </summary>
 	internal class ResourceProvider : IResourceProvider
 	{
-		public event Action<string> OnRequest;
-		public event Action<string> Received;
-
-		private readonly CookieContainer _cookies;
-		private string _root;
-
-		public ResourceProvider()
+		public ResourceProvider(IResourceProvider httpResourceProvider,
+			IResourceProvider fileResourceProvider)
 		{
-			_cookies = new CookieContainer();
-			HttpResourceProvider = new HttpResourceProvider(_cookies);
-			FileResourceProvider = new FileResourceProvider();
+			HttpResourceProvider = httpResourceProvider;
+			FileResourceProvider = fileResourceProvider;
 		}
 
-		protected FileResourceProvider FileResourceProvider { get; private set; }
-		public IHttpResourceProvider HttpResourceProvider { get; private set; }
+		private IResourceProvider DataResourceProvider { get; } = new DataResourceProvider();
+		protected IResourceProvider FileResourceProvider { get; }
+		public IResourceProvider HttpResourceProvider { get; }
 
-		public string Root
-		{
-			get { return _root; }
-			set
-			{
-				HttpResourceProvider.Root = value;
-				_root = value;
-			}
-		}
-
-		private bool IsAbsoleteUri(string uri)
-		{
-			return !uri.StartsWith("/") && (
-				uri.StartsWith("http://") || uri.StartsWith("https://") || uri.StartsWith("file://") ||
-			       uri.StartsWith("data:"));
-		}
-
-		private Uri GetUri(string uri)
-		{
-			return IsAbsoleteUri(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-		}
-
-		private ISpecResourceProvider GetResourceProvider(Uri u)
+		private IResourceProvider GetResourceProvider(Uri u)
 		{
 			var scheme = u.GetLeftPart(UriPartial.Scheme).ToLowerInvariant();
 
@@ -58,65 +31,20 @@ namespace Knyaz.Optimus.ResourceProviders
 					return HttpResourceProvider;
 				case "file://":
 					return FileResourceProvider;
+				case "data://": //mono
 				case "data:":
-					return new DataResourceProvider();
+					return DataResourceProvider;
 				default:
 					throw new Exception("Unsupported scheme: " + scheme);
 			}
 		}
 
-		public IRequest CreateRequest(string uri)
+		public Task<IResource> SendRequestAsync(Request req)
 		{
-			return GetResourceProvider(GetUri(uri)).CreateRequest(uri);
+			var provider = GetResourceProvider(req.Url);
+
+			return provider.SendRequestAsync(req);
 		}
-
-		public Task<IResource> GetResourceAsync(IRequest req)
-		{
-			if (OnRequest != null)
-				OnRequest(req.Url);
-			
-			var u = GetUri(req.Url);
-
-			var provider = GetResourceProvider(u);
-
-			return provider.SendRequestAsync(req).ContinueWith(t =>
-					{
-						try
-						{
-							if (Received != null)
-								Received(req.Url);
-						}
-						catch { }
-						return t.Result;
-					});
-		}
-
-		class DataResourceProvider : ISpecResourceProvider
-		{
-			public IRequest CreateRequest(string url)
-			{
-				return new DataRequest(url);
-			}
-
-			public Task<IResource> SendRequestAsync(IRequest request)
-			{
-				var uri = request.Url;
-				var data = uri.Substring(5);
-				var type = new string(data.TakeWhile(c => c != ',').ToArray());
-				var content = data.Substring(type.Length);
-				return new Task<IResource>(() => new Response(ResourceTypes.Html /*todo: fix type*/, new MemoryStream(Encoding.UTF8.GetBytes(content))));
-			}
-
-			class DataRequest : IRequest
-			{
-				public DataRequest(string url)
-				{
-					Url = url;
-				}
-
-				public string Url { get; private set; }
-			}
-		}		
 	}
 
 	public class Response : IResource

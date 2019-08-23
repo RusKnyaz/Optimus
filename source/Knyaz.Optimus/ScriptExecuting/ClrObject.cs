@@ -1,34 +1,57 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Jint.Native;
+using Jint.Native.Function;
 using Jint.Native.Object;
+using Jint.Runtime;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
+using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
-	public class ClrObject : ObjectInstance, IObjectWrapper
+	/// <summary>
+	/// Represents c# object (DOM and other) in JS environment.
+	/// </summary>
+	internal class ClrObject : ObjectInstance, IObjectWrapper
 	{
+		private readonly DomConverter _converter;
 		public Object Target { get; set; }
 
-		public ClrObject(Jint.Engine engine, Object obj)
+		public ClrObject(Jint.Engine engine, Object obj, DomConverter converter)
 			: base(engine)
 		{
+			_converter = converter;
 			Target = obj;
 			//todo: use static prototypes
-			Prototype = new ClrPrototype(engine, obj.GetType());
+			Prototype = new ClrPrototype(engine, obj.GetType(), _converter);
 			Extensible = true;
+		}
+
+		private JsValue Convert(Object obj)
+		{
+			_converter.TryConvert(obj, out var res);
+			return res;
 		}
 
 		public override PropertyDescriptor GetOwnProperty(string propertyName)
 		{
-			//todo: check indexers (for example in CssStyleDeclaration)
-			PropertyDescriptor x;
-			if (Properties.TryGetValue(propertyName, out x))
+			if (Properties.TryGetValue(propertyName, out var x))
 				return x;
 
+			x = FindProperty(propertyName);
+			Properties.Add(propertyName, x);
+			return x;
+		}
+		
+		private PropertyDescriptor FindProperty(string propertyName)
+		{
+			//todo: check indexers (for example in CssStyleDeclaration)
 			var pascalCasedPropertyName = char.ToUpperInvariant(propertyName[0]).ToString();
 			if (propertyName.Length > 1)
 			{
@@ -39,10 +62,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			// look for a property
 			var property = type.GetProperty(pascalCasedPropertyName, BindingFlags.Instance | BindingFlags.Public);
+			if(property == null)
+			{
+				property = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+					.FirstOrDefault(p => (p.GetCustomAttribute(typeof(JsNameAttribute)) as JsNameAttribute)?.Name == propertyName);
+			}
+
 			if (property != null)
 			{
-				var descriptor = new PropertyInfoDescriptor(Engine, property, Target);
-				Properties.Add(propertyName, descriptor);
+				var descriptor = new ClrPropertyInfoDescriptor(Engine, property, Target);
 				return descriptor;
 			}
 
@@ -51,9 +79,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (field != null)
 			{
-				var descriptor = new FieldInfoDescriptor(Engine, field, Target);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return new FieldInfoDescriptor(Engine, field, Target);
 			}
 
 			// if no properties were found then look for a method 
@@ -63,14 +89,16 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (methods.Any())
 			{
-				var func = new MethodInfoFunctionInstance(Engine, methods);
-				func.FastAddProperty("toString",
-					new JsValue(new ClrFunctionInstance(Engine, (value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
-					false, false, false);
-				var descriptor = new PropertyDescriptor(func, false, true, false);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return MethodDescriptor(propertyName, methods);
 			}
+			
+			//look for methods with JsNameAttribute
+			var namedMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+				.Where(m => (m.GetCustomAttribute(typeof(JsNameAttribute)) as JsNameAttribute)?.Name == propertyName)
+										 .ToArray();
+			if(namedMethods.Length > 0)
+				return MethodDescriptor(propertyName, namedMethods);
+
 
 			// look for methods using pascal cased name.
 			var pascalCasedMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
@@ -79,14 +107,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (pascalCasedMethods.Any())
 			{
-				var func = new MethodInfoFunctionInstance(Engine, pascalCasedMethods);
-				func.FastAddProperty("toString",
-					new JsValue(new ClrFunctionInstance(Engine, (value, values) => new JsValue("function " + propertyName + "() { [native code] }"))), 
-					false, false, false);
-
-				var descriptor = new PropertyDescriptor(func, false, true, false);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return MethodDescriptor(propertyName, pascalCasedMethods);
 			}
 
 			// if no methods are found check if target implemented indexing
@@ -106,7 +127,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (explicitProperties.Length == 1)
 			{
 				var descriptor = new PropertyInfoDescriptor(Engine, explicitProperties[0], Target);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -119,7 +139,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (explicitMethods.Length > 0)
 			{
 				var descriptor = new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, explicitMethods), false, true, false);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -132,7 +151,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			if (explicitPascalCasedMethods.Length > 0)
 			{
 				var descriptor = new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, explicitPascalCasedMethods), false, true, false);
-				Properties.Add(propertyName, descriptor);
 				return descriptor;
 			}
 
@@ -154,38 +172,231 @@ namespace Knyaz.Optimus.ScriptExecuting
 				if (eventInfo.Name.ToLower() != propertyName)
 					continue;
 
-				var settedHandler = new JsValue[1] { JsValue.Null };
-				var listener = (Action)(() => settedHandler[0].Invoke(this, new JsValue[0]));
+				var invoke = eventInfo.EventHandlerType.GetMethod("Invoke");
+				var pars = invoke.GetParameters();
+				var settedHandler = new JsValue[1] {JsValue.Null};
 
+				Delegate listener;
+				
+				if (invoke.ReturnType != typeof(void))
+				{
+					if (pars.Length == 1 && pars[0].ParameterType == typeof(Event))
+					{
+						listener = (Func<Event, bool?>)(
+							e => (bool?)settedHandler[0].Invoke(this, new []{Convert(e)}).ToObject());
+					}
+					else
+						throw new NotImplementedException(); //todo: build and compile the Expression.
+				}
+				else
+				{
+					listener = pars.Length == 1 
+						? (Delegate) (Action<object>) (p1 => settedHandler[0].Invoke(this, new [] {JsValue.FromObject(Engine, p1)})) 
+						: (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
+				}
+				
 				var getter = new ClrFunctionInstance(Engine, (value, values) => settedHandler[0]);
-				var info = eventInfo;
 				var setter = new ClrFunctionInstance(Engine, (value, values) =>
 				{
 					if (settedHandler[0] != JsValue.Null)
-						info.RemoveEventHandler(Target, listener);
+						eventInfo.RemoveEventHandler(Target, listener);
 
 					settedHandler[0] = values[0];
 					if (settedHandler[0] != JsValue.Null)
-						info.AddEventHandler(Target, listener);
+						eventInfo.AddEventHandler(Target, listener);
 					return values[0];
 				});
 
-				var descriptor =  new PropertyDescriptor(getter, setter);
-				Properties.Add(propertyName, descriptor);
+				var descriptor = new PropertyDescriptor(getter, setter);
 				return descriptor;
 			}
 
 			//Look for static fields
 			var staticField = type.GetField(propertyName);
-			if (staticField != null)
+			if (staticField != null && staticField.GetCustomAttribute<JsHiddenAttribute>() == null)
 			{
-				var descriptor = new FieldInfoDescriptor(Engine, staticField, Target);
-				Properties.Add(propertyName, descriptor);
-				return descriptor;
+				return new FieldInfoDescriptor(Engine, staticField, Target);
 			}
 
-
 			return PropertyDescriptor.Undefined;
+		}
+
+		private PropertyDescriptor MethodDescriptor(string propertyName, MethodInfo[] methods)
+		{
+			var func = new ClrMethodInfoFunc(Engine, methods, this);
+			func.FastAddProperty("toString",
+				new JsValue(new ClrFunctionInstance(Engine,
+					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
+				false, false, false);
+
+			return new PropertyDescriptor(func, false, true, false);
+		}
+		
+		
+		readonly ConditionalWeakTable<ICallable, object> _delegatesCache = new ConditionalWeakTable<ICallable, object>();
+		internal Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsValue)
+		{
+			if (jsValue.IsNull())
+				return null;
+			
+			var callable = jsValue.AsObject() as ICallable;
+			Action<T> handler = null;
+			if (callable != null)
+			{
+				handler = (Action<T>)_delegatesCache.GetValue(callable, key => (Action<T>)(e =>
+				{
+					_converter.TryConvert(e, out var val);
+					key.Call(@this, new[] { val });
+				}));
+			}
+			return handler;
+		}
+	}
+
+	class ClrMethodInfoFunc : FunctionInstance
+	{
+		private readonly MethodInfoFunctionInstance _internalFunc;
+		private readonly MethodInfo[] _methods;
+		private readonly ClrObject _clrObject;
+
+		public ClrMethodInfoFunc(Jint.Engine engine, MethodInfo[] methods, ClrObject clrObject)
+			: base(engine, null, null, false)
+		{
+			_internalFunc = new MethodInfoFunctionInstance(engine, methods);
+			_methods = methods;
+			_clrObject = clrObject;
+			Prototype = engine.Function.PrototypeObject;
+		}
+
+		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
+		{
+			//hack to pass 'this' to event handler function.
+			bool add;
+			if (((add = _methods[0].Name == "AddEventListener") ||
+			          _methods[0].Name == "RemoveEventListener")&& 
+			    arguments.Length > 1)
+			{
+				var eventName = arguments[0].AsString();
+				var handler = _clrObject.ConvertDelegate<Event>(thisObject, arguments[1]);
+
+				if ((thisObject.AsObject() as ClrObject)?.Target is IEventTarget et)
+				{
+					var capture = false;
+					var optionsJs = arguments.Length > 2 ? arguments[2].ToBooleanOrObject(out capture) : null;
+					
+					if (optionsJs == null)
+					{
+						if (add)
+							et.AddEventListener(eventName, handler, capture);
+						else
+							et.RemoveEventListener(eventName, handler, capture);
+					}
+					else
+					{
+						bool GetBool(JsValue val) => val.IsBoolean() && val.AsBoolean();
+
+						var options = new EventListenerOptions {
+							Capture = GetBool(optionsJs.Get("capture")),
+							Passive = GetBool(optionsJs.Get("passive")),
+							Once = GetBool(optionsJs.Get("once"))
+						};
+						
+						if(add)
+							et.AddEventListener(eventName, handler, options);
+						else
+							et.RemoveEventListener(eventName, handler, options);
+					}
+					
+					return JsValue.Undefined;
+				}
+			}
+
+			//todo: it should be done for any count of such methods.
+			
+			//handle default parameters
+			if (_methods.Length == 1)
+			{
+				var methodParameters = _methods[0].GetParameters();
+				if (methodParameters.Length > arguments.Length &&
+				    methodParameters.Any(x => x.HasDefaultValue))
+				{
+					var oldArguments = arguments;
+					arguments = new JsValue[methodParameters.Length];
+					Array.Copy(oldArguments, arguments, oldArguments.Length);
+
+					for (var i = oldArguments.Length; i < arguments.Length; i++)
+					{
+						var par = methodParameters[i];
+						if(par.HasDefaultValue)
+							arguments[i] = JsValue.FromObject(Engine, par.DefaultValue);
+					}
+				}
+			}
+
+			try
+			{
+				var maxParams = _methods.Max(x => x.GetParameters().Length);
+
+				if (arguments.Length > maxParams)
+				{
+					var tmp = new JsValue[maxParams];
+					Array.Copy(arguments, 0, tmp, 0, tmp.Length);
+					arguments = tmp;
+				}
+				
+				return _internalFunc.Call(thisObject, arguments);
+			}
+			catch (Exception ex)
+			{
+				throw new JavaScriptException(JsValue.FromObject(Engine, ex.Message));
+			}
+		}
+	}
+	
+	public sealed class ClrPropertyInfoDescriptor : PropertyDescriptor
+	{
+		private readonly Jint.Engine _engine;
+		private readonly PropertyInfo _propertyInfo;
+		private readonly object _item;
+
+		public ClrPropertyInfoDescriptor(Jint.Engine engine, PropertyInfo propertyInfo, object item)
+		{
+			_engine = engine;
+			_propertyInfo = propertyInfo;
+			_item = item;
+			Writable = propertyInfo.CanWrite;
+		}
+
+		public override JsValue Value
+		{
+			get
+			{
+				return JsValue.FromObject(_engine, _propertyInfo.GetValue(_item, null));
+			}
+			set
+			{
+				try
+				{
+					JsValue jsValue = value;
+					object obj;
+					if (_propertyInfo.PropertyType == typeof(JsValue))
+					{
+						obj = jsValue;
+					}
+					else
+					{
+						obj = jsValue.ToObject();
+						if (obj != null && obj.GetType() != _propertyInfo.PropertyType)
+							obj = _engine.ClrTypeConverter.Convert(obj, _propertyInfo.PropertyType,
+								CultureInfo.InvariantCulture);
+					}
+					_propertyInfo.SetValue(_item, obj, null);
+				}
+				catch (Exception ex)
+				{
+					throw new JavaScriptException(JsValue.FromObject(_engine, ex));
+				}
+			}
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -27,6 +28,19 @@ namespace Knyaz.Optimus.Tests
 
 			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
 			return engine;
+		}
+
+		public static Console ToConsole(this Console console)
+		{
+			console.OnLog += o => System.Console.WriteLine(o == null ? "<null>" : o.ToString());
+			return console;
+		}
+
+		public static List<object> ToList(this Console console)
+		{
+			var log = new List<object>();
+			console.OnLog += x => log.Add(x);
+			return log;
 		}
 
 		public static void Load(this Engine engine, string html)

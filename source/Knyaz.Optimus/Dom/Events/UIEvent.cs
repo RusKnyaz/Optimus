@@ -1,17 +1,23 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
+﻿using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
-	public class UIEvent : Event, IUIEvent
+	/// <summary>
+	/// The base class for UI events.
+	/// </summary>
+	[DomItem]
+	public class UIEvent : Event
 	{
-		/*readonly    attribute Window? view;
+		internal UIEvent(Document owner) : base(owner){}
+		
+		public Window View {
+			get;
+			protected set;
+		}
+		/*
 		readonly    attribute long    detail;*/
 		//todo: complete
-	}
-
-	[DomItem]
-	public interface IUIEvent
-	{
 		
 	}
 }

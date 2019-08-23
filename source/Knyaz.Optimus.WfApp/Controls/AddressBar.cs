@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Knyaz.Optimus.WfApp.Controls
@@ -32,29 +33,24 @@ namespace Knyaz.Optimus.WfApp.Controls
 
 		private void OnUriChanged()
 		{
-			this.SafeInvoke(() =>
-			{
-				textBoxUrl.Text = _engine.Uri.ToString();
-			});
+			this.SafeInvoke(() => { textBoxUrl.Text = _engine.Uri.ToString();});
 		}
 
-		private void textBoxUrl_KeyDown(object sender, KeyEventArgs e)
+		private async void textBoxUrl_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				new Thread(() =>
-					{
-						try
-						{
-							Engine.OpenUrl(textBoxUrl.Text);
-						}
-						catch (Exception ex)
-						{
-							MessageBox.Show(ex.ToString());
-						}
-					}
-				 ).Start();
-
+				try
+				{
+					Cursor.Current = Cursors.WaitCursor;
+					new Thread(() => Engine.OpenUrl(textBoxUrl.Text)).Start();
+					Cursor.Current = DefaultCursor;
+				}
+				catch (Exception ex)
+				{
+					Cursor.Current = DefaultCursor;
+					MessageBox.Show(ex.ToString());
+				}
 			}
 		}
 	}

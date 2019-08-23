@@ -22,5 +22,17 @@ namespace Knyaz.Optimus.WfApp.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://html5test.com")]
+        public string LastUrl {
+            get {
+                return ((string)(this["LastUrl"]));
+            }
+            set {
+                this["LastUrl"] = value;
+            }
+        }
     }
 }

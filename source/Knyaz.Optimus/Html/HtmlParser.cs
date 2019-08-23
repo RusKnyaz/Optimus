@@ -3,66 +3,121 @@ using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Html
 {
-	class HtmlParser
+	static class HtmlParser
 	{
 		internal static IEnumerable<IHtmlNode> Parse(System.IO.Stream stream)
 		{
-			using(var enumerator = HtmlReader.Read(stream).GetEnumerator())
+			using(var enumerator = FixHtml(HtmlReader.Read(stream)).GetEnumerator())
 			{
-				var rootElem = new HtmlElement();
+				//todo: try to get rid of fake element
+				var rootElem = new HtmlElement("root");
 
-				var moreExist = true;
-				do
-				{
-					moreExist = ParseElement(rootElem, enumerator);
-				} while (moreExist);
+				while (ParseElement(rootElem, enumerator) == ParseResult.Ok){}
 
 				return rootElem.Children;
 			}
 		}
 
-		private static bool ParseElement(HtmlElement elem, IEnumerator<HtmlChunk> enumerator)
+		private static IEnumerable<HtmlChunk> FixHtml(IEnumerable<HtmlChunk> html)
+		{
+			var tags = new List<string>();
+			foreach (var chunk in html)
+			{
+				if(chunk.Type == HtmlChunk.Types.TagStart)
+					tags.Add(chunk.Value);
+				else if (chunk.Type == HtmlChunk.Types.TagEnd)
+				{
+					int idx;
+					for(idx = tags.Count -1; idx>=0;idx--)
+						if (StringComparer.InvariantCultureIgnoreCase.Equals(tags[idx], chunk.Value))
+							break;
+
+					if (idx >= 0)
+						tags.RemoveRange(idx, tags.Count - idx);
+					else
+						continue;
+				}
+
+				yield return chunk;
+			}
+		}
+
+		enum ParseResult : byte
+		{
+			End,
+			BackToParent,
+			Ok
+		}
+
+		private static ParseResult ParseElement(HtmlElement elem, IEnumerator<HtmlChunk> enumerator)
 		{
 			string attributeName = null;
-
-			while(enumerator.MoveNext())
+			var reread = false;
+			while (reread || enumerator.MoveNext())
 			{
+				reread = false;
 				var htmlChunk = enumerator.Current;
-				switch(htmlChunk.Type)
+				switch (htmlChunk.Type)
 				{
-					case HtmlChunkTypes.AttributeName:
-						if(attributeName!=null)
-							elem.Attributes.Add(attributeName.ToLowerInvariant(), null);
-						attributeName = htmlChunk.Value.ToLower();		
+					case HtmlChunk.Types.AttributeName:
+						//attribute without value followed by attribute
+						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName))
+							elem.Attributes.Add(attributeName, null);
+
+						attributeName = htmlChunk.Value.ToLowerInvariant();
 						break;
-					case HtmlChunkTypes.AttributeValue:
+					case HtmlChunk.Types.AttributeValue:
 						if (string.IsNullOrEmpty(attributeName))
 							throw new HtmlParseException("Unexpected attribute value.");
-						if(!elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))//todo:
-							elem.Attributes.Add(attributeName.ToLowerInvariant(), htmlChunk.Value);
+						if (!elem.Attributes.ContainsKey(attributeName)) //todo:
+							elem.Attributes.Add(attributeName, htmlChunk.Value);
 						attributeName = null;
 						break;
-					case HtmlChunkTypes.TagStart:
-						var childElem = new HtmlElement() {Name = htmlChunk.Value.ToLower()};
-						ParseElement(childElem, enumerator);
+					case HtmlChunk.Types.TagStart:
+						var tagName = htmlChunk.Value.ToLower();
+						if (ClosePrevTag(elem.Name, tagName))
+							return ParseResult.BackToParent;
+
+						var childElem = new HtmlElement(htmlChunk.Value);
+						if (ParseElement(childElem, enumerator) == ParseResult.BackToParent)
+							reread = true;
 						elem.Children.Add(childElem);
 						break;
-					case HtmlChunkTypes.TagEnd:
-						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName.ToLowerInvariant()))
-							elem.Attributes.Add(attributeName.ToLowerInvariant(), string.Empty);
-						return true;
-					case HtmlChunkTypes.Text:
-						elem.Children.Add(new HtmlText(){Value = htmlChunk.Value});
+					case HtmlChunk.Types.TagEnd:
+						if (attributeName != null && !elem.Attributes.ContainsKey(attributeName))
+							elem.Attributes.Add(attributeName, string.Empty);
+
+						return
+							string.Equals(elem.Name, htmlChunk.Value, StringComparison.InvariantCultureIgnoreCase) 
+								? ParseResult.Ok : ParseResult.BackToParent;
+					case HtmlChunk.Types.Text:
+						elem.Children.Add(new HtmlText(htmlChunk.Value));
 						break;
-					case HtmlChunkTypes.Comment:
-						elem.Children.Add(new HtmlComment(){ Text = htmlChunk.Value });
+					case HtmlChunk.Types.Comment:
+						elem.Children.Add(new HtmlComment {Text = htmlChunk.Value});
 						break;
-					case HtmlChunkTypes.DocType:
+					case HtmlChunk.Types.DocType:
 						elem.Children.Add(new HtmlDocType());
 						break;
 				}
-			}
-			return false;
+			} 
+			return ParseResult.End;
+		}
+
+		private static bool ClosePrevTag(string prevName, string name)
+		{
+			return (prevName == "li" && name == "li") 
+				|| (prevName == "dl" && (name == "dt" || name == "dl"))
+				|| (prevName == "dt" && (name == "dt" || name == "dl"))
+
+				|| (prevName == "th" && (name == "td" || name == "th" || name == "tr" || name == "tbody" || name=="tfoot"))
+				|| (prevName == "td" && (name == "td" || name == "th" || name == "tr" || name == "tbody" || name == "tfoot"))
+				|| (prevName == "tr" && (name == "tr" || name=="tbody" || name=="tfoot"))
+				
+				|| (prevName == "option" && (name == "option" || name == "optgroup"))
+			    || (prevName == "optgroup" && name == "optgroup")
+				
+				|| (prevName == "thead" && (name == "tbody" || name == "tfoot"));
 		}
 	}
 
@@ -75,54 +130,26 @@ namespace Knyaz.Optimus.Html
 		public string Text;
 	}
 
-	internal class HtmlElement : IHtmlElement
+	internal sealed class HtmlElement : IHtmlNode
 	{
-		public HtmlElement()
+		public HtmlElement(string name)
 		{
+			Name = name;
 			Attributes = new Dictionary<string, string>();
 			Children = new List<IHtmlNode>();
-			InnerText = string.Empty;
 		}
 
-		public string Name { get; set; }
-
-		public IList<IHtmlNode> Children
-		{
-			get;
-			private set;
-		}
-
-		public IDictionary<string, string> Attributes { get; private set; }
-
-
-		IEnumerable<IHtmlNode> IHtmlElement.Children
-		{
-			get { return this.Children; }
-		}
-
-		public string InnerText { get; set; }
+		public readonly string Name;
+		public readonly IList<IHtmlNode> Children;
+		public readonly IDictionary<string, string> Attributes;
 	}
 
-	interface IHtmlNode
-	{
-		 
-	}
+	interface IHtmlNode{}
 
-	interface IHtmlElement : IHtmlNode
+	sealed class HtmlText : IHtmlNode
 	{
-		IEnumerable<IHtmlNode> Children { get; }
-		string Name { get; }
-		IDictionary<string, string> Attributes { get; }
-	}
-
-	interface IHtmlText : IHtmlNode
-	{
-		string Value { get; }
-	}
-
-	class HtmlText : IHtmlText
-	{
-		public string Value { get; set; }
+		public HtmlText(string value) => Value = value;
+		public readonly string Value;
 	}
 
 	class HtmlParseException : Exception

@@ -2,16 +2,16 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
-using Knyaz.Optimus.Tests.Properties;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
+using Knyaz.Optimus.Tests.Resources;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
 	public class KnockoutTests
 	{
-		Document Load(string html)
+		static Document Load(string html)
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
@@ -23,14 +23,14 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
-			engine.Load("<html><head><script>" + Resources.knockout + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
+			engine.Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
 			return engine.Document;
 		}
 
 		[Test]
 		public void KnockoutInclude()
 		{
-			Load("<html><head><script> " + Resources.knockout + " </script></head><body></body></html>");
+			Load("<html><head><script> " + R.KnockoutJs + " </script></head><body></body></html>");
 		}
 
 		[Test]
@@ -66,7 +66,7 @@ ko.applyBindings(new VM());
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
 						   "<script>" + vm + "</script></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
@@ -99,7 +99,7 @@ ko.applyBindings(new VM());
 }
 ko.applyBindings(new VM());";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script></head>"+
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>"+
 				"<body>" +
 				"<input type='text' data-bind='value:Name' id='in'/>" +
 				"<span id = 'c1' data-bind='text:Greeting'/>" +
@@ -129,8 +129,8 @@ ko.applyBindings(new VM());",
 				"<input type='checkbox' data-bind='checked:Checked' id='in'/>" +
 				"<div id = 'button' data-bind='click:Click'>Click me</div>");
 
-			var div = (HtmlElement)doc.Body.GetElementsByTagName("div").First();
-			var checkbox = (HtmlInputElement) doc.Body.GetElementsByTagName("input").First();
+			var div = (HtmlElement)doc.GetElementById("button");
+			var checkbox = (HtmlInputElement) doc.GetElementById("in");
 			Assert.IsNotNull(checkbox);
 			Assert.IsNotNull(div);
 			Assert.IsTrue(checkbox.Checked);
@@ -169,6 +169,28 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));",
 		}
 
 		[Test]
+		public void ArrayPushAll()
+		{
+			var doc = Load(
+@"function VM() {
+	var _this = this;	
+	this.Peoples = ko.observableArray();
+	this.Click = function(){_this.Peoples.push({Name:'Neo'});};
+}
+var vm = new VM();
+ko.applyBindings(vm);
+ko.utils.arrayPushAll(vm.Peoples, [{Name:'Ivan'},{Name:'Vasil'}]);peoples",
+@"<!-- ko foreach: Peoples -->
+		<span data-bind='text:Name'></span>
+<!-- /ko -->");
+
+			var spans = doc.Body.GetElementsByTagName("span").ToArray();
+			Assert.AreEqual(2, spans.Length);
+			Assert.AreEqual("Ivan", spans[0].InnerHTML);
+			Assert.AreEqual("Vasil", spans[1].InnerHTML);
+		}
+
+		[Test]
 		public void Template()
 		{
 			var vm =
@@ -185,7 +207,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));",
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"<script type='text/html' id='tmpl'>
 <span id = 'c1' data-bind='text:Greeting, click: Click'/>
 </script>
@@ -213,7 +235,7 @@ ko.applyBindings(new VM());
 		[Test]
 		public void TemplateInsideForeachBinding()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"
 <script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
@@ -249,7 +271,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 		[Test]
 		public void BindToNode()
 		{
-			var doc = Load("<html><head><script> " + Resources.knockout + " </script>" +
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"<script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
 </script>
@@ -280,7 +302,71 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 
 			var newDivs = doc.Body.GetElementsByTagName("div").ToArray();
 			Assert.AreEqual(4, newDivs.Length);
+		}
 
+		[Test]
+		public static void ComponentBinding()
+		{
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
+@"<body> <div id='view' data-bind=""component:{name:'myco'}""></div> </body>
+<script>
+	ko.components.register('myco', { 
+		viewModel: {instance: { name:'Kos' }}, 
+		template: '<div id=inner><div><span data-bind=""text:name""></span></div></div>'	
+	});
+	ko.applyBindings({});
+</script>
+</html>");
+			
+			var inner = doc.WaitId("inner");
+			Assert.NotNull(inner, "First component's div");
+			Assert.AreEqual(1, inner.ChildNodes.Count, "First component's div children count");
+			Assert.AreEqual(1, inner.ChildNodes[0].ChildNodes.Count);
+			Assert.AreEqual("Kos", ((HtmlElement)inner.ChildNodes[0].ChildNodes[0]).InnerHTML);
+		}
+
+		[Test]
+		public void HtmlWithScriptBinding()
+		{
+			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
+@"<body> <div id='view' data-bind=""html:html""></div> </body>
+<script>
+	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
+</script>
+</html>");
+			Assert.IsNotNull(doc.GetElementById("d"));
+		}
+
+		[Test]
+		public void HtmlWithScriptBindingWithJquery()
+		{
+			var engine = new Engine();
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load("<html><head><script>" + R.JQueryJs+"</script><script> " + R.KnockoutJs + " </script></head>" +
+			            @"<body> <div id='view' data-bind=""html:html""></div> </body>
+<script>
+	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
+</script>
+</html>");
+			var doc = engine.Document;
+			Assert.IsNotNull(doc.GetElementById("d"));
+		}
+
+		[Test]
+		public void SelectOptionsTest()
+		{
+			var engine = new Engine();
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			engine.Load("<html><head><script>" + R.JQueryJs + "</script><script> " + R.KnockoutJs + " </script></head>" +
+						@"<body> <select id='s' data-bind=""options:options""></select> </body>
+<script>
+	ko.applyBindings({ options: ['A','B']});
+</script>
+</html>");
+			var doc = engine.Document;
+			var select = doc.GetElementById("s") as HtmlSelectElement;
+			Assert.IsNotNull(select);
+			Assert.AreEqual(2, select.Options.Length);
 		}
 	}
 }

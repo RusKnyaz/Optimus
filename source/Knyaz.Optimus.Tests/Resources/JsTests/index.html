@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Optimus Web tests</title>
+    <script src="base.js"></script>
+    <script src="DataViewTests.js" ></script>
+    <script src="DocumentFragmentTests.js"></script>
+    <script src="DocumentTests.js" ></script>
+    <script src="ElementTests.js"></script>
+    <script src="NodeTests.js"></script>
+    <script src="ScriptTests.js"></script>
+    <script src="DocTypeTests.js"></script>
+    <script src="JavaScriptTests.js"></script>
+    <script src="CommentTests.js"></script>
+    <script src="FormTests.js"></script>
+    <script src="HtmlInputElementTests.js"></script>
+    <script src="HtmlLabelElementTests.js"></script>
+    <script src="EventTests.js"></script>
+    <script src="HtmlOptionElementTests.js"></script>
+    <script src="HtmlImageElementTests.js"></script>
+    <script src="StorageTests.js"></script>
+</head>
+<body>
+</body>
+<script>
+    var table = document.createElement("table");
+    document.body.appendChild(table);
+    table.style["width"] = "100%";
+
+    table.innerHTML = "<col width=200/><col/><col/>";
+
+    for (var fixtureName in Tests)  {
+        var fixture = Tests[fixtureName];
+
+        for (var testName in fixture) {
+            var tr = document.createElement("tr");
+
+            var td1 = document.createElement("td");
+            td1.innerHTML = fixtureName + "." + testName;
+
+            (function (testContent) {
+                td1.onclick = function (evt) {
+                    evt.target.parentNode.cells[2].textContent = testContent;
+                };
+            })(Tests[fixtureName][testName].run.toString());
+
+            tr.appendChild(td1);
+
+            var td2 = document.createElement("td");
+
+            try {
+                var result = Run(fixtureName, testName);
+                if (result != null) {
+                    td2.style["color"] = "red";
+                    td2.textContent = "failed: " + result;
+                }
+                else {
+                    td2.style["color"] = "green";
+                    td2.textContent = "success";
+                }
+            }
+            catch (ex) {
+                td2.style["color"] = "red";
+                td2.textContent = "exception:" + ex;
+            }
+
+            tr.appendChild(td2);
+
+            var td3 = document.createElement("td");
+            td3.style["white-space"] = "pre-wrap";
+            tr.appendChild(td3);
+
+            table.appendChild(tr);
+        }
+    }
+</script>
+</html>

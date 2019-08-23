@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Knyaz.Optimus.WfApp</RootNamespace>
     <AssemblyName>Knyaz.Optimus.WfApp</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>&lt;Project Location In Database&gt;</SccProjectName>
     <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
@@ -85,6 +85,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeLineModel.cs" />
+    <Compile Include="Tools\ListThreadSafeExtensions.cs" />
     <EmbeddedResource Include="Controls\AddressBar.resx">
       <DependentUpon>AddressBar.cs</DependentUpon>
     </EmbeddedResource>
@@ -128,7 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj">
-      <Project>{42593765-6DE4-4846-BC61-7C74336DD977}</Project>
+      <Project>{59e4c9b2-c70e-4084-9aa4-bedadb28578e}</Project>
       <Name>Knyaz.Optimus</Name>
     </ProjectReference>
   </ItemGroup>

@@ -2,9 +2,9 @@
 {
 	/// <summary>
 	/// Represents textarea html element (see http://www.w3.org/TR/html5/forms.html#the-textarea-element).
-	/// Todo: complete implementation
 	/// </summary>
-	public class HtmlTextAreaElement : HtmlElement, IResettableElement, IFormElement
+	// Todo: complete implementation
+	public sealed class HtmlTextAreaElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults
 		{
@@ -21,104 +21,138 @@
 			public static long MinLength = -1;
 			public static string Name = string.Empty;
 			public static string Wrap = string.Empty;
-			public static string DefaultValue = string.Empty;
 		}
 
-		public HtmlTextAreaElement(Document ownerDocument) : base(ownerDocument, TagsNames.Textarea)
-		{
-		}
+		internal HtmlTextAreaElement(Document ownerDocument) : base(ownerDocument, TagsNames.Textarea){}
 
+		/// <summary>
+		/// Gets or sets the element's autofocus attribute, indicating that the control should have input focus when the page loads.
+		/// </summary>
 		public bool Autofocus
 		{
-			get { return GetAttribute("autofocus", Defaults.Autofocus); }
-			set { SetAttribute("autofocus", value ? "true" : "false"); }
+			get => GetAttribute("autofocus", Defaults.Autofocus);
+			set => SetAttribute("autofocus", value ? "true" : "false");
 		}
 
+		/// <summary>
+		/// Gets or sets the element's cols attribute, indicating the visible width of the text area.
+		/// </summary>
 		public ulong Cols
 		{
-			get { return GetAttribute("cols", Defaults.Cols); }
-			set { SetAttribute("cols", value.ToString());}
+			get => GetAttribute("cols", Defaults.Cols);
+			set => SetAttribute("cols", value.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the element's rows attribute, indicating the number of visible text lines for the control.
+		/// </summary>
 		public ulong Rows
 		{
-			get { return GetAttribute("rows", Defaults.Rows); }
-			set { SetAttribute("rows", value.ToString());}
+			get => GetAttribute("rows", Defaults.Rows);
+			set => SetAttribute("rows", value.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the element's disabled attribute, indicating that the control is not available for interaction.
+		/// </summary>
 		public bool Disabled
 		{
-			get { return GetAttribute("disabled", Defaults.Disabled); }
-			set { SetAttribute("disabled", value.ToString()); }
+			get => GetAttribute("disabled", Defaults.Disabled);
+			set => SetAttribute("disabled", value.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the element's required attribute, indicating that the user must specify a value before submitting the form.
+		/// </summary>
 		public bool Required
 		{
-			get { return GetAttribute("required", Defaults.Required); }
-			set { SetAttribute("required", value.ToString()); }
+			get => GetAttribute("required", Defaults.Required);
+			set => SetAttribute("required", value.ToString());
 		}
 
-		public bool Readonly
+		/// <summary>
+		/// Gets or sets the element's readonly attribute, indicating that the user cannot modify the value of the control.
+		/// </summary>
+		public bool ReadOnly
 		{
-			get { return GetAttribute("readonly", Defaults.Readonly); }
-			set { SetAttribute("readonly", value.ToString()); }
+			get => GetAttribute("readonly", Defaults.Readonly);
+			set => SetAttribute("readonly", value.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the element's placeholder attribute, containing a hint to the user about what to enter in the control.
+		/// </summary>
 		public string Placeholder
 		{
-			get { return GetAttribute("placeholder", Defaults.Placeholder); }
-			set { SetAttribute("placeholder", value); }
+			get => GetAttribute("placeholder", Defaults.Placeholder);
+			set => SetAttribute("placeholder", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the raw value contained in the control.
+		/// </summary>
 		public string Value
 		{
-			get { return InnerHTML ?? string.Empty; }
-			set { InnerHTML = value ?? string.Empty; }
+			get => InnerHTML ?? string.Empty;
+			set => InnerHTML = value ?? string.Empty;
 		}
 
+		
 		public string DirName
 		{
 			get { return GetAttribute("dirName", Defaults.DirName); }
 			set { SetAttribute("dirName", value); }
 		}
 
+		/// <summary>
+		/// Gets or sets the element's maxlength attribute, indicating the maximum number of characters the user can enter. 
+		/// </summary>
 		public long MaxLength
 		{
-			get { return GetAttribute("maxLength", Defaults.MaxLength); }
-			set { SetAttribute("maxLength", value.ToString()); }
+			get => GetAttribute("maxLength", Defaults.MaxLength);
+			set => SetAttribute("maxLength", value.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the element's minlength attribute, indicating the minimum number of characters the user can enter. 
+		/// </summary>
 		public long MinLength
 		{
-			get { return GetAttribute("minLength", Defaults.MinLength); }
-			set { SetAttribute("minLength", value.ToString()); }
+			get => GetAttribute("minLength", Defaults.MinLength);
+			set => SetAttribute("minLength", value.ToString());
 		}
 
+		/// <summary>
+		/// Gets or sets the element's name attribute, containing the name of the control.
+		/// </summary>
 		public string Name
 		{
-			get { return GetAttribute("name", Defaults.Name); }
-			set { SetAttribute("name", value); }
+			get => GetAttribute("name", Defaults.Name);
+			set => SetAttribute("name", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the wrap HTML attribute, indicating how the control wraps text.
+		/// </summary>
 		public string Wrap
 		{
-			get { return GetAttribute("wrap", Defaults.Wrap); }
-			set { SetAttribute("wrap", value); }
+			get => GetAttribute("wrap", Defaults.Wrap);
+			set => SetAttribute("wrap", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the control's default value, which behaves like the Node.textContent property.
+		/// </summary>
 		public string DefaultValue
 		{
-			get { return GetAttribute("defaultValue", Defaults.DefaultValue); }
-			set { SetAttribute("defaultValue", value); }
+			get => TextContent;
+			set => TextContent = value;
 		}
 
-		public ulong TextLength
-		{
-			get { return (ulong) (Value ?? string.Empty).Length; }
-		}
-
-		//todo: Check implementation
-		public string TextContent { get {return DefaultValue;} set { DefaultValue = value; } }
+		/// <summary>
+		/// Gets the length of the control's value.
+		/// </summary>
+		public ulong TextLength => (ulong) (Value ?? string.Empty).Length;
 
 //  readonly attribute HTMLFormElement? form;
 //
@@ -137,19 +171,21 @@
 //  void setRangeText(DOMString replacement);
 //  void setRangeText(DOMString replacement, unsigned long start, unsigned long end, optional SelectionMode selectionMode = "preserve");
 //  void setSelectionRange(unsigned long start, unsigned long end, optional DOMString direction);
-		public void Reset()
+
+
+		void IResettableElement.Reset()
 		{
 			Value = TextContent;
 		}
 
-		public HtmlFormElement Form
-		{
-			get { return this.FindOwnerForm(); }
-		}
+		/// <summary>
+		/// Returns a reference to the parent form element.
+		/// </summary>
+		public HtmlFormElement Form => this.FindOwnerForm();
 
-		public override string ToString()
-		{
-			return "[object HTMLTextAreaElement]";
-		}
+		/// <summary>
+		/// Returns "[object HTMLTextAreaElement]".
+		/// </summary>
+		public override string ToString() => "[object HTMLTextAreaElement]";
 	}
 }

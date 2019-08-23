@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Tools;
+using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests
 {
-	[TestFixture, Ignore]
+	[TestFixture, Ignore("For manual run")]
 	public class TestPages
 	{
 		private string GetTestUrl(string testUrl)

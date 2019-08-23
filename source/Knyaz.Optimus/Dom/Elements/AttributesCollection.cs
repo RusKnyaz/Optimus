@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -6,83 +7,54 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
+	/// <summary>
+	/// Collection of element attributes.
+	/// </summary>
 	[DomItem]
-	public interface IAttributesCollection : IEnumerable<Attr>
+	public class AttributesCollection : IEnumerable<Attr>
 	{
-		Attr this[string name] { get; set; }
-		Attr this[int idx] { get; }
-		bool ContainsKey(string name);
-		void Remove(string name);
-		void Add(string invariantName, Attr attr);
-		int Count { get; }
-	}
+		internal AttributesCollection() {}
 
-	public class AttributesCollection : IAttributesCollection
-	{
-		public AttributesCollection()
-		{
-			Properties = new OrderedDictionary();
-		}
+		private readonly OrderedDictionary _properties 
+			= new OrderedDictionary(StringComparer.InvariantCultureIgnoreCase);
 
-		public OrderedDictionary Properties { get; private set; }
-
+		/// <summary>
+		/// Gets or sets <see cref="Attr"/> object with the specified name.
+		/// </summary>
+		/// <param name="name"></param>
 		public Attr this[string name]
 		{
-			get
-			{
-				int number;
-				if (int.TryParse(name, out number))
-					return this[number];
-				
-				return (Attr)Properties[name]; //return value
-			}
+			get => int.TryParse(name, out var number) ? this[number] : (Attr) _properties[name];
 			set
 			{
-				int number;
-				if (int.TryParse(name, out number))
+				if (int.TryParse(name, out _))
 					return;
 			
-				Properties[name] = value;
+				_properties[name] = value;
 			}
 		}
 
-		public Attr this[int idx]
-		{
-			get
-			{
-				return idx < 0 || idx >= Properties.Count ? null : (Attr)Properties[idx];
-			}
-		}
+		/// <summary>
+		/// Gets <see cref="Attr"/> node at specified position.
+		/// </summary>
+		public Attr this[int idx] => idx < 0 || idx >= _properties.Count ? null : (Attr)_properties[idx];
 
-		public bool ContainsKey(string name)
-		{
-			int number;
-			if (int.TryParse(name, out number))
-				return number >= 0  && number < Count;
+		internal bool ContainsKey(string name) =>
+			int.TryParse(name, out var number) 
+				? number >= 0 && number < Length 
+				: _properties.Contains(name);
 
-			return Properties.Contains(name);
-		}
+		public IEnumerator<Attr> GetEnumerator() => _properties.Values.Cast<Attr>().GetEnumerator();
 
-		public IEnumerator<Attr> GetEnumerator()
-		{
-			return Properties.Values.Cast<Attr>().GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => _properties.GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return Properties.GetEnumerator();
-		}
+		/// <summary>
+		/// Removes the attribute with specifeid name.
+		/// </summary>
+		internal void Remove(string name) => _properties.Remove(name);
 
-		public void Remove(string name)
-		{
-			Properties.Remove(name);
-		}
+		internal void Add(string invariantName, Attr attr) => _properties.Add(invariantName, attr);
 
-		public void Add(string invariantName, Attr attr)
-		{
-			Properties.Add(invariantName, attr);
-		}
-
-		public int Count { get { return Properties.Count; } }
+		public int Length => _properties.Count;
 	}
 }

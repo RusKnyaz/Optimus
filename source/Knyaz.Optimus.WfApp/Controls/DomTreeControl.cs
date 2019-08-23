@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.WfApp.Tools;
 using HtmlElement = Knyaz.Optimus.Dom.Elements.HtmlElement;
 
 namespace Knyaz.Optimus.WfApp.Controls
@@ -113,15 +114,13 @@ namespace Knyaz.Optimus.WfApp.Controls
 			}
 			else
 			{
-				var comment = node as Comment;
-				if (comment != null)
+				if (node is Comment comment)
 				{
-					name = "<!-- " + comment.Text.Substring(0, Math.Min(comment.Text.Length, 50)) + "-->";
+					name = "<!-- " + comment.Data.Substring(0, Math.Min(comment.Data.Length, 50)) + "-->";
 				}
 				else
 				{
-					var attr = node as Attr;
-					if (attr != null)
+					if (node is Attr attr)
 					{
 						name = attr.Name;
 						if (attr.Value != null)
@@ -131,8 +130,7 @@ namespace Knyaz.Optimus.WfApp.Controls
 					}
 					else
 					{
-						var text = node as Text;
-						if (text != null)
+						if (node is Text text)
 						{
 							name = "\"" + text.Data.Substring(0, Math.Min(text.Data.Length, 50)) + "\"";
 						}
@@ -146,11 +144,7 @@ namespace Knyaz.Optimus.WfApp.Controls
 			var treeNode = new TreeNode(name) {Tag = node};
 
 
-			Node[] nodes;
-			lock (node.OwnerDocument)
-			{
-				nodes = node.ChildNodes.ToArray();	
-			}
+			var nodes = node.ChildNodes.CopyListThreadSafe();	
 			
 			foreach (var child in nodes.Select(CreateBranch).Where(x => x!=null))
 			{

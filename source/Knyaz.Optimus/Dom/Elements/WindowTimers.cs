@@ -6,7 +6,7 @@ using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	public class WindowTimers
+	public sealed class WindowTimers : IDisposable
 	{
 		readonly List<IDisposable> _activeTimers = new List<IDisposable>();
 
@@ -26,13 +26,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		/// <param name="handler"></param>
 		/// <param name="timeout"></param>
+		/// <param name="ctx">The data objects passed to callback function.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action handler, int timeout)
+		public int SetTimeout(Action<object[]> handler, int timeout, object[] ctx)
 		{
 			var timer = new TimeoutTimer(t =>
 				{
 					RaiseOnExecuting();
-					handler();
+					handler(ctx);
 					lock (_activeTimers)
 					{
 						_activeTimers.Remove(t);
@@ -57,17 +58,33 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Call handler periodically
 		/// </summary>
-		/// <param name="handler"></param>
-		/// <param name="timeout"></param>
+		/// <param name="handler">The callback function.</param>
+		/// <param name="timeout">Time interval in milliseconds between handler calls.</param>
+		/// <param name="data">The arguments to be passed to the handler.</param>
 		/// <returns></returns>
-		public int SetInterval(Action handler, int timeout)
+		public int SetInterval(Action<object[]> handler, int timeout, object[] data)
 		{
+			ManualResetEvent stoppedSignal = new ManualResetEvent(false);
 			bool stopped = false;
 			var container = new Timer[1];
 			Disposable disp;
 			lock (_activeTimers)
 			{
-				disp = new Disposable(() => stopped = true);
+				disp = new Disposable(() =>
+				{
+					stopped = true;
+					if (!stoppedSignal.WaitOne(10000))
+					{
+						lock (container)
+						{
+							if (container[0] != null)
+							{
+								container[0].Dispose();
+								container[0] = null;
+							}
+						}
+					}
+				});
 				_activeTimers.Add(disp);
 			}
 
@@ -75,14 +92,29 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				lock (_getSyncObj())
 				{
-					if (!stopped)
+					try
 					{
-						handler();
+						if (!stopped)
+						{
+							handler(data);
+						}
+						else
+						{
+							lock (container)
+							{
+								if (container[0] != null)
+								{
+									container[0].Dispose();
+									container[0] = null;
+									stoppedSignal.Set();
+								}
+							}
+						}
 					}
-					else if(container[0] != null)
+					catch (Exception e)
 					{
-						container[0].Dispose();
-						container[0] = null;
+						if(OnException != null)
+							OnException(e);
 					}
 				}
 			}, null, 0, timeout);
@@ -152,18 +184,33 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		protected virtual void RaiseOnExecuting()
+		private void RaiseOnExecuting()
 		{
 			var handler = OnExecuting;
 			if (handler != null) handler();
 		}
 
-		protected virtual void RaiseOnExecuted()
+		private void RaiseOnExecuted()
 		{
 			var handler = OnExecuted;
 			if (handler != null) handler();
 		}
+
+		public void Dispose()
+		{
+			ClearAll();
+		}
+
+		internal void ClearAll()
+		{
+			lock (_activeTimers)
+			{
+				foreach (var activeTimer in _activeTimers)
+				{
+					activeTimer.Dispose();
+				}
+				_activeTimers.Clear();
+			}
+		}
 	}
-
-
 }

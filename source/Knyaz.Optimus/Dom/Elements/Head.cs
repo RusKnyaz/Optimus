@@ -1,9 +1,10 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class Head : HtmlElement
+	/// <summary>
+	/// Represents &lt;HEAD&gt; element.
+	/// </summary>
+	public sealed class Head : HtmlElement
 	{
-		public Head(Document ownerDocument) : base(ownerDocument, TagsNames.Head)
-		{
-		}
+		internal Head(Document ownerDocument) : base(ownerDocument, TagsNames.Head){}
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -9,31 +8,34 @@ using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	class HttpResourceProvider : IHttpResourceProvider
+	/// <summary>
+	/// Allows to request web resources. 
+	/// </summary>
+	class HttpResourceProvider : IResourceProvider
 	{
-		private readonly CookieContainer _cookies;
+		private readonly Func<Request, HttpClient> _getClientFn;
 
-		public HttpResourceProvider(CookieContainer cookies)
+		public HttpResourceProvider(WebProxy proxy, AuthenticationHeaderValue auth)
 		{
-			_cookies = cookies;
-		}
-
-		public string Root { get; set; }
-		public IRequest CreateRequest(string url)
-		{
-			return new HttpRequest("GET", url);
-		}
-
-		private async Task<IResource> SendRequestEx(IRequest request)
-		{
-			var httpRequest = request as HttpRequest;
-
-			var req = MakeWebRequest(httpRequest);
-			
-			using (var client = new HttpClient(new HttpClientHandler { CookieContainer = _cookies })
+			_getClientFn = req => new HttpClient(new HttpClientHandler
 			{
-				Timeout = httpRequest != null && httpRequest.Timeout > 0 ? TimeSpan.FromMilliseconds(httpRequest.Timeout) : Timeout.InfiniteTimeSpan
+				CookieContainer = req.Cookies,
+				Proxy = proxy,
+				UseProxy = proxy != null,
 			})
+			{
+				Timeout = req.Timeout > 0
+				? TimeSpan.FromMilliseconds(req.Timeout)
+				: Timeout.InfiniteTimeSpan,
+				DefaultRequestHeaders = {Authorization = auth}
+			};
+		}
+
+		private async Task<IResource> SendRequestEx(Request request)
+		{
+			var req = MakeWebRequest(request);
+			
+			using (var client = _getClientFn(request))
 			using (var response = await client.SendAsync(req))
 			using (var content = response.Content)
 			{
@@ -42,24 +44,21 @@ namespace Knyaz.Optimus.ResourceProviders
 					response.StatusCode,
 					new MemoryStream(result),
 					content.Headers.ToString(),
-					content.Headers.ContentType.MediaType,
-					content.Headers.ContentLocation);
+					content.Headers.ContentType?.ToString(),
+					response.RequestMessage.RequestUri);
 			}
 		}
+		
+		public Task<IResource> SendRequestAsync(Request request) => SendRequestEx(request);
 
-		public Task<IResource> SendRequestAsync(IRequest request)
+		private HttpRequestMessage MakeWebRequest(Request request)
 		{
-			return SendRequestEx(request);
-		}
+			var u = request.Url;
+			var resultRequest = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
 
-		private HttpRequestMessage MakeWebRequest(HttpRequest request)
-		{
-			var u = MakeUri(request.Url);
-			var result = new HttpRequestMessage(new HttpMethod(request.Method.ToUpperInvariant()), u);
-
-			if (request.Data != null && result.Method.Method != "GET")
+			if (request.Data != null && resultRequest.Method.Method != "GET")
 			{
-				result.Content = new StreamContent(new MemoryStream(request.Data));
+				resultRequest.Content = new StreamContent(new MemoryStream(request.Data));
 			}
 			
 			if(request.Headers != null)
@@ -68,57 +67,26 @@ namespace Knyaz.Optimus.ResourceProviders
 				switch (keyValue.Key)
 				{
 					case "Content-Type":
-						result.Content.Headers.ContentType = new MediaTypeHeaderValue(keyValue.Value);
+						resultRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(keyValue.Value);
 						break;
 					default:
-						result.Content.Headers.Add(keyValue.Key, keyValue.Value);
+						resultRequest.Headers.Add(keyValue.Key, keyValue.Value);
 						break;
 				}
 			}
 
-			return result;
+			return resultRequest;
 		}
-
-		private Uri MakeUri(string uri)
-		{
-			if (uri.Substring(0, 2) == "./")
-				uri = uri.Remove(0, 2);
-
-			var u = Uri.IsWellFormedUriString(uri, UriKind.Absolute) ? new Uri(uri) : new Uri(new Uri(Root), uri);
-			return u;
-		}
-	}
-
-	public interface IHttpResourceProvider : ISpecResourceProvider
-	{
-		string Root { get; set; }
-	}
-
-	public class HttpRequest : IRequest
-	{
-		public string Method;
-		public string Url { get; set; }
-		public Dictionary<string, string> Headers;
-		public int Timeout { get; set; }
-
-		public byte[] Data;
-
-		public HttpRequest(string method, string url)
-		{
-			Headers = new Dictionary<string, string>();
-			Method = method;
-			Url = url;
-		}
-	}
-
-	public interface IRequest
-	{
-		string Url { get; }
 	}
 
 	public class HttpResponse : IResource
 	{
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, string headers, string contentType, Uri uri)
+		public HttpResponse(
+			HttpStatusCode statusCode, 
+			Stream stream, 
+			string headers, 
+			string contentType = ResourceTypes.Html, 
+			Uri uri = null)
 		{
 			StatusCode = statusCode;
 			Stream = stream;
@@ -127,13 +95,10 @@ namespace Knyaz.Optimus.ResourceProviders
 			Uri = uri;
 		}
 
-		public HttpResponse(HttpStatusCode statusCode, Stream stream, string headers)
-			:this(statusCode, stream, headers, ResourceTypes.Html, null) { }
-
-		public HttpStatusCode StatusCode { get; private set; }
-		public string Headers { get; private set; }
-		public string Type { get; private set; }
-		public Stream Stream { get; private set; }
-		public Uri Uri { get; private set; }
+		public HttpStatusCode StatusCode { get; }
+		public string Headers { get; }
+		public string Type { get; }
+		public Stream Stream { get; }
+		public Uri Uri { get; }
 	}
 }

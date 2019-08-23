@@ -1,20 +1,20 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
-	class FileResourceProvider : ISpecResourceProvider
+	/// <summary>
+	/// Allows to request files content from file system.
+	/// </summary>
+	class FileResourceProvider : IResourceProvider
 	{
-		public IRequest CreateRequest(string url)
+		/// <summary>
+		/// Requests file resource..
+		/// </summary>
+		public Task<IResource> SendRequestAsync(Request request)
 		{
-			return new FileRequest(url);
-		}
-
-		public Task<IResource> SendRequestAsync(IRequest request)
-		{
-			var uri = new Uri(request.Url);
+			var uri = request.Url;
 
 			var fielInfo = new FileInfo(uri.AbsolutePath);
 
@@ -31,15 +31,9 @@ namespace Knyaz.Optimus.ResourceProviders
 		}
 	}
 
-	public interface ISpecResourceProvider
-	{
-		IRequest CreateRequest(string url);
-		Task<IResource> SendRequestAsync(IRequest request);
-	}
-
 	class FileResponse : IResource
 	{
-		public FileResponse(string type, Stream stream)
+		internal FileResponse(string type, Stream stream)
 		{
 			Type = type;
 			Stream = stream;
@@ -47,15 +41,5 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public string Type { get; private set; }
 		public Stream Stream { get; private set; }
-	}
-
-	class FileRequest : IRequest
-	{
-		public FileRequest(string url)
-		{
-			Url = url;
-		}
-
-		public string Url { get; private set; }
 	}
 }

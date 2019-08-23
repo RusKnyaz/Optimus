@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// http://www.w3.org/TR/html5/forms.html
+	/// Represents &lt;FORM&gt; element.
+	/// http://www.w3.org/TR/html5/forms.html"
+	/// https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement"
 	/// </summary>
-	public class HtmlFormElement : HtmlElement
+	public sealed class HtmlFormElement : HtmlElement
 	{
 		static class Defaults
 		{
@@ -24,18 +27,38 @@ namespace Knyaz.Optimus.Dom.Elements
 		static string[] AllowedEnctypes = new []{"application/x-www-form-urlencoded", "multipart/form-data", "text/plain" };
 		private static string[] AllowedMethods = new[] {"get", "post"};
 
-		public HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form){}
+		internal HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form){}
 
-		public string Name
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			get { return GetAttribute("name", string.Empty);}
-			set { SetAttribute("name", value);}
+			base.CallDirectEventSubscribers(evt);
+
+			if (evt.Type == "submit")
+			{
+				Handle("onsubmit", OnSubmit, evt);
+				if (!evt.IsDefaultPrevented())
+				{
+					OwnerDocument.HandleFormSubmit(this, evt.OriginalTarget as HtmlElement);
+				}
+			}
 		}
 
+		/// <summary>
+		/// Gets or sets the 'name' attribute value reflecting the value of the form's name HTML attribute, containing the name of the form.
+		/// </summary>
+		public string Name
+		{
+			get => GetAttribute("name", string.Empty);
+			set => SetAttribute("name", value);
+		}
+
+		/// <summary>
+		/// Gets or sets the 'method' attribute value reflecting the value of the form's method HTML attribute, indicating the HTTP method used to submit the form. 
+		/// </summary>
 		public string Method
 		{
-			get { return GetAttribute("method", AllowedMethods, Defaults.Method).ToLowerInvariant(); }
-			set { SetAttribute("method", value); }
+			get => GetAttribute("method", AllowedMethods, Defaults.Method).ToLowerInvariant();
+			set => SetAttribute("method", value);
 		}
 
 		/// <summary>
@@ -43,8 +66,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string AcceptCharset
 		{
-			get { return GetAttribute("accept-charset", Defaults.AcceptCharset); }
-			set { SetAttribute("accept-charset", value); }
+			get => GetAttribute("accept-charset", Defaults.AcceptCharset);
+			set => SetAttribute("accept-charset", value);
 		}
 
 		/// <summary>
@@ -52,8 +75,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Action
 		{
-			get { return GetAttribute("action", Defaults.Action); }
-			set { SetAttribute("action", value); }
+			get => GetAttribute("action", Defaults.Action);
+			set => SetAttribute("action", value);
 		}
 
 		/// <summary>
@@ -61,8 +84,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Autocomplete
 		{
-			get { return GetAttribute("autocomplete", Defaults.Autocomplete); }
-			set { SetAttribute("autocomplete", value); }
+			get => GetAttribute("autocomplete", Defaults.Autocomplete);
+			set => SetAttribute("autocomplete", value);
 		}
 
 		/// <summary>
@@ -74,14 +97,18 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Enctype
 		{
-			get { return GetAttribute("enctype", AllowedEnctypes, Defaults.Enctype).ToLowerInvariant(); }
-			set { SetAttribute("enctype", value); }
+			get => GetAttribute("enctype", AllowedEnctypes, Defaults.Enctype).ToLowerInvariant();
+			set => SetAttribute("enctype", value);
 		}
 
+		/// <summary>
+		/// Gets or sets the 'encoding' attribute value reflecting the value of the form's enctype HTML 
+		/// attribute, indicating the type of content that is used to transmit the form to the server.
+		/// </summary>
 		public string Encoding
 		{
-			get { return GetAttribute("encoding", Defaults.Encoding); }
-			set { SetAttribute("encoding", value); }
+			get => GetAttribute("encoding", Defaults.Encoding);
+			set => SetAttribute("encoding", value);
 		}
 
 		/// <summary>
@@ -89,8 +116,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Target
 		{
-			get { return GetAttribute("target", Defaults.Target); }
-			set { SetAttribute("target", value); }
+			get => GetAttribute("target", Defaults.Target);
+			set => SetAttribute("target", value);
 		}
 
 		/// <summary>
@@ -99,17 +126,23 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// is the form element, with the exception of input elements whose type attribute is in the Image Button state, 
 		/// which must, for historical reasons, be excluded from this particular collection.
 		/// </summary>
-		public IEnumerable<HtmlElement> Elements
+		public IReadOnlyCollection<HtmlElement> Elements
 		{
 			get
 			{
 				//todo: consider to make search more optimal
-				var allelements = this.IsInDocument() ? this.Flatten() : OwnerDocument.Flatten();
-				return allelements.OfType<IFormElement>().Where(x => x.Form == this).OfType<HtmlElement>().Where(
-					x=> !(x.NodeType is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" );
+				var allelements = this.IsInDocument() ? OwnerDocument.Flatten() : this.Flatten();
+				return allelements.OfType<IFormElement>()
+                    .Where(x => x.Form == this)
+                    .OfType<HtmlElement>()
+                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" )
+					.ToList();
 			}
 		} 
 
+		/// <summary>
+		/// Resets the form to its initial state.
+		/// </summary>
 		public void Reset()
 		{
 			var resetEvent = OwnerDocument.CreateEvent("Event");
@@ -123,41 +156,26 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		public void Submit()
+		/// <summary>
+		/// Submits the form to the server.
+		/// </summary>
+		public void Submit() => OwnerDocument.HandleFormSubmit(this, null);
+
+		
+		internal void RaiseSubmit(HtmlElement submitElement)
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
+			evt.OriginalTarget = submitElement;
 			evt.InitEvent("submit", true, true);
 			DispatchEvent(evt);
 		}
+		
+		
 
+		/// <summary>
+		/// Called on form submit.
+		/// </summary>
 		public event Action<Event> OnSubmit;
-
-		public override bool DispatchEvent(Event evt)
-		{
-			if (!base.DispatchEvent(evt))
-				return false;
-
-			//default actions;
-			if (evt.Type == "submit")
-			{
-				try
-				{
-					if (OnSubmit != null)
-						OnSubmit(evt);
-				}
-				catch
-				{
-					//todo: log
-				}
-
-				if (evt.IsDefaultPrevented())
-					return false;
-
-				OwnerDocument.HandleFormSubmit(this);
-			}
-
-			return true;
-		}
 
 		/*
            attribute boolean noValidate;

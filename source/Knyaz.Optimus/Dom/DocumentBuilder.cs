@@ -1,138 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Html;
 using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
-using IHtmlElement = Knyaz.Optimus.Html.IHtmlElement;
 
 namespace Knyaz.Optimus.Dom
 {
-	//todo: chose one
-
-	//Build document parsed by HtmlAgilityPack
-	/*internal class DocumentBuilder
-	{
-		public static void Build(Node parentNode, string htmlString, NodeSources source = NodeSources.DocumentBuilder)
-		{
-			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
-			{
-				var html = Parse(stream);
-				Build(parentNode, html);
-			}
-		}
-
-		private static IEnumerable<HtmlNode> Parse(Stream stream)
-		{
-			var doc = new HtmlDocument();
-			doc.Load(stream);
-
-			return doc.DocumentNode.ChildNodes;
-			//return HtmlParser.Parse(stream);
-		}
-
-		public static void Build(Document parentNode, Stream stream)
-		{
-			var html = ExpandHtmlTag(Parse(stream));
-			Build(parentNode.DocumentElement, html);
-		}
-
-		private static IEnumerable<HtmlNode> ExpandHtmlTag(IEnumerable<HtmlNode> parse)
-		{
-			foreach (var htmlNode in parse)
-			{
-				if (htmlNode != null && htmlNode.Name.ToLowerInvariant() == "html")
-				{
-					foreach (var child in htmlNode.ChildNodes)
-					{
-						yield return child;
-					}
-				}
-				else
-				{
-					yield return htmlNode;
-				}
-			}
-		}
-
-		private static void Build(Node parentNode, IEnumerable<HtmlNode> htmlElements)
-		{
-			foreach (var htmlElement in htmlElements)
-			{
-				BuildElem(parentNode, htmlElement);
-			}
-		}
-
-		private static void BuildElem(Node node, HtmlNode htmlNode)
-		{
-			var comment = htmlNode as HtmlCommentNode;
-			if (comment != null)
-			{
-				node.AppendChild(node.OwnerDocument.CreateComment(comment.Comment));
-				return;
-			}
-
-			var txt = htmlNode as HtmlTextNode;
-			if (txt != null)
-			{
-				var c = node.OwnerDocument.CreateTextNode(txt.Text);
-				c.Source = NodeSources.DocumentBuilder;
-				node.AppendChild(c);
-				return;
-			}
-
-			if (!string.IsNullOrEmpty(htmlNode.Name))
-			{
-				var elem = node.OwnerDocument.CreateElement(htmlNode.Name);
-				elem.Source = NodeSources.DocumentBuilder;
-
-				if (elem is Script)
-				{
-					var htmlText = htmlNode.ChildNodes.FirstOrDefault() as HtmlTextNode;
-					elem.InnerHTML = htmlText != null ? htmlText.Text : string.Empty;
-				}
-
-				foreach (var attribute in htmlNode.Attributes)
-				{
-					elem.SetAttribute(attribute.Name, attribute.Value);
-				}
-
-				node.AppendChild(elem);
-
-				Build(elem, htmlNode.ChildNodes);
-			}
-			else
-			{
-				Build(node, htmlNode.ChildNodes);
-			}
-		}
-	}*/
-
 	//Build document using own parser
-	internal class DocumentBuilder
+	internal static class DocumentBuilder
 	{
 		public static void Build(Node parentNode, string htmlString, NodeSources source = NodeSources.DocumentBuilder)
 		{
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString)))
 			{
 				var html = HtmlParser.Parse(stream);
-				Build(parentNode, html, source);
+				BuildInternal(parentNode, html, source, true);
 			}
-		}
-
-		public static void Build(Document parentNode, Stream stream)
-		{
-			var html = ExpandHtmlTag(HtmlParser.Parse(stream));
-			Build(parentNode.DocumentElement, html);
 		}
 
 		private static IEnumerable<IHtmlNode> ExpandHtmlTag(IEnumerable<IHtmlNode> parse)
 		{
 			foreach (var htmlNode in parse)
 			{
-				var tag = htmlNode as HtmlElement;
-				if (tag != null && tag.Name.ToLowerInvariant() == "html")
+				if (htmlNode is HtmlElement tag && tag.Name.ToLowerInvariant() == "html")
 				{
 					foreach (var child in tag.Children)
 					{
@@ -146,66 +39,159 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private static void Build(Node parentNode, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder)
+		public static void Build(Document document, Stream stream, NodeSources source = NodeSources.DocumentBuilder)
 		{
-			foreach (var htmlElement in htmlElements)
-			{
-				BuildElem(parentNode, htmlElement, source);
-			}
+			var html = HtmlParser.Parse(stream);
+			Build(document, html, source);
 		}
 
-		private static void BuildElem(Node node, IHtmlNode htmlNode, NodeSources source)
+		public static void Build(Document document, IEnumerable<IHtmlNode> htmlElements, NodeSources source = NodeSources.DocumentBuilder) =>
+			BuildInternal(document.DocumentElement, ExpandHtmlTag(htmlElements), source);
+
+		private static IEnumerable<IHtmlNode> BuildInternal(
+			Node node, 
+			IEnumerable<IHtmlNode> htmlNodes, 
+			NodeSources source = NodeSources.DocumentBuilder, 
+			bool root = false)
 		{
-			var docType = htmlNode as HtmlDocType;
-			if (docType != null)
-			{
-				//todo: may be it's wrong to assume the doctype element placed before html in source document
-				node.OwnerDocument.InsertBefore(new DocType(), node.OwnerDocument.DocumentElement);
-			}
+			var extruded = new List<IHtmlNode>();
+
+			HtmlTableSectionElement currentTBody = null;
 			
-			var comment = htmlNode as HtmlComment;
-			if (comment != null)
+			foreach (var htmlNode in htmlNodes)
 			{
-				node.AppendChild(node.OwnerDocument.CreateComment(comment.Text));
-				return;
+				var currentNode = node;
+				
+				if (htmlNode is HtmlDocType)
+				{
+					//todo: may be it's wrong to assume the doctype element placed before html in source document
+					//todo: fill doctype attributes.
+					currentNode.OwnerDocument.InsertBefore(new DocType(), currentNode.OwnerDocument.DocumentElement);
+				}
+
+				if (htmlNode is HtmlComment comment)
+				{
+					currentNode.AppendChild(currentNode.OwnerDocument.CreateComment(comment.Text));
+					continue;
+				}
+				
+				var htmlElement = htmlNode as HtmlElement;
+
+				var htmlHtmlElt = currentNode as HtmlHtmlElement;
+				if (htmlHtmlElt != null && (htmlElement == null || (
+					                            !htmlElement.Name.Equals(TagsNames.Body,
+						                            StringComparison.InvariantCultureIgnoreCase) &&
+					                            !htmlElement.Name.Equals(TagsNames.Head,
+						                            StringComparison.InvariantCultureIgnoreCase))))
+				{
+					currentNode = currentNode.OwnerDocument.Body;
+				}
+				
+				if (htmlNode is HtmlText txt)
+				{
+					var c = currentNode.OwnerDocument.CreateTextNode(txt.Value);
+					c.Source = source;
+					currentNode.AppendChild(c);
+					continue;
+				}
+				
+				//skip child handling for nodes that not accepted children.
+				if (currentNode is Script)
+					continue;
+
+				if (currentNode is HtmlOptionElement option)
+				{
+					var innerText = htmlNode.ExtractText();
+					option.Text += innerText;
+					continue;
+				}
+
+				if (htmlElement == null)
+					continue;
+
+
+				if (htmlHtmlElt != null)
+				{
+					var invariantName = htmlElement.Name.ToUpperInvariant();
+					if (invariantName == "HEAD" || invariantName == "BODY")
+					{
+						var headOrBody = htmlHtmlElt.GetElementsByTagName(invariantName).FirstOrDefault();
+						headOrBody.Source = source;
+						SetAttributes(htmlElement, headOrBody);
+						BuildInternal(headOrBody, htmlElement.Children, source);
+						continue;
+					}
+				}
+
+				//if parent is table
+				if (currentNode is HtmlTableElement table)
+				{
+					var elementInvariantName = htmlElement.Name.ToUpperInvariant();
+					if (elementInvariantName == TagsNames.Tr)
+					{
+						if (currentTBody == null)
+						{
+							currentTBody = (HtmlTableSectionElement)currentNode.OwnerDocument.CreateElement(TagsNames.TBody);
+							currentTBody.Source = source;
+							table.AppendChild(currentTBody);
+						}
+						currentNode = currentTBody;
+					}
+					else if (elementInvariantName == TagsNames.Col)
+					{
+						var colgroup = currentNode.OwnerDocument.CreateElement(TagsNames.Colgroup);
+						table.AppendChild(colgroup);
+						currentNode = colgroup;
+					}
+					else if(elementInvariantName == TagsNames.TBody)
+					{
+						currentTBody = null;
+					}
+					else if (!root &&
+					         elementInvariantName != TagsNames.TBody &&
+					         elementInvariantName != TagsNames.Tr &&
+					         elementInvariantName != TagsNames.Caption &&
+					         elementInvariantName != TagsNames.THead &&
+					         elementInvariantName != TagsNames.TFoot &&
+					         elementInvariantName != TagsNames.Colgroup &&
+					         elementInvariantName != TagsNames.Col)
+					{
+						extruded.Add(htmlElement);
+						continue;
+					}
+				}
+
+				var elem = currentNode.OwnerDocument.CreateElement(htmlElement.Name);
+				elem.Source = source;
+				SetAttributes(htmlElement, elem);
+
+				var extrudedNodes = BuildInternal(elem, htmlElement.Children, source);
+				BuildInternal(currentNode, extrudedNodes, source);
+
+				currentNode.AppendChild(elem);
 			}
+			return extruded;
+		}
 
-			var txt = htmlNode as IHtmlText;
-			if (txt != null)
-			{
-				//todo: the more intelligent logic should be implemented. text nodes (except whitespaces) of html should falls into body.
-				if (node.NodeName == "HTML")
-					return;
-
-				var c = node.OwnerDocument.CreateTextNode(txt.Value);
-				c.Source = source;
-				node.AppendChild(c);
-				return;
-			}
-
-			var htmlElement = htmlNode as IHtmlElement;
-			if (htmlElement == null)
-				return;
-
-			var elem = node.OwnerDocument.CreateElement(htmlElement.Name);
-			elem.Source = source;
-			
-			if (elem is Script)
-			{
-				var htmlText = htmlElement.Children.FirstOrDefault() as IHtmlText;
-				elem.InnerHTML = htmlText != null ? htmlText.Value : string.Empty;
-			}
-			
+		private static void SetAttributes(HtmlElement htmlElement, Element elem)
+		{
 			foreach (var attribute in htmlElement.Attributes)
 			{
 				elem.SetAttribute(attribute.Key, attribute.Value);
+
+				if (attribute.Key == "selected" && elem is HtmlOptionElement option)
+				{
+					option.DefaultSelected = true;
+				}
 			}
-
-			node.AppendChild(elem);
-
-			Build(elem, htmlElement.Children, source);
 		}
-
-
+	}
+	
+	static class IHtmlNodeExtension
+	{
+		public static string ExtractText(this IHtmlNode node) =>
+			node is HtmlText text ? text.Value
+			: node is HtmlElement elt ? string.Join("", elt.Children.Select(ExtractText))
+			: string.Empty;
 	}
 }

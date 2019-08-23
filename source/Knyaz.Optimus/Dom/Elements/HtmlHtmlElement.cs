@@ -1,9 +1,24 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class HtmlHtmlElement : HtmlElement
+	/// <summary>
+	/// Represents &lt;HTML&gt; element.
+	/// </summary>
+	public sealed class HtmlHtmlElement : HtmlElement
 	{
-		public HtmlHtmlElement(Document ownerDocument) : base(ownerDocument, TagsNames.Html)
+		internal HtmlHtmlElement(Document ownerDocument) : base(ownerDocument, TagsNames.Html){}
+
+		/// <summary>
+		/// Gets or sets inner html of the 'HTML' element.
+		/// </summary>
+		public override string InnerHTML
 		{
+			get => base.InnerHTML;
+			set
+			{
+				AppendChild(OwnerDocument.CreateElement("HEAD"));
+				AppendChild(OwnerDocument.CreateElement("BODY"));
+				DocumentBuilder.Build(this, value, NodeSources.Script);
+			}
 		}
 	}
 }

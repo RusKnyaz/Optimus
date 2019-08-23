@@ -1,25 +1,52 @@
 ﻿namespace Knyaz.Optimus.Dom.Elements
 {
-	public class DocType : Node
+	/// <summary>
+	/// Represents the doctype element of the DOM.
+	/// </summary>
+	public sealed class DocType : Node
 	{
-		public DocType()
+		internal DocType() => NodeType = DOCUMENT_TYPE_NODE;
+
+		internal DocType(string name, string publicId, string systemId)
 		{
-			NodeType = DOCUMENT_TYPE_NODE;
+			Name = name;
+			PublicId = publicId;
+			SystemId = systemId;
 		}
 
-		public override Node CloneNode(bool deep)
-		{
-			return new DocType();
-		}
+		/// <summary>
+		/// Creates a copy of this DocType object.
+		/// </summary>
+		public override Node CloneNode(bool deep) => new DocType(Name, PublicId, SystemId);
 
-		public override string NodeName
-		{
-			get { return "html"; }
-		}
+		/// <summary>
+		/// The same as <see cref="Name"/>.
+		/// </summary>
+		public override string NodeName => Name;
 
-		public override string ToString()
-		{
-			return "<!DOCTYPE html>";
-		}
+		/// <summary>
+		/// Always [Object DocumentType] for the DocType element.
+		/// </summary>
+		public override string ToString() => "[Object DocumentType]";
+
+		/// <summary>
+		/// A DOMString, eg "html" for &lt;!DOCTYPE HTML&gt;.
+		/// </summary>
+		public string Name { get; }
+
+		/// <summary>
+		/// A string, eg "-//W3C//DTD HTML 4.01//EN", empty string for HTML5.
+		/// </summary>
+		public string PublicId { get; }
+
+		/// <summary>
+		/// A string, eg "http://www.w3.org/TR/html4/strict.dtd", empty string for HTML5.
+		/// </summary>
+		public string SystemId { get; }
+
+		/// <summary>
+		/// Removes this doctype from parent document.
+		/// </summary>
+		public void Remove() => ParentNode?.RemoveChild(this);
 	}
 }

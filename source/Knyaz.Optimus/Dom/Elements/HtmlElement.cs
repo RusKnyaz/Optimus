@@ -1,38 +1,45 @@
 ﻿using System;
-using System.Linq;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// http://www.w3.org/TR/2012/WD-html5-20121025/elements.html#htmlelement
+	/// The base class for the classes representing html elemenets.
 	/// </summary>
-	public class HtmlElement : Element, IHtmlElement
+	[DomItem]
+	public class HtmlElement : Element
 	{
+		private CssStyleDeclaration _style;
+
 		static class Defaults
 		{
 			public static bool Hidden = false;
 		}
 
-		public HtmlElement(Document ownerDocument, string tagName)
-			: base(ownerDocument, tagName)
+		internal HtmlElement(Document ownerDocument, string tagName): base(ownerDocument, tagName)	{}
+
+		protected override void CallDirectEventSubscribers(Event evt)
 		{
-			Style = new CssStyleDeclaration();
+			base.CallDirectEventSubscribers(evt);
+			
+			if (evt.Type == "click")
+				Handle("onclick", OnClick, evt);
 		}
 
+		/// <summary>
+		/// Gets or sets the 'hidden' attribute value, indicating if the element is hidden or not.
+		/// </summary>
 		public bool Hidden
 		{
-			get { return GetAttribute("hidden", Defaults.Hidden); }
-			set { SetAttribute("hidden", value.ToString());}
+			get => GetAttribute("hidden", Defaults.Hidden);
+			set => SetAttribute("hidden", value.ToString());
 		}
 
-		public string ClassName
-		{
-			get { return GetAttribute("class", "");}
-			set { SetAttribute("class", value);}
-		}
-
+		/// <summary>
+		/// Sends a mouse click event to the element.
+		/// </summary>
 		public virtual void Click()
 		{
 			var evt = OwnerDocument.CreateEvent("Event");
@@ -40,53 +47,53 @@ namespace Knyaz.Optimus.Dom.Elements
 			DispatchEvent(evt);
 		}
 
-		public event Action OnClick;
-
 		/// <summary>
-		/// This method allows the dispatch of events into the implementations event model. 
-		/// Events dispatched in this manner will have the same capturing and bubbling behavior as events dispatched directly by the implementation. The target of the event is the EventTarget on which dispatchEvent is called.
+		/// Called before the mouse 'click' dispatched.
 		/// </summary>
-		/// <returns> If preventDefault was called the value is false, else the value is true.</returns>
-		public override bool DispatchEvent(Event evt)
+		public event Func<Event, bool?> OnClick;
+		
+		/// <summary>
+		/// Gets a CssStyleDeclaration whose value represents the declarations specified in the attribute, if present. 
+		/// </summary>
+		/// <remarks>
+		/// Mutating the CssStyleDeclaration object must create a style attribute on the element (if there isn't one 
+		/// already) and then change its value to be a value representing the serialized form of the CSSStyleDeclaration
+		///  object. The same object must be returned each time.
+		/// </remarks>
+		public CssStyleDeclaration Style
 		{
-			if (evt.Type == "click" && OnClick != null)
-				OnClick();
-			
-			return base.DispatchEvent(evt);
-		}
+			get
+			{
+				if (_style == null)
+				{
+					_style = new CssStyleDeclaration {CssText = GetAttribute("style")};
+					_style.OnStyleChanged += css =>
+					{
+						if(GetAttribute("style") != css)
+							SetAttribute("style", css);
+					};
+				}
 
-		public CssStyleDeclaration Style { get; private set; }
+				return _style;
+			}
+		}
 
 		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
 		{
 			base.UpdatePropertyFromAttribute(value, invariantName);
 
-			//todo: remove it to property
-			if (invariantName == "style")
-			{
-				if (!string.IsNullOrEmpty(value))
-				{
-					var styleParts = value.Split(';');
-					foreach (var stylePart in styleParts.Where(s => !string.IsNullOrEmpty(s)))
-					{
-						var keyValue = stylePart.Split(':');
-						if (keyValue.Length == 2)
-						{
-							//todo: handle duplicates
-							Style.Properties.Add(keyValue[0], keyValue[1]);
-						}
-					}
-				}
-			} 
+			if (invariantName == "style" && _style != null && Style.CssText != value)
+				Style.CssText = value;
 		}
-	}
 
-	[DomItem]
-	public interface IHtmlElement
-	{
-		bool Hidden { get; set; }
-		void Click();
-		event Action OnClick;
-		string ClassName { get; set; }
+		/// <summary>
+		/// Removes keyboard focus from the current element.
+		/// </summary>
+		public void Blur() => OwnerDocument.ActiveElement = null;
+
+		/// <summary>
+		/// Sets keyboard focus on the specified element, if it can be focused.
+		/// </summary>
+		public void Focus() => OwnerDocument.ActiveElement = this;
 	}
 }

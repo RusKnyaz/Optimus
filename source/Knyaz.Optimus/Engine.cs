@@ -1,24 +1,88 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
+using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
 
 namespace Knyaz.Optimus
 {
-	public class Engine: IDisposable
+	/// <summary>
+	/// The web engine that allows you you to load html pages, execute JavaScript and get live DOM.
+	/// </summary>
+	public partial class Engine: IDisposable
 	{
 		private Document _document;
 		private Uri _uri;
-		public IResourceProvider ResourceProvider { get; private set; }
-		public IScriptExecutor ScriptExecutor { get; private set; }
-
+		internal readonly LinkProvider LinkProvider = new LinkProvider();
+		
+		/// <summary>
+		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
+		/// </summary>
+		public IResourceProvider ResourceProvider { get; }
+		
+		/// <summary>
+		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
+		/// </summary>
+		public IScriptExecutor ScriptExecutor { get; }
+		
+		/// <summary>
+		/// Glues Document and ScriptExecutor.
+		/// </summary>
 		public DocumentScripting Scripting	{get; private set;}
+		internal DocumentStyling Styling { get; private set; }
+	
+		/// <summary>
+		/// Gets the browser's console object.
+		/// </summary>
+		public Console Console { get; }
+		
+		/// <summary>
+		/// Gets the current Window object.
+		/// </summary>
+		public Window Window { get; }
 
+		readonly CookieContainer _cookieContainer;
+
+		
+		/// <summary>
+		/// Creates new Engine instance with default settings (Js enabled, css disabled).
+		/// </summary>
+		public Engine(IResourceProvider resourceProvider = null)
+		{
+			if (resourceProvider == null)
+				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
+					.Notify(request => OnRequest?.Invoke(request), response => OnResponse?.Invoke(response))
+					.Build();
+			
+			ResourceProvider = resourceProvider;
+			_cookieContainer = new CookieContainer();
+			
+			Console = new Console();
+			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
+			ScriptExecutor = new ScriptExecutor(this);
+			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+		}
+
+		public event Action<Request> OnRequest;
+		public event Action<ReceivedEventArguments> OnResponse;
+
+		/// <summary>
+		/// Occurs when window.open method called.
+		/// </summary>
+		public event Action<string, string, string> OnWindowOpen;
+
+		/// <summary>
+		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).
+		/// </summary>
 		public Document Document
 		{
 			get { return _document; }
@@ -32,143 +96,131 @@ namespace Knyaz.Optimus
 
 				if (Scripting != null)
 				{
+					
 					Scripting.Dispose();
 					Scripting = null;
+				}
+
+				if (Styling != null)
+				{
+					Styling.Dispose();
+					Styling = null;
 				}
 
 				_document = value;
 				
 				if (_document != null)
 				{
-					Scripting = new DocumentScripting (_document, ScriptExecutor, ResourceProvider);
+					Scripting = new DocumentScripting (_document, ScriptExecutor, 
+						s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
+					
+					Document.CookieContainer = _cookieContainer;
+
+					if (_computedStylesEnabled)
+					{
+						EnableDocumentStyling();
+					}
+
+					Document.GetImage = async url =>
+					{
+						var request = CreateRequest(url);
+						var response = await ResourceProvider.SendRequestAsync(request);
+						if(response is HttpResponse httpResponse && httpResponse.StatusCode != HttpStatusCode.OK)
+							throw new Exception("Resource not found");
+							
+						return new Image(response.Type, response.Stream);
+					};
 				}
 
-				if (DocumentChanged != null)
-					DocumentChanged();
+				DocumentChanged?.Invoke();
 			}
 		}
+		
+		
 
-		private void OnNodeException(Node node, Exception exception)
-		{
+		private void OnNodeException(Node node, Exception exception) =>
 			Console.Log("Node event handler exception: " + exception.Message);
-		}
 
-		public Console Console { get; private set; }
-		public Window Window { get; private set; }
 
-		public Engine(IResourceProvider resourceProvider)
+		/// <summary>
+		/// Gets the current Uri of the document.
+		/// </summary>
+		public Uri Uri
 		{
-			ResourceProvider = resourceProvider;
-			Console = new Console();
-			Window = new Window(() => Document, this);
-			ScriptExecutor = new ScriptExecutor(this);
-			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+			get => _uri;
+			internal set
+			{
+				_uri = value;
+				OnUriChanged?.Invoke();
+			}
 		}
 
 		/// <summary>
-		/// todo: rewrite and complete the stuff
+		/// Called on <see cref="Engine.Uri"/> changed.
 		/// </summary>
-		/// <param name="form"></param>
-		private async void OnFormSubmit(HtmlFormElement form)
-		{
-			if (string.IsNullOrEmpty(form.Action))
-				return;
-			//todo: we should consider the case when button clicked and the button have 'method' or other attributes.
-			
-			var dataElements = form.Elements.OfType<IFormElement>().Where(x => !string.IsNullOrEmpty(x.Name));
-
-			var replaceSpaces = form.Method != "post" || form.Enctype != "multipart/form-data";
-			
-			var data = string.Join("&", dataElements.Select(x => 
-				x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
-				));
-
-			var isGet = form.Method.ToLowerInvariant() == "get";
-
-			var url = form.Action;
-
-			if (isGet)
-				url += "?" + data;
-
-			if (form.Action != "about:blank")
-			{
-				var document = new Document(Window);
-
-				HtmlIFrameElement targetFrame = null;
-				if (!string.IsNullOrEmpty(form.Target) &&
-					(targetFrame = Document.GetElementsByName(form.Target).FirstOrDefault() as HtmlIFrameElement) != null)
-				{
-					targetFrame.ContentDocument = document;
-				}
-				else
-				{
-					Document = document;
-				}
-
-				var request = ResourceProvider.CreateRequest(url);
-				if (!isGet)
-				{
-					var httpRequest = request as HttpRequest;
-					if (httpRequest != null)
-					{
-						//todo: use right encoding and enctype
-						httpRequest.Data = Encoding.UTF8.GetBytes(data);
-					}
-				}
-
-				var response = await ResourceProvider.GetResourceAsync(request);
-
-				//what should we do if the frame is not found?
-				if (response.Type == ResourceTypes.Html)
-				{
-					//todo: clear js runtime context
-					DocumentBuilder.Build(document, response.Stream);
-					document.Complete();
-				}
-			}
-			//todo: handle 'about:blank'
-		}
-
-		public Engine() : this(new ResourceProvider()) { }
-
-		public Uri Uri
-		{
-			get { return _uri; }
-			private set
-			{
-				_uri = value;
-				if (OnUriChanged != null)
-				{
-					OnUriChanged();
-				}
-			}
-		}
-
 		public event Action OnUriChanged;
+		
+		/// <summary>
+		/// Called when new Document created and assigned to <see cref="Engine.Document"/> property.
+		/// </summary>
+		public event Action DocumentChanged;
 
-		public async void OpenUrl(string path)
+		/// <summary>
+		/// Creates new <see cref="Document"/> and loads it from specified path (http or file).
+		/// </summary>
+		/// <param name="path">The string which represents Uri of the document to be loaded.</param>
+		public async Task<Page> OpenUrl(string path)
 		{
-			//todo: clear timers!!!!
+			//todo: stop unfinished ajax requests or drop their results
+			Window.Timers.ClearAll();
 			ScriptExecutor.Clear();
+			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
+			Window.History.PushState(null, null, uri.AbsoluteUri);
+			
 			Document = new Document(Window);
-			Uri = Uri.IsWellFormedUriString(path, UriKind.Absolute) ? new Uri(path) : new Uri(Uri, path);
-			ResourceProvider.Root = Uri.GetLeftPart(UriPartial.Path).TrimEnd('/');
-			var resource = await ResourceProvider.GetResourceAsync(Uri.ToString().TrimEnd('/'));
-			LoadFromResponse(resource);
+			LinkProvider.Root = Uri.GetRoot();
+			var response = await ResourceProvider.SendRequestAsync(CreateRequest(path));
+			
+			LoadFromResponse(Document, response);
+
+			return response is HttpResponse httpResponse
+				? new HttpPage(Document, httpResponse.StatusCode)
+				: new Page(Document);
 		}
 
-		private void LoadFromResponse(IResource resource)
+		internal Request CreateRequest(string uri, string method = "GET")
 		{
-			if (resource.Type == ResourceTypes.Html)
-			{
-				var httpResponse = resource as HttpResponse;
-				if (httpResponse != null && httpResponse.Uri != null)
-					Uri = httpResponse.Uri;
+			var req = new Request(method, LinkProvider.MakeUri(uri));
+			req.Headers["User-Agent"] = Window.Navigator.UserAgent;
+			req.Cookies = _cookieContainer;
+			return req;
+		}
+		
+		/// <summary>
+		/// Occurs before the document being loaded from response. 
+		/// Can be used to handle non-html response types.
+		/// </summary>
+		public event EventHandler<ResponseEventArags> PreHandleResponse; 
 
-				BuildDocument(resource.Stream);
+		private void LoadFromResponse(Document document, IResource resource)
+		{
+			if (PreHandleResponse != null)
+			{
+				var args = new ResponseEventArags(resource);
+				PreHandleResponse(this, args);
+				if (args.Cancel)
+					return;
 			}
+			
+			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
+				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
+
+			if (resource is HttpResponse httpResponse && httpResponse.Uri != null)
+				Uri = httpResponse.Uri;
+
+			BuildDocument(document, resource.Stream);
 		}
 
 		/// <summary>
@@ -179,23 +231,98 @@ namespace Knyaz.Optimus
 		{
 			ScriptExecutor.Clear();
 			Document = new Document(Window);
-			BuildDocument(stream);
+			BuildDocument(Document, stream);
 		}
 
-		private void BuildDocument(Stream stream)
+		private void BuildDocument(Document document, Stream stream)
 		{
 			//todo: fix protocol
 			if(Uri == null)
 				Uri = new Uri("http://localhost");
 
 			//todo: clear js runtime context
-			DocumentBuilder.Build(Document, stream);
-			Document.Complete();
+
+			var html = HtmlParser.Parse(stream).ToList();
+
+			if (ResourceProvider is IPredictedResourceProvider resourceProvider)
+			{
+				foreach (var src in html.OfType<HtmlElement>()
+					.Flat(x => x.Children.OfType<HtmlElement>())
+					.Where(x => x.Name == "script" && x.Attributes.ContainsKey("src"))
+					.Select(x => x.Attributes["src"])
+					.Where(x => !string.IsNullOrEmpty(x))
+					)
+				{
+					resourceProvider.Preload(CreateRequest(src));
+				}
+
+				if (ComputedStylesEnabled)
+				{
+					foreach (var src in html.OfType<HtmlElement>()
+					.Flat(x => x.Children.OfType<HtmlElement>())
+					.Where(x => x.Name == "link" && x.Attributes.ContainsKey("href") &&
+					            (!x.Attributes.ContainsKey("type") || x.Attributes["type"] == "text/css"))
+					.Select(x => x.Attributes["href"])
+					.Where(x => !string.IsNullOrEmpty(x)))
+					{
+						resourceProvider.Preload(CreateRequest(src));
+					}
+				}
+			}
+
+			DocumentBuilder.Build(document, html);
+			document.Complete();
 		}
 
-		public event Action DocumentChanged;
-		public void Dispose()
+		public void Dispose() => Window.Dispose();
+
+		private bool _computedStylesEnabled;
+		
+		/// <summary>
+		/// Enables or disables the css loading and styles evaluation.
+		/// </summary>
+		public bool ComputedStylesEnabled
 		{
+			get => _computedStylesEnabled;
+			set
+			{
+				if (_computedStylesEnabled == value)
+					return;
+
+				_computedStylesEnabled = value;
+				if (_document == null) 
+					return;
+
+				if(_computedStylesEnabled)
+					EnableDocumentStyling();
+				else
+				{
+					Styling.Dispose();
+					Styling = null;
+				}
+			}
 		}
-    }
+
+		private void EnableDocumentStyling()
+		{
+			Styling = new DocumentStyling(_document, s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
+			Styling.LoadDefaultStyles();
+		}
+
+		/// <summary>
+		/// Gets the current media settings (used in computed styles evaluation).
+		/// </summary>
+		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
+	}
+
+	public class ResponseEventArags : EventArgs
+	{
+		public bool Cancel { get; set; }
+		public readonly IResource Response;
+
+		public ResponseEventArags(IResource resource)
+		{
+			Response = resource;
+		}
+	}
 }

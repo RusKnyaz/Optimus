@@ -19,7 +19,7 @@
 		
 	<!-- Property -->
 	<property name="buildnumber" value="${environment::get-variable('BUILD_NUMBER')}"/>
-	<property name="version" value="1.0.${buildnumber}.0"/>
+	<property name="version" value="1.2.${buildnumber}.1"/>
 	<property name="config.work.d"      value="${work.d}/${config.environment}" />
 	
 	<!-- Binaries-->        
@@ -29,7 +29,6 @@
 	
 	<!-- Sources -->
 	<property name="sources.d" value="${work.d}/source"/>
-	<property name="sources.assemblyversioninfo.cs" value="${sources.d}/AssemblyVersionInfo.cs"/>
 	<property name="solution" value="${sources.d}/Knyaz.Optimus.sln"/>
 	<property name="nuget.exe" value="${sources.d}/.nuget/NuGet.exe"/>	
 	
@@ -61,12 +60,11 @@
 
 	<target name="build" description="Compiles the source code.">
 		<echo message="Target started at: ${datetime::now()}."/>
-		<property name="nant.settings.currentframework" value="${net-4.0}" />
 		
 		<call target="set-props" />
 		
 		<property name="args" value="&quot;${solution}&quot;"/>
-		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig}"/>
+		<property name="args" value="${args} /t:Knyaz_Optimus:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
 		
 		<echo message="exec: ${build.exe} ${args}"/>
 		
@@ -75,27 +73,31 @@
 		<copy todir="${bin.d}">
 			<fileset>
 				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/*.dll"/>
+				<include name="${sources.d}/Knyaz.Optimus/bin/${msconfig}/Knyaz.Optimus.xml"/>
 			</fileset>
 		</copy>
 		<echo message="Build finished at: ${datetime::now()}"/>
 	</target>
 
+  <target name="build-tests" description="Compiles the source code of the Knyaz.Optimus.Tests">
+    <call target="set-props" />
+    <property name="args" value="&quot;${solution}&quot;"/>
+    <property name="args" value="${args} /t:Knyaz_Optimus_Tests:Rebuild /p:Configuration=${msconfig};Version=${version}"/>
+    <exec program="${build.exe}" commandline="${args}"/>
+    <copy todir="${bin.d}">
+      <fileset>
+        <include name="${sources.d}/Knyaz.Optimus.Tests/bin/${msconfig}/Knyaz.Optimus.Tests.dll"/>
+      </fileset>
+    </copy>
+  </target>
+
 	<target name="nuget-restore">
 		<exec if="${iswin}"
 		      program="${nuget.exe}" workingdir = "${work.d}/sources" commandline="install .nuget\packages.config -o packages"/>
 		<exec if="${not iswin}"
-		      program="mono" workingdir = "${sources.d}" commandline="${nuget.exe} install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
+		      program="mono" workingdir = "${sources.d}" commandline="&quot;${nuget.exe}&quot; install .nuget/packages.config -o packages -ConfigFile .nuget/NuGet.config"/>
 	</target>
 		
-	<target name="artifacts-zip" description="Create zip archive from 'publish' directory">
-		<mkdir dir="${artifacts.d}" />
-		<zip zipfile="${artifacts.d}/optimus.zip">
-			<fileset basedir="${publish.d}">
-			        <include name="**/*" />
-			</fileset>
-		</zip>
-	</target>
-
 	<target name="artifacts-nuget" description="Create nuget package from 'bin' directory">
 		<mkdir dir="${artifacts.d}" />
 		<copy todir="${bin.d}">
@@ -103,17 +105,24 @@
 				<include name="${work.d}/build-scripts/Package.nuspec"/>
 			</fileset>
 		</copy>
-		<property name="args" value="pack ${bin.d}/Package.nuspec -Properties version=${version}"/>
-		<exec program="mono" commandline="${nuget.exe} ${args}" workingdir = "${artifacts.d}" if="${not iswin}"/>
+		<property name="args" value="pack &quot;${bin.d}/Package.nuspec&quot; -Properties version=${version}"/>
+		<exec program="mono" commandline="&quot;${nuget.exe}&quot; ${args}" workingdir = "${artifacts.d}" if="${not iswin}"/>
 		<exec program="${nuget.exe}" commandline="${args}" workingdir = "${artifacts.d}" if="${iswin}"/>
 	</target>
 	
 	<target name="nunit-run" description="Run unit-tests">
 		<echo message="Launch NUnit." />
 		<mkdir dir="${test.res.d}" />
-		<exec program="nunit-console" commandline="&quot;${bin.optimus.dll}&quot; -xml=&quot;${test.res.d}/${optimus.dll}-results.xml&quot; -noshadow"/>
+		<exec program="nunit-console" commandline="&quot;${bin.optimus.dll}&quot; -xml=&quot;${test.res.d}/${optimus.dll}-results.xml&quot; -noshadow -exclude:manual"/>
 		<echo message="Target completed at: ${datetime::now()}." />
 	</target>
+
+  <target name="nunit-a-run" description="Run acceptance tests">
+    <echo message="Launch NUnit." />
+    <mkdir dir="${test.res.d}" />
+    <exec program="nunit-console" commandline="&quot;${bin.d}/Knyaz.Optimus.Tests.dll&quot; -xml=&quot;${test.res.d}/Knyaz.Optimus.Tests.dll-results.xml&quot; -noshadow"/>
+    <echo message="Target completed at: ${datetime::now()}." />
+  </target>
 	
 	<target name="config-nunit">
 		<property name = "config.environment" value="nunit"/>
@@ -122,7 +131,9 @@
 	<target name="build-nunit" >
 		<call target="config-nunit"/>
 		<call target="build" />
+    <call target="build-tests"/>
 	</target>
+  
 	<target name="build-release" >
 		<property name = "config.environment" value="release"/>
 		<call target="build" />
@@ -141,6 +152,7 @@
 		<call target="nuget-restore"/>
 		<call target="build-nunit"/>
 		<call target="nunit-run"/>
+    <call target="nunit-a-run"/>
 		<call target="build-release"/>
 		<call target="artifacts-nuget"/>
 	</target>
