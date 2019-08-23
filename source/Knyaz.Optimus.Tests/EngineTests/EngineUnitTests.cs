@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -572,7 +573,7 @@ function reqListener () {
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
 		}
-
+		
 		[Test]
 		public async Task GetImageRawData()
 		{
@@ -595,6 +596,42 @@ function reqListener () {
 			Assert.AreEqual(new byte[]{1,2,3,2,1}, data.ToArray());
 		}
 		
+		[Test]
+		public async Task DocumentWithImage()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "<html><body><img src='image.bmp'/></body></html>")
+				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.GetElementsByTagName("img").First();
+			
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.IsTrue(img.Complete);
+		}
+		
+		[Test]
+		public async Task DocumentWithEmbeddedImage()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "<html><body><img src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.AreEqual(8, img.NaturalWidth);
+			Assert.AreEqual(4, img.NaturalHeight);
+		}
 		[Test]
 		public async Task SetAndResetImage()
 		{

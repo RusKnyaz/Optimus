@@ -27,10 +27,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public string JQueryIdSelectorInDeferScript(bool defer)
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>()
-				.Resource("http://localhost", "<html><head><script> " + R.JQueryJs + " </script><script src='test.js' "+ (defer?"defer":"") + "/></head><body><div id='uca'></div></body></html>")
+				.Resource("http://localhost",
+					"<html><head><script> " + R.JQueryJs + " </script><script src='test.js' " + (defer ? "defer" : "") +
+					"/></head><body><div id='uca'></div></body></html>")
 				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
 			var engine = new Engine(resourceProvider);
-			engine.Console.OnLog +=o => System.Console.WriteLine(o.ToString());
+			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
 			return ucaDiv.InnerHTML;
@@ -40,7 +42,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void JQueryIdSelectorIn()
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>()
-				.Resource("http://localhost", "<html><head><script> " + R.JQueryJs + " </script><script src='test.js'/></head><body><div id='uca'></div></body></html>")
+				.Resource("http://localhost",
+					"<html><head><script> " + R.JQueryJs +
+					" </script><script src='test.js'/></head><body><div id='uca'></div></body></html>")
 				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
 			var engine = new Engine(resourceProvider);
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
@@ -53,8 +57,11 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Post()
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>()
-				.Resource("http://localhost", "<html><head><script> " + R.JQueryJs + " </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>")
-				.Resource("http://localhost/test.js", "$.post('http://localhost/data').done(function(x){console.log(x);});")
+				.Resource("http://localhost",
+					"<html><head><script> " + R.JQueryJs +
+					" </script><script src='test.js' defer/></head><body><div id='uca'></div></body></html>")
+				.Resource("http://localhost/test.js",
+					"$.post('http://localhost/data').done(function(x){console.log(x);});")
 				.Resource("http://localhost/data", "OK");
 
 			var engine = new Engine(resourceProvider);
@@ -67,9 +74,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			engine.OpenUrl("http://localhost");
 			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[]{"OK"}, log);
+			CollectionAssert.AreEqual(new[] {"OK"}, log);
 		}
-		
+
 
 		[Test]
 		public void JQueryCreate()
@@ -77,12 +84,13 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var script = "var a = $('<input type=\"file\">');console.log(a?'ok':'error');";
 			var engine = new Engine();
 			string result = null;
-			engine.Console.OnLog += o => 
-			{ 
+			engine.Console.OnLog += o =>
+			{
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script defer>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script defer>" + script +
+			            "</script></head><body><div id='uca'></div></body></html>");
 			Assert.AreEqual("ok", result);
 		}
 
@@ -101,14 +109,15 @@ document.body.appendChild(e);";
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs +
+			            " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
 			var loaded = engine.WaitId("loaded");
 			Assert.IsNotNull(loaded);
-			
+
 			var e = engine.Document.CreateEvent("Event");
 			e.InitEvent("click", true, true);
 			engine.Document.GetElementById("b").DispatchEvent(e);
-			
+
 			Assert.AreEqual("hi", result);
 		}
 
@@ -127,11 +136,12 @@ document.body.appendChild(e);";
 				System.Console.WriteLine(o.ToString());
 				result = o.ToString();
 			};
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs +
+			            " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
 			var loaded = engine.WaitId("loaded");
 			Assert.IsNotNull(loaded);
 
-			((HtmlElement)engine.Document.GetElementById("b")).Click();
+			((HtmlElement) engine.Document.GetElementById("b")).Click();
 
 			Assert.AreEqual("hi", result);
 		}
@@ -143,8 +153,9 @@ document.body.appendChild(e);";
 
 			var engine = new Engine();
 			object result = null;
-			engine.Console.OnLog += o =>{result = o;};
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script>" + script + "</script></head><body><div id='b'></div></body></html>");
+			engine.Console.OnLog += o => { result = o; };
+			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script>" + script +
+			            "</script></head><body><div id='b'></div></body></html>");
 			Thread.Sleep(1000);
 
 			Assert.IsNotNull(result);
@@ -155,12 +166,18 @@ document.body.appendChild(e);";
 		[TestCase("#a", 1)]
 		public void Selector(string selector, int exptectedCount)
 		{
-			var script = @"console.log($('"+selector+"').length);";
+			var script = @"console.log($('" + selector + "').length);";
 			var engine = new Engine();
 			object result = null;
-			engine.Console.OnLog += o => {System.Console.WriteLine((o ??"null").ToString()); result = o; };
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div class = 'u' id='a'></div><script>" + script + "</script></body></html>");
-			
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine((o ?? "null").ToString());
+				result = o;
+			};
+			engine.Load("<html><head><script> " + R.JQueryJs +
+			            " </script></head><body><div class = 'u' id='a'></div><script>" + script +
+			            "</script></body></html>");
+
 			Assert.AreEqual(exptectedCount, result);
 		}
 
@@ -170,8 +187,14 @@ document.body.appendChild(e);";
 			var script = @"$('#a').on('click.some', '.u', function(){console.log('hi');});";
 			var engine = new Engine();
 			object result = null;
-			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script + "</script></body></html>");
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine((o ?? "null").ToString());
+				result = o;
+			};
+			engine.Load("<html><head><script> " + R.JQueryJs +
+			            " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script +
+			            "</script></body></html>");
 
 			var u = engine.Document.GetElementById("u") as HtmlElement;
 			u.Click();
@@ -184,20 +207,16 @@ document.body.appendChild(e);";
 			var script = "$('#target')['html']('<script>console.log(1);</script>');";
 			var engine = new Engine();
 			object result = null;
-			engine.Console.OnLog += o => { System.Console.WriteLine((o ?? "null").ToString()); result = o; };
+			engine.Console.OnLog += o =>
+			{
+				System.Console.WriteLine((o ?? "null").ToString());
+				result = o;
+			};
 
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
+			engine.Load("<html><head><script> " + R.JQueryJs +
+			            " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
 
-			engine.DumpToFile("c:\\temp\\c.html");
 			Assert.AreEqual(1, result);
-		}
-	}
-
-	public static class StringExtension
-	{
-		public static Stream ToStream(this string str)
-		{
-			return new MemoryStream(Encoding.UTF8.GetBytes(str));
 		}
 	}
 }
