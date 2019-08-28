@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
@@ -52,11 +53,25 @@ namespace Knyaz.Optimus
 
 		readonly CookieContainer _cookieContainer;
 
+
 		
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine(IResourceProvider resourceProvider = null)
+		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null)
+		{
+			var navigator = new Navigator(new NavigatorPlugins(new PluginInfo[0]))
+			{
+				UserAgent =
+					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
+			};
+			Window = new Window(() => Document, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts),
+				navigator);
+
+			Window.Engine = this;
+		}
+
+		internal Engine(IResourceProvider resourceProvider, Window window)
 		{
 			if (resourceProvider == null)
 				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
@@ -67,7 +82,13 @@ namespace Knyaz.Optimus
 			_cookieContainer = new CookieContainer();
 			
 			Console = new Console();
-			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
+
+			if (window != null)
+			{
+				window.Engine = this;
+				Window = window;
+			}
+
 			ScriptExecutor = new ScriptExecutor(this);
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
 		}

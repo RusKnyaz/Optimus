@@ -3,10 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## [2.3] - 2019
 
+## Added
+- NavigatorPlugins
+- EngineBuilder
+
+## [2.2.6]
+
 ### Added 
 - HtmlImageElement.ImageData property to get raw image data
 ### Fixed
 - Loading of image when source specified using setAttribute('src', ...) method.
+- Execution addEventListener("", null)
 
 ## [2.2] - 2017-08-20
 

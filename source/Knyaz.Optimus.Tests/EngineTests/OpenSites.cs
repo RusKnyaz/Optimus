@@ -68,7 +68,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			foreach (var category in ("parsing elements form location output input communication " +
 			                          "interaction performance security offline " +
 			                          "storage files streams video audio responsive " +
-			                         "canvas animation components scripting other").Split(' '))
+			                          "canvas animation components scripting other").Split(' '))
 			{
 				var headerRow = engine.Document.WaitId($"head-{category}");
 				if (headerRow == null)
@@ -83,7 +83,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					System.Console.WriteLine($"Score of {category} category not found.");
 					continue;
 				}
-					
+
 				System.Console.WriteLine(category + ": " + scoreElement.InnerHTML);
 			}
 		}
@@ -105,7 +105,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.AttachConsole();
 			engine.OpenUrl("http://okkamtech.com").Wait(timeout);
 			//engine.OpenUrl("http://localhost:2930");
-			
+
 			var logonButton = engine.WaitId("logon") as HtmlElement;
 			Thread.Sleep(5000);
 
@@ -156,7 +156,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.OpenUrl("http://chi.todosoft.org").Wait(timeout);
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
-			
+
 			var userName = engine.WaitId("UserName") as HtmlInputElement;
 			var password = engine.WaitId("Password") as HtmlInputElement;
 			Assert.IsNotNull(logonButton, "LogonButton");
@@ -185,7 +185,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.OpenUrl("http://red.todosoft.ru").Wait();
 			var login = engine.WaitSelector("a.login").FirstOrDefault() as HtmlElement;
 			Assert.IsNotNull(login, "login button");
-			engine.Window.Location.Href = login.GetAttribute("href");//login.Click();
+			engine.Window.Location.Href = login.GetAttribute("href"); //login.Click();
 			var userNameInput = engine.WaitId("username") as HtmlInputElement;
 			Assert.IsNotNull(userNameInput, "user name inpit");
 			var passwordInput = engine.WaitId("password") as HtmlInputElement;
@@ -203,7 +203,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			engine.OpenUrl("http://whatsmyuseragent.org/").Wait();
-			var uaDiv = (HtmlDivElement)engine.WaitSelector("div.user-agent").FirstOrDefault();
+			var uaDiv = (HtmlDivElement) engine.WaitSelector("div.user-agent").FirstOrDefault();
 			var ua = uaDiv?.TextContent;
 			Assert.IsNotNull(ua);
 			System.Console.Write(ua);
@@ -222,7 +222,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.OpenUrl("https://rutracker.org").Wait();
 			System.Console.WriteLine(engine.Document.DocumentElement.InnerHTML);
 		}
-		
+
 		[Test]
 		public async Task OpenHabr()
 		{

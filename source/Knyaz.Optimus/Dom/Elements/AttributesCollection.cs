@@ -49,7 +49,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		IEnumerator IEnumerable.GetEnumerator() => _properties.GetEnumerator();
 
 		/// <summary>
-		/// Removes the attribute with specifeid name.
+		/// Removes the attribute with specified name.
 		/// </summary>
 		internal void Remove(string name) => _properties.Remove(name);
 

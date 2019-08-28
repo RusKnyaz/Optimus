@@ -10,7 +10,9 @@ namespace Knyaz.Optimus.Environment
 	/// </summary>
 	public class History : IHistory
 	{
-		//todo: history should updated on navigatin using links, and Open method call.
+		private readonly Action<string, string> _onSetState;
+
+		//todo: history should updated on navigation using links, and Open method call.
 		readonly List<HistoryItem> _history = new List<HistoryItem>();
 		private int _currentPosition = -1;
 
@@ -21,9 +23,7 @@ namespace Knyaz.Optimus.Environment
 			public object Data;
 		}
 
-		private readonly Engine _engine;
-
-		internal History(Engine engine) => _engine = engine;
+		internal History(Action<string,string> onSetState) => _onSetState = onSetState;
 
 		/// <summary>
 		/// Gets the number of elements in the session history.
@@ -93,12 +93,6 @@ namespace Knyaz.Optimus.Environment
 			SetState(item);
 		}
 
-		private void SetState(HistoryItem item)
-		{
-			var url = item.Url;
-			_engine.Uri = UriHelper.IsAbsolete(url) ? new Uri(url) : new Uri(new Uri(_engine.Uri.GetLeftPart(UriPartial.Authority)), url);
-			if (item.Title != null)
-				_engine.Document.Title = item.Title;
-		}
+		private void SetState(HistoryItem item) => _onSetState?.Invoke(item.Url, item.Title);
 	}
 }

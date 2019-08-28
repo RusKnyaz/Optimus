@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using System.Text;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Configure;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -1156,6 +1157,73 @@ dispatchEvent(evt);");
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.AreEqual(new object[]{"no error"}, log);
+		}
+		
+				
+		[Test]
+		public void CustomGlobalFunc()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"myfunc = function(msg) {console.log(msg);};" +
+				"myfunc('1');" +
+				"window.myfunc('2');" +
+				"window['myfunc']('3');" +
+				"</script></html>");
+
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.OpenUrl("http://localhost").Wait();
+			Assert.AreEqual(new object[]{"1", "2", "3"}, log);
+		}
+
+		[Test]
+		public void NavigatorMimeTypesSmoke()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"console.log(navigator.mimeTypes.length);"+
+				"console.log(navigator.mimeTypes[\"application/x-shockwave-flash\"]);" +
+				"console.log('ok');" +
+				"</script></html>");
+
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.OpenUrl("http://localhost").Wait();
+			Assert.AreEqual(new object[]{0, null, "ok"}, log);
+		}
+
+		[Test]
+		public async Task NavigatorPlugins()
+		{
+			var plugins = new [] {
+				new PluginInfo("Pdf reader", "Pdf document reader", "", "",
+					new PluginMimeTypeInfo[] {new PluginMimeTypeInfo("application/pdf", "", "pdf")}),
+				new PluginInfo("Video plugin", "", "", "", new PluginMimeTypeInfo[]
+				{
+					new PluginMimeTypeInfo("application/mpeg","","mpg"),
+					new PluginMimeTypeInfo("application/avi","","avi"),
+				}), 
+			};
+			
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"console.log(navigator.mimeTypes.length);"+
+				"console.log(navigator.plugins.length);" +
+				"console.log(navigator.plugins[0].name);"+
+				"console.log(navigator.plugins[0][0].type)"+
+				"</script></html>");
+			
+			var engine = new EngineBuilder()
+				.SetResourceProvider(resourceProvider)
+				.Window(w => w.SetNavigatorPlugins(plugins))
+				.Build();
+
+			var log = engine.Console.ToList();
+
+			await engine.OpenUrl("http://localhost");
+			
+			Assert.AreEqual(new object[]{3, 2, "Pdf reader", "application/pdf"}, log);
 		}
 	}
 }
