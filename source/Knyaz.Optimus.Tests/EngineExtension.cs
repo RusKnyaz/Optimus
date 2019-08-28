@@ -17,10 +17,13 @@ namespace Knyaz.Optimus.Tests
 				engine.Document.DomContentLoaded += document => System.Console.Write("DOMContentLoaded");
 
 				engine.Scripting.BeforeScriptExecute += script => System.Console.WriteLine(
-					"Executing:" + (script.Src ?? script.Id ?? "<script>"));
+					"Executing:" + (
+						!string.IsNullOrEmpty(script.Src) ? script.Src : 
+						!string.IsNullOrEmpty(script.Id) ? script.Src : "<script>"));
 
 				engine.Scripting.AfterScriptExecute += script => System.Console.WriteLine(
-					"Executed:" + (script.Src ?? script.Id ?? "<script>"));
+					"Executed:" + (!string.IsNullOrEmpty(script.Src) ? script.Src : 
+						!string.IsNullOrEmpty(script.Id) ? script.Src : "<script>"));
 
 				engine.Scripting.ScriptExecutionError += (script, exception) => System.Console.WriteLine(
 					"Error script execution:" + (script.Src ?? script.Id ?? "<script>") + " " + exception.Message);
