@@ -1225,5 +1225,26 @@ dispatchEvent(evt);");
 			
 			Assert.AreEqual(new object[]{3, 2, "Pdf reader", "application/pdf"}, log);
 		}
+
+		[Test]
+		public async Task PredefineCustomFunction()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"console.log(myFunc(\"a b\"));"+
+				"</script></html>");
+			
+			var engine = new EngineBuilder()
+				.SetResourceProvider(resourceProvider)
+				.Build();
+
+			engine.ScriptExecutor.Execute("text/javascript", "function myFunc(str){return encodeURI(str)};");
+			
+			var log = engine.Console.ToList();
+			
+			await engine.OpenUrl("http://localhost", false);
+			
+			Assert.AreEqual(new[]{"a%20b"}, log);
+		}
 	}
 }

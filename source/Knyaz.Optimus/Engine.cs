@@ -192,11 +192,14 @@ namespace Knyaz.Optimus
 		/// Creates new <see cref="Document"/> and loads it from specified path (http or file).
 		/// </summary>
 		/// <param name="path">The string which represents Uri of the document to be loaded.</param>
-		public async Task<Page> OpenUrl(string path)
+		public async Task<Page> OpenUrl(string path) => await OpenUrl(path, true);
+		
+		public async Task<Page> OpenUrl(string path, bool clearScript)
 		{
 			//todo: stop unfinished ajax requests or drop their results
 			Window.Timers.ClearAll();
-			ScriptExecutor.Clear();
+			if(clearScript)
+				ScriptExecutor.Clear();
 			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			

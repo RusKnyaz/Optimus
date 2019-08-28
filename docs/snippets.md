@@ -200,3 +200,12 @@ var page = engine.OpenUrl("http://site.net").Wait();
 var button = page.Document.GetElementById("download") as HtmlElement;
 button.Click();
 ```
+
+## Pre-define JavaScript functions
+Some sites may use the JS functions that does not supported by Optimus. Most often, this is an obsolete API parts. You can execute your script that defines missing functions.
+
+```c#
+var engine = new Engine();
+engine.ScriptExecutor.Execute("text/javascript", "function escape(str){return encodeURI(str)};");
+var page = await engine.OpenUrl("http://localhost", false);//second parameter should be 'false'.
+```
