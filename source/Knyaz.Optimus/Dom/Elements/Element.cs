@@ -143,8 +143,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Id
 		{
-			get => GetAttribute("id", string.Empty);
-			set => SetAttribute("id", value);
+			get => GetAttribute(Attrs.Id, string.Empty);
+			set => SetAttribute(Attrs.Id, value);
 		}
 
 		/// <summary>

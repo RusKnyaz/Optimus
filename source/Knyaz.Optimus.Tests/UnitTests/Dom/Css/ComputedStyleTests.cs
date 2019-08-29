@@ -217,5 +217,23 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 			Assert.IsNotNull(div);
 			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == "red");
 		}
+
+		[Test]
+		public void SetCssTextForElementNotInDocument()
+		{
+			var engine = Load("");
+			var div = (HtmlElement)engine.Document.CreateElement("div");
+			div.Style.CssText = "background-color:rgba(1,1,1,.5)";
+			Assert.AreEqual("rgba(1,1,1,.5)", div.Style.BackgroundColor);
+		}
+		
+		[Test]
+		public void SetCssTextForElementInDocument()
+		{
+			var engine = Load("<div id=d></div>");
+			var div = (HtmlElement)engine.Document.GetElementById("d");
+			div.Style.CssText = "background-color:rgba(1,1,1,.5)";
+			Assert.AreEqual("rgba(1,1,1,.5)", div.Style.BackgroundColor);
+		}
 	}
 }

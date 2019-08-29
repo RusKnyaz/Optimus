@@ -65,9 +65,9 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <Target Name="GetVersion" Label="Saves generated assembly version to the version.text file">
-    <WriteLinesToFile File="version.txt" Lines="$(Version)" Overwrite="true" Encoding="ASCII"/>
+    <WriteLinesToFile File="version.txt" Lines="$(Version)" Overwrite="true" Encoding="ASCII" />
   </Target>
   <ItemGroup>
-    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 </Project>

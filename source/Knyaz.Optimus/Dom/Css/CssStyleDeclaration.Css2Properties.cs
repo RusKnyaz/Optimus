@@ -10,8 +10,8 @@
 		/// </remarks>
 		public string Azimuth
 		{
-			get { return GetPropertyValue("azimuth"); }
-			set { SetProperty("azimuth", value); }
+			get => GetPropertyValue(Css.Azimuth);
+			set => SetProperty(Css.Azimuth, value);
 		}
 
 		/// <summary>
@@ -23,8 +23,8 @@
 		/// </remarks>
 		public string Background
 		{
-			get { return GetPropertyValue("background"); }
-			set { SetProperty("background", value); }
+			get => GetPropertyValue(Css.Background);
+			set => SetProperty(Css.Background, value);
 		}
 
 		/// <summary>
@@ -32,8 +32,8 @@
 		/// </summary>
 		public string BackgroundAttachment
 		{
-			get { return GetPropertyValue("backgroundAttachment"); }
-			set { SetProperty("backgroundAttachment", value); }
+			get => GetPropertyValue(Css.BackgroundAttachment);
+			set => SetProperty(Css.BackgroundAttachment, value);
 		}
 
 		/// <summary>
@@ -44,8 +44,8 @@
 		/// </remarks>
 		public string BackgroundColor
 		{
-			get { return GetPropertyValue("backgroundColor"); }
-			set { SetProperty("backgroundColor", value); }
+			get => GetPropertyValue(Css.BackgroundColor);
+			set => SetProperty(Css.BackgroundColor, value);
 		}
 
 		/// <summary>
@@ -57,8 +57,8 @@
 		/// </remarks>
 		public string BackgroundImage
 		{
-			get { return GetPropertyValue("backgroundImage"); }
-			set { SetProperty("backgroundImage", value); }
+			get => GetPropertyValue(Css.BackgroundImage);
+			set => SetProperty(Css.BackgroundImage, value);
 		}
 
 		/// <summary>
@@ -70,8 +70,8 @@
 		/// </remarks>
 		public string BackgroundPosition
 		{
-			get { return GetPropertyValue("backgroundPosition"); }
-			set { SetProperty("backgroundPosition", value); }
+			get => GetPropertyValue(Css.BackgroundPosition);
+			set => SetProperty(Css.BackgroundPosition, value);
 		}
 
 		/// <summary>
@@ -86,8 +86,8 @@
 		/// </remarks>
 		public string BackgroundRepeat
 		{
-			get { return GetPropertyValue("backgroundRepeat"); }
-			set { SetProperty("backgroundRepeat", value); }
+			get => GetPropertyValue(Css.BackgroundRepeat);
+			set => SetProperty(Css.BackgroundRepeat, value);
 		}
 
 		/// <summary>
@@ -98,8 +98,8 @@
 		/// </remarks>
 		public string Border
 		{
-			get { return GetPropertyValue("border"); }
-			set { SetProperty("border", value); }
+			get => GetPropertyValue(Css.Border);
+			set => SetProperty(Css.Border, value);
 		}
 
 		/// <summary>
@@ -110,8 +110,8 @@
 		/// </remarks>
 		public string BorderCollapse
 		{
-			get { return GetPropertyValue("borderCollapse"); }
-			set { SetProperty("borderCollapse", value); }
+			get => GetPropertyValue(Css.BorderCollapse);
+			set => SetProperty(Css.BorderCollapse, value);
 		}
 
 		/// <summary>
@@ -122,8 +122,8 @@
 		/// </remarks>
 		public string BorderColor
 		{
-			get { return GetPropertyValue("borderColor"); }
-			set { SetProperty("borderColor", value); }
+			get => GetPropertyValue(Css.BorderColor);
+			set => SetProperty(Css.BorderColor, value);
 		}
 
 		/// <summary>
@@ -134,8 +134,8 @@
 		/// </remarks>
 		public string BorderSpacing
 		{
-			get { return GetPropertyValue("borderSpacing"); }
-			set { SetProperty("borderSpacing", value); }
+			get => GetPropertyValue(Css.BorderSpacing);
+			set => SetProperty(Css.BorderSpacing, value);
 		}
 
 		/// <summary>
@@ -146,8 +146,8 @@
 		/// </remarks>
 		public string BorderStyle
 		{
-			get { return GetPropertyValue("borderStyle"); }
-			set { SetProperty("borderStyle", value); }
+			get => GetPropertyValue(Css.BorderStyle);
+			set => SetProperty(Css.BorderStyle, value);
 		}
 
 		/// <summary>
@@ -155,8 +155,8 @@
 		/// </summary>
 		public string BorderTop
 		{
-			get { return GetPropertyValue("borderTop"); }
-			set { SetProperty("borderTop", value); }
+			get => GetPropertyValue(Css.BorderTop);
+			set => SetProperty(Css.BorderTop, value);
 		}
 
 		/// <summary>
@@ -164,8 +164,8 @@
 		/// </summary>
 		public string BorderRight
 		{
-			get { return GetPropertyValue("borderRight"); }
-			set { SetProperty("borderRight", value); }
+			get => GetPropertyValue(Css.BorderRight);
+			set => SetProperty(Css.BorderRight, value);
 		}
 
 		/// <summary>
@@ -173,8 +173,8 @@
 		/// </summary>
 		public string BorderBottom
 		{
-			get { return GetPropertyValue("borderBottom"); }
-			set { SetProperty("borderBottom", value); }
+			get => GetPropertyValue(Css.BorderBottom);
+			set => SetProperty(Css.BorderBottom, value);
 		}
 
 		/// <summary>
@@ -182,8 +182,8 @@
 		/// </summary>
 		public string BorderLeft
 		{
-			get { return GetPropertyValue("borderLeft"); }
-			set { SetProperty("borderLeft", value); }
+			get => GetPropertyValue(Css.BorderLeft);
+			set => SetProperty(Css.BorderLeft, value);
 		}
 
 		/// <summary>
@@ -191,8 +191,8 @@
 		/// </summary>
 		public string BorderTopColor
 		{
-			get { return GetPropertyValue("borderTopColor"); }
-			set { SetProperty("borderTopColor", value); }
+			get => GetPropertyValue(Css.BorderTopColor);
+			set => SetProperty(Css.BorderTopColor, value);
 		}
 
 		/// <summary>
@@ -200,8 +200,8 @@
 		/// </summary>
 		public string BorderRightColor
 		{
-			get { return GetPropertyValue("borderRightColor"); }
-			set { SetProperty("borderRightColor", value); }
+			get => GetPropertyValue(Css.BorderRightColor);
+			set => SetProperty(Css.BorderRightColor, value);
 		}
 
 		/// <summary>
@@ -209,8 +209,8 @@
 		/// </summary>
 		public string BorderBottomColor
 		{
-			get { return GetPropertyValue("borderBottomColor"); }
-			set { SetProperty("borderBottomColor", value); }
+			get => GetPropertyValue(Css.BorderBottomColor);
+			set => SetProperty(Css.BorderBottomColor, value);
 		}
 
 		/// <summary>
@@ -218,8 +218,8 @@
 		/// </summary>
 		public string BorderLeftColor
 		{
-			get { return GetPropertyValue("borderLeftColor"); }
-			set { SetProperty("borderLeftColor", value); }
+			get => GetPropertyValue(Css.BorderLeftColor);
+			set => SetProperty(Css.BorderLeftColor, value);
 		}
 
 		/// <summary>
@@ -230,8 +230,8 @@
 		/// </remarks>
 		public string BorderTopStyle
 		{
-			get { return GetPropertyValue("borderTopStyle"); }
-			set { SetProperty("borderTopStyle", value); }
+			get => GetPropertyValue(Css.BorderTopStyle);
+			set => SetProperty(Css.BorderTopStyle, value);
 		}
 
 		/// <summary>
@@ -242,8 +242,8 @@
 		/// </remarks>
 		public string BorderRightStyle
 		{
-			get { return GetPropertyValue("borderRightStyle"); }
-			set { SetProperty("borderRightStyle", value); }
+			get => GetPropertyValue(Css.BorderRightStyle);
+			set => SetProperty(Css.BorderRightStyle, value);
 		}
 
 		/// <summary>
@@ -254,8 +254,8 @@
 		/// </remarks>
 		public string BorderBottomStyle
 		{
-			get { return GetPropertyValue("borderBottomStyle"); }
-			set { SetProperty("borderBottomStyle", value); }
+			get => GetPropertyValue(Css.BorderBottomStyle);
+			set => SetProperty(Css.BorderBottomStyle, value);
 		}
 
 		/// <summary>
@@ -266,8 +266,8 @@
 		/// </remarks>
 		public string BorderLeftStyle
 		{
-			get { return GetPropertyValue("borderLeftStyle"); }
-			set { SetProperty("borderLeftStyle", value); }
+			get => GetPropertyValue(Css.BorderLeftStyle);
+			set => SetProperty(Css.BorderLeftStyle, value);
 		}
 
 		/// <summary>
@@ -279,8 +279,8 @@
 		/// </remarks>
 		public string BorderTopWidth
 		{
-			get { return GetPropertyValue("borderTopWidth"); }
-			set { SetProperty("borderTopWidth", value); }
+			get => GetPropertyValue(Css.BorderTopWidth);
+			set => SetProperty(Css.BorderTopWidth, value);
 		}
 
 		/// <summary>
@@ -292,8 +292,8 @@
 		/// </remarks>
 		public string BorderRightWidth
 		{
-			get { return GetPropertyValue("borderRightWidth"); }
-			set { SetProperty("borderRightWidth", value); }
+			get => GetPropertyValue(Css.BorderRightWidth);
+			set => SetProperty(Css.BorderRightWidth, value);
 		}
 
 		/// <summary>
@@ -305,8 +305,8 @@
 		/// </remarks>
 		public string BorderBottomWidth
 		{
-			get { return GetPropertyValue("borderBottomWidth"); }
-			set { SetProperty("borderBottomWidth", value); }
+			get => GetPropertyValue(Css.BorderBottomWidth);
+			set => SetProperty(Css.BorderBottomWidth, value);
 		}
 
 		/// <summary>
@@ -318,8 +318,8 @@
 		/// </remarks>
 		public string BorderLeftWidth
 		{
-			get { return GetPropertyValue("borderLeftWidth"); }
-			set { SetProperty("borderLeftWidth", value); }
+			get => GetPropertyValue(Css.BorderLeftWidth);
+			set => SetProperty(Css.BorderLeftWidth, value);
 		}
 
 		/// <summary>
@@ -331,8 +331,8 @@
 		/// </remarks>
 		public string BorderWidth
 		{
-			get { return GetPropertyValue("borderWidth"); }
-			set { SetProperty("borderWidth", value); }
+			get => GetPropertyValue(Css.BorderWidth);
+			set => SetProperty(Css.BorderWidth, value);
 		}
 
 		/// <summary>
@@ -340,8 +340,8 @@
 		/// </summary>
 		public string Bottom
 		{
-			get { return GetPropertyValue("bottom"); }
-			set { SetProperty("bottom", value); }
+			get => GetPropertyValue(Css.Bottom);
+			set => SetProperty(Css.Bottom, value);
 		}
 
 		/// <summary>
@@ -352,8 +352,8 @@
 		/// </remarks>
 		public string CaptionSide
 		{
-			get { return GetPropertyValue("captionSide"); }
-			set { SetProperty("captionSide", value); }
+			get => GetPropertyValue(Css.CaptionSide);
+			set => SetProperty(Css.CaptionSide, value);
 		}
 
 		/// <summary>
@@ -364,8 +364,8 @@
 		/// </remarks>
 		public string Clear
 		{
-			get { return GetPropertyValue("clear"); }
-			set { SetProperty("clear", value); }
+			get => GetPropertyValue(Css.Clear);
+			set => SetProperty(Css.Clear, value);
 		}
 
 		/// <summary>
@@ -378,8 +378,8 @@
 		/// </remarks>
 		public string Clip
 		{
-			get { return GetPropertyValue("clip"); }
-			set { SetProperty("clip", value); }
+			get => GetPropertyValue(Css.Clip);
+			set => SetProperty(Css.Clip, value);
 		}
 
 		/// <summary>
@@ -387,8 +387,8 @@
 		/// </summary>
 		public string Color
 		{
-			get { return GetPropertyValue("color"); }
-			set { SetProperty("color", value); }
+			get => GetPropertyValue(Css.Color);
+			set => SetProperty(Css.Color, value);
 		}
 
 		/// <summary>
@@ -399,8 +399,8 @@
 		/// </remarks>
 		public string Content
 		{
-			get { return GetPropertyValue("content"); }
-			set { SetProperty("content", value); }
+			get => GetPropertyValue(Css.Content);
+			set => SetProperty(Css.Content, value);
 		}
 
 		/// <summary>
@@ -408,17 +408,17 @@
 		/// </summary>
 		public string CounterIncrement
 		{
-			get { return GetPropertyValue("counterIncrement"); }
-			set { SetProperty("counterIncrement", value); }
+			get => GetPropertyValue(Css.CounterIncrement);
+			set => SetProperty(Css.CounterIncrement, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'counter-reset' property wchich contains a list of one or more names of counters, each one optionally followed by an integer. The integer gives the value that the counter is set to on each occurrence of the element.
+		/// Gets or sets the 'counter-reset' property which contains a list of one or more names of counters, each one optionally followed by an integer. The integer gives the value that the counter is set to on each occurrence of the element.
 		/// </summary>
 		public string CounterReset
 		{
-			get { return GetPropertyValue("counterReset"); }
-			set { SetProperty("counterReset", value); }
+			get => GetPropertyValue(Css.CounterReset);
+			set => SetProperty(Css.CounterReset, value);
 		}
 
 		/// <summary>
@@ -426,8 +426,8 @@
 		/// </summary>
 		public string Cue
 		{
-			get { return GetPropertyValue("cue"); }
-			set { SetProperty("cue", value); }
+			get => GetPropertyValue(Css.Cue);
+			set => SetProperty(Css.Cue, value);
 		}
 
 		/// <summary>
@@ -435,8 +435,8 @@
 		/// </summary>
 		public string CueAfter
 		{
-			get { return GetPropertyValue("cueAfter"); }
-			set { SetProperty("cueAfter", value); }
+			get => GetPropertyValue(Css.CueAfter);
+			set => SetProperty(Css.CueAfter, value);
 		}
 
 		/// <summary>
@@ -444,8 +444,8 @@
 		/// </summary>
 		public string CueBefore
 		{
-			get { return GetPropertyValue("cueBefore"); }
-			set { SetProperty("cueBefore", value); }
+			get => GetPropertyValue(Css.CueBefore);
+			set => SetProperty(Css.CueBefore, value);
 		}
 
 		/// <summary>
@@ -456,8 +456,8 @@
 		/// </remarks>
 		public string Cursor
 		{
-			get { return GetPropertyValue("cursor"); }
-			set { SetProperty("cursor", value); }
+			get => GetPropertyValue(Css.Cursor);
+			set => SetProperty(Css.Cursor, value);
 		}
 
 		/// <summary>
@@ -468,8 +468,8 @@
 		/// </remarks>
 		public string Direction
 		{
-			get { return GetPropertyValue("direction"); }
-			set { SetProperty("direction", value); }
+			get => GetPropertyValue(Css.Direction);
+			set => SetProperty(Css.Direction, value);
 		}
 
 		/// <summary>
@@ -487,8 +487,8 @@
 		/// </remarks>
 		public string Display
 		{
-			get { return GetPropertyValue("display"); }
-			set { SetProperty("display", value); }
+			get => GetPropertyValue(Css.Display);
+			set => SetProperty(Css.Display, value);
 		}
 
 		/// <summary>
@@ -496,8 +496,8 @@
 		/// </summary>
 		public string Elevation
 		{
-			get { return GetPropertyValue("elevation"); }
-			set { SetProperty("elevation", value); }
+			get => GetPropertyValue(Css.Elevation);
+			set => SetProperty(Css.Elevation, value);
 		}
 
 		/// <summary>
@@ -513,8 +513,8 @@
 		/// </remarks>
 		public string EmptyCells
 		{
-			get { return GetPropertyValue("emptyCells"); }
-			set { SetProperty("emptyCells", value); }
+			get => GetPropertyValue(Css.EmptyCells);
+			set => SetProperty(Css.EmptyCells, value);
 		}
 
 		/// <summary>
@@ -523,8 +523,8 @@
 		/// </summary>
 		public string Float
 		{
-			get { return GetPropertyValue("cssFloat"); }
-			set { SetProperty("cssFloat", value); }
+			get => GetPropertyValue(Css.Float);
+			set => SetProperty(Css.Float, value);
 		}
 
 		/// <summary>
@@ -535,8 +535,8 @@
 		/// </remarks>
 		public string Font
 		{
-			get { return GetPropertyValue("font"); }
-			set { SetProperty("font", value); }
+			get => GetPropertyValue(Css.Font);
+			set => SetProperty(Css.Font, value);
 		}
 
 		/// <summary>
@@ -544,8 +544,8 @@
 		/// </summary>
 		public string FontFamily
 		{
-			get { return GetPropertyValue("fontFamily"); }
-			set { SetProperty("fontFamily", value); }
+			get => GetPropertyValue(Css.FontFamily);
+			set => SetProperty(Css.FontFamily, value);
 		}
 
 		/// <summary>
@@ -556,8 +556,8 @@
 		/// </remarks>
 		public string FontSize
 		{
-			get { return GetPropertyValue("fontSize"); }
-			set { SetProperty("fontSize", value); }
+			get => GetPropertyValue(Css.FontSize);
+			set => SetProperty(Css.FontSize, value);
 		}
 
 		/// <summary>
@@ -568,8 +568,8 @@
 		/// </remarks>
 		public string FontSizeAdjust
 		{
-			get { return GetPropertyValue("fontSizeAdjust"); }
-			set { SetProperty("fontSizeAdjust", value); }
+			get => GetPropertyValue(Css.FontAdjustSize);
+			set => SetProperty(Css.FontAdjustSize, value);
 		}
 
 		/// <summary>
@@ -580,8 +580,8 @@
 		/// </remarks>
 		public string FontStretch
 		{
-			get { return GetPropertyValue("fontStretch"); }
-			set { SetProperty("fontStretch", value); }
+			get => GetPropertyValue(Css.FontStretch);
+			set => SetProperty(Css.FontStretch, value);
 		}
 
 		/// <summary>
@@ -589,8 +589,8 @@
 		/// </summary>
 		public string FontStyle
 		{
-			get { return GetPropertyValue("fontStyle"); }
-			set { SetProperty("fontStyle", value); }
+			get => GetPropertyValue(Css.FontStyle);
+			set => SetProperty(Css.FontStyle, value);
 		}
 
 		/// <summary>
@@ -602,8 +602,8 @@
 		/// </remarks>
 		public string FontVariant
 		{
-			get { return GetPropertyValue("fontVariant"); }
-			set { SetProperty("fontVariant", value); }
+			get => GetPropertyValue(Css.FontVariant);
+			set => SetProperty(Css.FontVariant, value);
 		}
 
 		/// <summary>
@@ -611,8 +611,8 @@
 		/// </summary>
 		public string FontWeight
 		{
-			get { return GetPropertyValue("fontWeight"); }
-			set { SetProperty("fontWeight", value); }
+			get => GetPropertyValue(Css.FontWeight);
+			set => SetProperty(Css.FontWeight, value);
 		}
 
 		/// <summary>
@@ -623,8 +623,8 @@
 		/// </remarks>
 		public string Height
 		{
-			get { return GetPropertyValue("height"); }
-			set { SetProperty("height", value); }
+			get => GetPropertyValue(Css.Height);
+			set => SetProperty(Css.Height, value);
 		}
 
 		/// <summary>
@@ -632,8 +632,8 @@
 		/// </summary>
 		public string Left
 		{
-			get { return GetPropertyValue("left"); }
-			set { SetProperty("left", value); }
+			get => GetPropertyValue(Css.Left);
+			set => SetProperty(Css.Left, value);
 		}
 
 		/// <summary>
@@ -641,8 +641,8 @@
 		/// </summary>
 		public string LetterSpacing
 		{
-			get { return GetPropertyValue("letterSpacing"); }
-			set { SetProperty("letterSpacing", value); }
+			get => GetPropertyValue(Css.LetterSpacing);
+			set => SetProperty(Css.LetterSpacing, value);
 		}
 
 		/// <summary>
@@ -651,8 +651,8 @@
 		/// </summary>
 		public string LineHeight
 		{
-			get { return GetPropertyValue("lineHeight"); }
-			set { SetProperty("lineHeight", value); }
+			get => GetPropertyValue(Css.LineHeight);
+			set => SetProperty(Css.LineHeight, value);
 		}
 
 		/// <summary>
@@ -660,8 +660,8 @@
 		/// </summary>
 		public string ListStyle
 		{
-			get { return GetPropertyValue("listStyle"); }
-			set { SetProperty("listStyle", value); }
+			get => GetPropertyValue(Css.ListStyle);
+			set => SetProperty(Css.ListStyle, value);
 		}
 
 		/// <summary>
@@ -671,8 +671,8 @@
 		/// </remarks>
 		public string ListStyleImage
 		{
-			get { return GetPropertyValue("listStyleImage"); }
-			set { SetProperty("listStyleImage", value); }
+			get => GetPropertyValue(Css.ListStyleImage);
+			set => SetProperty(Css.ListStyleImage, value);
 		}
 
 		/// <summary>
@@ -680,8 +680,8 @@
 		/// </summary>
 		public string ListStylePosition
 		{
-			get { return GetPropertyValue("listStylePosition"); }
-			set { SetProperty("listStylePosition", value); }
+			get => GetPropertyValue(Css.ListStylePosition);
+			set => SetProperty(Css.ListStylePosition, value);
 		}
 
 		/// <summary>
@@ -690,8 +690,8 @@
 		/// <remarks>Value: disc | circle | square | decimal | decimal-leading-zero | lower-roman | upper-roman | lower-greek | lower-alpha | lower-latin | upper-alpha | upper-latin | hebrew | armenian | georgian | cjk-ideographic | hiragana | katakana | hiragana-iroha | katakana-iroha | none | inherit </remarks>
 		public string ListStyleType
 		{
-			get { return GetPropertyValue("listStyleType"); }
-			set { SetProperty("listStyleType", value); }
+			get => GetPropertyValue(Css.ListStyleType);
+			set => SetProperty(Css.ListStyleType, value);
 		}
 
 		/// <summary>
@@ -702,44 +702,44 @@
 		/// </remarks>
 		public string Margin
 		{
-			get { return GetPropertyValue("margin"); }
-			set { SetProperty("margin", value); }
+			get => GetPropertyValue(Css.Margin);
+			set => SetProperty(Css.Margin, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'mergin-top' css property.
+		/// Gets or sets the 'margin-top' css property.
 		/// </summary>
 		public string MarginTop
 		{
-			get { return GetPropertyValue("marginTop"); }
-			set { SetProperty("marginTop", value); }
+			get => GetPropertyValue(Css.MarginTop);
+			set => SetProperty(Css.MarginTop, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'mergin-right' css property.
+		/// Gets or sets the 'margin-right' css property.
 		/// </summary>
 		public string MarginRight
 		{
-			get { return GetPropertyValue("marginRight"); }
-			set { SetProperty("marginRight", value); }
+			get => GetPropertyValue(Css.MarginRight);
+			set => SetProperty(Css.MarginRight, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'mergin-bottom' css property.
+		/// Gets or sets the 'margin-bottom' css property.
 		/// </summary>
 		public string MarginBottom
 		{
-			get { return GetPropertyValue("marginBottom"); }
-			set { SetProperty("marginBottom", value); }
+			get => GetPropertyValue(Css.MarginBottom);
+			set => SetProperty(Css.MarginBottom, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'mergin-left' css property.
+		/// Gets or sets the 'margin-left' css property.
 		/// </summary>
 		public string MarginLeft
 		{
-			get { return GetPropertyValue("marginLeft"); }
-			set { SetProperty("marginLeft", value); }
+			get => GetPropertyValue(Css.MarginLeft);
+			set => SetProperty(Css.MarginLeft, value);
 		}
 
 		/// <summary>
@@ -747,8 +747,8 @@
 		/// </summary>
 		public string MarkerOffset
 		{
-			get { return GetPropertyValue("markerOffset"); }
-			set { SetProperty("markerOffset", value); }
+			get => GetPropertyValue(Css.MarkerOffset);
+			set => SetProperty(Css.MarkerOffset, value);
 		}
 
 		/// <summary>
@@ -760,8 +760,8 @@
 		/// </remarks>
 		public string Marks
 		{
-			get { return GetPropertyValue("marks"); }
-			set { SetProperty("marks", value); }
+			get => GetPropertyValue(Css.Marks);
+			set => SetProperty(Css.Marks, value);
 		}
 
 		/// <summary>
@@ -769,8 +769,8 @@
 		/// </summary>
 		public string MaxHeight
 		{
-			get { return GetPropertyValue("maxHeight"); }
-			set { SetProperty("maxHeight", value); }
+			get { return GetPropertyValue(Css.MaxHeight); }
+			set { SetProperty(Css.MaxHeight, value); }
 		}
 
 		/// <summary>
@@ -778,8 +778,8 @@
 		/// </summary>
 		public string MaxWidth
 		{
-			get { return GetPropertyValue("maxWidth"); }
-			set { SetProperty("maxWidth", value); }
+			get => GetPropertyValue(Css.MaxWidth);
+			set => SetProperty(Css.MaxWidth, value);
 		}
 
 		/// <summary>
@@ -787,17 +787,17 @@
 		/// </summary>
 		public string MinHeight
 		{
-			get { return GetPropertyValue("minHeight"); }
-			set { SetProperty("minHeight", value); }
+			get => GetPropertyValue(Css.MinHeight);
+			set => SetProperty(Css.MinHeight, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'min-height' css property. Value: &lt;length&gt; | &lt;percentage&gt; | inherit 
+		/// Gets or sets the 'min-width' css property. Value: &lt;length&gt; | &lt;percentage&gt; | inherit 
 		/// </summary>
 		public string MinWidth
 		{
-			get { return GetPropertyValue("minWidth"); }
-			set { SetProperty("minWidth", value); }
+			get => GetPropertyValue(Css.MinWidth);
+			set => SetProperty(Css.MinWidth, value);
 		}
 
 		/// <summary>
@@ -805,8 +805,8 @@
 		/// </summary>
 		public string Orphans
 		{
-			get { return GetPropertyValue("orphans"); }
-			set { SetProperty("orphans", value); }
+			get => GetPropertyValue(Css.Orphans);
+			set => SetProperty(Css.Orphans, value);
 		}
 
 		/// <summary>
@@ -821,8 +821,8 @@
 		/// </remarks>
 		public string Outline
 		{
-			get { return GetPropertyValue("outline"); }
-			set { SetProperty("outline", value); }
+			get => GetPropertyValue(Css.Outline);
+			set => SetProperty(Css.Outline, value);
 		}
 
 		/// <summary>
@@ -830,8 +830,8 @@
 		/// </summary>
 		public string OutlineColor
 		{
-			get { return GetPropertyValue("outlineColor"); }
-			set { SetProperty("outlineColor", value); }
+			get => GetPropertyValue(Css.OutlineColor);
+			set => SetProperty(Css.OutlineColor, value);
 		}
 
 		/// <summary>
@@ -839,8 +839,8 @@
 		/// </summary>
 		public string OutlineStyle
 		{
-			get { return GetPropertyValue("outlineStyle"); }
-			set { SetProperty("outlineStyle", value); }
+			get => GetPropertyValue(Css.OutlineStyle);
+			set => SetProperty(Css.OutlineStyle, value);
 		}
 
 		/// <summary>
@@ -848,8 +848,8 @@
 		/// </summary>
 		public string OutlineWidth
 		{
-			get { return GetPropertyValue("outlineWidth"); }
-			set { SetProperty("outlineWidth", value); }
+			get => GetPropertyValue(Css.OutlineWidth);
+			set => SetProperty(Css.OutlineWidth, value);
 		}
 
 		/// <summary>
@@ -858,8 +858,8 @@
 		/// </summary>
 		public string Overflow
 		{
-			get { return GetPropertyValue("overflow"); }
-			set { SetProperty("overflow", value); }
+			get => GetPropertyValue(Css.Overflow);
+			set => SetProperty(Css.Overflow, value);
 		}
 
 		/// <summary>
@@ -870,8 +870,8 @@
 		/// </remarks>
 		public string Padding
 		{
-			get { return GetPropertyValue("padding"); }
-			set { SetProperty("padding", value); }
+			get => GetPropertyValue(Css.Padding);
+			set => SetProperty(Css.Padding, value);
 		}
 
 		/// <summary>
@@ -879,8 +879,8 @@
 		/// </summary>
 		public string PaddingTop
 		{
-			get { return GetPropertyValue("paddingTop"); }
-			set { SetProperty("paddingTop", value); }
+			get => GetPropertyValue(Css.PaddingTop);
+			set => SetProperty(Css.PaddingTop, value);
 		}
 
 		/// <summary>
@@ -888,8 +888,8 @@
 		/// </summary>
 		public string PaddingRight
 		{
-			get { return GetPropertyValue("paddingRight"); }
-			set { SetProperty("paddingRight", value); }
+			get => GetPropertyValue(Css.PaddingRight);
+			set => SetProperty(Css.PaddingRight, value);
 		}
 
 		/// <summary>
@@ -897,8 +897,8 @@
 		/// </summary>
 		public string PaddingBottom
 		{
-			get { return GetPropertyValue("paddingBottom"); }
-			set { SetProperty("paddingBottom", value); }
+			get => GetPropertyValue(Css.PaddingBottom);
+			set => SetProperty(Css.PaddingBottom, value);
 		}
 
 		/// <summary>
@@ -906,8 +906,8 @@
 		/// </summary>
 		public string PaddingLeft
 		{
-			get { return GetPropertyValue("paddingLeft"); }
-			set { SetProperty("paddingLeft", value); }
+			get => GetPropertyValue(Css.PaddingLeft);
+			set => SetProperty(Css.PaddingLeft, value);
 		}
 
 		/// <summary>
@@ -915,8 +915,8 @@
 		/// </summary>
 		public string Page
 		{
-			get { return GetPropertyValue("page"); }
-			set { SetProperty("page", value); }
+			get => GetPropertyValue(Css.Page);
+			set => SetProperty(Css.Page, value);
 		}
 
 		/// <summary>
@@ -924,8 +924,8 @@
 		/// </summary>
 		public string PageBreakAfter
 		{
-			get { return GetPropertyValue("pageBreakAfter"); }
-			set { SetProperty("pageBreakAfter", value); }
+			get => GetPropertyValue(Css.PageBreakAfter);
+			set => SetProperty(Css.PageBreakAfter, value);
 		}
 
 		/// <summary>
@@ -933,8 +933,8 @@
 		/// </summary>
 		public string PageBreakBefore
 		{
-			get { return GetPropertyValue("pageBreakBefore"); }
-			set { SetProperty("pageBreakBefore", value); }
+			get => GetPropertyValue(Css.PageBreakBefore);
+			set => SetProperty(Css.PageBreakBefore, value);
 		}
 
 		/// <summary>
@@ -942,8 +942,8 @@
 		/// </summary>
 		public string PageBreakInside
 		{
-			get { return GetPropertyValue("pageBreakInside"); }
-			set { SetProperty("pageBreakInside", value); }
+			get => GetPropertyValue(Css.PageBreakInside);
+			set => SetProperty(Css.PageBreakInside, value);
 		}
 
 		/// <summary>
@@ -951,8 +951,8 @@
 		/// </summary>
 		public string Pause
 		{
-			get { return GetPropertyValue("pause"); }
-			set { SetProperty("pause", value); }
+			get => GetPropertyValue(Css.Pause);
+			set => SetProperty(Css.Pause, value);
 		}
 
 		/// <summary>
@@ -960,8 +960,8 @@
 		/// </summary>
 		public string PauseAfter
 		{
-			get { return GetPropertyValue("pauseAfter"); }
-			set { SetProperty("pauseAfter", value); }
+			get => GetPropertyValue(Css.PauseAfter);
+			set => SetProperty(Css.PauseAfter, value);
 		}
 
 		/// <summary>
@@ -969,8 +969,8 @@
 		/// </summary>
 		public string PauseBefore
 		{
-			get { return GetPropertyValue("pauseBefore"); }
-			set { SetProperty("pauseBefore", value); }
+			get => GetPropertyValue(Css.PauseBefore);
+			set => SetProperty(Css.PauseBefore, value);
 		}
 
 		/// <summary>
@@ -978,8 +978,8 @@
 		/// </summary>
 		public string Pitch
 		{
-			get { return GetPropertyValue("pitch"); }
-			set { SetProperty("pitch", value); }
+			get => GetPropertyValue(Css.Pitch);
+			set => SetProperty(Css.Pitch, value);
 		}
 
 		/// <summary>
@@ -987,8 +987,8 @@
 		/// </summary>
 		public string PitchRange
 		{
-			get { return GetPropertyValue("pitchRange"); }
-			set { SetProperty("pitchRange", value); }
+			get => GetPropertyValue(Css.PitchRange);
+			set => SetProperty(Css.PitchRange, value);
 		}
 
 		/// <summary>
@@ -996,8 +996,8 @@
 		/// </summary>
 		public string PlayDuring
 		{
-			get { return GetPropertyValue("playDuring"); }
-			set { SetProperty("playDuring", value); }
+			get => GetPropertyValue(Css.PlayDuring);
+			set => SetProperty(Css.PlayDuring, value);
 		}
 
 		/// <summary>
@@ -1005,8 +1005,8 @@
 		/// </summary>
 		public string Position
 		{
-			get { return GetPropertyValue("position"); }
-			set { SetProperty("position", value); }
+			get => GetPropertyValue(Css.Position);
+			set => SetProperty(Css.Position, value);
 		}
 
 		/// <summary>
@@ -1014,8 +1014,8 @@
 		/// </summary>
 		public string Quotes
 		{
-			get { return GetPropertyValue("quotes"); }
-			set { SetProperty("quotes", value); }
+			get => GetPropertyValue(Css.Quotes);
+			set => SetProperty(Css.Quotes, value);
 		}
 
 		/// <summary>
@@ -1023,8 +1023,8 @@
 		/// </summary>
 		public string Richness
 		{
-			get { return GetPropertyValue("richness"); }
-			set { SetProperty("richness", value); }
+			get => GetPropertyValue(Css.Richness);
+			set => SetProperty(Css.Richness, value);
 		}
 
 		/// <summary>
@@ -1032,8 +1032,8 @@
 		/// </summary>
 		public string Right
 		{
-			get { return GetPropertyValue("right"); }
-			set { SetProperty("right", value); }
+			get => GetPropertyValue(Css.Right);
+			set => SetProperty(Css.Right, value);
 		}
 
 		/// <summary>
@@ -1041,8 +1041,8 @@
 		/// </summary>
 		public string Size
 		{
-			get { return GetPropertyValue("size"); }
-			set { SetProperty("size", value); }
+			get => GetPropertyValue(Css.Size);
+			set => SetProperty(Css.Size, value);
 		}
 
 		/// <summary>
@@ -1050,8 +1050,8 @@
 		/// </summary>
 		public string Speak
 		{
-			get { return GetPropertyValue("speak"); }
-			set { SetProperty("speak", value); }
+			get => GetPropertyValue(Css.Speak);
+			set => SetProperty(Css.Speak, value);
 		}
 
 		/// <summary>
@@ -1060,8 +1060,8 @@
 		/// </summary>
 		public string SpeakHeader
 		{
-			get { return GetPropertyValue("speakHeader"); }
-			set { SetProperty("speakHeader", value); }
+			get => GetPropertyValue(Css.SpeakHeader);
+			set => SetProperty(Css.SpeakHeader, value);
 		}
 
 		/// <summary>
@@ -1069,8 +1069,8 @@
 		/// </summary>
 		public string SpeakNumeral
 		{
-			get { return GetPropertyValue("speakNumeral"); }
-			set { SetProperty("speakNumeral", value); }
+			get => GetPropertyValue(Css.SpeakNumeral);
+			set => SetProperty(Css.SpeakNumeral, value);
 		}
 
 		/// <summary>
@@ -1083,17 +1083,17 @@
 		/// </remarks>
 		public string SpeakPunctuation
 		{
-			get { return GetPropertyValue("speakPunctuation"); }
-			set { SetProperty("speakPunctuation", value); }
+			get => GetPropertyValue(Css.SpeakPunctuation);
+			set => SetProperty(Css.SpeakPunctuation, value);
 		}
 
 		/// <summary>
-		/// Gets or sets the 'speach-rate' css property which specifies the speaking rate. Value: &lt;number&gt; | x-slow | slow | medium | fast | x-fast | faster | slower | inherit 
+		/// Gets or sets the 'speech-rate' css property which specifies the speaking rate. Value: &lt;number&gt; | x-slow | slow | medium | fast | x-fast | faster | slower | inherit 
 		/// </summary>
 		public string SpeechRate
 		{
-			get { return GetPropertyValue("speechRate"); }
-			set { SetProperty("speechRate", value); }
+			get => GetPropertyValue(Css.SpeechRate);
+			set => SetProperty(Css.SpeechRate, value);
 		}
 
 		/// <summary>
@@ -1101,8 +1101,8 @@
 		/// </summary>
 		public string Stress
 		{
-			get { return GetPropertyValue("stress"); }
-			set { SetProperty("stress", value); }
+			get => GetPropertyValue(Css.Stress);
+			set => SetProperty(Css.Stress, value);
 		}
 
 		/// <summary>
@@ -1111,8 +1111,8 @@
 		/// </summary>
 		public string TableLayout
 		{
-			get { return GetPropertyValue("tableLayout"); }
-			set { SetProperty("tableLayout", value); }
+			get => GetPropertyValue(Css.TableLayout);
+			set => SetProperty(Css.TableLayout, value);
 		}
 
 		/// <summary>
@@ -1121,8 +1121,8 @@
 		/// </summary>
 		public string TextAlign
 		{
-			get { return GetPropertyValue("textAlign"); }
-			set { SetProperty("textAlign", value); }
+			get => GetPropertyValue(Css.TextAlign);
+			set => SetProperty(Css.TextAlign, value);
 		}
 
 		/// <summary>
@@ -1131,8 +1131,8 @@
 		/// </summary>
 		public string TextDecoration
 		{
-			get { return GetPropertyValue("textDecoration"); }
-			set { SetProperty("textDecoration", value); }
+			get => GetPropertyValue(Css.TextDecoration);
+			set => SetProperty(Css.TextDecoration, value);
 		}
 
 		/// <summary>
@@ -1140,8 +1140,8 @@
 		/// </summary>
 		public string TextIndent
 		{
-			get { return GetPropertyValue("textIndent"); }
-			set { SetProperty("textIndent", value); }
+			get => GetPropertyValue(Css.TextIndent);
+			set => SetProperty(Css.TextIndent, value);
 		}
 
 		/// <summary>
@@ -1152,8 +1152,8 @@
 		/// </remarks>
 		public string TextShadow
 		{
-			get { return GetPropertyValue("textShadow"); }
-			set { SetProperty("textShadow", value); }
+			get => GetPropertyValue(Css.TextShadow);
+			set => SetProperty(Css.TextShadow, value);
 		}
 
 		/// <summary>
@@ -1162,8 +1162,8 @@
 		/// </summary>
 		public string TextTransform
 		{
-			get { return GetPropertyValue("textTransform"); }
-			set { SetProperty("textTransform", value); }
+			get => GetPropertyValue(Css.TextTransform);
+			set => SetProperty(Css.TextTransform, value);
 		}
 
 		/// <summary>
@@ -1171,8 +1171,8 @@
 		/// </summary>
 		public string Top
 		{
-			get { return GetPropertyValue("top"); }
-			set { SetProperty("top", value); }
+			get => GetPropertyValue(Css.Top);
+			set => SetProperty(Css.Top, value);
 		}
 
 		/// <summary>
@@ -1186,8 +1186,8 @@
 		/// </remarks>
 		public string UnicodeBidi
 		{
-			get { return GetPropertyValue("unicodeBidi"); }
-			set { SetProperty("unicodeBidi", value); }
+			get => GetPropertyValue(Css.UnicodeBidi);
+			set => SetProperty(Css.UnicodeBidi, value);
 		}
 
 		/// <summary>
@@ -1196,8 +1196,8 @@
 		/// </summary>
 		public string VerticalAlign
 		{
-			get { return GetPropertyValue("verticalAlign"); }
-			set { SetProperty("verticalAlign", value); }
+			get => GetPropertyValue(Css.VerticalAlign);
+			set => SetProperty(Css.VerticalAlign, value);
 		}
 
 		/// <summary>
@@ -1206,8 +1206,8 @@
 		/// </summary>
 		public string Visibility
 		{
-			get { return GetPropertyValue("visibility"); }
-			set { SetProperty("visibility", value); }
+			get => GetPropertyValue(Css.Visibility);
+			set => SetProperty(Css.Visibility, value);
 		}
 
 		/// <summary>
@@ -1215,8 +1215,8 @@
 		/// </summary>
 		public string VoiceFamily
 		{
-			get { return GetPropertyValue("voiceFamily"); }
-			set { SetProperty("voiceFamily", value); }
+			get => GetPropertyValue(Css.VoiceFamily);
+			set => SetProperty(Css.VoiceFamily, value);
 		}
 
 		/// <summary>
@@ -1225,8 +1225,8 @@
 		/// </summary>
 		public string Volume
 		{
-			get { return GetPropertyValue("volume"); }
-			set { SetProperty("volume", value); }
+			get => GetPropertyValue(Css.Volume);
+			set => SetProperty(Css.Volume, value);
 		}
 
 		/// <summary>
@@ -1235,8 +1235,8 @@
 		/// </summary>
 		public string WhiteSpace
 		{
-			get { return GetPropertyValue("whiteSpace"); }
-			set { SetProperty("whiteSpace", value); }
+			get => GetPropertyValue(Css.WhiteSpace);
+			set => SetProperty(Css.WhiteSpace, value);
 		}
 
 		/// <summary>
@@ -1244,8 +1244,8 @@
 		/// </summary>
 		public string Widows
 		{
-			get { return GetPropertyValue("widows"); }
-			set { SetProperty("widows", value); }
+			get => GetPropertyValue(Css.Widows);
+			set => SetProperty(Css.Widows, value);
 		}
 
 		/// <summary>
@@ -1253,8 +1253,8 @@
 		/// </summary>
 		public string Width
 		{
-			get { return GetPropertyValue("width"); }
-			set { SetProperty("width", value); }
+			get => GetPropertyValue(Css.Width);
+			set => SetProperty(Css.Width, value);
 		}
 
 		/// <summary>
@@ -1263,8 +1263,8 @@
 		/// </summary>
 		public string WordSpacing
 		{
-			get { return GetPropertyValue("wordSpacing"); }
-			set { SetProperty("wordSpacing", value); }
+			get => GetPropertyValue(Css.WordSpacing);
+			set => SetProperty(Css.WordSpacing, value);
 		}
 
 		/// <summary>
@@ -1274,8 +1274,8 @@
 		/// </summary>
 		public string ZIndex
 		{
-			get { return GetPropertyValue("zIndex"); }
-			set { SetProperty("zIndex", value); }
+			get => GetPropertyValue(Css.ZIndex);
+			set => SetProperty(Css.ZIndex, value);
 		}
 	}
 }

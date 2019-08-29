@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -137,6 +138,20 @@ namespace Knyaz.Optimus.Dom.Css
 			GetValidValues(propertyName) is HashSet<string> avaliableValues
 			? Validate(value.ToLowerInvariant(), avaliableValues)
 			: value;
+
+
+		private static string ValidateComplex(string propertyName, string value)
+		{
+			switch (propertyName)
+			{
+				case Css.BorderStyle:
+					var validValues = BorderStyleValidValues;
+					return value.Split(' ').Any(x => !validValues.Contains(x.ToLower())) ? string.Empty : value;
+			}
+			
+			return Validate(propertyName, value);
+		} 
+			
 
 		private static string Validate(string value, HashSet<string> avaliableValues) =>
 			avaliableValues.Contains(value) ? value : "";
