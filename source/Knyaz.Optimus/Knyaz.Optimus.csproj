@@ -13,7 +13,7 @@
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
-    <VersionPrefix>2.2.6</VersionPrefix>
+    <VersionPrefix>2.3.0</VersionPrefix>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
