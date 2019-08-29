@@ -671,5 +671,110 @@ function reqListener () {
 			img.Src = "image.bmp";
 			Assert.IsTrue(errorSignal.WaitOne(1000));
 		}
+
+		[Test]
+		public async Task StyleOnLoad()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+@"<html><body></body>
+<script>
+	document.body.onload=function(){console.log('body onload')};
+	var style=document.createElement('style');
+	style.innerHTML='div{border:1px solid red}';
+	var onLoadCalled = false;
+	style.onload=function(){ console.log('style onload')};
+
+	var cnt = document.createElement('div');
+	cnt.appendChild(style);
+
+	console.log('add');
+	document.head.appendChild(style)
+	console.log('added');
+</script>
+
+<script>
+		console.log('script2')
+</script></html>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.IsNotNull(page.Document.GetElementsByTagName("style").FirstOrDefault());
+			Assert.AreEqual(new[]{"add", "added", "script2", "style onload", "body onload"}, log);
+		}
+
+		[Test]
+		public async Task OverrideBodyOnLoadFromScript()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+@"<html><body onload='console.log(""body onload attr"")'></body>
+<script>
+	document.body.onload=function(){console.log('body onload script')};
+</script></html>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.AreEqual(new[]{"body onload script"}, log);
+		}
+
+		[Test]
+		public async Task BodyOnLoad()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+				@"<html><body onload='console.log(""body onload attr"")'></body>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.AreEqual(new[]{"body onload attr"}, log);
+		}
+
+		[Test]
+		public async Task LinkOnError()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body>
+<script>	
+	document.body.onload=function(){console.log('body onload');};
+	var link = document.createElement('link');
+	link.onload  = function(){console.log('ok')};
+	link.onerror = function(){console.log('link onerror')};
+	link.rel='stylesheet';
+	link.href='mystylesheet.css';
+	document.head.appendChild(link);
+	console.log('added');
+</script>
+</html>");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{"added","link onerror","body onload"}, log);
+		}
+		
+		[Test]
+		public async Task LinkOnLoad()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body>
+<script>	
+	document.body.onload=function(){console.log('body onload');};
+	var link = document.createElement('link');
+	link.onload  = function(){console.log('ok')};
+	link.onerror = function(){console.log('link onerror')};
+	link.rel='stylesheet';
+	link.href='mystylesheet.css';
+	document.head.appendChild(link);
+	console.log('added');
+</script>
+</html>").Resource("http://loc/mystyesheet.css","*{border:1px solid black}");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{"added","ok","body onload"}, log);
+		}
 	}
 }

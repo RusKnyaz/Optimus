@@ -1,4 +1,5 @@
 ﻿using System;
+using Knyaz.Optimus.Dom.Events;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -115,5 +116,18 @@ LinkStyle.sheet Read only
 Returns the StyleSheet object associated with the given element, or null if there is none.
 */
 
+		public event Action<Event> OnLoad;
+		public event Action<Event> OnError;
+		
+		protected override void CallDirectEventSubscribers(Event evt)
+		{
+			base.CallDirectEventSubscribers(evt);
+
+			switch (evt.Type)
+			{
+				case "load":Handle("onload", OnLoad, evt);break;
+				case "error":Handle("onerror", OnError, evt);break;
+			}
+		}
 	}
 }

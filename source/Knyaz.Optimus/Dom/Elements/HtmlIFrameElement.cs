@@ -1,4 +1,7 @@
-﻿namespace Knyaz.Optimus.Dom.Elements
+﻿using System;
+using Knyaz.Optimus.Dom.Events;
+
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents &lt;IFRAME&gt; element.
@@ -72,5 +75,19 @@
 		/// todo: implement document loading
 		/// </summary>
 		public Document ContentDocument { get; internal set; }
+
+		public event Action<Event> OnError;
+		public event Action<Event> OnLoad;
+		
+		protected override void CallDirectEventSubscribers(Event evt)
+		{
+			base.CallDirectEventSubscribers(evt);
+
+			switch (evt.Type)
+			{
+				case "load":Handle("onload", OnLoad, evt);break;
+				case "error":Handle("onerror", OnError, evt);break;
+			}
+		}
 	}
 }
