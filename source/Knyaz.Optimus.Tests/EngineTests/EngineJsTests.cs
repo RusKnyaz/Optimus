@@ -1142,5 +1142,20 @@ dispatchEvent(evt);");
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.AreEqual(new object[]{null,null}, log);
 		}
+
+		[Test]
+		public void AddEventListenerNull()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://localhost",
+				"<html><script>" +
+				"addEventListener('load', null);" +
+				"console.log('no error');" +
+				"</script></html>");
+
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			engine.OpenUrl("http://localhost").Wait();
+			Assert.AreEqual(new object[]{"no error"}, log);
+		}
 	}
 }

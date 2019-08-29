@@ -89,17 +89,21 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsFunc)
 		{
+			if (jsFunc.IsNull())
+				return null;
+			
 			var callable = jsFunc.AsObject() as ICallable;
 			Action<T> handler = null;
 			if (callable != null)
 			{
-				handler = (Action<T>)_delegatesCache.GetValue(callable, key => (Action<T>)(e =>
+				handler = (Action<T>) _delegatesCache.GetValue(callable, key => (Action<T>) (e =>
 				{
 					JsValue val;
 					TryConvert(e, out val);
-					key.Call(@this, new[] { val });
+					key.Call(@this, new[] {val});
 				}));
 			}
+
 			return handler;
 		}
 		
