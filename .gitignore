@@ -1,7 +1,6 @@
-syntax: glob
 *.dll
-*/bin
-*/obj
+bin/
+obj/
 */packages
 **/.idea
 **/.nuget
