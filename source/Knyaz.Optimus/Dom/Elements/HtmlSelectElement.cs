@@ -44,7 +44,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Adds an element to the collection of option elements for this select element.
 		/// </summary>
 		/// <param name="option">The element to be added.</param>
-		/// <param name="index">The index, representing the item item should be inserted before.</param>
+		/// <param name="index">The index, representing the item should be inserted before.</param>
 		public void Add(HtmlOptionElement option, long index) =>
 			InsertBefore(option, Options[index]);
 		

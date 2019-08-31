@@ -18,7 +18,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		public DataView(ArrayBuffer buffer, int byteOffset) : this(buffer, byteOffset, buffer.ByteLength - byteOffset){}
 
 		/// <summary>
-		/// Creates new DataView instance matches specifeid bytes count of buffer from specified offset.
+		/// Creates new DataView instance matches specified bytes count of buffer from specified offset.
 		/// </summary>
 		public DataView(ArrayBuffer buffer, int byteOffset, int byteLength)
 		{

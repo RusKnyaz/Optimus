@@ -75,7 +75,7 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 
 		/// <summary>
-		/// Retrieve the properties anmes that have been explicitly set in this declaration block.
+		/// Retrieve the properties names that have been explicitly set in this declaration block.
 		/// </summary>
 		/// <param name="idx"></param>
 		/// <returns></returns>

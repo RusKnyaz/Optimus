@@ -129,7 +129,7 @@ namespace Knyaz.Optimus.Dom.Css
 		};
 
 		/// <summary>
-		/// Validates property value and returns normalied value.
+		/// Validates property value and returns normalized value.
 		/// </summary>
 		/// <param name="propertyName">Property name to be validated</param>
 		/// <param name="value">Property value.</param>

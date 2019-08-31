@@ -23,7 +23,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 			foreach (var rule in GetStyleRulesFor(elt, elt.OwnerDocument.StyleSheets)
 			         .SelectMany(x => x.Selectors.Select(sel => Tuple.Create(sel, x)))
-					 .OrderByDescending(tuple => tuple.Item1.Specifity)
+					 .OrderByDescending(tuple => tuple.Item1.Specificity)
 					 .Select(tuple => tuple.Item2))
 				yield return rule.Style;
 			
@@ -31,14 +31,14 @@ namespace Knyaz.Optimus.Dom.Css
 			if (elt is HtmlElement)
 				foreach (var rule in GetStyleRulesFor(elt, Enumerable.Repeat(_defaultStyleSheet,1))
 					.SelectMany(x => x.Selectors.Select(sel => Tuple.Create(sel, x)))
-					.OrderByDescending(tuple => tuple.Item1.Specifity)
+					.OrderByDescending(tuple => tuple.Item1.Specificity)
 					.Select(tuple => tuple.Item2))
 					yield return rule.Style;
 		}
 
 		private static IEnumerable<CssStyleRule> GetStyleRulesFor(IElement elt, IEnumerable<CssStyleSheet> styleSheets)
 		{
-			//todo: it would be better to have reversed list, or acces it by index;
+			//todo: it would be better to have reversed list, or access it by index;
 			//todo(2): what about safe enumeration
 
 			foreach (var cssRule in styleSheets.SelectMany(x => x.CssRules).Reverse())

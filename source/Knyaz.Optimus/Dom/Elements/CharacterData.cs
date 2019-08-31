@@ -72,7 +72,7 @@
 	}
 
 	/// <summary>
-	/// Represtents the text element in the DOM.
+	/// Represents the text element in the DOM.
 	/// </summary>
 	public class Text : CharacterData
 	{
@@ -91,7 +91,7 @@
 	}
 
 	/// <summary>
-	/// Represtents the comment element in the DOM.
+	/// Represents the comment element in the DOM.
 	/// </summary>
 	public class Comment : CharacterData
 	{

@@ -97,7 +97,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("#x34y", 0x010000)]           /* a=0 b=1 c=0 d=0 -> specificity = 0,1,0,0 */
  		public void SpecifityTests(string selectorText, int expectedSpecifity)
 		{
-			Assert.AreEqual(expectedSpecifity, new CssSelector(selectorText).Specifity);
+			Assert.AreEqual(expectedSpecifity, new CssSelector(selectorText).Specificity);
 		}
 
 		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^='row_']", "row_0,row_1")]

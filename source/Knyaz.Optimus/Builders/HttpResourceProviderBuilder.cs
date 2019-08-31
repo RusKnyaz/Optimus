@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.ResourceProviders
         private AuthenticationHeaderValue _auth;
 
         /// <summary>
-        /// setup basic athorization login/password
+        /// setup basic authorization login/password
         /// </summary>
         /// <returns></returns>
         public HttpResourceProviderBuilder Basic(string userName, string password)

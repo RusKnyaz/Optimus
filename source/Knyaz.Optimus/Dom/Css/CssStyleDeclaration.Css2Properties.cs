@@ -473,7 +473,7 @@
 		}
 
 		/// <summary>
-		/// Specifies how the itemto be layed out.
+		/// Specifies how the item to be layed out.
 		/// </summary>
 		/// <remarks>
 		/// Value:inline | block | list-item | run-in | compact | marker | table | inline-table | table-row-group | table-header-group | table-footer-group | table-row | table-column-group | table-column | table-cell | table-caption | none | inherit 

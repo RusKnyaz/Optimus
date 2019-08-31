@@ -4,7 +4,8 @@ using Knyaz.Optimus.Dom.Events;
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// The HTMLLinkElement interface represents reference information for external resources and the relationship of those resources to a document and vice-versa. This object inherits all of the properties and methods of the HTMLElement interface.
+	/// The HTMLLinkElement interface represents reference information for external resources and the relationship of those resources to a document and vice-versa.
+    /// This object inherits all of the properties and methods of the HTMLElement interface.
 	/// https://www.w3.org/TR/html5/document-metadata.html#the-link-element
 	/// </summary>
 	public sealed class HtmlLinkElement : HtmlElement

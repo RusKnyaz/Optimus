@@ -273,7 +273,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		public void Execute(string type, string code)
 		{
-			if (code == null) //if error occured on script loading.
+			if (code == null) //if error occurred on script loading.
 				return;
 
 			if (string.IsNullOrEmpty(type) || type.ToLowerInvariant() == "text/javascript")

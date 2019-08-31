@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Tools
 		}
 
 		/// <summary>
-		/// Determines if the node lies to document hierarhcy.
+		/// Determines if the node lies to document hierarchy.
 		/// </summary>
 		/// <returns><c>true</c> if is in document the specified node; otherwise, <c>false</c>.</returns>
 		/// <param name="node">Node.</param>
