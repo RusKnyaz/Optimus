@@ -83,7 +83,7 @@ namespace Knyaz.Optimus.Environment
 		}
 
 		/// <summary>
-		/// Gets or sets the string ontaining an initial '/' followed by the path of the URL.
+		/// Gets or sets the string obtaining an initial '/' followed by the path of the URL.
 		/// </summary>
 		public string Pathname
 		{
@@ -150,7 +150,7 @@ namespace Knyaz.Optimus.Environment
 		/// <summary>
 		/// Reloads the resource from the current URL.
 		/// </summary>
-		/// <param name="force">If <c>true</c>, the page to be reloaded from the server. Othervise, the engine may reload the page from its cache.</param>
+		/// <param name="force">If <c>true</c>, the page to be reloaded from the server. Otherwise, the engine may reload the page from its cache.</param>
 		public void Reload(bool force = false) => _openUri(Uri.ToString());
 	}
 }

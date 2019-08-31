@@ -87,7 +87,7 @@ namespace Knyaz.Optimus.Html
 
 					var next = reader.Peek();
 					var nextChar = (char) next;
-					if (nextChar == '/') // Line commet - //
+					if (nextChar == '/') // Line comment - //
 					{
 						buffer.Add(symbol);
 						buffer.Add((char) reader.Read());
@@ -271,7 +271,7 @@ namespace Knyaz.Optimus.Html
 							}
 							else if (invariantTagName == "script" || invariantTagName == "style")
 							{
-								yield return ReadScript(reader, "</" + tagName); //todo: revise concatination
+								yield return ReadScript(reader, "</" + tagName); //todo: revise concatenation
 								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
 							}
 							else if (invariantTagName == "textarea")

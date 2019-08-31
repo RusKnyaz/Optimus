@@ -6,7 +6,7 @@ using System.Linq;
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// Represents readonly colletion of html elements.
+	/// Represents readonly collection of html elements.
 	/// </summary>
 	public class HtmlCollection : IReadOnlyList<HtmlElement>
 	{

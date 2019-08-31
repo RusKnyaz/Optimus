@@ -4,7 +4,7 @@ using Knyaz.Optimus.ScriptExecuting;
 namespace Knyaz.Optimus.Dom.Events
 {
 	/// <summary>
-	/// Represents the any event occured in the DOM.
+	/// Represents the any event occurred in the DOM.
 	/// </summary>
 	[DomItem]
 	public class Event
@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Dom.Events
 		public object Target { get; internal set; }
 		
 		/// <summary>
-		/// The original target of the event before any retargetings.
+		/// The original target of the event before any re-targeting.
 		/// </summary>
 		public object OriginalTarget { get; internal set; }
 		

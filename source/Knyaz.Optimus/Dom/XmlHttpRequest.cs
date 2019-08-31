@@ -167,7 +167,7 @@ namespace Knyaz.Optimus.Dom
 			var headersString = _response.Headers;
 
 			//todo: probably the hack below is no more required due to JINT's reges was fixed.
-			//to fix jquery we should remove \r due to jquery uses .net regex where \r\n is not threated as end line
+			//to fix jquery we should remove \r due to jquery uses .net regex where \r\n is not treated as end line
 			headersString = headersString.Replace("\r", "");
 
 			return headersString;

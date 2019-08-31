@@ -164,7 +164,7 @@ namespace Knyaz.Optimus.Dom
 		public DocType DocType { get; set; }
 
 		/// <summary>
-		/// Return this document's DOMimplementation object.
+		/// Return this document's DOM implementation object.
 		/// </summary>
 		public DomImplementation Implementation { get; }
 
@@ -226,7 +226,7 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public void WriteLn(string text)
 		{
-			throw new NotImplementedException("Please use write insted.");
+			throw new NotImplementedException("Please use write instead.");
 		}
 
 		/// <summary>

@@ -61,7 +61,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <summary>
 		/// Blocks the execution of the current thread until an item with the specified ID appears in the document.
 		/// </summary>
-		/// <param name="engine">Document onwer.</param>
+		/// <param name="engine">Document owner.</param>
 		/// <param name="id">Id of element waiting for.</param>
 		/// <param name="timeout">The time to wait in milliseconds</param>
 		/// <returns>Element with specified Id, <c>null</c> if the element with the specified identifier has not appeared in the document for a given time.</returns>
@@ -96,10 +96,10 @@ namespace Knyaz.Optimus.TestingTools
 		/// </summary>
 		/// <param name="engine">Document owner.</param>
 		/// <param name="id">Identifier of the item to be disappeared.</param>
-		/// <returns>Element if found, <c>null</c> othervise.</returns>
-		public static Element WaitDesappearingOfId(this Engine engine, string id)
+		/// <returns>Element if found, <c>null</c> otherwise.</returns>
+		public static Element WaitDisappearingOfId(this Engine engine, string id)
 		{
-			return WaitDesappearingOfId(engine, id, DefaultTimeout);
+			return WaitDisappearingOfId(engine, id, DefaultTimeout);
 		}
 
 		/// <summary>
@@ -108,8 +108,8 @@ namespace Knyaz.Optimus.TestingTools
 		/// <param name="engine">Document owner.</param>
 		/// <param name="id">Identifier of the item to be disappeared.</param>
 		/// <param name="timeout">The timeout</param>
-		/// <returns>Element if found, <c>null</c> othervise.</returns>
-		public static Element WaitDesappearingOfId(this Engine engine, string id, int timeout)
+		/// <returns>Element if found, <c>null</c> otherwise.</returns>
+		public static Element WaitDisappearingOfId(this Engine engine, string id, int timeout)
 		{
 			var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
@@ -257,14 +257,14 @@ namespace Knyaz.Optimus.TestingTools
 			var ua = agent == KnownUserAgents.Linux_Chromium ? "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/66.0.3359.139 Chrome/66.0.3359.139 Safari/537.36"
 				: agent == KnownUserAgents.Windows_Firefox ? "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0"
 				: agent == KnownUserAgents.IOs_Firefox ? "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0"
-				: agent == KnownUserAgents.Andrpoid_Chrome ? "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36"
+				: agent == KnownUserAgents.Android_Chrome ? "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36"
 				: throw new ArgumentException("agent");
 
 			return engine.UseCustomUserAgent(ua);
 		}
 
 		/// <summary>
-		/// Setup user agent name value that avaliable in js (navigator.userAgent) and sent within http request headers.
+		/// Setup user agent name value that available in js (navigator.userAgent) and sent within http request headers.
 		/// </summary>
 		public static Engine UseCustomUserAgent(this Engine engine, string userAgent)
 		{
@@ -278,6 +278,6 @@ namespace Knyaz.Optimus.TestingTools
 		Linux_Chromium,
 		Windows_Firefox,
 		IOs_Firefox,
-		Andrpoid_Chrome
+		Android_Chrome
 	}
 }

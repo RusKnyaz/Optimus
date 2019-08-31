@@ -15,7 +15,7 @@ namespace Knyaz.Optimus.ResourceProviders
 			if (uri.Substring(0, 2) == "./")
 				uri = uri.Remove(0, 2);
 
-			return UriHelper.IsAbsolete(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
+			return UriHelper.IsAbsolute(uri) ? new Uri(uri) : new Uri(new Uri(Root), uri);
 		}
 	}
 }

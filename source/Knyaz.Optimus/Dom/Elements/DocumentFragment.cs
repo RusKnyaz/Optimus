@@ -16,7 +16,7 @@
 		/// <summary>
 		/// Creates a new copy of the DocumentFragment.
 		/// </summary>
-		/// <param name="deep">Specifies whether or not the child nodes should be clonned too.</param>
+		/// <param name="deep">Specifies whether or not the child nodes should be cloned too.</param>
 		/// <returns></returns>
 		public override Node CloneNode(bool deep)
 		{

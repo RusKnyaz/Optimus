@@ -69,7 +69,7 @@ namespace Knyaz.Optimus.Environment
 
 		private void OnSetState(string url, string title)
 		{
-			_engine.Uri = UriHelper.IsAbsolete(url) ? new Uri(url) : new Uri(new Uri(_engine.Uri.GetLeftPart(UriPartial.Authority)), url);
+			_engine.Uri = UriHelper.IsAbsolute(url) ? new Uri(url) : new Uri(new Uri(_engine.Uri.GetLeftPart(UriPartial.Authority)), url);
 			if (title != null)
 				_engine.Document.Title = title;
 		}

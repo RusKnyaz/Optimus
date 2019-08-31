@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
     
     /// <summary>
-    /// Allows to get resources like files, html pages and etc (dependes on implementation).
+    /// Allows to get resources like files, html pages and etc (depends on implementation).
     /// </summary>
     public interface IResourceProvider
     {

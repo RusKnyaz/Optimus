@@ -28,7 +28,7 @@ namespace Knyaz.Optimus.Environment
 		/// <summary>
 		/// Gets the number of elements in the session history.
 		/// </summary>
-		public long Lenght => _history.Count;
+		public long Length => _history.Count;
 
 		/// <summary>
 		/// Loads a page from the session history, identified by its relative location to the current page.

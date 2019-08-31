@@ -200,7 +200,7 @@ namespace Knyaz.Optimus
 			Window.Timers.ClearAll();
 			if(clearScript)
 				ScriptExecutor.Clear();
-			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
+			var uri = UriHelper.IsAbsolute(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
 			Document = new Document(Window);
@@ -226,13 +226,13 @@ namespace Knyaz.Optimus
 		/// Occurs before the document being loaded from response. 
 		/// Can be used to handle non-html response types.
 		/// </summary>
-		public event EventHandler<ResponseEventArags> PreHandleResponse; 
+		public event EventHandler<ResponseEventArgs> PreHandleResponse; 
 
 		private void LoadFromResponse(Document document, IResource resource)
 		{
 			if (PreHandleResponse != null)
 			{
-				var args = new ResponseEventArags(resource);
+				var args = new ResponseEventArgs(resource);
 				PreHandleResponse(this, args);
 				if (args.Cancel)
 					return;
@@ -339,12 +339,12 @@ namespace Knyaz.Optimus
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
 	}
 
-	public class ResponseEventArags : EventArgs
+	public class ResponseEventArgs : EventArgs
 	{
 		public bool Cancel { get; set; }
 		public readonly IResource Response;
 
-		public ResponseEventArags(IResource resource)
+		public ResponseEventArgs(IResource resource)
 		{
 			Response = resource;
 		}
