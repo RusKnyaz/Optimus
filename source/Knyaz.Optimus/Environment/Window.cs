@@ -1,5 +1,6 @@
 ﻿using System;
 using Jint.Runtime;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
@@ -11,7 +12,7 @@ namespace Knyaz.Optimus.Environment
 	/// <summary>
 	/// http://www.w3.org/TR/html5/browsers.html#window
 	/// </summary>
-	public class Window : IWindow
+	public class Window : IWindowEx
 	{
 		private Engine _engine;
 		private readonly Action<string, string, string> _openWindow;
@@ -19,6 +20,8 @@ namespace Knyaz.Optimus.Environment
 
 		public WindowTimers Timers => _timers;
 		
+		public Console Console => _engine.Console;
+		public Document Document => _engine.Document;
 		public Storage LocalStorage { get; } = new Storage();
 		public Storage SessionStorage { get; }= new Storage();
 

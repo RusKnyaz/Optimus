@@ -38,7 +38,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_converter.TryConvert(obj, out var res);
 			return res;
 		}
-
+		
 		public override PropertyDescriptor GetOwnProperty(string propertyName)
 		{
 			if (Properties.TryGetValue(propertyName, out var x))

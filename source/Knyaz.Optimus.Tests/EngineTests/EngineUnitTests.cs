@@ -627,8 +627,7 @@ function reqListener () {
 			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();
 			var loadSignal = new ManualResetEvent(false);
 			img.OnLoad += evt => { loadSignal.Set(); };
-			img.Src = "image.bmp";
-			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.IsTrue(loadSignal.WaitOne(1000), "loaded");
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
 		}

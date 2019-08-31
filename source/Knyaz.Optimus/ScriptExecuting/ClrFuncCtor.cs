@@ -5,7 +5,7 @@ using Jint.Native.Object;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
-	internal class ClrFuncCtor : FunctionInstance, IConstructor
+	internal class ClrFuncCtor<ClrType> : FunctionInstance, IConstructor
 	{
 		private readonly Func<JsValue[], ObjectInstance> _act;
 
@@ -22,6 +22,17 @@ namespace Knyaz.Optimus.ScriptExecuting
 		public ObjectInstance Construct(JsValue[] arguments)
 		{
 			return _act(arguments);
+		}
+		
+		public override bool HasInstance(JsValue v)
+		{
+			var clrObject = v.TryCast<ClrObject>();
+			if (clrObject != null && clrObject.Target != null)
+			{
+				return clrObject.Target is ClrType;
+			}
+
+			return base.HasInstance(v);
 		}
 	}
 }

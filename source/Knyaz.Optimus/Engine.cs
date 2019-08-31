@@ -60,15 +60,7 @@ namespace Knyaz.Optimus
 		/// </summary>
 		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null)
 		{
-			var navigator = new Navigator(new NavigatorPlugins(new PluginInfo[0]))
-			{
-				UserAgent =
-					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
-			};
-			Window = new Window(() => Document, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts),
-				navigator);
-
-			Window.Engine = this;
+			
 		}
 
 		internal Engine(IResourceProvider resourceProvider, Window window)
@@ -83,14 +75,24 @@ namespace Knyaz.Optimus
 			
 			Console = new Console();
 
-			if (window != null)
-			{
-				window.Engine = this;
-				Window = window;
-			}
+			Window = window ?? CreateDefaultWindow();
+			Window.Engine = this;
 
-			ScriptExecutor = new ScriptExecutor(this);
+			ScriptExecutor = new ScriptExecutor(Window, parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson));
 			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+		}
+
+		Window CreateDefaultWindow()
+		{
+			var navigator = new Navigator(new NavigatorPlugins(new PluginInfo[0]))
+			{
+				UserAgent =
+					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
+			};
+			var window = new Window(() => Document, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts),
+				navigator);
+
+			return window;
 		}
 
 		public event Action<Request> OnRequest;

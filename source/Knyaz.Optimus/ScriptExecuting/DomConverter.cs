@@ -40,13 +40,25 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return false;
 			}
 
+			if (value is Undefined)
+			{
+				result = JsValue.Undefined;
+				return true;
+			}
+
 			if (value is Window)
 			{
 				result = engine.Global;
 				return true;
 			}
 
-			if (value != null && _cache.TryGetValue(value, out result))
+			if (value == null)
+			{
+				result = JsValue.Null;
+				return true;
+			}
+
+			if (_cache.TryGetValue(value, out result))
 				return true;
 
 			if (value is IList list)
@@ -56,14 +68,11 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return true;
 			}
 
-			if (value != null)
+			if (_bindedTypes.Any(x => x.IsInstanceOfType(value)))
 			{
-				if (_bindedTypes.Any(x => x.IsInstanceOfType(value)))
-				{
-					result = new ClrObject(engine, value, this);
-					_cache[value] = result;
-					return true;
-				}
+				result = new ClrObject(engine, value, this);
+				_cache[value] = result;
+				return true;
 			}
 
 			switch (value)
@@ -76,6 +85,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 					return true;
 				case bool b:
 					result = new JsValue(b);
+					return true;
+				case int i:
+					result = new JsValue(i);
 					return true;
 				case JsValue js: result = js;
 					return true;
@@ -108,29 +120,61 @@ namespace Knyaz.Optimus.ScriptExecuting
 		}
 		
 		/// <summary>
-		/// Converts js function to c# delegate with convertion array to arguments
-		/// </summary>
-		public Action<object[]> ConvertDelegateArrayArguments(JsValue @this, JsValue jsFunc)
+        /// Converts js function to c# delegate with conversion array of arguments.
+        /// </summary>
+		public Action<object[]> ConvertDelegate(JsValue @this, ICallable callable)
 		{
-			var callable = jsFunc.AsObject() as ICallable;
 			Action<object[]> handler = null;
 			if (callable != null)
 			{
-				handler = (Action<object[]>)_delegatesCache.GetValue(callable, key => 
-					(Action<object[]>)(e =>
-				{
-					var args = e == null ? new JsValue[0] 
-						: e.Select(x => { TryConvert(x, out var val); return val;}).ToArray();
-					
-					key.Call(@this, args);
-				}));
+				handler = (Action<object[]>) _delegatesCache.GetValue(callable, key =>
+					(Action<object[]>) (e =>
+					{
+						var args = e == null
+							? new JsValue[0]
+							: e.Select(x =>
+							{
+								TryConvert(x, out var val);
+								return val;
+							}).ToArray();
+
+						key.Call(@this, args);
+					}));
 			}
+
 			return handler;
 		}
-		
-		
+
 
 		readonly ConditionalWeakTable<ICallable, object> _delegatesCache = new ConditionalWeakTable<ICallable, object>();
+
+		public object ConvertFromJs(JsValue jsValue)
+		{
+			if (jsValue.IsUndefined())
+				return Undefined.Instance;
+			
+			if (jsValue.IsObject())
+			{
+				switch (jsValue.AsObject())
+				{
+					case ClrObject clr:
+						return clr.Target;
+				}
+				
+				return ((ClrObject) jsValue.AsObject()).Target;
+			}
+			
+			if (jsValue.IsBoolean())
+				return jsValue.AsBoolean();
+
+			if (jsValue.IsString())
+				return jsValue.AsString();
+
+			if (jsValue.IsNumber())
+				return jsValue.AsNumber();
+
+			return null;
+		}
 	}
 
 	internal class DomItemAttribute : Attribute
