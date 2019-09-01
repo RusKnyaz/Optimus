@@ -170,7 +170,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 					return;
 				}
 				
-
 				if (args[2] is IDictionary<string, object> options)
 				{
 					window.RemoveEventListener(
