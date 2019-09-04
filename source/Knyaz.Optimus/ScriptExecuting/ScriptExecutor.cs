@@ -120,7 +120,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 						false);
 					return;
 				}
-				
 
 				if (args[2] is IDictionary<string, object> options)
 				{
@@ -128,9 +127,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 						args[0]?.ToString(),
 						handler,
 						new EventListenerOptions {
-							Capture = options["capture"] is bool c && c,
-							Passive = options["passive"] is bool p && p,
-							Once = options["once"] is bool o && o
+							Capture = options.ContainsKey("capture") &&options["capture"] is bool c && c,
+							Passive = options.ContainsKey("passive") &&options["passive"] is bool p && p,
+							Once = options.ContainsKey("once") && options["once"] is bool o && o
 						});
 				}
 				else
@@ -176,9 +175,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 						args[0]?.ToString(),
 						handler,
 						new EventListenerOptions {
-							Capture = options["capture"] is bool c && c,
-							Passive = options["passive"] is bool p && p,
-							Once = options["once"] is bool o && o
+							Capture = options.ContainsKey("capture") && options["capture"] is bool c && c,
+							Passive = options.ContainsKey("passive") &&options["passive"] is bool p && p,
+							Once = options.ContainsKey("once") &&options["once"] is bool o && o
 						});
 				}
 				else
@@ -218,11 +217,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_jsEngine.AddGlobalType("Event", args =>
 			{
 				var evt = _window.Document.CreateEvent("Event");
-				var opts = args.Length > 1 ? args[1].AsObject() : null;
-				var canCancel = opts != null && !opts.Get("cancelable").IsUndefined() &&
-				                opts.Get("cancelable").AsBoolean();
-				var canBubble = opts != null && !opts.Get("bubbles").IsUndefined() && opts.Get("bubbles").AsBoolean();
-				evt.InitEvent(args[0].AsString(), canBubble, canCancel);
+				var opts = args.Length > 1 ? args[1] as IDictionary<string, object> : null;
+				var canCancel = opts != null && opts.ContainsKey("cancelable") && opts["cancelable"] is bool c && c; 
+				var canBubble = opts != null && opts.ContainsKey("bubbles")&& opts["bubbles"] is bool b && b;
+				evt.InitEvent(args[0]?.ToString(), canBubble, canCancel);
 				return evt;
 			});
 			
@@ -230,10 +228,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 				var img = (HtmlImageElement)_window.Document.CreateElement("img");
 				
 				if (args.Length > 0)
-					img.Width = (int)args[0].AsNumber();
+					img.Width = Convert.ToInt32(args[0]);
 				
 				if(args.Length > 1)
-					img.Height = (int)args[1].AsNumber();
+					img.Height = Convert.ToInt32(args[1]);
 
 				return img;
 			});

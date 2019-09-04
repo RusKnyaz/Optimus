@@ -12,9 +12,6 @@ namespace Knyaz.Optimus.ScriptExecuting
         private readonly Jint.Engine _engine;
         private readonly DomConverter _typeConverter;
 
-        //todo: remove
-        public DomConverter TypeConverter => _typeConverter;
-
         public JintJsEngine()
         {
             _typeConverter = new DomConverter(() => _engine);
@@ -56,11 +53,12 @@ namespace Knyaz.Optimus.ScriptExecuting
             _engine.Global.FastAddProperty(jsTypeName, new JsValue(new ClrPrototype(_engine, type, _typeConverter)), false, false, false);
         }
 
-        public void AddGlobalType<T>(string name, Func<JsValue[], T> func)
+        public void AddGlobalType<T>(string name, Func<object[], T> func)
         {
             var ctor = new ClrFuncCtor<T>(_engine, args =>
             {
-                var obj = func(args);
+                var clrArgs = args.Select(x => _typeConverter.ConvertFromJs(x)).ToArray();
+                var obj = func(clrArgs);
                 _typeConverter.TryConvert(obj, out var res);
                 return res.AsObject();
             }); 

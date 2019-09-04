@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Jint.Native;
 using Jint.Native.Array;
+using Jint.Native.Object;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
@@ -159,9 +160,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 				{
 					case ClrObject clr:
 						return clr.Target;
+					case ObjectInstance objInst:
+						return objInst.GetOwnProperties().ToDictionary(x => x.Key, x => 
+							ConvertFromJs(objInst.Get(x.Key)));
 				}
-				
-				return ((ClrObject) jsValue.AsObject()).Target;
+
+				return jsValue;
 			}
 			
 			if (jsValue.IsBoolean())
