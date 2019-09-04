@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Jint.Native;
+using Jint.Native.Function;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
 
@@ -14,7 +15,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
         public JintJsEngine()
         {
-            _typeConverter = new DomConverter(() => _engine);
+            _typeConverter = new DomConverter();
 
             _engine = new Jint.Engine(o => o.AddObjectConverter(_typeConverter));
         }
@@ -24,33 +25,32 @@ namespace Knyaz.Optimus.ScriptExecuting
         
         public void AddGlobalGetter(string name, Func<object> getter)
         {
-            _engine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_engine, value =>
-            {
-                JsValue res;
-                _typeConverter.TryConvert(getter(), out res);
-                return res;
-            }), true);
+            var jsGetter = new GetterFunctionInstance(_engine, @this => JsValue.FromObject(_engine, getter()));
+            
+            _engine.Global.DefineOwnProperty(name, new GetSetPropertyDescriptor(jsGetter, JsValue.Undefined), true);
         }
 
         public void AddGlobalFunc(string name, Func<object[], object> action)
         {
-            var jsFunc = new ClrFunctionInstance(_engine, (@this, args) =>
+            var jsFunc = new ClrFunctionInstance(_engine, name, (@this, args) =>
             {
                 var clrArgs = args.Select(x => x.IsObject() && x.AsObject() is ICallable callable
-                    ? _typeConverter.ConvertDelegate(@this, callable)
+                    ? _typeConverter.ConvertDelegate(_engine, @this, callable)
                     : _typeConverter.ConvertFromJs(x)).ToArray();
                 
                 var result = action(clrArgs);
                 
-                _typeConverter.TryConvert(result, out var jsValue);
-                return jsValue;
+                return JsValue.FromObject(_engine, result);
             });
-            _engine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_engine, value => jsFunc), true);
+            
+            var getter = new GetterFunctionInstance(_engine, @this => jsFunc);
+            
+            _engine.Global.DefineOwnProperty(name, new GetSetPropertyDescriptor(getter, JsValue.Undefined), true);
         }
 
         public void AddGlobalType(string jsTypeName, Type type)
         {
-            _engine.Global.FastAddProperty(jsTypeName, new JsValue(new ClrPrototype(_engine, type, _typeConverter)), false, false, false);
+            _engine.Global.FastAddProperty(jsTypeName, new ClrPrototype(_engine, jsTypeName, type, _typeConverter), false, false, false);
         }
 
         public void AddGlobalType<T>(string name, Func<object[], T> func)
@@ -59,7 +59,7 @@ namespace Knyaz.Optimus.ScriptExecuting
             {
                 var clrArgs = args.Select(x => _typeConverter.ConvertFromJs(x)).ToArray();
                 var obj = func(clrArgs);
-                _typeConverter.TryConvert(obj, out var res);
+                var res = JsValue.FromObject(_engine, obj);
                 return res.AsObject();
             }); 
             
@@ -72,32 +72,24 @@ namespace Knyaz.Optimus.ScriptExecuting
             }
         }
 
-        public void AddGlobalAct(string name, Action<JsValue, JsValue[]> action)
-        {
-            var jsFunc = new ClrFunctionInstance(_engine, (jsValue, values) =>
-            {
-                action(jsValue, values);
-                return JsValue.Undefined;
-            });
-
-            _engine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_engine, value => jsFunc), true);
-        }
-        
+     
         public void AddGlobalAct(string name, Action<object[]> action)
         {
-            var jsFunc = new ClrFunctionInstance(_engine, (@this, args) =>
+            var jsFunc = new ClrFunctionInstance(_engine, "", (@this, args) =>
             {
                 var clrArgs = args.Select(x => x.IsObject() && x.AsObject() is ICallable callable
-                    ? _typeConverter.ConvertDelegate(@this, callable)
+                    ? _typeConverter.ConvertDelegate(_engine, @this, callable)
                     : _typeConverter.ConvertFromJs(x)).ToArray();   
                 action(clrArgs);
                 return JsValue.Undefined;
             });
 
-            _engine.Global.DefineOwnProperty(name, new ClrAccessDescriptor(_engine, value => jsFunc), true);
+            var getter = new GetterFunctionInstance(_engine, value => jsFunc);
+
+            _engine.Global.DefineOwnProperty(name, new GetSetPropertyDescriptor(getter, JsValue.Undefined), true);
         }
 
-        public object ParseJson(string json) => _engine.Json.Parse(null, new[] {new JsValue(json)});
+        public object ParseJson(string json) => _engine.Json.Parse(null, new[] {JsValue.FromObject(_engine, json)});
 
         public object Evaluate(string code)
         {

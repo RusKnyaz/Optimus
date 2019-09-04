@@ -85,7 +85,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             Assert.AreEqual(console, se.Evaluate("text/javascript","console"), "console");
             Assert.AreEqual(navigator, se.Evaluate("text/javascript","navigator"), "navigator");
         }
-        
+
         [Test]
         public void AddEventListenerWithOptions()
         {

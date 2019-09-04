@@ -39,7 +39,7 @@
     <EmbeddedResource Include="Resources\Large_Html.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Jint" Version="2.10.3" />
+    <PackageReference Include="Jint" Version="3.0.0-beta-1598" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="Moq" Version="4.7.142" />
     <PackageReference Include="NBench" Version="1.0.4" />

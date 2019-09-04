@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 	{
 		private readonly Func<JsValue[], ObjectInstance> _act;
 
-		public ClrFuncCtor(Jint.Engine engine, Func<JsValue[], ObjectInstance> act) : base(engine, null, null, false)
+		public ClrFuncCtor(Jint.Engine engine, Func<JsValue[], ObjectInstance> act) : base(engine, null, null, null, false)
 		{
 			_act = act;
 		}

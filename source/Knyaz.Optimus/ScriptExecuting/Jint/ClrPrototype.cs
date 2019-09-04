@@ -12,8 +12,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 		private readonly Type _type;
 		private readonly DomConverter _converter;
 
-		public ClrPrototype(Jint.Engine engine, Type type, DomConverter converter) : 
-			base(engine, null, null, false)
+		public ClrPrototype(Jint.Engine engine, string typeName, Type type, DomConverter converter) : 
+			base(engine, typeName, null, null, false)
 		{
 			_type = type;
 			_converter = converter;
@@ -34,7 +34,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				var obj = exactCtor.Invoke(argsValues);
 				JsValue val;
-				if (_converter.TryConvert(obj, out val))
+				if (_converter.TryConvert(Engine, obj, out val))
 					return val.ToObject() as ClrObject;
 			}
 

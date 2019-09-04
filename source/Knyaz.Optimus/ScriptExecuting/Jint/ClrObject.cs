@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Jint;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
@@ -29,24 +30,22 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_converter = converter;
 			Target = obj;
 			//todo: use static prototypes
-			Prototype = new ClrPrototype(engine, obj.GetType(), _converter);
+			Prototype = new ClrPrototype(engine, "", obj.GetType(), _converter);
 			Extensible = true;
 		}
 
-		private JsValue Convert(Object obj)
-		{
-			_converter.TryConvert(obj, out var res);
-			return res;
-		}
 		
-		public override PropertyDescriptor GetOwnProperty(string propertyName)
+		public override PropertyDescriptor GetOwnProperty(in Key propertyName)
 		{
-			if (Properties.TryGetValue(propertyName, out var x))
-				return x;
+			var existProp = base.GetOwnProperty(propertyName);
+			if (existProp != null && existProp != PropertyDescriptor.Undefined)
+				return existProp;
 
-			x = FindProperty(propertyName);
-			Properties.Add(propertyName, x);
-			return x;
+			var newProp = FindProperty(propertyName);
+			if(newProp != null && newProp != PropertyDescriptor.Undefined)
+				AddProperty(propertyName, newProp);
+			
+			return newProp;
 		}
 		
 		private PropertyDescriptor FindProperty(string propertyName)
@@ -70,7 +69,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (property != null)
 			{
-				var descriptor = new ClrPropertyInfoDescriptor(Engine, property, Target);
+				var descriptor = CreatePropertyDescriptor(property); 
 				return descriptor;
 			}
 
@@ -183,7 +182,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 					if (pars.Length == 1 && pars[0].ParameterType == typeof(Event))
 					{
 						listener = (Func<Event, bool?>)(
-							e => (bool?)settedHandler[0].Invoke(this, new []{Convert(e)}).ToObject());
+							e => (bool?)settedHandler[0].Invoke(this, new []
+							{JsValue.FromObject(Engine, e)}).ToObject());
 					}
 					else
 						throw new NotImplementedException(); //todo: build and compile the Expression.
@@ -195,19 +195,18 @@ namespace Knyaz.Optimus.ScriptExecuting
 						: (Action) (() => settedHandler[0].Invoke(this, new JsValue[0]));
 				}
 				
-				var getter = new ClrFunctionInstance(Engine, (value, values) => settedHandler[0]);
-				var setter = new ClrFunctionInstance(Engine, (value, values) =>
+				var getter = new GetterFunctionInstance(Engine, value => settedHandler[0]);
+				var setter = new SetterFunctionInstance(Engine, (@this, value) =>
 				{
 					if (settedHandler[0] != JsValue.Null)
 						eventInfo.RemoveEventHandler(Target, listener);
 
-					settedHandler[0] = values[0];
+					settedHandler[0] = value;
 					if (settedHandler[0] != JsValue.Null)
 						eventInfo.AddEventHandler(Target, listener);
-					return values[0];
 				});
-
-				var descriptor = new PropertyDescriptor(getter, setter);
+				
+				var descriptor = new GetSetPropertyDescriptor(getter, setter);
 				return descriptor;
 			}
 
@@ -221,12 +220,53 @@ namespace Knyaz.Optimus.ScriptExecuting
 			return PropertyDescriptor.Undefined;
 		}
 
+		/// <summary>
+		/// Creates JS <see cref="PropertyDescriptor"/> for a given .net <see cref="PropertyInfo"/> attached to this object.
+		/// </summary>
+		/// <param name="property"></param>
+		/// <returns></returns>
+		/// <exception cref="JavaScriptException"></exception>
+		private PropertyDescriptor CreatePropertyDescriptor(PropertyInfo property)
+		{
+			var get = property.GetMethod == null ? Undefined :  
+				new GetterFunctionInstance(Engine, @this => FromObject(Engine, property.GetValue(Target, null)));
+
+			var set = property.SetMethod == null 
+				? Undefined
+				: new SetterFunctionInstance(Engine, (@this, value) => {
+					try
+					{
+						object obj;
+						if (property.PropertyType == typeof(JsValue))
+						{
+							obj = value;
+						}
+						else
+						{
+							obj = value.ToObject();
+							if (obj != null && obj.GetType() != property.PropertyType)
+								obj = _engine.ClrTypeConverter.Convert(obj, property.PropertyType,
+									CultureInfo.InvariantCulture);
+						}
+
+						property.SetValue(Target, obj, null);
+					}
+					catch (Exception ex)
+					{
+						throw new JavaScriptException(JsValue.FromObject(_engine, ex));
+					}
+				});
+
+			return new GetSetPropertyDescriptor(get,set);
+		}
+
+
 		private PropertyDescriptor MethodDescriptor(string propertyName, MethodInfo[] methods)
 		{
 			var func = new ClrMethodInfoFunc(Engine, methods, this);
 			func.FastAddProperty("toString",
-				new JsValue(new ClrFunctionInstance(Engine,
-					(value, values) => new JsValue("function " + propertyName + "() { [native code] }"))),
+				JsValue.FromObject(Engine, new ClrFunctionInstance(Engine, "", 
+					(value, values) => JsValue.FromObject(Engine, "function " + propertyName + "() { [native code] }"))),
 				false, false, false);
 
 			return new PropertyDescriptor(func, false, true, false);
@@ -245,7 +285,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				handler = (Action<T>)_delegatesCache.GetValue(callable, key => (Action<T>)(e =>
 				{
-					_converter.TryConvert(e, out var val);
+					var val = JsValue.FromObject(Engine, e);
 					key.Call(@this, new[] { val });
 				}));
 			}
@@ -260,7 +300,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 		private readonly ClrObject _clrObject;
 
 		public ClrMethodInfoFunc(Jint.Engine engine, MethodInfo[] methods, ClrObject clrObject)
-			: base(engine, null, null, false)
+			: base(engine, "", null, null, false)
 		{
 			_internalFunc = new MethodInfoFunctionInstance(engine, methods);
 			_methods = methods;
@@ -349,53 +389,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			catch (Exception ex)
 			{
 				throw new JavaScriptException(JsValue.FromObject(Engine, ex.Message));
-			}
-		}
-	}
-	
-	public sealed class ClrPropertyInfoDescriptor : PropertyDescriptor
-	{
-		private readonly Jint.Engine _engine;
-		private readonly PropertyInfo _propertyInfo;
-		private readonly object _item;
-
-		public ClrPropertyInfoDescriptor(Jint.Engine engine, PropertyInfo propertyInfo, object item)
-		{
-			_engine = engine;
-			_propertyInfo = propertyInfo;
-			_item = item;
-			Writable = propertyInfo.CanWrite;
-		}
-
-		public override JsValue Value
-		{
-			get
-			{
-				return JsValue.FromObject(_engine, _propertyInfo.GetValue(_item, null));
-			}
-			set
-			{
-				try
-				{
-					JsValue jsValue = value;
-					object obj;
-					if (_propertyInfo.PropertyType == typeof(JsValue))
-					{
-						obj = jsValue;
-					}
-					else
-					{
-						obj = jsValue.ToObject();
-						if (obj != null && obj.GetType() != _propertyInfo.PropertyType)
-							obj = _engine.ClrTypeConverter.Convert(obj, _propertyInfo.PropertyType,
-								CultureInfo.InvariantCulture);
-					}
-					_propertyInfo.SetValue(_item, obj, null);
-				}
-				catch (Exception ex)
-				{
-					throw new JavaScriptException(JsValue.FromObject(_engine, ex));
-				}
 			}
 		}
 	}
