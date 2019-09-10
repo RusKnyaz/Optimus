@@ -2,6 +2,7 @@
 using Jint;
 using Jint.Native;
 using Jint.Native.Array;
+using Jint.Native.Object;
 using Jint.Runtime.Descriptors;
 using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
@@ -11,7 +12,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 	/// <summary>
 	/// Fork of jint's list adapter
 	/// </summary>
-	internal class ListAdapter : ArrayInstance, IObjectWrapper
+	internal class ListAdapter : ObjectInstance, IObjectWrapper
 	{
 		private readonly IList _list;
 
