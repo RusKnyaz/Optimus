@@ -61,7 +61,7 @@ namespace Knyaz.Optimus.Tests
 					NUnit.Framework.Assert.AreNotEqual(rightResult, leftResult, GetMessage(expression.Left));
 					break;
 				case ExpressionType.GreaterThan:
-					//todo: be carefull with unconditional convertation to decimal
+					//todo: be carefull with unconditional conversion to decimal
 					NUnit.Framework.Assert.Greater((decimal)rightResult, (decimal)leftResult, GetMessage(expression.Left));
 					break;
 				case ExpressionType.GreaterThanOrEqual:
