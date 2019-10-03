@@ -49,8 +49,8 @@ Test("StorageTests", {
     "SetByIndexer":{
         run:function () {
             sessionStorage["setByIndexer"] = "ok";
-            Assert.AreEqual("ok", sessionStorage.getItem("setByIndexer"));
-            Assert.AreEqual("ok", sessionStorage["setByIndexer"]);
+            Assert.AreEqual("ok", sessionStorage.getItem("setByIndexer"),"get using getItem method");
+            Assert.AreEqual("ok", sessionStorage["setByIndexer"], "get using indexer");
         }
     },
     "SessionStorage":{

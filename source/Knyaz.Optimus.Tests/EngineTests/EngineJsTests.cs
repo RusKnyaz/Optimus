@@ -149,21 +149,7 @@ console.log(div.appendChild != null);");
 			CollectionAssert.AreEqual(new object[] {true, true, "DIV", true, true}, _log);
 		}
 
-		[Test]
-		public void Document()
-		{
-			var engine = CreateEngineWithScript(
-				@"console.log(document == document);
-console.log(document != null);
-console.log(document.hasOwnProperty('ownerDocument'));
-console.log(document.ownerDocument === null);
-console.log(document.parentNode === null);
-console.log(document.documentElement != null);
-console.log(document.appendChild != null);");
-
-			CollectionAssert.AreEqual(new object[] {true, true, true, true, true, true, true}, _log);
-		}
-
+		
 		[Test]
 		public void DocumentElement()
 		{
@@ -188,15 +174,13 @@ console.log(elems.length);");
 			CollectionAssert.AreEqual(new object[] {2}, _log);
 		}
 
-		[Test]
-		public void ChildNodes()
+		[TestCase("document.body.childNodes.length", 3)]
+		[TestCase("document.body.childNodes[0] != null", true)]
+		public void ChildNodes(string code, object expectedResult)
 		{
-			var engine = Load("<div id='d'></div><div></div><span></span>",
-				@"var elems = document.body.childNodes;
-console.log(elems.length);
-console.log(elems[0] != null);");
-
-			CollectionAssert.AreEqual(new object[] {3, true}, _log);
+			var engine = Load("<div id='d'></div><div></div><span></span>", $"console.log({code});");
+			
+			CollectionAssert.AreEqual(new object[] {expectedResult}, _log);
 		}
 
 		[Test]
@@ -507,48 +491,33 @@ console.log('afterappend');"));
 		}
 
 		[Test]
-		public void AddScriptOnloadThisAccess()
+		public async Task AddScriptOnloadThisAccess()
 		{
 			var script = @"var script = document.createElement('script');
 script.src = 'script.js';
 script.someData = 'hello';
-script.onload = function(){ console.log(this.someData); };
+script.onload = function(){ console.log(this.someData); document.body.innerHtml='<div id=x></div>';};
 			document.head.appendChild(script); ";
 
 			var engine = new Engine(
 				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');")
 					.Resource("http://localhost", Mocks.Page(script)));
 			var log = engine.Console.ToList();
-			engine.OpenUrl("http://localhost").Wait();
-
-			Thread.Sleep(1000);
-			Assert.AreEqual("in new script,hello", string.Join(",", log));
+			var page = await engine.OpenUrl("http://localhost");
+			page.Document.WaitId("x", 1000);
+			Assert.AreEqual(new[]{"in new script", "hello"}, log);
 		}
 
-		[Test]
-		public void InstanceOfHtmlElement()
+		[TestCase("document.getElementById('d').attributes['id'].name", "id")]
+		[TestCase("document.getElementById('d').attributes[0].name", "id")]
+		public void AttributesTest(string code, string expected)
 		{
-			var engine = Load("<div id='d'></div>",
-				@"
-console.log(document.body instanceof String);
-console.log(document.body instanceof Element);
-console.log(document.body instanceof HTMLElement);");
+			var engine = Load("<div id='d'></div>", $"console.log({code});");
 
-			CollectionAssert.AreEqual(new object[] {false, true, true}, _log);
+			CollectionAssert.AreEqual(new object[] {expected}, _log);
 		}
 
-		[Test]
-		public void AttributesTest()
-		{
-			var engine = Load("<div id='d'></div>",
-				@"
-console.log(document.getElementById('d').attributes['id'].name);
-console.log(document.getElementById('d').attributes[0].name);");
-
-			CollectionAssert.AreEqual(new object[] {"id", "id"}, _log);
-		}
-
-		[Test, Description("The sample come from jquer source code")]
+		[Test, Description("The sample come from jquery source code")]
 		public void PushApply()
 		{
 			var engine = Load("<div></div>", @"var arr = [];
@@ -614,13 +583,6 @@ console.log(arr[0]);");
 		{
 			Load("HI", "document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
 			CollectionAssert.AreEqual(new[] {"hi"}, _log);
-		}
-
-		[Test]
-		public void Splice()
-		{
-			Load("HI", "var x = [1,2,3]; x.splice(1,0,4);console.log(x);");
-			CollectionAssert.AreEqual(new[] {1, 4, 2, 3}, _log[0] as object[]);
 		}
 
 		[Test]
@@ -719,41 +681,7 @@ console.log(match[0]);");
 			CollectionAssert.AreEqual(new object[] {"Brown"}, _log);
 		}
 
-		[Test]
-		public void AlertTest()
-		{
-			Load("<div></div>", @"alert('HI');");
-			Assert.AreEqual(new[]{"HI"}, _alerts);
-		}
-
-		[Test]
-		public void GlobalFuncEquality()
-		{
-			Load("<div></div>", @"console.log(alert == alert);console.log(setInterval == setInterval);");
-			CollectionAssert.AreEqual(new object[] {true, true}, _log);
-		}
-
-		[Test]
-		public void ClrFuncEquality()
-		{
-			Load("<div id=d></div>", @"var d = document.getElementById('d');  console.log(d.appendChild == d.appendChild);");
-			CollectionAssert.AreEqual(new object[] { true }, _log);
-		}
-
-		[Test]
-		public void WindowApi()
-		{
-			Load("<div></div>", @"console.log(window.setTimeout != null);
-console.log(window.clearTimeout != null);
-console.log(window.addEventListener != null);
-console.log(window.removeEventListener != null);
-console.log(window.dispatchEvent != null);
-console.log(window.setInterval != null);
-console.log(window.clearInterval != null);");
-
-			CollectionAssert.AreEqual(new object[] { true, true, true, true, true, true, true }, _log);
-		}
-
+		
 		[Test]
 		public void WindowAddEventListener()
 		{
@@ -808,12 +736,12 @@ dispatchEvent(evt);");
 			CollectionAssert.AreEqual(new[] { 1.0 }, _log);
 		}
 
-		[Test]
-		public void SelectOptionsItem()
+		[TestCase("document.getElementById('s').options.item(0).id")]
+		[TestCase("document.getElementById('s').options[0].id")]
+		public void SelectOptionsItem(string expr)
 		{
-			Load("<select id=s><option id=X/></select>", "console.log(document.getElementById('s').options.Item(0).Id);" +
-																 "console.log(document.getElementById('s').options[0].Id);");
-			CollectionAssert.AreEqual(new[] { "X","X" }, _log);
+			Load("<select id=s><option id=X/></select>", $"console.log({expr});");
+			CollectionAssert.AreEqual(new[] { "X" }, _log);
 		}
 
 		[Test]
@@ -858,23 +786,21 @@ dispatchEvent(evt);");
 			CollectionAssert.AreEqual(new[] { "block", "block" }, log);
 		}
 
-		[Test]
-		public void SetStyleNumericValue()
+		[TestCase("d.style['zoom'] == 1", ExpectedResult = true)]
+		[TestCase("d.style['zoom'] === 1", ExpectedResult = true)]
+		[TestCase("typeof d.style['zoom']", ExpectedResult = "number")]
+		[TestCase("d.style['color'] == 1", ExpectedResult = false, Ignore = "Color value to be validated.")]
+		[TestCase("d.style['color'] === 1", ExpectedResult = false)]
+		[TestCase("typeof d.style['color']", ExpectedResult = "string")]
+		
+		public object SetStyleNumericValue(string expression)
 		{
 			Load("<div id=d></div>", 
 				"var d = document.getElementById('d');" +
 				"d.style['zoom'] = 1;" +
-				"console.log(d.style['zoom'] == 1);" +
-				"console.log(d.style['zoom'] === 1);" + 
-				"console.log(typeof d.style['zoom']);");
-			CollectionAssert.AreEqual(new object[] { true, false, "string" }, _log);
-		}
-
-		[Test]
-		public void UndefinedTest()
-		{
-			Load("", "var data; if(data !== undefined) {console.log('a');}else{console.log('b');}");
-			CollectionAssert.AreEqual(new object[] { "b" }, _log);
+				"d.style['color'] = 1;" +
+				$"console.log({expression});");
+			return _log[0];
 		}
 
 		[Test]
@@ -885,13 +811,7 @@ dispatchEvent(evt);");
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
 
-		[Test]
-		public void CompareWithThis()
-		{
-			Load("<div></div>", @"console.log({}===this);");
-			CollectionAssert.AreEqual(new object[] {false}, _log);
-		}
-
+		
 		[Test]
 		public void WindowOpen()
 		{
@@ -1211,6 +1131,7 @@ dispatchEvent(evt);");
 				"console.log(navigator.mimeTypes.length);"+
 				"console.log(navigator.plugins.length);" +
 				"console.log(navigator.plugins[0].name);"+
+				"console.log(navigator.plugins[0].length);"+
 				"console.log(navigator.plugins[0][0].type)"+
 				"</script></html>");
 			
@@ -1223,7 +1144,7 @@ dispatchEvent(evt);");
 
 			await engine.OpenUrl("http://localhost");
 			
-			Assert.AreEqual(new object[]{3, 2, "Pdf reader", "application/pdf"}, log);
+			Assert.AreEqual(new object[]{3, 2, "Pdf reader", 1, "application/pdf"}, log);
 		}
 
 		[Test]

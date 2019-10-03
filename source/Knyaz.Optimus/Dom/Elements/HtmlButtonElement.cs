@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents a &lt;BUTTON&gt; HTML element.
 	/// </summary>
+	[JsName("HTMLButtonElement")]
 	public sealed class HtmlButtonElement : HtmlElement, IFormElement
 	{
 		private static class Defaults

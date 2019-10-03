@@ -52,6 +52,7 @@ namespace Knyaz.Optimus.Environment
             idx < 0 || idx >= _pluginInfo.MimeTypes.Length ? null : _plugins.MimeTypes[_pluginInfo.MimeTypes[idx].Type];
 
         public MimeType this[string name] =>
+            int.TryParse(name, out var index) ? this[index] :
             _pluginInfo.MimeTypes.Any(x => x.Type == name) ? _plugins.MimeTypes[name] : null;
         
         public int Length => _pluginInfo.MimeTypes.Length;

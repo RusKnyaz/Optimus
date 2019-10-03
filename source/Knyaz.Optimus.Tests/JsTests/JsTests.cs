@@ -1,11 +1,20 @@
-﻿using NUnit.Framework;
+﻿using Knyaz.Optimus.Tests.ScriptExecuting;
+using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
-	[TestFixture]
-	class DocumentJsTests
+	/// <summary>
+	/// This stuff runs JS tests from Resources/JsTests/*.js files.
+	/// </summary>
+	[TestFixture(JsEngines.Jint)]
+	[TestFixture(JsEngines.Jurassic)]
+	public class JsTests
 	{
-		[TestCase("ImplementationCreateHtmlDocument")]
+		private readonly JsEngines _jsEngine;
+
+		public JsTests(JsEngines jsEngine) => _jsEngine = jsEngine;
+	    
+	    [TestCase("ImplementationCreateHtmlDocument")]
 		[TestCase("ImplementationCreateDocumentType")]
 		[TestCase("ImplementationCreateDocumentWithDocTypeSvg")]
 		[TestCase("ImplementationCreateDocumentWithoutDocType")]
@@ -16,14 +25,14 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetBody")]
 		[TestCase("SetBodyDiv")]
 		[TestCase("SetBodyNull")]
-		public void DocumentTests(string testName) => JsTestsRunner.Run(testName);
+		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]
 		[TestCase("TextRemove")]
-		public void NodeTests(string testName) => JsTestsRunner.Run(testName);
+		public void NodeTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("Clone")]
-		public void DocumentFragmentTests(string testName) => JsTestsRunner.Run(testName);
+		public void DocumentFragmentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("AppendScriptTwice")]
 		[TestCase("AppendScriptClone")]
@@ -36,11 +45,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ParseFromHtml")]
 		[TestCase("SetInnerHtml")]
 		[TestCase("TextOfExternal")]
-		public void ScriptTests(string testName) => JsTestsRunner.Run(testName);
+		public void ScriptTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("Clone")]
 		[TestCase("TextContentIsNull")]
-		public void DocTypeTests(string testName) => JsTestsRunner.Run(testName);
+		public void DocTypeTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CallThisIsObj")]
 		[TestCase("CallThisIsNull")]
@@ -50,7 +59,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("CompareObjectWithWindow")]
 		[TestCase("CompareObjectWithWindowInverted")]
 		[TestCase("CallAndCompareThisIsUndefined")]
-		public void JavaScriptTests(string testName) => JsTestsRunner.Run(testName);
+		public void JavaScriptTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
 		[TestCase("Clone")]
 		[TestCase("TextContent")]
@@ -62,11 +71,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SubstringData")]
 		[TestCase("LengthTest")]
 		[TestCase("AppendChildThrows")]
-		public void CommentTests(string testName) => JsTestsRunner.Run(testName);
+		public void CommentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("ChildElements")]
 		[TestCase("DefaultEnctype")]
-		public void FormTests(string testName) => JsTestsRunner.Run(testName);
+		public void FormTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
 		[TestCase("EventConstructor")]
 		[TestCase("EventConstructorWithInit")]
@@ -77,7 +86,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AddEventListenerCaptureOptionFalse")]
 		[TestCase("AddEventListenerTwice")]
 		[TestCase("AddEventListenerTwiceAndRemove")]
-		public void EventTests(string testName) => JsTestsRunner.Run(testName);
+		public void EventTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("SetItem")]
 		[TestCase("SetItemTwice")]
@@ -88,6 +97,30 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetByIndexer")]
 		[TestCase("LocalStorage")]
 		[TestCase("SessionStorage")]
-		public void StorageTests(string testName) => JsTestsRunner.Run(testName);
-	}
+		public void StorageTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+	    
+		[TestCase("Construct")]
+		[TestCase("ConstructWithDefaultLength")]
+		[TestCase("ConstructWithDefaultOffset")]
+		[TestCase("SetInt32DefaultEndian")]
+		[TestCase("SetInt32")]
+		[TestCase("ArrayBufferType")]
+		[TestCase("Int8ArrayType")]
+		[TestCase("Uint8ArrayType")]
+		[TestCase("Int16ArrayType")]
+		[TestCase("Uint16ArrayType")]
+		[TestCase("Int32ArrayType")]
+		[TestCase("Uint32ArrayType")]
+		[TestCase("Float32ArrayType")]
+		[TestCase("Float64ArrayType")]
+		[TestCase("DataViewType")]
+		[TestCase("NewArrayBuffer")]
+		
+		[TestCase("Int16FromArrayBuffer")]
+		[TestCase("Int16FromArray")]
+		[TestCase("Int16FromArrayWithFloats")]
+		[TestCase("Uint16InstatiatedFromArray")]
+		[TestCase("Uint16InstatiatedFromSignedArray")]
+		public void DataViewTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+    }
 }

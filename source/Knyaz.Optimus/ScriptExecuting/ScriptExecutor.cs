@@ -18,7 +18,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 		private readonly IWindowEx _window;
 		private readonly Func<Func<Stream, object>, XmlHttpRequest> _createXmlHttpRequest;
 
-		private IJsEngine _jsEngine;
+		private JintJsEngine _jsEngine;
 		
 		public ScriptExecutor(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXmlHttpRequest)
 		{
@@ -344,5 +344,4 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		public string Code { get; private set; }
 	}
-
 }

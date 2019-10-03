@@ -66,14 +66,16 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var engine = new Engine(resourceProvider);
 			var log = new List<string>();
+			var signal = new ManualResetEvent(false);
 			engine.Console.OnLog += o =>
 			{
 				System.Console.WriteLine(o ?? "<null>");
 				log.Add(o.ToString());
+				signal.Set();
 			};
 
 			engine.OpenUrl("http://localhost");
-			Thread.Sleep(1000);
+			Assert.IsTrue(signal.WaitOne(10000));
 			CollectionAssert.AreEqual(new[] {"OK"}, log);
 		}
 

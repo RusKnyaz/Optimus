@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Jint" Version="2.10.3" />
+    <PackageReference Include="Jurassic" Version="3.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
   <ItemGroup>

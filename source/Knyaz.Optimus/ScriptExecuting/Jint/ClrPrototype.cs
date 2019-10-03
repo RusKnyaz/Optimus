@@ -7,12 +7,14 @@ using System.Linq;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
+	using Engine = global::Jint.Engine;
+	
 	internal class ClrPrototype : FunctionInstance, IConstructor
 	{
 		private readonly Type _type;
 		private readonly DomConverter _converter;
 
-		public ClrPrototype(Jint.Engine engine, Type type, DomConverter converter) : 
+		public ClrPrototype(Engine engine, Type type, DomConverter converter) : 
 			base(engine, null, null, false)
 		{
 			_type = type;

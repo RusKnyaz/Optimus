@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Perf
 {
@@ -123,6 +124,7 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// <summary>
 	/// 8-bit unsigned integer array.
 	/// </summary>
+	[JsName("Uint8Array")]
 	public class UInt8Array : TypedArray<byte>
 	{
 		public UInt8Array(ArrayBuffer buffer) : base(buffer) { }

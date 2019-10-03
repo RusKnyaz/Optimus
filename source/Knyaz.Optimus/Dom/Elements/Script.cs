@@ -8,6 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// Represents &lt;SCRIPT&gt; element.
 	/// </summary>
 	[DomItem]
+	[JsName("HTMLScriptElement")]
 	public sealed class Script : HtmlElement
 	{
 		private readonly AttributeMappedValue<string> _type;
@@ -73,7 +74,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Fired immediately after an element has been loaded.
 		/// </summary>
+		[JsName("onload")]
 		public event Action<Event> OnLoad;
+		[JsName("onerror")]
 		public event Action<Event> OnError;
 		
 		protected override void CallDirectEventSubscribers(Event evt)

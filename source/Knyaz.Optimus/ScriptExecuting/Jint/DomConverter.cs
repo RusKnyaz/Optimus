@@ -14,14 +14,16 @@ using Knyaz.Optimus.Environment;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
+	using Engine = global::Jint.Engine;
+	
 	internal class DomConverter : IObjectConverter
 	{
-		private Func<Jint.Engine> _getEngine;
+		private Func<Engine> _getEngine;
 
 		private List<Type> _bindedTypes = new List<Type>();
 		private Dictionary<object, JsValue> _cache = new Dictionary<object, JsValue>();
 		
-		public DomConverter(Func<Jint.Engine> getEngine)
+		public DomConverter(Func<Engine> getEngine)
 		{
 			_getEngine = getEngine;
 
@@ -98,7 +100,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			return false;
 		}
 
-		protected Jint.Engine Engine => _getEngine();
+		protected Engine Engine => _getEngine();
 
 		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsFunc)
 		{
@@ -190,10 +192,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 	/// </summary>
 	internal class ListAdapterEx : ArrayInstance, IObjectWrapper
 	{
-		private readonly Jint.Engine _engine;
+		private readonly Engine _engine;
 		private readonly IList _list;
 
-		public ListAdapterEx(Jint.Engine engine, IList list)
+		public ListAdapterEx(Engine engine, IList list)
 			: base(engine)
 		{
 			_engine = engine;

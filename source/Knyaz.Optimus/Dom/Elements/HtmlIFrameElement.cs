@@ -1,11 +1,13 @@
 ﻿using System;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents &lt;IFRAME&gt; element.
 	/// </summary>
+	[JsName("HTMLIFrameElement")]
 	public sealed class HtmlIFrameElement : HtmlElement
 	{
 		private static class Defaults

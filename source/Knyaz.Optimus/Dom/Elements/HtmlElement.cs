@@ -9,6 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// The base class for the classes representing html elements.
 	/// </summary>
 	[DomItem]
+	[JsName("HTMLElement")]
 	public class HtmlElement : Element
 	{
 		private CssStyleDeclaration _style;
@@ -50,6 +51,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Called before the mouse 'click' dispatched.
 		/// </summary>
+		[JsName("onclick")]
 		public event Func<Event, bool?> OnClick;
 		
 		/// <summary>

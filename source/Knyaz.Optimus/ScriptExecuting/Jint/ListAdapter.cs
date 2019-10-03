@@ -6,15 +6,17 @@ using Jint.Runtime.Interop;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
+	using Engine = global::Jint.Engine;
+	
 	/// <summary>
 	/// List to JS Array adapter
 	/// </summary>
 	internal class ListAdapter : ArrayInstance, IObjectWrapper
 	{
-		private readonly Jint.Engine _engine;
+		private readonly Engine _engine;
 		private readonly IList _list;
 
-		public ListAdapter(Jint.Engine engine, IList list):base(engine)
+		public ListAdapter(Engine engine, IList list):base(engine)
 		{
 			_engine = engine;
 			_list = list;

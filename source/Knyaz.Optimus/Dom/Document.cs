@@ -39,6 +39,7 @@ namespace Knyaz.Optimus.Dom
 	/// http://dev.w3.org/html5/spec-preview/dom.html
 	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
+	[JsName("HTMLDocument")]
 	public class Document : Element, IDocument
 	{
 		//used for event's timestamp.

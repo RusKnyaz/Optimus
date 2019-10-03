@@ -29,18 +29,31 @@ namespace Knyaz.Optimus
 		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
 		/// </summary>
 		public IResourceProvider ResourceProvider { get; }
-		
+
 		/// <summary>
 		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
 		/// </summary>
-		public IScriptExecutor ScriptExecutor { get; }
-		
+		public IScriptExecutor ScriptExecutor
+		{
+			get => _scriptExecutor;
+			set
+			{
+				if(_scriptExecutor != null)
+					throw new InvalidOperationException("ScriptExecutor already has been set.");
+				
+				_scriptExecutor = value;
+				_scriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+			}
+		}
+
 		/// <summary>
 		/// Glues Document and ScriptExecutor.
 		/// </summary>
 		public DocumentScripting Scripting	{get; private set;}
 		internal DocumentStyling Styling { get; private set; }
-	
+
+		internal CookieContainer CookieContainer => _cookieContainer; 
+
 		/// <summary>
 		/// Gets the browser's console object.
 		/// </summary>
@@ -53,17 +66,19 @@ namespace Knyaz.Optimus
 
 		readonly CookieContainer _cookieContainer;
 
-
-		
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null)
+		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null, null)
 		{
-			
+			ScriptExecutor = new ScriptExecutor(Window,
+				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson));
 		}
 
-		internal Engine(IResourceProvider resourceProvider, Window window)
+		internal Engine(
+			IResourceProvider resourceProvider, 
+			Window window,
+			IScriptExecutor scriptExecutor)
 		{
 			if (resourceProvider == null)
 				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
@@ -78,8 +93,8 @@ namespace Knyaz.Optimus
 			Window = window ?? CreateDefaultWindow();
 			Window.Engine = this;
 
-			ScriptExecutor = new ScriptExecutor(Window, parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson));
-			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+			if (scriptExecutor != null)
+				ScriptExecutor = scriptExecutor; 
 		}
 
 		Window CreateDefaultWindow()
@@ -134,8 +149,12 @@ namespace Knyaz.Optimus
 				
 				if (_document != null)
 				{
-					Scripting = new DocumentScripting (_document, ScriptExecutor, 
-						s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
+					if (_scriptExecutor != null)
+					{
+						Scripting = new DocumentScripting(_document, ScriptExecutor,
+							s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
+					}
+
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
 					
@@ -201,7 +220,7 @@ namespace Knyaz.Optimus
 			//todo: stop unfinished ajax requests or drop their results
 			Window.Timers.ClearAll();
 			if(clearScript)
-				ScriptExecutor.Clear();
+				ScriptExecutor?.Clear();
 			var uri = UriHelper.IsAbsolute(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
@@ -339,6 +358,8 @@ namespace Knyaz.Optimus
 		/// Gets the current media settings (used in computed styles evaluation).
 		/// </summary>
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
+
+		private IScriptExecutor _scriptExecutor;
 	}
 
 	public class ResponseEventArgs : EventArgs

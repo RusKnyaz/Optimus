@@ -66,6 +66,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.IsNotNull(elem);
 		}
 
+	
 		[Test]
 		public void Text()
 		{
@@ -162,7 +163,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
-			Assert.AreEqual(0, log.Count);
+			Assert.AreEqual(new object[0], log);
 			Thread.Sleep(1000);
 			CollectionAssert.AreEqual(new[] { "ok" }, log);
 		}
@@ -172,10 +173,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			var signal = new ManualResetEvent(false);
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				signal.Set();
+			};
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log('ok');}, 300);"));
 			Assert.AreEqual(0, log.Count);
-			Thread.Sleep(1000);
+			Assert.IsTrue(signal.WaitOne(1000));
 			CollectionAssert.AreEqual(new[]{"ok"}, log);
 		}
 
@@ -223,6 +229,21 @@ window.clearTimeout(timer);"));
 			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual(2d, log[0]);
+		}
+		
+		[Test]
+		public void GetElementsByTagNameByIndex()
+		{
+			var engine = new Engine();
+			var log = engine.Console.ToList();
+			engine.Load(Mocks.Page(@"console.log(document.body.getElementsByTagName('div')[0])", "<div id='content1'></div><div id='content2'></div>"));
+			
+			
+			Assert.AreEqual(1, log.Count);
+			var obj = log[0];
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOf<HtmlDivElement>(obj);
+			Assert.AreEqual("content1", ((HtmlDivElement)obj).Id);
 		}
 
 		[Test]
@@ -340,7 +361,7 @@ window.clearTimeout(timer);"));
 			var httpResourceProvider = Mocks.HttpResourceProvider()
 				.Resource(url.TrimEnd('/'), "<html><head><script src='"+resUrl+"'></script></head></html>");
 
-			httpResourceProvider.Resource(expectedResUrl, "console.Log('ok');");
+			httpResourceProvider.Resource(expectedResUrl, "console.log('ok');");
 
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			

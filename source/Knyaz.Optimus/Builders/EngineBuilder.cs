@@ -1,6 +1,10 @@
 using System;
+using System.IO;
 using Knyaz.Optimus.Configure;
+using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
@@ -13,10 +17,9 @@ namespace Knyaz.Optimus.ResourceProviders
         //private Window _window;
         private WindowConfig _windowConfig;
 
-        public EngineBuilder()
-        {
-            
-        }
+        private Func<ScriptExecutionContext, IScriptExecutor> _getScriptExecutor;
+        
+        public static EngineBuilder New() => new EngineBuilder();
         
         public EngineBuilder SetResourceProvider(IResourceProvider resourceProvider)
         {
@@ -28,6 +31,12 @@ namespace Knyaz.Optimus.ResourceProviders
         {
             _windowConfig = new WindowConfig();
             configure(_windowConfig);
+            return this;
+        }
+
+        internal EngineBuilder ScriptExecutor(Func<ScriptExecutionContext, IScriptExecutor> getScriptExecutor)
+        {
+            _getScriptExecutor = getScriptExecutor;
             return this;
         }
 
@@ -46,8 +55,27 @@ namespace Knyaz.Optimus.ResourceProviders
             return windowKeeper[0] = new Window(() => windowKeeper[0].Engine.Document, _windowConfig?._windowOpenHandler, navigator);
         }
 
-        public Engine Build() => new Engine(_resourceProvider, BuildWindow());
-
+        public Engine Build()
+        {
+            var window = BuildWindow();
+            var engineKeeper = new Engine[1];
+            
+            Request CreateRequest(string uri, string method = "GET")
+            {
+                var req = new Request(method, engineKeeper[0].LinkProvider.MakeUri(uri));
+                req.Headers["User-Agent"] = window.Navigator.UserAgent;
+                req.Cookies = engineKeeper[0].CookieContainer;
+                return req;
+            }
+            
+            var exeCtx = new ScriptExecutionContext(
+                window,
+                parseJson => new XmlHttpRequest(_resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
+            
+            var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
+            return engineKeeper[0] = new Engine(_resourceProvider, window , scriptExecutor);   
+        }
+        
         public class WindowConfig
         {
             internal PluginInfo[] _plugins;
@@ -65,5 +93,19 @@ namespace Knyaz.Optimus.ResourceProviders
                 return this;
             }
         }
+    }
+
+    internal class ScriptExecutionContext
+    {
+        public ScriptExecutionContext(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXhr)
+        {
+            Window = window;
+            CreateXhr = createXhr;
+        }
+
+        public IWindowEx Window { get; }
+
+        public Func<Func<Stream, object>, XmlHttpRequest> CreateXhr { get; }
+        
     }
 }

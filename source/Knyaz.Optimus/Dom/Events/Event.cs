@@ -69,6 +69,11 @@ namespace Knyaz.Optimus.Dom.Events
 			Type = type;
 		}
 
+		internal Event(Document owner, string type, EventInitOptions opts) : this(owner)
+		{
+			InitEvent(type, opts?.Bubbles ?? false, opts?.Cancelable ?? false);
+		}
+
 		/// <summary>
 		/// Prevents further propagation of the current event in the capturing and bubbling phases.
 		/// </summary>
@@ -115,5 +120,24 @@ namespace Knyaz.Optimus.Dom.Events
 		/// 3
 		/// </summary>
 		public const ushort BUBBLING_PHASE = 3;
+	}
+	
+	public class EventInitOptions
+	{
+		/// <summary>
+		/// A <see cref="System.Boolean"/> indicating whether the event bubbles. The default is <c>false</c>.
+		/// </summary>
+		public bool Bubbles;
+
+		/// <summary>
+		/// A <see cref="System.Boolean"/> indicating whether the event can be cancelled. The default is <c>false</c>.
+		/// </summary>
+		public bool Cancelable;
+
+		/// <summary>
+		/// A <see cref="System.Boolean"/> indicating whether the event will trigger listeners outside of a shadow root (see Event.composed for more details).
+		/// The default is <c>false</c>.
+		/// </summary>
+		public bool Composed;
 	}
 }

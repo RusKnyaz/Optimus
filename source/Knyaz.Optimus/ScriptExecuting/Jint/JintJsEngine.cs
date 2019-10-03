@@ -7,16 +7,18 @@ using Jint.Runtime.Interop;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
-    internal class JintJsEngine : IJsEngine
+    using Engine = global::Jint.Engine;
+    
+    internal class JintJsEngine
     {
-        private readonly Jint.Engine _engine;
+        private readonly Engine _engine;
         private readonly DomConverter _typeConverter;
 
         public JintJsEngine()
         {
             _typeConverter = new DomConverter(() => _engine);
 
-            _engine = new Jint.Engine(o => o.AddObjectConverter(_typeConverter));
+            _engine = new Engine(o => o.AddObjectConverter(_typeConverter));
         }
 
         public void Execute(string code) => _engine.Execute(code);

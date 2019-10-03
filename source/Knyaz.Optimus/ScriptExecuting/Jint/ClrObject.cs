@@ -15,6 +15,8 @@ using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
+	using Engine = global::Jint.Engine;
+	
 	/// <summary>
 	/// Represents c# object (DOM and other) in JS environment.
 	/// </summary>
@@ -23,7 +25,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 		private readonly DomConverter _converter;
 		public Object Target { get; set; }
 
-		public ClrObject(Jint.Engine engine, Object obj, DomConverter converter)
+		public ClrObject(Engine engine, Object obj, DomConverter converter)
 			: base(engine)
 		{
 			_converter = converter;
@@ -259,7 +261,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 		private readonly MethodInfo[] _methods;
 		private readonly ClrObject _clrObject;
 
-		public ClrMethodInfoFunc(Jint.Engine engine, MethodInfo[] methods, ClrObject clrObject)
+		public ClrMethodInfoFunc(Engine engine, MethodInfo[] methods, ClrObject clrObject)
 			: base(engine, null, null, false)
 		{
 			_internalFunc = new MethodInfoFunctionInstance(engine, methods);
@@ -355,11 +357,11 @@ namespace Knyaz.Optimus.ScriptExecuting
 	
 	public sealed class ClrPropertyInfoDescriptor : PropertyDescriptor
 	{
-		private readonly Jint.Engine _engine;
+		private readonly Engine _engine;
 		private readonly PropertyInfo _propertyInfo;
 		private readonly object _item;
 
-		public ClrPropertyInfoDescriptor(Jint.Engine engine, PropertyInfo propertyInfo, object item)
+		public ClrPropertyInfoDescriptor(Engine engine, PropertyInfo propertyInfo, object item)
 		{
 			_engine = engine;
 			_propertyInfo = propertyInfo;

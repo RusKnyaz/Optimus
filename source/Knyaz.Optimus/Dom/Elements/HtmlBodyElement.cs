@@ -1,5 +1,6 @@
 ﻿using System;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -7,6 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// Represents &lt;BODY&gt; element.
 	/// http://www.w3.org/TR/html-markup/body.html#body
 	/// </summary>
+	[JsName("HTMLBodyElement")]
 	public class HtmlBodyElement : HtmlElement
 	{
 		internal HtmlBodyElement(Document ownerDocument) : base(ownerDocument, TagsNames.Body){}
