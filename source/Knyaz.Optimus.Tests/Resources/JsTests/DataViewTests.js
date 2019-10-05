@@ -20,7 +20,7 @@
             Assert.AreEqual(2, dv.byteLength);
         }
     },
-    "SetInt32DefaultEndian":{
+    "SetInt16DefaultEndian":{
         run: function () {
             var buffer = new ArrayBuffer(4);
             var dataView = new DataView(buffer);
@@ -28,7 +28,7 @@
             Assert.AreEqual(3, dataView.getInt16(1));
         }
     },
-    "SetInt32":{
+    "SetInt16":{
         run: function () {
             var buffer = new ArrayBuffer(4);
             var dataView = new DataView(buffer);

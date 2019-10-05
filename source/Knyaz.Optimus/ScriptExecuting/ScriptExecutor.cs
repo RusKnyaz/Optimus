@@ -32,199 +32,41 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_jsEngine = new JintJsEngine();
 			_jsEngine.Execute("var window = this");
 			_jsEngine.Execute("var self = window");
-			_jsEngine.AddGlobalType("Node", typeof(Node));
-			_jsEngine.AddGlobalType("Element", typeof(Element));
-			_jsEngine.AddGlobalType("HTMLBodyElement", typeof(HtmlBodyElement));
-			_jsEngine.AddGlobalType("HTMLButtonElement", typeof(HtmlButtonElement));
-			_jsEngine.AddGlobalType("HTMLDivElement", typeof(HtmlDivElement));
-			_jsEngine.AddGlobalType("HTMLElement", typeof(HtmlElement));
-			_jsEngine.AddGlobalType("HTMLIFrameElement", typeof(HtmlIFrameElement));
-			_jsEngine.AddGlobalType("HTMLInputElement", typeof(HtmlInputElement));
-			_jsEngine.AddGlobalType("HTMLTextAreaElement", typeof(HtmlTextAreaElement));
-			_jsEngine.AddGlobalType("HTMLUnknownElement", typeof(HtmlUnknownElement));
-			_jsEngine.AddGlobalType("HTMLFormElement", typeof(HtmlFormElement));
-			_jsEngine.AddGlobalType("HTMLHtmlElement", typeof(HtmlHtmlElement));
-			_jsEngine.AddGlobalType("Script", typeof(Script));
-			_jsEngine.AddGlobalType("Comment", typeof(Comment));
-			_jsEngine.AddGlobalType("Document", typeof(Document));
-			_jsEngine.AddGlobalType("Text", typeof(Text));
-			_jsEngine.AddGlobalType("Attr", typeof(Attr));
+			_jsEngine.AddGlobalType(typeof(Node));
+			_jsEngine.AddGlobalType(typeof(Element));
+			_jsEngine.AddGlobalType(typeof(HtmlBodyElement));
+			_jsEngine.AddGlobalType(typeof(HtmlButtonElement));
+			_jsEngine.AddGlobalType(typeof(HtmlDivElement));
+			_jsEngine.AddGlobalType(typeof(HtmlElement));
+			_jsEngine.AddGlobalType(typeof(HtmlIFrameElement));
+			_jsEngine.AddGlobalType(typeof(HtmlInputElement));
+			_jsEngine.AddGlobalType(typeof(HtmlTextAreaElement));
+			_jsEngine.AddGlobalType(typeof(HtmlUnknownElement));
+			_jsEngine.AddGlobalType(typeof(HtmlFormElement));
+			_jsEngine.AddGlobalType(typeof(HtmlHtmlElement));
+			_jsEngine.AddGlobalType(typeof(Script));
+			_jsEngine.AddGlobalType(typeof(Comment));
+			_jsEngine.AddGlobalType(typeof(Document));
+			_jsEngine.AddGlobalType(typeof(Text));
+			_jsEngine.AddGlobalType(typeof(Attr));
 			//Perf types
-			_jsEngine.AddGlobalType("ArrayBuffer", typeof(ArrayBuffer));
-			_jsEngine.AddGlobalType("Int8Array", typeof(Int8Array));
-			_jsEngine.AddGlobalType("Uint8Array", typeof(UInt8Array));
-			_jsEngine.AddGlobalType("Int16Array", typeof(Int16Array));
-			_jsEngine.AddGlobalType("Uint16Array", typeof(UInt16Array));
-			_jsEngine.AddGlobalType("Int32Array", typeof(Int32Array));
-			_jsEngine.AddGlobalType("Uint32Array", typeof(UInt32Array));
-			_jsEngine.AddGlobalType("Float32Array", typeof(Float32Array));
-			_jsEngine.AddGlobalType("Float64Array", typeof(Float64Array));
-			_jsEngine.AddGlobalType("DataView", typeof(DataView));
+			_jsEngine.AddGlobalType(typeof(ArrayBuffer));
+			_jsEngine.AddGlobalType(typeof(Int8Array));
+			_jsEngine.AddGlobalType(typeof(UInt8Array));
+			_jsEngine.AddGlobalType(typeof(Int16Array));
+			_jsEngine.AddGlobalType(typeof(UInt16Array));
+			_jsEngine.AddGlobalType(typeof(Int32Array));
+			_jsEngine.AddGlobalType(typeof(UInt32Array));
+			_jsEngine.AddGlobalType(typeof(Float32Array));
+			_jsEngine.AddGlobalType(typeof(Float64Array));
+			_jsEngine.AddGlobalType(typeof(DataView));
 
-			_jsEngine.AddGlobalGetter("console", () => window.Console);
-			_jsEngine.AddGlobalGetter("document", () => window.Document);
-			_jsEngine.AddGlobalGetter("history", () => window.History);
-			_jsEngine.AddGlobalGetter("location", () => window.Location);
-			_jsEngine.AddGlobalGetter("sessionStorage", () => window.SessionStorage);
-			_jsEngine.AddGlobalGetter("localStorage", () => window.LocalStorage);
-			_jsEngine.AddGlobalGetter("navigator", () => window.Navigator);
-			_jsEngine.AddGlobalGetter("screen", () => window.Screen);
-			_jsEngine.AddGlobalGetter("innerWidth", () => window.InnerWidth);
-			_jsEngine.AddGlobalGetter("innerHeight", () => window.InnerHeight);
+			_jsEngine.SetGlobal(window);
 			
-			_jsEngine.AddGlobalAct("alert", args => window.Alert(args[0]?.ToString()));
-
-			_jsEngine.AddGlobalAct("open", values =>
-			{
-				if (values.Length == 0)
-					window.Open();
-				else if (values.Length == 1)
-					window.Open(values[0]?.ToString());
-				else if (values.Length == 2)
-					window.Open(values[0]?.ToString(), values[1]?.ToString());
-				else
-					window.Open(values[0]?.ToString(), values[1]?.ToString(), values[2]?.ToString());
-			});
+			_jsEngine.AddGlobalType<Event>(new []{typeof(string),typeof(EventInitOptions)}, 
+				args => new Event(window.Document, args[0]?.ToString(), args.Length > 1 ? (EventInitOptions)args[1] : null));
 			
-			_jsEngine.AddGlobalAct("clearInterval", args => window.ClearInterval(args.Length > 0 ? Convert.ToInt32(args[0]) : -1));
-			_jsEngine.AddGlobalAct("clearTimeout", args => window.ClearTimeout(args.Length > 0 ? Convert.ToInt32(args[0]) : -1));
-			_jsEngine.AddGlobalAct("dispatchEvent", args => window.DispatchEvent(args.Length > 0 ? (Event)args[0] : null));
-			
-			
-			var listenersHandlers = new ConditionalWeakTable<Action<object[]>, Action<Event>>();
-
-			_jsEngine.AddGlobalAct("addEventListener", args =>
-			{
-				if (args.Length < 2)
-					return;
-				
-				var jsHandler = (Action<object[]>)args[1];
-
-				Action<Event> handler;
-				
-				if (jsHandler == null)
-				{
-					handler = null;
-				} 
-				else if (!listenersHandlers.TryGetValue(jsHandler, out handler))
-				{
-					handler = @event => jsHandler(new object[] {@event});
-					listenersHandlers.Add(jsHandler, handler);
-				}
-
-				if (args.Length <= 2)
-				{
-					window.AddEventListener(
-						args.Length > 0 ? args[0]?.ToString() : null,
-						handler,
-						false);
-					return;
-				}
-
-				if (args[2] is IDictionary<string, object> options)
-				{
-					window.AddEventListener(
-						args[0]?.ToString(),
-						handler,
-						new EventListenerOptions {
-							Capture = options.ContainsKey("capture") &&options["capture"] is bool c && c,
-							Passive = options.ContainsKey("passive") &&options["passive"] is bool p && p,
-							Once = options.ContainsKey("once") && options["once"] is bool o && o
-						});
-				}
-				else
-				{
-					window.AddEventListener(
-						args[0]?.ToString(),
-						handler,
-						TryBool(args[2])); 
-				}
-			});
-
-			_jsEngine.AddGlobalAct("removeEventListener", args =>
-			{
-				if (args.Length < 2)
-					return;
-				
-				var jsHandler = (Action<object[]>)args[1];
-
-				Action<Event> handler;
-				
-				if (jsHandler == null)
-				{
-					handler = null;
-				} 
-				else if (!listenersHandlers.TryGetValue(jsHandler, out handler))
-				{
-					handler = @event => jsHandler(new object[] {@event});
-					listenersHandlers.Add(jsHandler, handler);
-				}
-				
-				if (args.Length <= 2)
-				{
-					window.RemoveEventListener(
-						args.Length > 0 ? args[0]?.ToString() : null,
-						handler,
-						false);
-					return;
-				}
-				
-				if (args[2] is IDictionary<string, object> options)
-				{
-					window.RemoveEventListener(
-						args[0]?.ToString(),
-						handler,
-						new EventListenerOptions {
-							Capture = options.ContainsKey("capture") && options["capture"] is bool c && c,
-							Passive = options.ContainsKey("passive") &&options["passive"] is bool p && p,
-							Once = options.ContainsKey("once") &&options["once"] is bool o && o
-						});
-				}
-				else
-				{
-					window.RemoveEventListener(
-						args[0]?.ToString(),
-						handler,
-						TryBool(args[2])); 
-				}
-			});
-
-			_jsEngine.AddGlobalFunc("matchMedia", args => window.MatchMedia(args[0]?.ToString()));
-
-			_jsEngine.AddGlobalFunc("setTimeout", args =>
-			{
-				if (args.Length == 0)
-					return Undefined.Instance;
-				var handler = (Action<object[]>)args[0];
-				var timeout = args.Length > 1 ? Convert.ToDouble(args[1]) : 1d;
-				var data = args.Length > 2 ? args.Skip(2).ToArray() : null;
-				return (object)window.SetTimeout(handler, timeout, data);
-			});
-
-			_jsEngine.AddGlobalFunc("setInterval", args =>
-			{
-				if (args.Length == 0)
-					return Undefined.Instance;
-				var handler = (Action<object[]>)args[0];
-				var interval = args.Length > 1 ? Convert.ToDouble(args[1]) : 1d;
-				var data = args.Length > 2 ? args.Skip(2).ToArray() : null;
-				return (object)window.SetInterval(handler, interval, data);
-			});
-
-			_jsEngine.AddGlobalFunc("getComputedStyle", args => 
-				window.GetComputedStyle((IElement)args[0], args.Length > 1 ? args[1]?.ToString() : null));
-
-			_jsEngine.AddGlobalType("Event", args =>
-			{
-				var evt = _window.Document.CreateEvent("Event");
-				var opts = args.Length > 1 ? args[1] as IDictionary<string, object> : null;
-				var canCancel = opts != null && opts.ContainsKey("cancelable") && opts["cancelable"] is bool c && c; 
-				var canBubble = opts != null && opts.ContainsKey("bubbles")&& opts["bubbles"] is bool b && b;
-				evt.InitEvent(args[0]?.ToString(), canBubble, canCancel);
-				return evt;
-			});
-			
-			_jsEngine.AddGlobalType("Image", args => {
+			_jsEngine.AddGlobalType<Image>(new []{typeof(int), typeof(int)}, args => {
 				var img = (HtmlImageElement)_window.Document.CreateElement("img");
 				
 				if (args.Length > 0)
@@ -239,18 +81,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			Func<Stream, object> parseJsonFn = s => _jsEngine.ParseJson(s.ReadToEnd());
 
 			_jsEngine.AddGlobalType("XMLHttpRequest", x => createXmlHttpRequest(parseJsonFn));
-			
-		}
-
-		private bool TryBool(object o)
-		{
-			if (o is bool b)
-				return b;
-
-			if (o is double d)
-				return d > 0;
-
-			return o != null && !(o is Undefined);
 		}
 
 		public void Execute(string type, string code)

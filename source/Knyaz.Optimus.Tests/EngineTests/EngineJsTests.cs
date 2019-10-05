@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System.Text;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Configure;
+using Knyaz.Optimus.ScriptExecuting.Jint;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -16,7 +17,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	public class EngineJsTests
 	{
 		private List<object> _log;
-		private List<string> _alerts = new List<string>();
 
 
 		private Engine CreateEngineWithScript(string js)
@@ -28,7 +28,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine(resourceProvider);
 			_log = engine.Console.ToList();
-			engine.Window.OnAlert += msg => _alerts.Add(msg);
 			engine.OpenUrl("http://localhost").Wait();
 			return engine;
 		}
@@ -394,7 +393,7 @@ console.log(xhr.readyState);");
 		}
 
 		[Test]
-		public void Ajax()
+		public void XmlHttpRequestSend()
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>()
 				.Resource("http://localhost/unicorn.xml", "hello");
@@ -788,6 +787,7 @@ dispatchEvent(evt);");
 
 		[TestCase("d.style['zoom'] == 1", ExpectedResult = true)]
 		[TestCase("d.style['zoom'] === 1", ExpectedResult = true)]
+		[TestCase("d.style['zoom']", ExpectedResult = 1)]
 		[TestCase("typeof d.style['zoom']", ExpectedResult = "number")]
 		[TestCase("d.style['color'] == 1", ExpectedResult = false, Ignore = "Color value to be validated.")]
 		[TestCase("d.style['color'] === 1", ExpectedResult = false)]
@@ -1137,6 +1137,7 @@ dispatchEvent(evt);");
 			
 			var engine = new EngineBuilder()
 				.SetResourceProvider(resourceProvider)
+				.UseJint()
 				.Window(w => w.SetNavigatorPlugins(plugins))
 				.Build();
 
@@ -1157,6 +1158,7 @@ dispatchEvent(evt);");
 			
 			var engine = new EngineBuilder()
 				.SetResourceProvider(resourceProvider)
+				.UseJint()
 				.Build();
 
 			engine.ScriptExecutor.Execute("text/javascript", "function myFunc(str){return encodeURI(str)};");

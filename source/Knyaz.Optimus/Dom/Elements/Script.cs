@@ -101,10 +101,5 @@ namespace Knyaz.Optimus.Dom.Elements
 			node.Executed = Executed;
 			return node;
 		}
-
-		/// <summary>
-		/// [Object HTMLScriptElement]
-		/// </summary>
-		public override string ToString() => "[Object HTMLScriptElement]";
 	}
 }

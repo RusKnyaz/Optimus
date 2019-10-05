@@ -11,7 +11,6 @@ namespace Knyaz.Optimus.Tests.JsTests
 {
     class JsTestsRunner
     {
-    
 	    public static void Run(JsEngines engineType, string testName, [CallerMemberName] string fixture = null)
 		{
 			var testJs = R.GetString("Knyaz.Optimus.Tests.Resources.JsTests."+fixture+".js");

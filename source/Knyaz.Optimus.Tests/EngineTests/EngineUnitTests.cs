@@ -160,10 +160,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			var signal = new ManualResetEvent(false);
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				signal.Set();
+			};
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
 			Assert.AreEqual(new object[0], log);
-			Thread.Sleep(1000);
+			signal.WaitOne(1000);
 			CollectionAssert.AreEqual(new[] { "ok" }, log);
 		}
 
@@ -456,6 +461,32 @@ function reqListener () {
 			
 			Assert.IsNotNull(engine.WaitId("finished"));
 			Assert.AreEqual(new[]{expectedMsg}, log);
+		}
+
+		[Test]
+		public void XmlHttpRequestThis()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", @"<html><script>
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'data.json', false);
+	xhr.responseType = 'json';
+	xhr.onload = function () {
+		console.log(xhr == this);		
+	};
+	xhr.send(null);</script></html>")
+				.Resource("http://localhost/data.json", "");
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+			((Navigator)engine.Window.Navigator).UserAgent = "My favorite browser";
+
+			var log = engine.Console.ToList();
+
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(new[]{true}, log);
 		}
 
 		[Test]

@@ -8,7 +8,6 @@ using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Dom.Perf;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
-using Undefined = Knyaz.Optimus.ScriptExecuting.Undefined;
 
 namespace Knyaz.Optimus.Scripting.Jurassic
 {
@@ -81,17 +80,6 @@ namespace Knyaz.Optimus.Scripting.Jurassic
 
 			_jsEngine.AddGlobalType("XMLHttpRequest", typeof(XmlHttpRequest), x => createXmlHttpRequest(parseJsonFn));
 			
-		}
-
-		private bool TryBool(object o)
-		{
-			if (o is bool b)
-				return b;
-
-			if (o is double d)
-				return d > 0;
-
-			return o != null && !(o is Undefined);
 		}
 
 		public void Execute(string type, string code)

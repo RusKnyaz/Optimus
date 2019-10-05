@@ -18,7 +18,7 @@
 		/// </summary>
 		/// <param name="deep">Specifies whether or not the child nodes should be cloned too.</param>
 		/// <returns></returns>
-		public override Node CloneNode(bool deep)
+		public override Node CloneNode(bool deep = false)
 		{
 			var node = OwnerDocument.CreateDocumentFragment();
 			if (deep)

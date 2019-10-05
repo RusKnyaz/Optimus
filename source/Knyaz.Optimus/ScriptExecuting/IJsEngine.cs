@@ -27,9 +27,4 @@ namespace Knyaz.Optimus.ScriptExecuting
         object ParseJson(string json);
         object Evaluate(string code);
     }
-
-    internal struct Undefined
-    {
-        public static Undefined Instance;
-    }
 }

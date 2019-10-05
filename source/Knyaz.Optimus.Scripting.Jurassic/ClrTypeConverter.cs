@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Jurassic;
 using Jurassic.Library;
+using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Scripting.Jurassic
 {
@@ -26,7 +28,7 @@ namespace Knyaz.Optimus.Scripting.Jurassic
         private readonly Dictionary<object, object> _clrToJsObjects = new Dictionary<object, object>();
         private readonly IDictionary<object, object> _jsToClrMap = new Dictionary<object, object>();
         private readonly IDictionary<Tuple<ObjectInstance, ObjectInstance>, Delegate> _jsToClrDelegatesMap = new Dictionary<Tuple<ObjectInstance, ObjectInstance>, Delegate>(
-            new TupleComparer()); 
+            new TupleComparer<ObjectInstance,ObjectInstance>()); 
 
         void RegisterMap(object clrObject, object jsObject)
         {
@@ -306,7 +308,7 @@ namespace Knyaz.Optimus.Scripting.Jurassic
             return creator;
         }
 
-        private Dictionary<Type, ObjectInstance> _prototypes = new Dictionary<Type,ObjectInstance>();
+        private readonly Dictionary<Type, ObjectInstance> _prototypes = new Dictionary<Type,ObjectInstance>();
 
         /// <summary>
         /// Creates prototype wrapper
@@ -338,16 +340,7 @@ namespace Knyaz.Optimus.Scripting.Jurassic
             return events;
         }
     }
-
-    internal class TupleComparer : IEqualityComparer<Tuple<ObjectInstance,ObjectInstance>>
-    {
-        public bool Equals(Tuple<ObjectInstance, ObjectInstance> x, Tuple<ObjectInstance, ObjectInstance> y) =>
-            Equals(x?.Item1, y?.Item1) && Equals(x?.Item2, y?.Item2);
-
-        public int GetHashCode(Tuple<ObjectInstance, ObjectInstance> obj) =>
-            obj.Item1.GetHashCode() ^ obj.Item2.GetHashCode();
-    }
-
+    
     class FuncInst : FunctionInstance
     {
         private readonly ClrTypeConverter _ctx;

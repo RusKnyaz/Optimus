@@ -18,7 +18,7 @@ namespace Knyaz.Optimus.Scripting.Jurassic
             //register properties
             foreach (var property in type.GetProperties(bindingFlags).Where(p => p.GetCustomAttribute<JsHiddenAttribute>() == null))
             {
-                var name = GetName(property);
+                var name = property.GetName();
 
                 //todo: compile delegate instead of reflection, research what is faster.
 
@@ -38,7 +38,7 @@ namespace Knyaz.Optimus.Scripting.Jurassic
             foreach (var methods in type
                 .GetMethods(bindingFlags)
                 .Where(p => p.GetCustomAttribute<JsHiddenAttribute>() == null)
-                .GroupBy(GetName))
+                .GroupBy(p => p.GetName()))
             {
                 var methodsArray = methods.ToArray();
 
@@ -70,7 +70,7 @@ namespace Knyaz.Optimus.Scripting.Jurassic
             foreach (var evt in type.GetEvents(bindingFlags)
                 .Where(p => p.GetCustomAttribute<JsHiddenAttribute>() == null))
             {
-                var name = GetName(evt).ToLowerInvariant();
+                var name = evt.GetName().ToLowerInvariant();
             
                 var jsGetter = new FuncInst(ctx, clrThis =>
                 {
@@ -118,30 +118,6 @@ namespace Knyaz.Optimus.Scripting.Jurassic
                 var prop = new PropertyDescriptor(ctx.ConvertToJs(clrValue), PropertyAttributes.Sealed);
                 jsObject.DefineProperty(staticField.Name, prop, false);
             }
-        }
-
-        public static string GetName(this MemberInfo memberInfo)
-        {
-            if (typeof(System.Collections.ICollection).IsAssignableFrom(memberInfo.ReflectedType) &&
-                memberInfo.Name == "Count")
-                return "length";
-            
-            var jsNameAttribute = memberInfo.GetCustomAttribute<JsNameAttribute>();
-            var name = jsNameAttribute?.Name ?? memberInfo.Name;
-            return ToCamel(name);
-        }
-
-        private static string ToCamel(string name)
-        {
-            var camelChar = char.ToLower(name[0]);
-            if (name.Length > 1)
-            {
-                var chars = name.ToCharArray();
-                chars[0] = camelChar;
-                return new string(chars);
-            }
-
-            return camelChar.ToString();
         }
     }
 }

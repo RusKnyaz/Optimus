@@ -21,6 +21,18 @@ namespace Knyaz.Optimus.ScriptExecuting
 			_engine = engine;
 			_list = list;
 			Prototype = engine.Array;
+			
+			var get =
+				new ClrFunctionInstance(engine, (jsThis, values) => JsValue.FromObject(engine, _list.Count));
+			var set = new ClrFunctionInstance(_engine, (value, values) =>
+			{
+				//todo: resize list
+				return value;
+			});
+                
+			var lengthProperty = new PropertyDescriptor(get, set);
+
+			DefineOwnProperty("length", lengthProperty, false);
 		}
 
 		public override void Put(string propertyName, JsValue value, bool throwOnError)
@@ -46,27 +58,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 			}
 
 			return base.Get(propertyName);
-		}
-
-		public override PropertyDescriptor GetOwnProperty(string propertyName)
-		{
-			if (Properties.ContainsKey(propertyName))
-				return Properties[propertyName];
-
-			if (propertyName == "length")
-			{
-				var p = new PropertyDescriptor(
-					new ClrFunctionInstance(_engine, (value, values) => _list.Count),
-					new ClrFunctionInstance(_engine, (value, values) =>
-						{
-							//todo: resize list
-							return value;
-						}));
-
-				Properties.Add(propertyName, p);
-			}
-
-			return base.GetOwnProperty(propertyName);
 		}
 
 		public object Target { get { return _list; } }

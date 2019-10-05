@@ -11,9 +11,14 @@ namespace Knyaz.Optimus.ScriptExecuting
     {
         private readonly Func<JsValue[], ObjectInstance> _act;
 
-        public ClrFuncCtor(Engine engine, Func<JsValue[], ObjectInstance> act) : base(engine, null, null, false)
+        public ClrFuncCtor(
+	        Engine engine, Func<JsValue[], ObjectInstance> act, 
+	        ObjectInstance prototype)
+	        : base(engine, null, null, false)
         {
             _act = act;
+            FastAddProperty("prototype", prototype, false, false, false);
+            DomConverter.DefineStatic(this, typeof(ClrType));
         }
 
         public override JsValue Call(JsValue thisObject, JsValue[] arguments)
@@ -21,11 +26,8 @@ namespace Knyaz.Optimus.ScriptExecuting
             throw new NotImplementedException();
         }
 
-        public ObjectInstance Construct(JsValue[] arguments)
-        {
-            return _act(arguments);
-        }
-		
+        public ObjectInstance Construct(JsValue[] arguments) => _act(arguments);
+
         public override bool HasInstance(JsValue v)
         {
             var clrObject = v.TryCast<ClrObject>();

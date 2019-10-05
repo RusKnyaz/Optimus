@@ -116,7 +116,7 @@ namespace Knyaz.Optimus.Environment
 		/// <param name="delay">The time, in milliseconds, the timer should wait before the specified function or code is executed. If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, as soon as possible. </param>
 		/// <param name="data">Variables to be passed to the handler.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action<object[]> handler, double? delay, params object[] data) =>
+		public int SetTimeout(Action<object[]> handler, double? delay = null, params object[] data) =>
 			_timers.SetTimeout(handler, (int)(delay ?? 1), data);
 
 		/// <summary>
@@ -129,7 +129,7 @@ namespace Knyaz.Optimus.Environment
 		/// Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
 		/// </summary>
 		/// <returns>It returns an interval ID which uniquely identifies the interval, so you can remove it later by calling <see cref="ClearInterval"/></returns>
-		public int SetInterval(Action<object[]> handler, double? delay, params object[] data) =>
+		public int SetInterval(Action<object[]> handler, double? delay = null, params object[] data) =>
 			_timers.SetInterval(handler, (int)(delay ?? 1), data);
 
 		/// <summary>

@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting.Jint;
+using Knyaz.Optimus.Scripting.Jurassic;
 using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
@@ -64,7 +66,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					"$.post('http://localhost/data').done(function(x){console.log(x);});")
 				.Resource("http://localhost/data", "OK");
 
-			var engine = new Engine(resourceProvider);
+			var engine = EngineBuilder.New().SetResourceProvider(resourceProvider).UseJint().Build();
+			
 			var log = new List<string>();
 			var signal = new ManualResetEvent(false);
 			engine.Console.OnLog += o =>

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -34,6 +35,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 
 		//todo: it's not better idea to use 'object' but sometimes js code tries to set the value of 'double' type.
+		[JsHidden]
 		public object this[string name]
 		{
 			get

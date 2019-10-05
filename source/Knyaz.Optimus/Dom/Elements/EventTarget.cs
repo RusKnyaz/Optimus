@@ -55,6 +55,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			if (handler == null)
 				return;
+
+			if (options == null)
+			{
+				AddEventListener(type, handler);
+				return;
+			}
+
 			var listenersList = options.Capture ? GetCapturingListeners(type) : GetBubblingListeners(type);
 			if (listenersList.Any(x => x.Handler == handler))//do not add listener twice
 				return;
