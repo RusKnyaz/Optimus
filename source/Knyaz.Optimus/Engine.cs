@@ -52,7 +52,10 @@ namespace Knyaz.Optimus
 		public DocumentScripting Scripting	{get; private set;}
 		internal DocumentStyling Styling { get; private set; }
 
-		internal CookieContainer CookieContainer => _cookieContainer; 
+		/// <summary>
+		/// Returns the cookie container that used to create requests.
+		/// </summary>
+		public CookieContainer CookieContainer => _cookieContainer; 
 
 		/// <summary>
 		/// Gets the browser's console object.

@@ -155,29 +155,15 @@ You just need to get the link from the document and load the file in any accessi
 
 
 ```c#
-var page = new Engine().OpenUrl("http://testpage.net/").Wait();
+var engine = new Engine();
+var page = engine.OpenUrl("http://testpage.net/").Wait();
 var download = page.Document.GetElementById("download");
 var href = download.GetAttribute("href");
 var fileLink = new Uri(engine.Uri, href);
+//you can get cookies using engine.CookieContainer
 using (var client = new WebClient())
     System.Console.Write(client.DownloadString(fileLink));
 ```
-
-### Download the file by url using ResourceProvider
-
-The server may require the presence of certain cookies to download the file. In this case, you can use the ResourceProvider, through which Engine requests resources.
-```c#
-var engine = new Engine();
-var page = engine.OpenUrl("http://todosoft.ru/test/").Wait();
-var download = page.Document.GetElementById("download");
-var href = download.GetAttribute("href");
-var request = engine.ResourceProvider.CreateRequest(href);
-var task = engine.ResourceProvider.SendRequestAsync(request);
-task.Wait();
-System.Console.Write(task.Result.Stream.ReadToEnd());
-```
-
-By the way, ResourceProvider also provides direct access to cookies, which you can modify or use to make your own request to the server. Use the engine.ResourceProvider.CookieContainer property (Optimus v2.1).
 
 ### Download the file initiated by window.open call
 Some pages may contain the buttons or other elements like this:
