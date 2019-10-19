@@ -1,4 +1,4 @@
-set suff=%0
+set suff=%1
 
 dotnet build -c Release source/Knyaz.Optimus/Knyaz.Optimus.csproj /p:VersionSuffix=%suff%
 
