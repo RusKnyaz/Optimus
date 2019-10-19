@@ -1,25 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Globals">
-    <SccProjectName>&lt;Project Location In Database&gt;</SccProjectName>
-    <SccProvider>Mercurial Source Control Package</SccProvider>
-    <SccAuxPath>&lt;Source Control Database&gt;</SccAuxPath>
-    <SccLocalPath>&lt;Local Binding Root of Project&gt;</SccLocalPath>
-  </PropertyGroup>
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <Authors>Konstantin Petukhov</Authors>
     <Company>Knyaz</Company>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageProjectUrl>https://bitbucket.org/RusKnyaz/optimus/wiki/Home</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/RusKnyaz/Optimus</PackageProjectUrl>
     <PackageIconUrl />
-    <RepositoryUrl>https://bitbucket.org/RusKnyaz/optimus/src</RepositoryUrl>
-    <RepositoryType>mercurial</RepositoryType>
+    <RepositoryUrl>https://github.com/RusKnyaz/Optimus</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
     <PackageReleaseNotes>Added support of UserAgent, Proxy and BasicAuth. Fixed bugs.</PackageReleaseNotes>
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
+    <VersionPrefix>2.2.6</VersionPrefix>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -70,6 +65,9 @@
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+  <Target Name="GetVersion" Label="Saves generated assembly version to the version.text file">
+    <WriteLinesToFile File="version.txt" Lines="$(Version)" Overwrite="true" Encoding="ASCII"/>
+  </Target>
   <ItemGroup>
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
   </ItemGroup>

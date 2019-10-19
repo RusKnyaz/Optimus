@@ -188,7 +188,6 @@ document.body.appendChild(e);";
 
 			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
 
-			engine.DumpToFile("c:\\temp\\c.html");
 			Assert.AreEqual(1, result);
 		}
 	}

@@ -125,7 +125,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public void DocumentRadyStateComplete()
+		public void DocumentReadyStateComplete()
 		{
 			var engine = new Engine();
 			engine.Load("<html><body></body></html>");
@@ -585,6 +585,23 @@ function reqListener () {
 			img.OnError += evt => { errorSignal.Set(); };
 			img.Src = "image.bmp";
 			Assert.IsTrue(errorSignal.WaitOne(1000));
+		}
+
+		[Test]
+		public async Task UrlWithHash()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider().Resource("http://localhost/index.html", "hello");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+
+			var page = await engine.OpenUrl("http://localhost/index.html#some");
+			
+			page.Document.Assert(document => 
+				document.InnerHTML == "<HTML><HEAD></HEAD><BODY>hello</BODY></HTML>"
+				&& page.Document.Location.Href == "http://localhost/index.html#some"
+				&& page.Document.Location.Hash == "#some");
 		}
 	}
 }
