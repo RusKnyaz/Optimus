@@ -65,6 +65,19 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.IsNull(xhr.ResponseXML);
 		}
 
+		[Test]
+		public void HashShouldNotBeSent()
+		{
+			var sync = new Object();
+			var resourceProvider = Mocks.ResourceProvider("http://data", "hello");
+			var xhr = new XmlHttpRequest(resourceProvider, () => sync, null, (s, s1) => new Request(s1, UriHelper.GetUri(s)));
+
+			xhr.Open("GET", "http://data#some", false);
+			xhr.Send();
+			
+			Assert.AreEqual("hello", xhr.Response);
+		}
+
 		XmlHttpRequest Send(string type, string data)
 		{
 			var sync = new Object();

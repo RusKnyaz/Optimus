@@ -598,7 +598,10 @@ function reqListener () {
 
 			var page = await engine.OpenUrl("http://localhost/index.html#some");
 			
-			Assert.AreEqual("<HTML><HEAD></HEAD><BODY>hello</BODY></HTML>", page.Document.InnerHTML);
+			page.Document.Assert(document => 
+				document.InnerHTML == "<HTML><HEAD></HEAD><BODY>hello</BODY></HTML>"
+				&& page.Document.Location.Href == "http://localhost/index.html#some"
+				&& page.Document.Location.Hash == "#some");
 		}
 	}
 }
