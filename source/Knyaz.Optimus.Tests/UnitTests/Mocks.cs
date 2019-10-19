@@ -46,23 +46,21 @@ namespace Knyaz.Optimus.Tests
 
 		public class SpecResourceProvider : IResourceProvider
 		{
-			Dictionary<Uri, IResource> _resources = new Dictionary<Uri, IResource>();
+			Dictionary<string, IResource> _resources = new Dictionary<string, IResource>();
 			
 			private HttpResponse _response404 = new HttpResponse(HttpStatusCode.NotFound, Stream.Null, "");
 
 			public Task<IResource> SendRequestAsync(Request request)
 			{
 				History.Add(request);
-				return Task.Run(() => 
-					_resources.ContainsKey(request.Url) ? _resources[request.Url] 
-					: _response404); 
+				return Task.Run(() => _resources.TryGetValue(request.Url.ToString(), out var res) ? res : _response404); 
 			}
 
 			public SpecResourceProvider Resource(string url, string data, string resourceType = "text/html")
 			{
 				var uri = new Uri(url, UriKind.RelativeOrAbsolute); 
 				
-				_resources[uri] =  new HttpResponse(
+				_resources[uri.ToString()] =  new HttpResponse(
 					HttpStatusCode.OK, 
 					new MemoryStream(Encoding.UTF8.GetBytes(data)), 
 					null, 
@@ -76,7 +74,7 @@ namespace Knyaz.Optimus.Tests
 			{
 				var uri = new Uri(url, UriKind.RelativeOrAbsolute); 
 				
-				_resources[uri] =  new HttpResponse(
+				_resources[uri.ToString()] =  new HttpResponse(
 					HttpStatusCode.OK, 
 					new MemoryStream(data), 
 					null, 

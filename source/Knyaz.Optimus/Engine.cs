@@ -261,12 +261,15 @@ namespace Knyaz.Optimus
 				if (args.Cancel)
 					return;
 			}
-			
+
 			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
 				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
 
 			if (resource is HttpResponse httpResponse && httpResponse.Uri != null)
-				Uri = httpResponse.Uri;
+			{
+				Uri = new Uri(httpResponse.Uri+Uri.Fragment);
+			}
+				
 
 			BuildDocument(document, resource.Stream);
 		}
@@ -275,6 +278,7 @@ namespace Knyaz.Optimus
 		/// For tests
 		/// </summary>
 		/// <param name="stream"></param>
+		[Obsolete]
 		public void Load(Stream stream)
 		{
 			ScriptExecutor.Clear();

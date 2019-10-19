@@ -58,7 +58,7 @@ namespace Knyaz.Optimus.Html
 
 		static string[] _noContentTags = { "meta", "br", "link" };
 
-		private static HtmlChunk ReadScript(StreamReader reader, string endWord)
+		private static HtmlChunk ReadScript(StreamReader reader, string endWord, bool allowOneLineComments = true)
 		{
 			var buffer = new List<char>();
 			if (reader.EndOfStream)
@@ -87,7 +87,7 @@ namespace Knyaz.Optimus.Html
 
 					var next = reader.Peek();
 					var nextChar = (char) next;
-					if (nextChar == '/') // Line comment - //
+					if (allowOneLineComments && nextChar == '/') // Line comment - //
 					{
 						buffer.Add(symbol);
 						buffer.Add((char) reader.Read());
@@ -272,6 +272,11 @@ namespace Knyaz.Optimus.Html
 							else if (invariantTagName == "script" || invariantTagName == "style")
 							{
 								yield return ReadScript(reader, "</" + tagName); //todo: revise concatenation
+								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
+							}
+							else if (invariantTagName == "style")
+							{
+								yield return ReadScript(reader, "</" + tagName, false);
 								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
 							}
 							else if (invariantTagName == "textarea")

@@ -11,6 +11,8 @@ namespace Knyaz.Optimus.Tests.UnitTests.ResourceProviders
 		[TestCase("http://todosoft.ru/test/", "/js/script.js", "http://todosoft.ru/js/script.js")]
 		[TestCase("http://chromium.github.io/octane/", "js/jquery.js", "http://chromium.github.io/octane/js/jquery.js")]
 		[TestCase("file:///var/www/site/subdir/", "js/jquery.js", "file:///var/www/site/subdir/js/jquery.js")]
+		[TestCase("http://localhost/", "index.html#hash", "http://localhost/index.html")]
+		[TestCase("http://localhost/", "index.html?p=x#hash", "http://localhost/index.html?p=x")]
 		public void CreateRequestRelativePath(string root, string rel, string result) =>
 			new LinkProvider {Root = root}
 				.MakeUri(rel)
