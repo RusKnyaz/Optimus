@@ -269,7 +269,7 @@ namespace Knyaz.Optimus.Html
 							{
 								yield return new HtmlChunk {Value = tagName, Type = HtmlChunk.Types.TagEnd};
 							}
-							else if (invariantTagName == "script" || invariantTagName == "style")
+							else if (invariantTagName == "script")
 							{
 								yield return ReadScript(reader, "</" + tagName); //todo: revise concatenation
 								yield return new HtmlChunk { Value = tagName, Type = HtmlChunk.Types.TagEnd };
