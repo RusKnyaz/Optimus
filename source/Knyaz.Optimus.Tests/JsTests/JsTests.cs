@@ -97,7 +97,13 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetByIndexer")]
 		[TestCase("LocalStorage")]
 		[TestCase("SessionStorage")]
-		public void StorageTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+		public void StorageTests(string testName)
+		{
+			if(testName == "SetByIndexer" && _jsEngine == JsEngines.Jurassic)
+				Assert.Ignore("Jurassic limitation");
+		
+			JsTestsRunner.Run(_jsEngine, testName);
+		} 
 	    
 		[TestCase("Construct")]
 		[TestCase("ConstructWithDefaultLength")]

@@ -110,9 +110,12 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             Assert.AreEqual(true, se.EvaluateJs("window === self"), "window === self");
         }
         
-        [Test, Ignore("Bug in Jint")]
+        [Test]
         public void AccessArrayWithEmptyString()
         {
+	        if(_jsEngine == JsEngines.Jint)
+		        Assert.Ignore("Ignored due to bug in jint");
+	        
             var window = Mock.Of<IWindowEx>();
             var res = Evaluate(window, "(function(){var arr=[];arr[\"\"]=8;return arr[\"\"];})()");
             Assert.AreEqual(8, res);
