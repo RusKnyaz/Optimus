@@ -272,7 +272,8 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             var evt = document.CreateEvent("event");
             evt.InitEvent("click", true, true);
             window.Document.Body.DispatchEvent(evt);
-            
+
+            Mock.Get(window).Verify(x => x.Open(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.AreEqual("hi", msg);
             
             se.ExecuteJs("msg='by';" +

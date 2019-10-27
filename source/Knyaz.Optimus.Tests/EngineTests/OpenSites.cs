@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
@@ -57,7 +58,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void Html5Score()
 		{
-			var engine = new Engine();
+			var engine = EngineBuilder.New().UseJint().Build();
 			engine.OpenUrl("https://html5test.com").Wait(timeout);
 
 			var tagWithValue = engine.WaitSelector("#score strong").FirstOrDefault();

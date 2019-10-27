@@ -26,7 +26,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 				if (idx >= argumentValues.Length)
 				{
-					if(par.HasDefaultValue)
+					if(par.IsOptional)
 						continue;
 
 					return false;
