@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.ResourceProviders
     public class EngineBuilder
     {
         private IResourceProvider _resourceProvider;
-        //private Window _window;
+        private bool _computedStylesEnabled = false;
         private WindowConfig _windowConfig;
 
         private Func<ScriptExecutionContext, IScriptExecutor> _getScriptExecutor;
@@ -25,6 +25,23 @@ namespace Knyaz.Optimus.ResourceProviders
         {
             _resourceProvider = resourceProvider;
             return this;
+        }
+
+        /// <summary>
+        /// Enables computed styles evaluation. Styles evaluation is disabled by default.
+        /// </summary>
+        public EngineBuilder EnableCss()
+        {
+	        _computedStylesEnabled = true;
+	        return this;
+        }
+
+        public EngineBuilder ConfigureResourceProvider(Action<ResourceProviderBuilder> configure)
+        {
+	        var builder = new ResourceProviderBuilder();
+	        configure(builder);
+	        _resourceProvider = builder.Build();
+	        return this;
         }
 
         public EngineBuilder Window(Action<WindowConfig> configure)
@@ -73,7 +90,9 @@ namespace Knyaz.Optimus.ResourceProviders
                 parseJson => new XmlHttpRequest(_resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
             
             var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
-            return engineKeeper[0] = new Engine(_resourceProvider, window , scriptExecutor);   
+            return engineKeeper[0] = new Engine(_resourceProvider, window , scriptExecutor) {
+	            ComputedStylesEnabled = _computedStylesEnabled
+            }; 
         }
         
         public class WindowConfig

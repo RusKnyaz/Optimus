@@ -72,6 +72,7 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
+		[Obsolete("Use EngineBuilder to initialize Engine")]
 		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null, null)
 		{
 			ScriptExecutor = new ScriptExecutor(Window,
