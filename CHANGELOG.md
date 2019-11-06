@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ## Added
 - NavigatorPlugins
 - EngineBuilder
+- Cookie container properties
 
 ## [2.2.6]
 
