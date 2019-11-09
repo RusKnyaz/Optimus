@@ -87,7 +87,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Gets the first selected option or <c>null</c> if nothing have been selected.
 		/// </summary>
-		public string Value => SelectedOptions.Count > 0 ? SelectedOptions[0].Value : null;
+		public string Value
+		{
+			get => SelectedOptions.Count > 0 ? SelectedOptions[0].Value : "";
+			set
+			{
+				SelectedOptions.Clear();
+
+				foreach (var option in Options.Where(o => o.Value == value))
+				{
+					SelectedOptions.Add(option);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets a collection of selected options.
