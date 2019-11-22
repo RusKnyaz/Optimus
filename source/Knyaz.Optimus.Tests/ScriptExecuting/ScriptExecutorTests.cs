@@ -18,12 +18,12 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
     {
         private readonly JsEngines _jsEngine;
 
-        private IScriptExecutor CreateExecutor(IWindowEx window,Func<Func<Stream, object>, XmlHttpRequest> createXhr = null)
+        private IJsScriptExecutor CreateExecutor(IWindowEx window,Func<Func<Stream, object>, XmlHttpRequest> createXhr = null)
         {
             switch (_jsEngine)
             {
-                case JsEngines.Jint: return new ScriptExecutor(window, createXhr ?? (_ => null));
-                case JsEngines.Jurassic: return new Scripting.Jurassic.ScriptExecutor(window,  createXhr ?? (_ => null));
+                case JsEngines.Jint: return new Knyaz.Optimus.ScriptExecuting.Jint.JintJsScriptExecutor(window, createXhr ?? (_ => null));
+                case JsEngines.Jurassic: return new Scripting.Jurassic.JurassicJsScriptExecutor(window,  createXhr ?? (_ => null));
                 default:throw new Exception("Invalid engine specified: " + _jsEngine);
             }
         }
@@ -35,7 +35,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         {
             var window = Mock.Of<IWindowEx>();
             var se = CreateExecutor(window);
-            Assert.AreEqual(10, se.Evaluate("text/javascript","5+5"));
+            Assert.AreEqual(10, se.Evaluate("5+5"));
         }
 
         [Test]
@@ -86,8 +86,8 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             var window = Mock.Of<IWindowEx>();
             var xmlhttp = new XmlHttpRequest(null, () => new object(), null, null);
             var se = CreateExecutor(window, func => xmlhttp );
-            Assert.AreEqual(true, se.Evaluate("text/javascript", "XMLHttpRequest != null"));
-            Assert.AreEqual(xmlhttp, se.Evaluate("text/javascript", "new XMLHttpRequest()"));
+            Assert.AreEqual(true, se.Evaluate("XMLHttpRequest != null"));
+            Assert.AreEqual(xmlhttp, se.Evaluate("new XMLHttpRequest()"));
         }
         
         [Test]
@@ -96,9 +96,9 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             var window = Mock.Of<IWindowEx>();
             var se = CreateExecutor(window, func => new XmlHttpRequest(null, () => new object(), null, null) );
 
-            Assert.AreEqual(0, se.EvaluateJs("XMLHttpRequest.UNSENT"));
-            Assert.AreEqual(1, se.EvaluateJs("XMLHttpRequest.OPENED"));
-            Assert.AreEqual(1, se.EvaluateJs("(new XMLHttpRequest()).OPENED"));
+            Assert.AreEqual(0, se.Evaluate("XMLHttpRequest.UNSENT"));
+            Assert.AreEqual(1, se.Evaluate("XMLHttpRequest.OPENED"));
+            Assert.AreEqual(1, se.Evaluate("(new XMLHttpRequest()).OPENED"));
         }
 
         [Test]
@@ -106,8 +106,8 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         {
             var window = Mock.Of<IWindowEx>();
             var se = CreateExecutor(window, func => new XmlHttpRequest(null, null, null, null) );
-            Assert.AreEqual(true, se.EvaluateJs("window != null"), "window != null");
-            Assert.AreEqual(true, se.EvaluateJs("window === self"), "window === self");
+            Assert.AreEqual(true, se.Evaluate("window != null"), "window != null");
+            Assert.AreEqual(true, se.Evaluate("window === self"), "window === self");
         }
         
         [Test]
@@ -133,9 +133,9 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
                      x.Document == document);
             
             var se = CreateExecutor(window, func => new XmlHttpRequest(null, null, null, null) );
-            Assert.AreEqual(console, se.Evaluate("text/javascript","console"), "console");
-            Assert.AreEqual(navigator, se.Evaluate("text/javascript","navigator"), "navigator");
-            Assert.AreEqual(document, se.EvaluateJs("document"), "document");
+            Assert.AreEqual(console, se.Evaluate("console"), "console");
+            Assert.AreEqual(navigator, se.Evaluate("navigator"), "navigator");
+            Assert.AreEqual(document, se.Evaluate("document"), "document");
         }
         
         [Test]
@@ -265,7 +265,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
 
             var se = CreateExecutor(window);
             
-            se.ExecuteJs("var msg='hi';" +
+            se.Execute("var msg='hi';" +
                          "function handler(){window.open(msg);}" +
                          "window.document.body.addEventListener('click', handler);");
 
@@ -276,7 +276,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             Mock.Get(window).Verify(x => x.Open(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.AreEqual("hi", msg);
             
-            se.ExecuteJs("msg='by';" +
+            se.Execute("msg='by';" +
                          "window.document.body.removeEventListener('click', handler);");
             
             var evt2 = document.CreateEvent("event");
@@ -293,7 +293,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             var document = DomImplementation.Instance.CreateHtmlDocument();
             var window = Mock.Of<IWindowEx>(x => x.Document == document);
             var se = CreateExecutor(window);
-            Assert.AreEqual(expected, se.EvaluateJs(expr));
+            Assert.AreEqual(expected, se.Evaluate(expr));
         }
         
         [Test]
@@ -330,7 +330,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             var window = Mock.Of<IWindowEx>(x => x.Document == document);
             var se = CreateExecutor(window);
 
-            Assert.AreEqual(document, se.EvaluateJs("document"), "document");
+            Assert.AreEqual(document, se.Evaluate("document"), "document");
             /*Assert.AreEqual(document, se.EvaluateJs("window['document']"), "window['document']'");
             Assert.AreEqual(document, se.EvaluateJs("self['document']"), "self['document']'");
             Assert.AreEqual(document.Body, se.EvaluateJs("document.body"), "document.body");
@@ -344,11 +344,11 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             var window = Mock.Of<IWindowEx>(x => x.Document == document);
             var se = CreateExecutor(window);
 
-            se.ExecuteJs("document.$customProperty = 'hello';");
-            Assert.AreEqual("hello", se.EvaluateJs("document.$customProperty"), "document.$customProperty");
+            se.Execute("document.$customProperty = 'hello';");
+            Assert.AreEqual("hello", se.Evaluate("document.$customProperty"), "document.$customProperty");
             
-            se.ExecuteJs("document.body.$customProperty = 'world'");
-            Assert.AreEqual("world", se.EvaluateJs("document.body.$customProperty"), "document.body.$customProperty");
+            se.Execute("document.body.$customProperty = 'world'");
+            Assert.AreEqual("world", se.Evaluate("document.body.$customProperty"), "document.body.$customProperty");
         }
         
         [Test]
@@ -409,7 +409,7 @@ child.dispatchEvent(evt);");
             var document = DomImplementation.Instance.CreateHtmlDocument();
             var window = Mock.Of<IWindowEx>(x => x.Document == document);
             var se = CreateExecutor(window, _ => new XmlHttpRequest(null, () => new object(), document, null, null));
-            var result = se.Evaluate("text/javascript", expression);
+            var result = se.Evaluate(expression);
             Assert.AreEqual(expected, result);
         }
         
@@ -499,19 +499,9 @@ return ev;})()");
         }
         
         private object Evaluate(IWindowEx window, string code)=>
-            CreateExecutor(window).Evaluate("text/javascript", code);
+            CreateExecutor(window).Evaluate(code);
         
         private void Execute(IWindowEx window, string code) =>
-            CreateExecutor(window).Execute("text/javascript", code);
-    }
-    
-    
-    static class ScriptExecutorExtensions
-    {
-        public static object EvaluateJs(this IScriptExecutor se, string code) =>
-            se.Evaluate("text/javascript", code);
-        
-        public static void ExecuteJs(this IScriptExecutor se, string code) =>
-            se.Execute("text/javascript", code);
+            CreateExecutor(window).Execute(code);
     }
 }

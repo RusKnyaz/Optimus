@@ -9,6 +9,6 @@ namespace Knyaz.Optimus.Scripting.Jurassic
     {
         /// <summary> Sets the Jurassic to be JavaScript engine in the Optimus.</summary>
         public static EngineBuilder UseJurassic(this EngineBuilder builder) => 
-            builder.ScriptExecutor(ctx => new ScriptExecutor(ctx.Window, ctx.CreateXhr));
+            builder.JsScriptExecutor(ctx => new JurassicJsScriptExecutor(ctx.Window, ctx.CreateXhr));
     }
 }

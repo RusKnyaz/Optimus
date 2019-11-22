@@ -14,6 +14,12 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
     <VersionPrefix>2.3.0</VersionPrefix>
+      <PackageReleaseNotes>
+          - NavigatorPlugins
+          - EngineBuilder - new way to configure optimus engine
+          - EngineBuilder.JsScriptExecutor - ability to specify own js script execution engine
+          - Cookie container properties
+      </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

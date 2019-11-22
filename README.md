@@ -2,6 +2,8 @@
 
 Optimus is headless Web Browser fully implemented on .net.
 
+[Release notes](CHANGELOG.md)
+
 ## Downloads
 
  - Public release versions are available on [NuGet](https://www.nuget.org/packages/Knyaz.Optimus).

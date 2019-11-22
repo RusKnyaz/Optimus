@@ -6,6 +6,6 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
     {
         /// <summary> Setup JINT javascript engine. </summary>
         public static EngineBuilder UseJint(this EngineBuilder builder) => 
-            builder.ScriptExecutor(ctx => new ScriptExecutor(ctx.Window, ctx.CreateXhr));
+            builder.JsScriptExecutor(ctx => new JintJsScriptExecutor(ctx.Window, ctx.CreateXhr));
     }
 }

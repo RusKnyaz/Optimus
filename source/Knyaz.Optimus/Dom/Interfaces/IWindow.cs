@@ -27,7 +27,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 	
 	
 	//todo: join with IWindow in next major version
-	internal interface IWindowEx : IWindow
+	public interface IWindowEx : IWindow
 	{
 		Document Document {get;}
 		Console Console { get; }

@@ -1,11 +1,12 @@
 # Optimus Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.3] - 2019
+## [2.3] - 2019-11-23
 
-## Added
+## New features
 - NavigatorPlugins
-- EngineBuilder
+- EngineBuilder - new way to configure optimus engine
+- EngineBuilder.JsScriptExecutor - ability to specify own js script execution engine
 - Cookie container properties
 
 ## [2.2.6]

@@ -11,6 +11,7 @@ using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.Tools;
 using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
 
@@ -75,8 +76,8 @@ namespace Knyaz.Optimus
 		[Obsolete("Use EngineBuilder to initialize Engine")]
 		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null, null)
 		{
-			ScriptExecutor = new ScriptExecutor(Window,
-				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson));
+			ScriptExecutor = new ScriptExecutor(() => new JintJsScriptExecutor(Window,
+				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson)));
 		}
 
 		internal Engine(

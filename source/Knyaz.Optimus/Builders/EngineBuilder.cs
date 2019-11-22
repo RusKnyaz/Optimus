@@ -51,10 +51,10 @@ namespace Knyaz.Optimus.ResourceProviders
             return this;
         }
 
-        internal EngineBuilder ScriptExecutor(Func<ScriptExecutionContext, IScriptExecutor> getScriptExecutor)
+        public EngineBuilder JsScriptExecutor(Func<ScriptExecutionContext, IJsScriptExecutor> getScriptExecutor)
         {
-            _getScriptExecutor = getScriptExecutor;
-            return this;
+	        _getScriptExecutor = context => new ScriptExecutor(() => getScriptExecutor(context));
+	        return this;
         }
 
         private Window BuildWindow()
@@ -114,7 +114,7 @@ namespace Knyaz.Optimus.ResourceProviders
         }
     }
 
-    internal class ScriptExecutionContext
+    public class ScriptExecutionContext
     {
         public ScriptExecutionContext(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXhr)
         {

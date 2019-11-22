@@ -10,4 +10,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 		void Clear();
 		object EvalFuncAndCall(string v, object @this, params object[] evt);
 	}
+
+	public interface IJsScriptExecutor
+	{
+		void Execute(string code);
+		object Evaluate(string code);
+	}
 }
