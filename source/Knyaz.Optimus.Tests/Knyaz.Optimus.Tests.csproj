@@ -48,9 +48,10 @@
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
+    <PackageReference Include="Knyaz.Optimus.Scripting.Jurassic" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Knyaz.Optimus.Scripting.Jurassic\Knyaz.Optimus.Scripting.Jurassic.csproj" />
+    
     <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />
   </ItemGroup>
   <ItemGroup>
