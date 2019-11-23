@@ -6,8 +6,15 @@ namespace Knyaz.Optimus.Environment
 	/// <summary>
 	/// http://www.w3schools.com/jsref/obj_navigator.asp
 	/// </summary>
-	public class Navigator : INavigator
+	public class Navigator : INavigator, INavigatorPlugins
 	{
+		private readonly INavigatorPlugins _plugins;
+
+		public Navigator(INavigatorPlugins plugins)
+		{
+			_plugins = plugins;
+		}
+		
 		public string AppCodeName { get { return "Optimus Browser"; } }
 		public string AppName { get { return "Optimus"; } }
 
@@ -30,5 +37,9 @@ namespace Knyaz.Optimus.Environment
 		public string Language => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
 
 		public bool JavaEnabled() => true;
+		
+		public MimeTypesArray MimeTypes => _plugins.MimeTypes;
+
+		public PluginsArray Plugins => _plugins.Plugins;
 	}
 }

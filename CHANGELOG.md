@@ -1,6 +1,22 @@
 # Optimus Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.3] - 2019-11-23
+
+## New features
+- NavigatorPlugins
+- EngineBuilder - new way to configure optimus engine
+- EngineBuilder.JsScriptExecutor - ability to specify own js script execution engine
+- Cookie container properties
+
+## [2.2.6]
+
+### Added 
+- HtmlImageElement.ImageData property to get raw image data
+### Fixed
+- Loading of image when source specified using setAttribute('src', ...) method.
+- Execution addEventListener("", null)
+
 ## [2.2] - 2017-08-20
 
 ### Added

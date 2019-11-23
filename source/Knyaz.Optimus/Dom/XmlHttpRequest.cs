@@ -16,6 +16,7 @@ namespace Knyaz.Optimus.Dom
 	/// https://xhr.spec.whatwg.org/
 	/// </summary>
 	[DomItem]
+	[JsName("XMLHttpRequest")]
 	public class XmlHttpRequest
 	{
 		private readonly Func<Stream,object> _parseJsonFn;
@@ -31,7 +32,8 @@ namespace Knyaz.Optimus.Dom
 		private int _readyState;
 		
 		internal XmlHttpRequest(IResourceProvider resourceProvider, 
-			Func<object> syncObj, Document owner, 
+			Func<object> syncObj, 
+			Document owner, 
 			Func<string, string, Request> requestFn,
 			Func<Stream,object> parseJsonFn = null)
 		{
@@ -159,34 +161,15 @@ namespace Knyaz.Optimus.Dom
 		/// Returns all the response headers, separated by CRLF, as a string, or null if no response has been received.
 		/// </summary>
 		/// <returns></returns>
-		public string GetAllResponseHeaders()
-		{
-			if (_response.Headers == null)
-				return "";
-
-			var headersString = _response.Headers;
-
-			//todo: probably the hack below is no more required due to JINT's reges was fixed.
-			//to fix jquery we should remove \r due to jquery uses .net regex where \r\n is not threated as end line
-			headersString = headersString.Replace("\r", "");
-
-			return headersString;
-		}
+		public string GetAllResponseHeaders() => _response.Headers ?? "";
 
 		/// <summary>
 		/// Returns a string containing the response string returned by the HTTP server. 
 		/// </summary>
-		public string StatusText
-		{
-			get
-			{
-				if (ReadyState != DONE || _response == null)
-					return null;
-				return _response.StatusCode.ToString();
-			}
-		}
+		public string StatusText => 
+			ReadyState != DONE || _response == null ? null : _response.StatusCode.ToString();
 
-		
+
 		/// <summary>
 		/// Gets the response object of the type specified by ResponseType property.
 		/// </summary>

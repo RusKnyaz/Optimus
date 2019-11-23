@@ -44,7 +44,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// Adds an element to the collection of option elements for this select element.
 		/// </summary>
 		/// <param name="option">The element to be added.</param>
-		/// <param name="index">The index, representing the item item should be inserted before.</param>
+		/// <param name="index">The index, representing the item should be inserted before.</param>
 		public void Add(HtmlOptionElement option, long index) =>
 			InsertBefore(option, Options[index]);
 		
@@ -87,7 +87,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Gets the first selected option or <c>null</c> if nothing have been selected.
 		/// </summary>
-		public string Value => SelectedOptions.Count > 0 ? SelectedOptions[0].Value : null;
+		public string Value
+		{
+			get => SelectedOptions.Count > 0 ? SelectedOptions[0].Value : "";
+			set
+			{
+				SelectedOptions.Clear();
+
+				foreach (var option in Options.Where(o => o.Value == value))
+				{
+					SelectedOptions.Add(option);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets a collection of selected options.

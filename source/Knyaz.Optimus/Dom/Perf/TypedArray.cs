@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Perf
 {
@@ -15,13 +16,15 @@ namespace Knyaz.Optimus.Dom.Perf
 			if (buffer.Data.Length % _bytesPerElement != 0)
 				throw new ArgumentOutOfRangeException("byte length of "+GetType().Name+" should be a multiple of " + _bytesPerElement);
 
+			Buffer = buffer;
+			
 			_data = buffer.Data;
 		}
 
 		protected TypedArray(T[] data)
 		{
 			_data = new byte[data.Length * _bytesPerElement];
-			Buffer.BlockCopy(data,0, _data, 0, _data.Length);
+			System.Buffer.BlockCopy(data,0, _data, 0, _data.Length);
 		} 
 
 		protected byte[] _data;
@@ -32,6 +35,13 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// Returns the length of the typed array from the start of its ArrayBuffer.
 		/// </summary>
 		public ulong Length => (ulong) (_data.Length/ _bytesPerElement);
+
+		/// <summary>
+		/// Returns the length (in bytes) from the start of its ArrayBuffer.
+		/// </summary>
+		public ulong ByteLength => (ulong) (_data.Length);
+		
+		public ArrayBuffer Buffer { get; }
 
 		/// <summary>
 		/// Stores multiple values in the typed array.
@@ -45,7 +55,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		{
 			//todo: write tests for the case when two arrays share the same ArrayBuffer.
 
-			Buffer.BlockCopy(array._data, 0, _data, offset * _bytesPerElement, array._data.Length);
+			System.Buffer.BlockCopy(array._data, 0, _data, offset * _bytesPerElement, array._data.Length);
 		}
 
 		/// <summary>
@@ -58,7 +68,7 @@ namespace Knyaz.Optimus.Dom.Perf
 		/// <param name="offset">The offset into the target array at which to begin writing values from the source array. If you omit this value, 0 is assumed (that is, the source array will overwrite values in the target array starting at index 0).</param>
 		public void Set(T[] array, int offset)
 		{
-			Buffer.BlockCopy(array, 0, _data, offset * _bytesPerElement, array.Length * _bytesPerElement);
+			System.Buffer.BlockCopy(array, 0, _data, offset * _bytesPerElement, array.Length * _bytesPerElement);
 		}
 
 		protected T[] GetSub(long begin, long? end)
@@ -123,6 +133,7 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// <summary>
 	/// 8-bit unsigned integer array.
 	/// </summary>
+	[JsName("Uint8Array")]
 	public class UInt8Array : TypedArray<byte>
 	{
 		public UInt8Array(ArrayBuffer buffer) : base(buffer) { }
@@ -197,6 +208,7 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// <summary>
 	/// 32-bit integer array.
 	/// </summary>
+	[JsName("Uint32Array")]
 	public class UInt32Array : TypedArray<uint>
 	{
 		public UInt32Array(ArrayBuffer buffer) : base(buffer) { }
@@ -221,6 +233,7 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// <summary>
 	/// 16-bit unsigned integer
 	/// </summary>
+	[JsName("Uint16Array")]
 	public class UInt16Array : TypedArray<ushort>
 	{
 		public UInt16Array(ArrayBuffer buffer) : base(buffer) { }

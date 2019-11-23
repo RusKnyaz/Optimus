@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -11,6 +12,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// http://www.w3.org/TR/html5/forms.html"
 	/// https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement"
 	/// </summary>
+	[JsName("HTMLFormElement")]
 	public sealed class HtmlFormElement : HtmlElement
 	{
 		static class Defaults

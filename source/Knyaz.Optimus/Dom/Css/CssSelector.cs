@@ -79,7 +79,7 @@ namespace Knyaz.Optimus.Dom.Css
 		/// <summary>
 		/// Priority of the selector.
 		/// </summary>
-		public readonly int Specifity;
+		public readonly int Specificity;
 
 		public CssSelector(string text)
 		{
@@ -96,18 +96,18 @@ namespace Knyaz.Optimus.Dom.Css
 					{
 						case '#':
 							currentChunkType = ChunkTypes.Id;
-							Specifity += 65536;
+							Specificity += 65536;
 							break;
 						case '.':
-							Specifity += 256;
+							Specificity += 256;
 							currentChunkType = ChunkTypes.Class;
 							break;
 						case ':':
-							Specifity++;	
+							Specificity++;	
 							currentChunkType = ChunkTypes.State;
 							break;
 						case '[':
-							Specifity += 256;
+							Specificity += 256;
 							currentChunkType = ChunkTypes.Attribute;
 							break;
 						case ']':
@@ -186,7 +186,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 							chain = new Node {Value = currentChunkType == ChunkTypes.Tags ? chunk.ToUpperInvariant(): chunk, Next = chain, Type = currentChunkType};
 							if (currentChunkType == ChunkTypes.Tags)
-								Specifity++;
+								Specificity++;
 							currentChunkType = ChunkTypes.Tags;
 							break;
 					}

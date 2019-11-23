@@ -1,9 +1,12 @@
-﻿namespace Knyaz.Optimus.Dom.Elements
+﻿using Knyaz.Optimus.ScriptExecuting;
+
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents textarea html element (see http://www.w3.org/TR/html5/forms.html#the-textarea-element).
 	/// </summary>
 	// Todo: complete implementation
+	[JsName("HTMLTextAreaElement")]
 	public sealed class HtmlTextAreaElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults

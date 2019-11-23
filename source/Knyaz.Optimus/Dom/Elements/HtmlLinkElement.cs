@@ -1,9 +1,11 @@
 ﻿using System;
+using Knyaz.Optimus.Dom.Events;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// The HTMLLinkElement interface represents reference information for external resources and the relationship of those resources to a document and vice-versa. This object inherits all of the properties and methods of the HTMLElement interface.
+	/// The HTMLLinkElement interface represents reference information for external resources and the relationship of those resources to a document and vice-versa.
+    /// This object inherits all of the properties and methods of the HTMLElement interface.
 	/// https://www.w3.org/TR/html5/document-metadata.html#the-link-element
 	/// </summary>
 	public sealed class HtmlLinkElement : HtmlElement
@@ -115,5 +117,18 @@ LinkStyle.sheet Read only
 Returns the StyleSheet object associated with the given element, or null if there is none.
 */
 
+		public event Action<Event> OnLoad;
+		public event Action<Event> OnError;
+		
+		protected override void CallDirectEventSubscribers(Event evt)
+		{
+			base.CallDirectEventSubscribers(evt);
+
+			switch (evt.Type)
+			{
+				case "load":Handle("onload", OnLoad, evt);break;
+				case "error":Handle("onerror", OnError, evt);break;
+			}
+		}
 	}
 }

@@ -1,8 +1,11 @@
-﻿namespace Knyaz.Optimus.Dom.Elements
+﻿using Knyaz.Optimus.ScriptExecuting;
+
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents &lt;HTML&gt; element.
 	/// </summary>
+	[JsName("HTMLHtmlElement")]
 	public sealed class HtmlHtmlElement : HtmlElement
 	{
 		internal HtmlHtmlElement(Document ownerDocument) : base(ownerDocument, TagsNames.Html){}

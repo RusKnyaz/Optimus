@@ -7,7 +7,7 @@ using Knyaz.Optimus.Dom.Interfaces;
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// Implements logic for event propogation and handling.
+	/// Implements logic for event propagation and handling.
 	/// </summary>
 	public sealed class EventTarget : IEventTarget
 	{
@@ -55,6 +55,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			if (handler == null)
 				return;
+
+			if (options == null)
+			{
+				AddEventListener(type, handler);
+				return;
+			}
+
 			var listenersList = options.Capture ? GetCapturingListeners(type) : GetBubblingListeners(type);
 			if (listenersList.Any(x => x.Handler == handler))//do not add listener twice
 				return;
@@ -73,7 +80,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="type">The type name of the event.</param>
 		/// <param name="handler">The event handler.</param>
 		/// <param name="useCapture">If <c>true</c> the handler invoked in 'capturing' order, 
-		/// othervise in the handler invoked in 'bubbling' order.</param>
+		/// otherwise in the handler invoked in 'bubbling' order.</param>
 		public void AddEventListener(string type, Action<Event> handler, bool useCapture = false) =>
 			AddEventListener(type, handler, useCapture ? CaptureOptions : BubbleOptions);
 
@@ -95,7 +102,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		
 
 		/// <summary>
-		/// Called when exception in handler occured.
+		/// Called when exception in handler occurred.
 		/// </summary>
 		public event Action<Exception> HandlerException;
 

@@ -9,6 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
 	[DomItem]
+	[JsName("HTMLInputElement")]
 	public sealed class HtmlInputElement : HtmlElement, IResettableElement, IFormElement
 	{
 		static class Defaults

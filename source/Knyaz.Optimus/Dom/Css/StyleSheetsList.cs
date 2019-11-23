@@ -65,7 +65,7 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 
 		/// <summary>
-		/// Removes stylesheet at the specified postion.
+		/// Removes stylesheet at the specified position.
 		/// </summary>
 		/// <param name="index">Index of the stylesheet to be removed.</param>
 		public void RemoveAt(int index)

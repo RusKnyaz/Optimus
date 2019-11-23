@@ -1,29 +1,35 @@
 ﻿using System;
 using Jint.Runtime;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Environment
 {
 	/// <summary>
 	/// http://www.w3.org/TR/html5/browsers.html#window
 	/// </summary>
-	public class Window : IWindow
+	public class Window : IWindowEx
 	{
-		private readonly Engine _engine;
+		private Engine _engine;
 		private readonly Action<string, string, string> _openWindow;
 		private readonly EventTarget _eventTarget;
 
 		public WindowTimers Timers => _timers;
 		
+		public Console Console => _engine.Console;
+		public Document Document => _engine.Document;
 		public Storage LocalStorage { get; } = new Storage();
 		public Storage SessionStorage { get; }= new Storage();
 
-		internal Window(Func<object> getSyncObj, Engine engine, Action<string, string, string> openWindow)
+		internal Window(
+			Func<object> getSyncObj, 
+			Action<string, string, string> openWindow,
+			INavigator navigator)
 		{
-			_engine = engine;
 			_openWindow = openWindow ?? ((x,y,z) => {});
 			Screen = new Screen
 				{
@@ -37,28 +43,38 @@ namespace Knyaz.Optimus.Environment
 
 			InnerWidth = 1024;
 			InnerHeight = 768;
-			Navigator = new Navigator()
-			{
-				UserAgent =
-					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
-			};
-			History = new History(engine);
-			Location = new Location(History, () => engine.Uri, s => engine.OpenUrl(s));
+			Navigator = navigator;
+			
+			History = new History(OnSetState);
+			Location = new Location(History, () => _engine.Uri, s => _engine.OpenUrl(s));
 
 			_timers = new WindowTimers(getSyncObj);
 			_timers.OnException += exception =>
 				{
 					if (exception is JavaScriptException jsEx)
 					{
-						engine.Console.Log($"JavaScript error in timer handler function (Line:{jsEx.LineNumber}, Col:{jsEx.Column}, Source: {jsEx.Source}): {jsEx.Error}");
+						_engine.Console.Log($"JavaScript error in timer handler function (Line:{jsEx.LineNumber}, Col:{jsEx.Column}, Source: {jsEx.Source}): {jsEx.Error}");
 					}
 					else
 					{
-						engine.Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
+						_engine.Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
 					}
 				};
 
-			_eventTarget = new EventTarget(this, () => null, () => engine.Document);
+			_eventTarget = new EventTarget(this, () => null, () => _engine.Document);
+		}
+		
+		internal Engine Engine
+		{
+			get => _engine;
+			set => _engine = value;
+		}
+
+		private void OnSetState(string url, string title)
+		{
+			_engine.Uri = UriHelper.IsAbsolute(url) ? new Uri(url) : new Uri(new Uri(_engine.Uri.GetLeftPart(UriPartial.Authority)), url);
+			if (title != null)
+				_engine.Document.Title = title;
 		}
 
 		/// <summary>
@@ -100,7 +116,7 @@ namespace Knyaz.Optimus.Environment
 		/// <param name="delay">The time, in milliseconds, the timer should wait before the specified function or code is executed. If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, as soon as possible. </param>
 		/// <param name="data">Variables to be passed to the handler.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action<object[]> handler, double? delay, params object[] data) =>
+		public int SetTimeout(Action<object[]> handler, double? delay = null, params object[] data) =>
 			_timers.SetTimeout(handler, (int)(delay ?? 1), data);
 
 		/// <summary>
@@ -113,7 +129,7 @@ namespace Knyaz.Optimus.Environment
 		/// Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
 		/// </summary>
 		/// <returns>It returns an interval ID which uniquely identifies the interval, so you can remove it later by calling <see cref="ClearInterval"/></returns>
-		public int SetInterval(Action<object[]> handler, double? delay, params object[] data) =>
+		public int SetInterval(Action<object[]> handler, double? delay = null, params object[] data) =>
 			_timers.SetInterval(handler, (int)(delay ?? 1), data);
 
 		/// <summary>

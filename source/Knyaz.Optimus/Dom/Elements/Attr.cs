@@ -43,7 +43,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string Name => _name;
 
 		/// <summary>
-		/// The element useded to access the attribute.
+		/// The element used to access the attribute.
 		/// </summary>
 		public Element OwnerElement => _ownerElement;
 

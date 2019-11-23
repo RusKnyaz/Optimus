@@ -10,11 +10,16 @@
     <RepositoryUrl>https://github.com/RusKnyaz/Optimus</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
-    <PackageReleaseNotes>Added support of UserAgent, Proxy and BasicAuth. Fixed bugs.</PackageReleaseNotes>
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
-    <VersionPrefix>2.2.6</VersionPrefix>
+    <VersionPrefix>2.3.0</VersionPrefix>
+      <PackageReleaseNotes>
+          - NavigatorPlugins
+          - EngineBuilder - new way to configure optimus engine
+          - EngineBuilder.JsScriptExecutor - ability to specify own js script execution engine
+          - Cookie container properties
+      </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -66,9 +71,9 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <Target Name="GetVersion" Label="Saves generated assembly version to the version.text file">
-    <WriteLinesToFile File="version.txt" Lines="$(Version)" Overwrite="true" Encoding="ASCII"/>
+    <WriteLinesToFile File="version.txt" Lines="$(Version)" Overwrite="true" Encoding="ASCII" />
   </Target>
   <ItemGroup>
-    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 </Project>

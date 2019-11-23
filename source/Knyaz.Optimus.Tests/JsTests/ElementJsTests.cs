@@ -1,13 +1,22 @@
-﻿using NUnit.Framework;
+﻿using Knyaz.Optimus.Tests.ScriptExecuting;
+using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
 	/// <summary>
-	/// This stuff runs JS tests from Resources/JsTests/ElementTetst.js file.
+	/// This stuff runs JS tests from Resources/JsTests/ElementTests.js file.
 	/// </summary>
-	[TestFixture]
+	[TestFixture(JsEngines.Jint)]
+	[TestFixture(JsEngines.Jurassic)]
 	public class ElementJsTests
 	{
+		private readonly JsEngines _jsEngine;
+
+		public ElementJsTests(JsEngines jsEngine)
+		{
+			_jsEngine = jsEngine;
+		}
+		
 		[TestCase("SetParent")]
 		[TestCase("SetOwnerDocument")]
 		[TestCase("Remove")]
@@ -35,7 +44,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetInnerHtmlText")]
 		[TestCase("AppendAttributeThrows")]
 		[TestCase("TextElementDispatchesEvent")]
-		public void ElementTests(string testName) => JsTestsRunner.Run(testName);
+		public void ElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("InputChangeCheckedOnClick")]
 		[TestCase("InputCheckChangingPrevented")]
@@ -51,11 +60,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("LabelClickEventsOrder")]
 		[TestCase("LabelClickEventsOrderInDocument")]
 		[TestCase("LabelClickEventsOrderInDocumentPreventDefault")]
-		public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(testName);
+		public void HtmlInputElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 	    
 		[TestCase("Control")]
 		[TestCase("ControlInDocument")]
-		public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(testName);
+		public void HtmlLabelElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("Form")]
 		[TestCase("NestedOptgroups")]
@@ -64,13 +73,32 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("GetLabelGetsTextIfThereIsNoAttribute")]
 		[TestCase("GetLabelWhenAttributeIsEmpty")]
 		[TestCase("DivInOptionSkipped")]
-		public void HtmlOptionElementTests(string testName) => JsTestsRunner.Run(testName);
+		public void HtmlOptionElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 	   
 		[TestCase("NoArgumentsCtor")]
 		[TestCase("OneArgumentCtor")]
 		[TestCase("TwoArgumentsCtor")]
 		[TestCase("SetWidthAndHeight")]
-		public void HtmlImageElementTests(string testName) => JsTestsRunner.Run(testName);
+		public void HtmlImageElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+
+		[TestCase("Node")]
+		[TestCase("Element")]
+		[TestCase("HTMLBodyElement")]
+		[TestCase("HTMLButtonElement")]
+		[TestCase("HTMLDivElement")]
+		[TestCase("HTMLDocument")]
+		[TestCase("HTMLElement")]
+		[TestCase("HTMLIFrameElement")]
+		[TestCase("HTMLInputElement")]
+		[TestCase("HTMLTextAreaElement")]
+		[TestCase("HTMLUnknownElement")]
+		[TestCase("HTMLFormElement")]
+		[TestCase("HTMLHtmlElement")]
+		[TestCase("HTMLScriptElement")]
+		[TestCase("Comment")]
+		[TestCase("Text")]
+		[TestCase("Attr")]
+		public void ElementTypesTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 	}
 }

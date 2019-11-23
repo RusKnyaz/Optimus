@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -30,6 +31,16 @@ namespace Knyaz.Optimus.Dom.Elements
 			_isMap = new AttributeMappedBoolValue(this, "ismap");
 			_width = new AttributeMappedValue<int>(this, "width");
 			_height = new AttributeMappedValue<int>(this, "height");
+		}
+
+		protected override void UpdatePropertyFromAttribute(string value, string invariantName)
+		{
+			base.UpdatePropertyFromAttribute(value, invariantName);
+
+			if (invariantName == "src")
+			{
+				LoadImage(value);
+			}
 		}
 
 		/// <summary>
@@ -65,18 +76,20 @@ namespace Knyaz.Optimus.Dom.Elements
 		public string Src
 		{
 			get => _src.Value;
-			set
-			{
-				_src.Value = value;
-
-				LoadImage(value);
-			}
+			set => _src.Value = value;
 		}
 
 		private bool _complete = false;
 
 		private async Task LoadImage(string value)
 		{
+			if (string.IsNullOrEmpty(value))
+			{
+				_loadedImage = null;
+				_complete = true;
+				return;
+			}
+			
 			var wasError = false;
 
 			try
@@ -161,5 +174,8 @@ namespace Knyaz.Optimus.Dom.Elements
 				case "error":Handle("onerror", OnError, evt);break;
 			}
 		}
+		
+		[JsHidden]
+		public IImage ImageData => _loadedImage;
 	}
 }

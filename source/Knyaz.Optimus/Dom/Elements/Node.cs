@@ -277,7 +277,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="type">The type name of the event.</param>
 		/// <param name="listener">The event handler.</param>
 		/// <param name="useCapture">If <c>true</c> the handler invoked in 'capturing' order, 
-		/// othervise in the handler invoked in 'bubbling' order.</param>
+		/// otherwise in the handler invoked in 'bubbling' order.</param>
 		public void AddEventListener(string type, Action<Event> listener, bool useCapture) =>
 			EventTarget.AddEventListener(type, listener, useCapture);
 
@@ -321,7 +321,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		///8: The first node (p1) is positioned inside the second node (p2).
 		///16: The second node (p2) is positioned inside the first node (p1).
 		///32: No relationship, or the two nodes are two attributes on the same element.
-		///Note: The return value could also be a combination of values. I.e. the returnvalue 20 means that p2 is inside p1 (16) AND p1 is positioned before p2 (4).
+		///Note: The return value could also be a combination of values. I.e. the return value 20 means that p2 is inside p1 (16) AND p1 is positioned before p2 (4).
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>

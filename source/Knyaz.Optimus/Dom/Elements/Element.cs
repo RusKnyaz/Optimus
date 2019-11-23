@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Tools;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -143,8 +145,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Id
 		{
-			get => GetAttribute("id", string.Empty);
-			set => SetAttribute("id", value);
+			get => GetAttribute(Attrs.Id, string.Empty);
+			set => SetAttribute(Attrs.Id, value);
 		}
 
 		/// <summary>
@@ -422,7 +424,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public override string NodeName => TagName;
 
-		public override string ToString() => "[Object " + GetType().Name+"]";
+		public override string ToString() => $"[object {GetType().GetCustomAttribute<JsNameAttribute>()?.Name ?? GetType().Name}]";
 
 		public override Node CloneNode(bool deep)
 		{

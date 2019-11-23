@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -159,10 +160,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			var signal = new ManualResetEvent(false);
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				signal.Set();
+			};
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
-			Assert.AreEqual(0, log.Count);
-			Thread.Sleep(1000);
+			Assert.AreEqual(new object[0], log);
+			signal.WaitOne(1000);
 			CollectionAssert.AreEqual(new[] { "ok" }, log);
 		}
 
@@ -171,10 +177,15 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var engine = new Engine();
 			var log = new List<string>();
-			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
+			var signal = new ManualResetEvent(false);
+			engine.Console.OnLog += o =>
+			{
+				log.Add(o == null ? "<null>" : o.ToString());
+				signal.Set();
+			};
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log('ok');}, 300);"));
 			Assert.AreEqual(0, log.Count);
-			Thread.Sleep(1000);
+			Assert.IsTrue(signal.WaitOne(1000));
 			CollectionAssert.AreEqual(new[]{"ok"}, log);
 		}
 
@@ -222,6 +233,21 @@ window.clearTimeout(timer);"));
 			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			Assert.AreEqual(1, log.Count);
 			Assert.AreEqual(2d, log[0]);
+		}
+		
+		[Test]
+		public void GetElementsByTagNameByIndex()
+		{
+			var engine = new Engine();
+			var log = engine.Console.ToList();
+			engine.Load(Mocks.Page(@"console.log(document.body.getElementsByTagName('div')[0])", "<div id='content1'></div><div id='content2'></div>"));
+			
+			
+			Assert.AreEqual(1, log.Count);
+			var obj = log[0];
+			Assert.IsNotNull(obj);
+			Assert.IsInstanceOf<HtmlDivElement>(obj);
+			Assert.AreEqual("content1", ((HtmlDivElement)obj).Id);
 		}
 
 		[Test]
@@ -339,7 +365,7 @@ window.clearTimeout(timer);"));
 			var httpResourceProvider = Mocks.HttpResourceProvider()
 				.Resource(url.TrimEnd('/'), "<html><head><script src='"+resUrl+"'></script></head></html>");
 
-			httpResourceProvider.Resource(expectedResUrl, "console.Log('ok');");
+			httpResourceProvider.Resource(expectedResUrl, "console.log('ok');");
 
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			
@@ -435,6 +461,32 @@ function reqListener () {
 			
 			Assert.IsNotNull(engine.WaitId("finished"));
 			Assert.AreEqual(new[]{expectedMsg}, log);
+		}
+
+		[Test]
+		public void XmlHttpRequestThis()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", @"<html><script>
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'data.json', false);
+	xhr.responseType = 'json';
+	xhr.onload = function () {
+		console.log(xhr == this);		
+	};
+	xhr.send(null);</script></html>")
+				.Resource("http://localhost/data.json", "");
+
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = new Engine(resourceProvider);
+			((Navigator)engine.Window.Navigator).UserAgent = "My favorite browser";
+
+			var log = engine.Console.ToList();
+
+			engine.OpenUrl("http://localhost").Wait();
+			
+			Assert.AreEqual(new[]{true}, log);
 		}
 
 		[Test]
@@ -546,12 +598,13 @@ function reqListener () {
 			img.OnLoad += evt => { loadSignal.Set(); };
 			img.Src = url;
 			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.IsTrue(img.Complete);
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
 		}
 
 		[Test]
-		public async Task LoadBmpFromUrl()
+		public async Task LoadBmpFromUrlAndGetSize()
 		{
 			var httpResourceProvider = Mocks.HttpResourceProvider()
 				.Resource("http://localhost/", "")
@@ -570,6 +623,88 @@ function reqListener () {
 			Assert.IsTrue(loadSignal.WaitOne(1000));
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
+		}
+		
+		[Test]
+		public async Task GetImageRawData()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "")
+				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+
+			var data = new MemoryStream();
+			img.ImageData.Data.CopyTo(data);
+			Assert.IsTrue(img.Complete);
+			Assert.AreEqual(new byte[]{1,2,3,2,1}, data.ToArray());
+		}
+		
+		[Test]
+		public async Task DocumentWithImage()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "<html><body><img src='image.bmp'/></body></html>")
+				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.GetElementsByTagName("img").First();
+			
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.IsTrue(img.Complete);
+		}
+		
+		[Test]
+		public async Task DocumentWithEmbeddedImage()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "<html><body><img src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			Assert.IsTrue(loadSignal.WaitOne(1000), "loaded");
+			Assert.AreEqual(8, img.NaturalWidth);
+			Assert.AreEqual(4, img.NaturalHeight);
+		}
+		[Test]
+		public async Task SetAndResetImage()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/", "")
+				.Resource("http://localhost/image.bmp",
+					Convert.FromBase64String(
+						"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"),
+					"image/bmp");
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			var engine = new Engine(resourceProvider);
+			var page = await engine.OpenUrl("http://localhost");
+			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+			img.Src = "image.bmp";
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+
+			img.Src = "";
+			Assert.IsTrue(img.Complete);
+			Assert.AreEqual(0, img.NaturalWidth);
+			Assert.AreEqual(0, img.NaturalHeight);
 		}
 
 		[Test]
@@ -602,6 +737,111 @@ function reqListener () {
 				document.InnerHTML == "<HTML><HEAD></HEAD><BODY>hello</BODY></HTML>"
 				&& page.Document.Location.Href == "http://localhost/index.html#some"
 				&& page.Document.Location.Hash == "#some");
+		}
+
+		[Test, Ignore("Failed")]
+		public async Task StyleOnLoad()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+@"<html><body></body>
+<script>
+	document.body.onload=function(){console.log('body onload')};
+	var style=document.createElement('style');
+	style.innerHTML='div{border:1px solid red}';
+	var onLoadCalled = false;
+	style.onload=function(){ console.log('style onload')};
+
+	var cnt = document.createElement('div');
+	cnt.appendChild(style);
+
+	console.log('add');
+	document.head.appendChild(style)
+	console.log('added');
+</script>
+
+<script>
+		console.log('script2')
+</script></html>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.IsNotNull(page.Document.GetElementsByTagName("style").FirstOrDefault());
+			Assert.AreEqual(new[]{"add", "added", "script2", "style onload", "body onload"}, log);
+		}
+
+		[Test, Ignore("Failed")]
+		public async Task OverrideBodyOnLoadFromScript()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+@"<html><body onload='console.log(""body onload attr"")'></body>
+<script>
+	document.body.onload=function(){console.log('body onload script')};
+</script></html>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.AreEqual(new[]{"body onload script"}, log);
+		}
+
+		[Test]
+		public async Task BodyOnLoad()
+		{
+			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+				@"<html><body onload='console.log(""body onload attr"")'></body>"));
+
+			var log = engine.Console.ToList();
+
+			var page = await engine.OpenUrl("http://loc/");
+			
+			Assert.AreEqual(new[]{"body onload attr"}, log);
+		}
+
+		[Test, Ignore("Failed")]
+		public async Task LinkOnError()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body>
+<script>	
+	document.body.onload=function(){console.log('body onload');};
+	var link = document.createElement('link');
+	link.onload  = function(){console.log('ok')};
+	link.onerror = function(){console.log('link onerror')};
+	link.rel='stylesheet';
+	link.href='mystylesheet.css';
+	document.head.appendChild(link);
+	console.log('added');
+</script>
+</html>");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{"added","link onerror","body onload"}, log);
+		}
+		
+		[Test, Ignore("Failed")]
+		public async Task LinkOnLoad()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body>
+<script>	
+	document.body.onload=function(){console.log('body onload');};
+	var link = document.createElement('link');
+	link.onload  = function(){console.log('ok')};
+	link.onerror = function(){console.log('link onerror')};
+	link.rel='stylesheet';
+	link.href='mystylesheet.css';
+	document.head.appendChild(link);
+	console.log('added');
+</script>
+</html>").Resource("http://loc/mystyesheet.css","*{border:1px solid black}");
+			var engine = new Engine(resourceProvider);
+			var log = engine.Console.ToList();
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{"added","ok","body onload"}, log);
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
@@ -10,6 +11,7 @@ using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.Tools;
 using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
 
@@ -28,18 +30,34 @@ namespace Knyaz.Optimus
 		/// Gets the Engine's resource provider - entity through which the engine gets the html pages, js files, images and etc.
 		/// </summary>
 		public IResourceProvider ResourceProvider { get; }
-		
+
 		/// <summary>
 		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
 		/// </summary>
-		public IScriptExecutor ScriptExecutor { get; }
-		
+		public IScriptExecutor ScriptExecutor
+		{
+			get => _scriptExecutor;
+			set
+			{
+				if(_scriptExecutor != null)
+					throw new InvalidOperationException("ScriptExecutor already has been set.");
+				
+				_scriptExecutor = value;
+				_scriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+			}
+		}
+
 		/// <summary>
 		/// Glues Document and ScriptExecutor.
 		/// </summary>
 		public DocumentScripting Scripting	{get; private set;}
 		internal DocumentStyling Styling { get; private set; }
-	
+
+		/// <summary>
+		/// Returns the cookie container that used to create requests.
+		/// </summary>
+		public CookieContainer CookieContainer => _cookieContainer; 
+
 		/// <summary>
 		/// Gets the browser's console object.
 		/// </summary>
@@ -52,11 +70,20 @@ namespace Knyaz.Optimus
 
 		readonly CookieContainer _cookieContainer;
 
-		
 		/// <summary>
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
-		public Engine(IResourceProvider resourceProvider = null)
+		[Obsolete("Use EngineBuilder to initialize Engine")]
+		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null, null)
+		{
+			ScriptExecutor = new ScriptExecutor(() => new JintJsScriptExecutor(Window,
+				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson)));
+		}
+
+		internal Engine(
+			IResourceProvider resourceProvider, 
+			Window window,
+			IScriptExecutor scriptExecutor)
 		{
 			if (resourceProvider == null)
 				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
@@ -67,9 +94,25 @@ namespace Knyaz.Optimus
 			_cookieContainer = new CookieContainer();
 			
 			Console = new Console();
-			Window = new Window(() => Document, this, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts));
-			ScriptExecutor = new ScriptExecutor(this);
-			ScriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
+
+			Window = window ?? CreateDefaultWindow();
+			Window.Engine = this;
+
+			if (scriptExecutor != null)
+				ScriptExecutor = scriptExecutor; 
+		}
+
+		Window CreateDefaultWindow()
+		{
+			var navigator = new Navigator(new NavigatorPlugins(new PluginInfo[0]))
+			{
+				UserAgent =
+					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
+			};
+			var window = new Window(() => Document, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts),
+				navigator);
+
+			return window;
 		}
 
 		public event Action<Request> OnRequest;
@@ -111,8 +154,12 @@ namespace Knyaz.Optimus
 				
 				if (_document != null)
 				{
-					Scripting = new DocumentScripting (_document, ScriptExecutor, 
-						s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
+					if (_scriptExecutor != null)
+					{
+						Scripting = new DocumentScripting(_document, ScriptExecutor,
+							s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
+					}
+
 					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
 					
@@ -171,12 +218,15 @@ namespace Knyaz.Optimus
 		/// Creates new <see cref="Document"/> and loads it from specified path (http or file).
 		/// </summary>
 		/// <param name="path">The string which represents Uri of the document to be loaded.</param>
-		public async Task<Page> OpenUrl(string path)
+		public async Task<Page> OpenUrl(string path) => await OpenUrl(path, true);
+		
+		public async Task<Page> OpenUrl(string path, bool clearScript)
 		{
 			//todo: stop unfinished ajax requests or drop their results
 			Window.Timers.ClearAll();
-			ScriptExecutor.Clear();
-			var uri = UriHelper.IsAbsolete(path) ? new Uri(path) : new Uri(Uri, path);
+			if(clearScript)
+				ScriptExecutor?.Clear();
+			var uri = UriHelper.IsAbsolute(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
 			
 			Document = new Document(Window);
@@ -202,13 +252,13 @@ namespace Knyaz.Optimus
 		/// Occurs before the document being loaded from response. 
 		/// Can be used to handle non-html response types.
 		/// </summary>
-		public event EventHandler<ResponseEventArags> PreHandleResponse; 
+		public event EventHandler<ResponseEventArgs> PreHandleResponse; 
 
 		private void LoadFromResponse(Document document, IResource resource)
 		{
 			if (PreHandleResponse != null)
 			{
-				var args = new ResponseEventArags(resource);
+				var args = new ResponseEventArgs(resource);
 				PreHandleResponse(this, args);
 				if (args.Cancel)
 					return;
@@ -317,14 +367,16 @@ namespace Knyaz.Optimus
 		/// Gets the current media settings (used in computed styles evaluation).
 		/// </summary>
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
+
+		private IScriptExecutor _scriptExecutor;
 	}
 
-	public class ResponseEventArags : EventArgs
+	public class ResponseEventArgs : EventArgs
 	{
 		public bool Cancel { get; set; }
 		public readonly IResource Response;
 
-		public ResponseEventArags(IResource resource)
+		public ResponseEventArgs(IResource resource)
 		{
 			Response = resource;
 		}

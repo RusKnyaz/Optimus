@@ -5,7 +5,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 	[DomItem]
 	public interface IHistory
 	{
-		long Lenght { get; }
+		long Length { get; }
 		void Go(long delta = 0);
 		void Back();
 		void Forward();

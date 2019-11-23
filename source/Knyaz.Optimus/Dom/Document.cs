@@ -39,6 +39,7 @@ namespace Knyaz.Optimus.Dom
 	/// http://dev.w3.org/html5/spec-preview/dom.html
 	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
+	[JsName("HTMLDocument")]
 	public class Document : Element, IDocument
 	{
 		//used for event's timestamp.
@@ -164,7 +165,7 @@ namespace Knyaz.Optimus.Dom
 		public DocType DocType { get; set; }
 
 		/// <summary>
-		/// Return this document's DOMimplementation object.
+		/// Return this document's DOM implementation object.
 		/// </summary>
 		public DomImplementation Implementation { get; }
 
@@ -226,7 +227,7 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public void WriteLn(string text)
 		{
-			throw new NotImplementedException("Please use write insted.");
+			throw new NotImplementedException("Please use write instead.");
 		}
 
 		/// <summary>

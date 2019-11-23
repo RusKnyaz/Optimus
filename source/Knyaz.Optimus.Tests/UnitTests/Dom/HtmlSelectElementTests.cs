@@ -150,7 +150,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void ValueTest()
+		public void FirstAddedElementIsSelectedByDefault()
 		{
 			var option = (HtmlOptionElement)_select.OwnerDocument.CreateElement("option");
 			option.Value = "ABC";
@@ -180,6 +180,40 @@ namespace Knyaz.Optimus.Tests.Dom
 			_select.Assert(x => x.Options[0] == opt2 && x.SelectedOptions[0] == opt2);
 			_select.Remove(0);
 			Assert.AreEqual(-1, _select.SelectedIndex);
+		}
+
+		[TestCase("v1", "v1", 0, 1)]
+		[TestCase("v2", "v2", 1, 1)]
+		[TestCase("v3", "", -1, 0)]
+		[TestCase("", "", -1, 0)]
+		public void SetValue(string setValue, string expectedValue, int expectedIndex, int expectedSelectedCount)
+		{
+			var opt1 = (HtmlOptionElement)_document.CreateElement("option");
+			opt1.Value = "v1";
+			var opt2 = (HtmlOptionElement)_document.CreateElement("option");
+			opt2.Value = "v2";
+			_select.Add(opt1);
+			_select.Add(opt2);
+
+			_select.Value = setValue;
+			
+			_select.Assert(select => 
+				select.Value == expectedValue &&
+				select.SelectedIndex == expectedIndex &&
+				select.SelectedOptions.Count == expectedSelectedCount);
+		}
+
+		[Test]
+		public void SetEmptyValue()
+		{
+			var opt1 = (HtmlOptionElement)_document.CreateElement("option");
+			opt1.Value = "v1";
+			var opt2 = (HtmlOptionElement)_document.CreateElement("option");
+			_select.Add(opt1);
+			_select.Add(opt2);
+
+			_select.Value = "";
+			_select.Assert(select => select.Value == "" && select.SelectedIndex == 1 && select.SelectedOptions.Count == 1);
 		}
 	}
 }

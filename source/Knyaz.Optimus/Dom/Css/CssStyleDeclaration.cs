@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -34,6 +35,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 
 		//todo: it's not better idea to use 'object' but sometimes js code tries to set the value of 'double' type.
+		[JsHidden]
 		public object this[string name]
 		{
 			get
@@ -55,10 +57,8 @@ namespace Knyaz.Optimus.Dom.Css
 				}
 				else
 				{
-					if (value is double)
-						SetProperty(name, ((double)value).ToString(CultureInfo.InvariantCulture));
-					else
-						SetProperty(name, value.ToString());
+					SetProperty(name,
+						value is double num ? num.ToString(CultureInfo.InvariantCulture) : value.ToString());
 				}
 			}
 		}
@@ -77,7 +77,7 @@ namespace Knyaz.Optimus.Dom.Css
 		}
 
 		/// <summary>
-		/// Retrieve the properties anmes that have been explicitly set in this declaration block.
+		/// Retrieve the properties names that have been explicitly set in this declaration block.
 		/// </summary>
 		/// <param name="idx"></param>
 		/// <returns></returns>
@@ -156,8 +156,8 @@ namespace Knyaz.Optimus.Dom.Css
 			else if(_importants.Contains(name))
 				_importants.Remove(name);
 
-			_properties[name] = Validate(name, value);
-			
+			_properties[name] = ValidateComplex(name, value);
+
 			HandleComplexProperty(name, value);
 			UpdateCssText();
 		}
@@ -194,7 +194,7 @@ namespace Knyaz.Optimus.Dom.Css
 					SetClockwise(BorderWidthNames, value);
 					break;
 				case Css.BorderStyle:
-					SetClockwise(BorderStyleNames, Validate(Css.BorderStyle, value));
+					SetClockwise(BorderStyleNames, value, x => Validate(Css.BorderStyle, x));
 					break;
 				case Css.BorderColor:
 					SetClockwise(BorderColorNames, value);
@@ -205,7 +205,37 @@ namespace Knyaz.Optimus.Dom.Css
 				case Css.BorderRadius:
 					SetClockwise(BorderRadiusNames, value);
 					break;
+				case Css.ListStyle:
+					SetListStyle(value);
+					break;
 			}
+		}
+
+		private void SetListStyle(string value)
+		{
+			if (string.IsNullOrEmpty(value))
+			{
+				this[Css.ListStyleType] = value;
+				this[Css.ListStylePosition] = value;
+				this[Css.ListStyleImage] = value;
+			}
+
+			var args = value.Split(' ');
+			if (args.Length > 0)
+			{
+				this[Css.ListStyleType] = args[0];
+			}
+
+			if (args.Length > 1)
+			{
+				this[Css.ListStylePosition] = args[1];
+			}
+
+			if (args.Length > 2)
+			{
+				this[Css.ListStyleImage] = args[2];
+			}
+
 		}
 
 		//Reges to remove spaces around commas
@@ -345,23 +375,25 @@ namespace Knyaz.Optimus.Dom.Css
 			{Css.BorderTopStyle, Css.BorderRightStyle, Css.BorderBottomStyle, Css.BorderLeftStyle};
 
 		static string[] BorderWidthNames =
-			{"border-top-width", "border-right-width", "border-bottom-width","border-left-width"};
+		{Css.BorderTopWidth, Css.BorderRightWidth, Css.BorderBottomWidth,Css.BorderLeftWidth};
 
 		static string[] BorderColorNames =
-			{"border-top-color", "border-right-color", "border-bottom-color","border-left-color"};
+			{Css.BorderTopColor, Css.BorderRightColor, Css.BorderBottomColor, Css.BorderLeftColor};
 
 		static string[] BorderRadiusNames =
 			{"border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"};
 		
-		static string[] PaddingNames = {"padding-top", "padding-right", "padding-bottom", "padding-left"};
-		static string[] MarginNames = {"margin-top", "margin-right", "margin-bottom", "margin-left"};
+		static string[] PaddingNames = {Css.PaddingTop, Css.PaddingRight, Css.PaddingBottom, Css.PaddingLeft};
+		static string[] MarginNames = {Css.MarginTop, Css.MarginRight, Css.MarginBottom, Css.MarginLeft};
 
 		private void SetPadding(string value)
 		{
 			SetClockwise(PaddingNames, value);
 		}
-		private void SetClockwise(string[] names, string value)
+		private void SetClockwise(string[] names, string value, Func<string, string> validate = null)
 		{
+			validate = validate ?? (s => s); 
+			
 			var top = names[0];
 			var right = names[1];
 			var bottom = names[2];
@@ -375,24 +407,24 @@ namespace Knyaz.Optimus.Dom.Css
 				var args = SplitValues(value).ToArray();
 				if (args.Length == 1)
 				{
-					_properties[top] = _properties[right] = _properties[bottom] = _properties[left] = args[0];
+					_properties[top] = _properties[right] = _properties[bottom] = _properties[left] = validate(args[0]);
 				}
 				else if(args.Length == 2)
 				{
-					_properties[top] = _properties[bottom] = args[0];
-					_properties[right] = _properties[left] = args[1];
+					_properties[top] = _properties[bottom] = validate(args[0]);
+					_properties[right] = _properties[left] = validate(args[1]);
 				}
 				else if (args.Length == 3)
 				{
-					_properties[top] = args[0];
-					_properties[right] = _properties[left] = args[1];
+					_properties[top] = validate(args[0]);
+					_properties[right] = _properties[left] = validate(args[1]);
 					_properties[bottom] = args[2];
 				}else if (args.Length >= 4)
 				{
-					_properties[top] = args[0];
-					_properties[right] = args[1];
-					_properties[bottom] = args[2];
-					_properties[left] = args[3];
+					_properties[top] = validate(args[0]);
+					_properties[right] = validate(args[1]);
+					_properties[bottom] = validate(args[2]);
+					_properties[left] = validate(args[3]);
 				}
 			}
 		}

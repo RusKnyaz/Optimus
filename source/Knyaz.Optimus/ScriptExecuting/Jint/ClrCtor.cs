@@ -1,23 +1,35 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
-using System.Linq;
 
-namespace Knyaz.Optimus.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting.Jint
 {
-	internal class ClrPrototype : FunctionInstance, IConstructor
+	using Engine = global::Jint.Engine;
+
+	internal class ClrCtor : FunctionInstance, IConstructor
 	{
 		private readonly Type _type;
 		private readonly DomConverter _converter;
 
-		public ClrPrototype(Jint.Engine engine, Type type, DomConverter converter) : 
+		public ClrCtor(Engine engine,  DomConverter converter, Type type) : 
 			base(engine, null, null, false)
 		{
 			_type = type;
 			_converter = converter;
-			Prototype = engine.Object;
+			Prototype = engine.Function.PrototypeObject;
+			FastAddProperty("prototype", _converter.GetPrototype(type), false, false, false);
+			
+			foreach (var staticField in type.GetFields(BindingFlags.Public | BindingFlags.Static)
+				.Where(p => p.GetCustomAttribute<JsHiddenAttribute>() == null))
+			{
+				var clrValue = staticField.GetValue(null);
+
+				FastAddProperty(staticField.Name, JsValue.FromObject(engine, clrValue), false, false, false);
+			}
 		}
 
 		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
@@ -57,7 +69,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 							.ToArray();
 						
 						var obj = ctor.Invoke(args);
-						return new ClrObject(Engine, obj, _converter);
+						return new ClrObject(Engine, obj, _converter.GetPrototype(obj.GetType()));
 					}
 				} 
 			}

@@ -25,9 +25,9 @@
 		public override string NodeName => Name;
 
 		/// <summary>
-		/// Always [Object DocumentType] for the DocType element.
+		/// Always [object DocumentType] for the DocType element.
 		/// </summary>
-		public override string ToString() => "[Object DocumentType]";
+		public override string ToString() => "[object DocumentType]";
 
 		/// <summary>
 		/// A DOMString, eg "html" for &lt;!DOCTYPE HTML&gt;.

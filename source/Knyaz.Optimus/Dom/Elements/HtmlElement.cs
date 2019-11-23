@@ -6,9 +6,10 @@ using Knyaz.Optimus.ScriptExecuting;
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
-	/// The base class for the classes representing html elemenets.
+	/// The base class for the classes representing html elements.
 	/// </summary>
 	[DomItem]
+	[JsName("HTMLElement")]
 	public class HtmlElement : Element
 	{
 		private CssStyleDeclaration _style;
@@ -33,8 +34,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public bool Hidden
 		{
-			get => GetAttribute("hidden", Defaults.Hidden);
-			set => SetAttribute("hidden", value.ToString());
+			get => GetAttribute(Attrs.Hidden, Defaults.Hidden);
+			set => SetAttribute(Attrs.Hidden, value.ToString());
 		}
 
 		/// <summary>
@@ -50,6 +51,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Called before the mouse 'click' dispatched.
 		/// </summary>
+		[JsName("onclick")]
 		public event Func<Event, bool?> OnClick;
 		
 		/// <summary>
@@ -66,11 +68,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			{
 				if (_style == null)
 				{
-					_style = new CssStyleDeclaration {CssText = GetAttribute("style")};
+					_style = new CssStyleDeclaration {CssText = GetAttribute(Attrs.Style)};
 					_style.OnStyleChanged += css =>
 					{
-						if(GetAttribute("style") != css)
-							SetAttribute("style", css);
+						if(GetAttribute(Attrs.Style) != css)
+							SetAttribute(Attrs.Style, css);
 					};
 				}
 
@@ -82,7 +84,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			base.UpdatePropertyFromAttribute(value, invariantName);
 
-			if (invariantName == "style" && _style != null && Style.CssText != value)
+			if (invariantName == Attrs.Style && _style != null && Style.CssText != value)
 				Style.CssText = value;
 		}
 

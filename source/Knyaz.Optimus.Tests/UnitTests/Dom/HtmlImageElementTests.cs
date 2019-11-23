@@ -66,6 +66,25 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.IsTrue(loadSignal.WaitOne(1000));
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
+			Assert.IsTrue(img.Complete);
+		}
+
+		[Test]
+		public void ImageSetSrcAttribute()
+		{
+			var imageData = Mock.Of<IImage>(x => x.Width == 8 && x.Height == 4);
+			_document.GetImage = s => Task.Run(() => imageData);
+
+			var img = (HtmlImageElement)_document.CreateElement("img");
+			var loadSignal = new ManualResetEvent(false);
+			img.OnLoad += evt => { loadSignal.Set(); };
+
+			img.SetAttribute("src", "http://image.jpg");
+
+			Assert.IsTrue(loadSignal.WaitOne(1000));
+			Assert.AreEqual(8, img.NaturalWidth);
+			Assert.AreEqual(4, img.NaturalHeight);
+			Assert.IsTrue(img.Complete);
 		}
 	}
 }

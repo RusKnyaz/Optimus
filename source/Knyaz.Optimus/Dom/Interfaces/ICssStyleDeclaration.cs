@@ -27,7 +27,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		string GetPropertyValue(string propertyName);
 		
 		/// <summary>
-		/// Gets the style property prority.
+		/// Gets the style property priority.
 		/// </summary>
 		/// <param name="propertyName">Property name to get.</param>
 		string GetPropertyPriority(string propertyName);

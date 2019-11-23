@@ -12,8 +12,8 @@ namespace ConsoleApplication1
 	{
 		static async void Main(string[] args)
 		{
-			var engine = new Engine();
-			var page = await engine.OpenUrl("http://google.com").Wait();
+			var engine = EngineBuilder.New().UseJint().Build();
+			var page = await engine.OpenUrl("http://google.com");
 
 			Console.WriteLine("The first document child node is: " + engine.Document.FirstChild);
 			Console.WriteLine("The first document body child node is: " + engine.Document.Body.FirstChild);
@@ -41,7 +41,7 @@ namespace Sample
 	{
 		public static async Task GetHtml5ScoreTest()
 		{
-			var engine = new Engine();
+			var engine = EngineBuilder.New().UseJint().Build()
 
 			//Open Html5Test site
 			var page = await engine.OpenUrl("https://html5test.com");
@@ -60,27 +60,24 @@ namespace Sample
 ```c#
 //create web proxy object
 var webProxy = new WebProxy(yor_proxy_address, true);
-//initialize resource provider with the proxy
-var resourceProvider = new ResourceProviderBuilder()
-    .Http(http => http.Proxy(webProxy))
-    .Build();
 
-var engine = new Engine(resourceProvider);
+var engine = EngineBuilder.New()
+    //initialize resource provider with the proxy
+    .ConfigureResourceProvider(r => r.Http(http => http.Proxy(webProxy))) 
+    .Build();
 ```
 
 ## Open sites with basic authorization
 ```c#
-var resourceProvider = new ResourceProviderBuilder()
-    .Http(http => http.Basic(login, password))
+var engine = EngineBuilder.New()
+    .ConfigureResourceProvider(r => r.Http(http.Basic(login, password))) 
     .Build();
-
-var engine = new Engine(resourceProvider);
 
 ```
 
 ## Get the status code of the page
 ```c#
-var page = await new Engine().OpenUrl(value);
+var page = await EngineBuilder.New().UseJint().Build().OpenUrl(value);
 if (page is HttpPage httpPage && httpPage.HttpStatusCode == HttpStatusCode.Unauthorized)
 {
 //do something
@@ -102,7 +99,7 @@ Easy way to submit this form is in the code below:
 
 
 ```c#
-var page = new Engine().OpenUrl("http://yoursite.here").Wait();
+var page = await EngineBuilder.New().UseJint().Build().OpenUrl("http://yoursite.here");
 ((HtmlInputElement)page.Document.GetElementById("Username")).Value = "John";
 ((HtmlInputElement)page.Document.GetElementById("Password")).Value = "123456";
 ((HtmlInputElement)page.Document.GetElementById("clickme")).Click();
@@ -116,7 +113,7 @@ The previous example shows how to send a simple form. It will work if your site 
 
 
 ```c#
-var page = new Engine().OpenUrl("http://yoursite.here").Wait();
+var page = await EngineBuilder.New().UseJint().Build().OpenUrl("http://yoursite.here");
 ((HtmlInputElement)page.Document.GetElementById("Username")).EnterText("John");
 ((HtmlInputElement)page.Document.GetElementById("Password")).EnterText("123456");
 ((HtmlInputElement)page.Document.GetElementById("clickme")).Click();
@@ -129,10 +126,10 @@ You can call the OpenUrl method as many times as you like. Each time a call is m
 
 
 ```c#
-var engine = new Engine();
-var mainPage = engine.OpenUrl("http://yoursite.here").Wait();
+var engine = EngineBuilder.New().UseJint().Build();
+var mainPage = await engine.OpenUrl("http://yoursite.here");
 //... Do something, for example, submit the login form on the main page.
-var subPage = engine.OpenUrl("http://yoursite.here/someresource").Wait();
+var subPage = await engine.OpenUrl("http://yoursite.here/someresource");
 // or if you have some 'a' element on the site
 engine.OpenUrl(engine.Document.GetElementsByTagName("a").First().GetAttribute("href"));
 ```
@@ -155,29 +152,15 @@ You just need to get the link from the document and load the file in any accessi
 
 
 ```c#
-var page = new Engine().OpenUrl("http://testpage.net/").Wait();
+var engine = EngineBuilder.New().UseJint().Build();
+var page = engine.OpenUrl("http://testpage.net/").Wait();
 var download = page.Document.GetElementById("download");
 var href = download.GetAttribute("href");
 var fileLink = new Uri(engine.Uri, href);
+//you can get cookies using engine.CookieContainer
 using (var client = new WebClient())
     System.Console.Write(client.DownloadString(fileLink));
 ```
-
-### Download the file by url using ResourceProvider
-
-The server may require the presence of certain cookies to download the file. In this case, you can use the ResourceProvider, through which Engine requests resources.
-```c#
-var engine = new Engine();
-var page = engine.OpenUrl("http://todosoft.ru/test/").Wait();
-var download = page.Document.GetElementById("download");
-var href = download.GetAttribute("href");
-var request = engine.ResourceProvider.CreateRequest(href);
-var task = engine.ResourceProvider.SendRequestAsync(request);
-task.Wait();
-System.Console.Write(task.Result.Stream.ReadToEnd());
-```
-
-By the way, ResourceProvider also provides direct access to cookies, which you can modify or use to make your own request to the server. Use the engine.ResourceProvider.CookieContainer property (Optimus v2.1).
 
 ### Download the file initiated by window.open call
 Some pages may contain the buttons or other elements like this:
@@ -190,13 +173,22 @@ In browser click on such a button leads to downloading the file from the url spe
 
 
 ```c#
-var engine = new Engine();
+var engine = EngineBuilder.New().UseJint().Build();
 engine.OnWindowOpen += (url, name, options) => {
    // download the file, from url using code from samples above.
 };
 
-var page = engine.OpenUrl("http://site.net").Wait();
+var page = await engine.OpenUrl("http://site.net");
 
 var button = page.Document.GetElementById("download") as HtmlElement;
 button.Click();
+```
+
+## Pre-define JavaScript functions
+Some sites may use the JS functions that does not supported by Optimus. Most often, this is an obsolete API parts. You can execute your script that defines missing functions.
+
+```c#
+var engine = EngineBuilder.New().UseJint().Build();
+engine.ScriptExecutor.Execute("text/javascript", "function escape(str){return encodeURI(str)};");
+var page = await engine.OpenUrl("http://localhost", false);//second parameter should be 'false'.
 ```
