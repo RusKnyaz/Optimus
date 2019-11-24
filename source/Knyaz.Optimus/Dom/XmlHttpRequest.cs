@@ -37,7 +37,7 @@ namespace Knyaz.Optimus.Dom
 			Func<string, string, Request> requestFn,
 			Func<Stream,object> parseJsonFn = null)
 		{
-			_resourceProvider = resourceProvider;
+			_resourceProvider = resourceProvider ?? throw new ArgumentNullException(nameof(resourceProvider));
 			_syncObj = syncObj;
 			_owner = owner;
 			_requestFn = requestFn;

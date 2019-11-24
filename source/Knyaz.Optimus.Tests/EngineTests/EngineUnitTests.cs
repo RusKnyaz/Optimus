@@ -578,8 +578,8 @@ function reqListener () {
 							: (IResource) null));
 			
 			Mock.Get(resourceProvider).Setup(x => x.Preload(It.IsAny<Request>())).Callback<Request>(req => prerequests.Add(req));
-			
-			var engine = new Engine(resourceProvider);
+
+			var engine = EngineBuilder.New().SetResourceProvider(resourceProvider).Build(); 
 			engine.OpenUrl("http://localhost").Wait();
 			
 			Assert.AreEqual(1, prerequests.Count);

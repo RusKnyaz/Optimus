@@ -85,12 +85,15 @@ namespace Knyaz.Optimus.ResourceProviders
                 return req;
             }
             
+            var resourceProvider = _resourceProvider ?? new ResourceProviderBuilder().UsePrediction().Http()
+	            .Build();
+            
             var exeCtx = new ScriptExecutionContext(
                 window,
-                parseJson => new XmlHttpRequest(_resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
+                parseJson => new XmlHttpRequest(resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
             
             var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
-            return engineKeeper[0] = new Engine(_resourceProvider, window , scriptExecutor) {
+            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor) {
 	            ComputedStylesEnabled = _computedStylesEnabled
             }; 
         }
