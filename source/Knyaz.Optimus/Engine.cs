@@ -96,7 +96,7 @@ namespace Knyaz.Optimus
 			
 			ResourceProvider = new NotifyingResourceProvider(rp, 
 				request => OnRequest?.Invoke(request), 
-				arguments => OnResponse(arguments));
+				arguments => OnResponse?.Invoke(arguments));
 
 			_cookieContainer = new CookieContainer();
 			
