@@ -110,6 +110,16 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ConstructWithDefaultOffset")]
 		[TestCase("SetInt16DefaultEndian")]
 		[TestCase("SetInt16")]
+		
+		[TestCase("SetInt8ByIndexer")]
+		[TestCase("SetInt16ByIndexer")]
+		[TestCase("SetInt32ByIndexer")]
+		[TestCase("SetUInt8ByIndexer")]
+		[TestCase("SetUInt16ByIndexer")]
+		[TestCase("SetUInt32ByIndexer")]
+		[TestCase("SetFloat32ByIndexer")]
+		[TestCase("SetFloat64ByIndexer")]
+		
 		[TestCase("ArrayBufferType")]
 		[TestCase("Int8ArrayType")]
 		[TestCase("Uint8ArrayType")]

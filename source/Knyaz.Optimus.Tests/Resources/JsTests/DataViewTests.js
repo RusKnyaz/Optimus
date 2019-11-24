@@ -36,6 +36,69 @@
             Assert.AreEqual(768, dataView.getInt16(1, true));
         }
     },
+    "SetFloat32ByIndexer":{
+        run: function () {
+            var dataView = new Float32Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetFloat64ByIndexer":{
+        run: function () {
+            var dataView = new Float32Array(new ArrayBuffer(8));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetInt16ByIndexer":{
+        run: function () {
+            var dataView = new Int16Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetUInt32ByIndexer":{
+        run: function () {
+            var dataView = new Uint32Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetInt32ByIndexer":{
+        run: function () {
+            var dataView = new Int32Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetUInt16ByIndexer":{
+        run: function () {
+            var dataView = new Uint16Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetInt16ByIndexer":{
+        run: function () {
+            var dataView = new Int16Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetUInt8ByIndexer":{
+        run: function () {
+            var dataView = new Int8Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
+    "SetInt8ByIndexer":{
+        run: function () {
+            var dataView = new Uint8Array(new ArrayBuffer(4));
+            dataView[0] = 20;
+            Assert.AreEqual(20, dataView[0], "dataView[0]");
+        }
+    },
     "ArrayBufferType":{run: function(){ Assert.AreEqual("function", typeof ArrayBuffer); }},
     "Int8ArrayType":{run: function(){ Assert.AreEqual("function", typeof Int8Array); }},
     "Uint8ArrayType":{run: function(){ Assert.AreEqual("function", typeof Uint8Array); }},

@@ -69,7 +69,7 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 							.ToArray();
 						
 						var obj = ctor.Invoke(args);
-						return new ClrObject(Engine, obj, _converter.GetPrototype(obj.GetType()));
+						return new ClrObject(Engine, obj, _converter.GetPrototype(obj.GetType()), _converter);
 					}
 				} 
 			}

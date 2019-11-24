@@ -168,7 +168,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			};
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
 			Assert.AreEqual(new object[0], log);
-			signal.WaitOne(1000);
+			Assert.IsTrue(signal.WaitOne(1000));
 			CollectionAssert.AreEqual(new[] { "ok" }, log);
 		}
 

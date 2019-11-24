@@ -213,6 +213,21 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         }
 
         [Test]
+        public void SetTimeoutWithNull()
+        {
+	        Tuple<Action<object[]>, double?, object[]> args = null; 
+            
+	        var windowMock = new Mock<IWindowEx>();
+	        windowMock.Setup(x => x.SetTimeout(It.IsAny<Action<object[]>>(), It.IsAny<double?>(), It.IsAny<object[]>()))
+		        .Callback<Action<object[]>, double?, object[]>( (a1,a2,a3) => args = new Tuple<Action<object[]>, double?, object[]>(a1,a2,a3));
+            
+	        Execute(windowMock.Object, "setTimeout(null, 300);");
+            
+	        Assert.IsNotNull(args);
+	        Assert.IsNull(args.Item1);
+        }
+
+        [Test]
         public void ChildNodesAccessedByIndexer()
         {
             var document = DomImplementation.Instance.CreateHtmlDocument();
