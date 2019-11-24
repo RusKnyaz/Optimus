@@ -23,13 +23,7 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			Prototype = engine.Function.PrototypeObject;
 			FastAddProperty("prototype", _converter.GetPrototype(type), false, false, false);
 			
-			foreach (var staticField in type.GetFields(BindingFlags.Public | BindingFlags.Static)
-				.Where(p => p.GetCustomAttribute<JsHiddenAttribute>() == null))
-			{
-				var clrValue = staticField.GetValue(null);
-
-				FastAddProperty(staticField.Name, JsValue.FromObject(engine, clrValue), false, false, false);
-			}
+			DomConverter.DefineStatic(this, type);
 		}
 
 		public override JsValue Call(JsValue thisObject, JsValue[] arguments)
@@ -85,13 +79,16 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			{
 				var val = argsValues[idx];
 
-				if (val is double)
+				if (val is double doubleVal)
 				{
 					if (type == typeof(int))
-						val = Convert.ToInt32((double) val);
+						val = Convert.ToInt32(doubleVal);
 					
 					if(type == typeof(float))
-						val = (float) (double) val;
+						val = (float) doubleVal;
+
+					if (type == typeof(ulong))
+						val = Convert.ToUInt64(doubleVal);
 				}
 				
 				yield return val;
@@ -104,7 +101,8 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			if (valType == typeof(double))
 				return parType == typeof(int) ||
 				       parType == typeof(float) ||
-				       parType == typeof(uint);
+				       parType == typeof(uint) ||
+					   parType == typeof(ulong);
 
 			return valType == parType;
 		}

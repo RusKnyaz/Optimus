@@ -132,11 +132,22 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("DataViewType")]
 		[TestCase("NewArrayBuffer")]
 		
+		
+		[TestCase("Int16FromSize")]
+		[TestCase("UInt16FromSize")]
+		[TestCase("Int8FromSize")]
+		[TestCase("UInt8FromSize")]
+		[TestCase("Int32FromSize")]
+		[TestCase("UInt32FromSize")]
+		[TestCase("Float32FromSize")]
+		[TestCase("Float64FromSize")]
+		
 		[TestCase("Int16FromArrayBuffer")]
 		[TestCase("Int16FromArray")]
 		[TestCase("Int16FromArrayWithFloats")]
 		[TestCase("Uint16InstatiatedFromArray")]
 		[TestCase("Uint16InstatiatedFromSignedArray")]
+		[TestCase("BytesPerElement")]
 		public void DataViewTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
     }
 }

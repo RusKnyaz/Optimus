@@ -1,9 +1,15 @@
 # Optimus Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.4]
+
+### New features
+- Expanded TypedArray API
+
+
 ## [2.3] - 2019-11-23
 
-## New features
+### New features
 - NavigatorPlugins
 - EngineBuilder - new way to configure optimus engine
 - EngineBuilder.JsScriptExecutor - ability to specify own js script execution engine

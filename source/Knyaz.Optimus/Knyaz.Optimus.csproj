@@ -13,12 +13,9 @@
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
-    <VersionPrefix>2.3.3</VersionPrefix>
+    <VersionPrefix>2.4.0</VersionPrefix>
       <PackageReleaseNotes>
-          - NavigatorPlugins
-          - EngineBuilder - new way to configure optimus engine
-          - EngineBuilder.JsScriptExecutor - ability to specify own js script execution engine
-          - Cookie container properties
+          Expanded TypedArray API.
       </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

@@ -111,6 +111,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// </summary>
 	public class Int8Array : TypedArray<sbyte>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 1;
+	
+		public Int8Array(ulong length) : base(new ArrayBuffer(length)){}
+		
 		public Int8Array(ArrayBuffer buffer) : base(buffer) { }
 		public Int8Array(sbyte[] data) : base(data) { }
 		public Int8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
@@ -136,6 +141,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	[JsName("Uint8Array")]
 	public class UInt8Array : TypedArray<byte>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 1;
+		
+		public UInt8Array(ulong length) : base(new ArrayBuffer(length)){}
+		
 		public UInt8Array(ArrayBuffer buffer) : base(buffer) { }
 		public UInt8Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public UInt8Array(byte[] data) : base(data) { }
@@ -162,6 +172,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// </summary>
 	public class Int16Array : TypedArray<short>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 2;
+		
+		public Int16Array(ulong length) : base(new ArrayBuffer(length*2)){}
+		
 		public Int16Array(ArrayBuffer buffer) : base(buffer) { }
 		public Int16Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Int16Array(short[] data) : base(data) { }
@@ -186,6 +201,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// </summary>
 	public class Int32Array : TypedArray<int>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 4;
+		
+		public Int32Array(ulong length) : base(new ArrayBuffer(length*4)){}
+		
 		public Int32Array(ArrayBuffer buffer) : base(buffer) { }
 		public Int32Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Int32Array(int[] data) : base(data) { }
@@ -211,6 +231,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	[JsName("Uint32Array")]
 	public class UInt32Array : TypedArray<uint>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 4;
+		
+		public UInt32Array(ulong length) : base(new ArrayBuffer(length*4)){}
+		
 		public UInt32Array(ArrayBuffer buffer) : base(buffer) { }
 		public UInt32Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public UInt32Array(uint[] data) : base(data) { }
@@ -236,6 +261,10 @@ namespace Knyaz.Optimus.Dom.Perf
 	[JsName("Uint16Array")]
 	public class UInt16Array : TypedArray<ushort>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 2;
+		
+		public UInt16Array(ulong length) : base(new ArrayBuffer(length*2)){}
 		public UInt16Array(ArrayBuffer buffer) : base(buffer) { }
 		public UInt16Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public UInt16Array(ushort[] data) : base(data) { }
@@ -260,6 +289,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// </summary>
 	public class Float32Array : TypedArray<float>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 4;
+		
+		public Float32Array(ulong length) : base(new ArrayBuffer(length*4)){}
+		
 		public Float32Array(ArrayBuffer buffer) : base(buffer) { }
 		public Float32Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Float32Array(float[] data) : base(data) { }
@@ -284,6 +318,11 @@ namespace Knyaz.Optimus.Dom.Perf
 	/// </summary>
 	public class Float64Array : TypedArray<double>
 	{
+		[JsName("BYTES_PER_ELEMENT")]
+		public static readonly int BytesPerElement = 8;
+		
+		public Float64Array(ulong length) : base(new ArrayBuffer(length*8)){}
+		
 		public Float64Array(ArrayBuffer buffer) : base(buffer) { }
 		public Float64Array(object[] data) : base(data.Select(FromObject).ToArray()) { }
 		public Float64Array(double[] data) : base(data) { }

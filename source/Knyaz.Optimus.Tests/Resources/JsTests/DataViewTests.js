@@ -123,6 +123,54 @@
             Assert.AreEqual(2, arr.byteLength);
         }
     },
+    "Int16FromSize":{
+        run:function() {
+            var arr = new Int16Array(4);
+            Assert.AreEqual(8, arr.byteLength);
+        }
+    },
+    "UInt16FromSize":{
+        run:function() {
+            var arr = new Uint16Array(4);
+            Assert.AreEqual(8, arr.byteLength);
+        }
+    },
+    "Int32FromSize":{
+        run:function() {
+            var arr = new Int32Array(4);
+            Assert.AreEqual(16, arr.byteLength);
+        }
+    },
+    "UInt32FromSize":{
+        run:function() {
+            var arr = new Uint32Array(4);
+            Assert.AreEqual(16, arr.byteLength);
+        }
+    },
+    "Int8FromSize":{
+        run:function() {
+            var arr = new Int8Array(4);
+            Assert.AreEqual(4, arr.byteLength);
+        }
+    },
+    "UInt8FromSize":{
+        run:function() {
+            var arr = new Uint8Array(4);
+            Assert.AreEqual(4, arr.byteLength);
+        }
+    },
+    "Float32FromSize":{
+        run:function() {
+            var arr = new Float32Array(4);
+            Assert.AreEqual(16, arr.byteLength);
+        }
+    },
+    "Float64FromSize":{
+        run:function() {
+            var arr = new Float64Array(4);
+            Assert.AreEqual(32, arr.byteLength);
+        }
+    },
     "Int16FromArray":{ 
         run:function() {
             var arr = new Int16Array([1, 2, -3]);
@@ -161,6 +209,27 @@
         run: function () {
             var arr = new Uint16Array([1, 2, -3]);
             Assert.AreEqual(65533, arr[2]);
+        }
+    },
+    "BytesPerElement" :{
+        run : function() {
+            Assert.AreEqual(1, new Int8Array(2).BYTES_PER_ELEMENT, "new Int8Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(1, new Uint8Array(2).BYTES_PER_ELEMENT, "new Uint8Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(2, new Int16Array(2).BYTES_PER_ELEMENT, "new Int16Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(2, new Uint16Array(2).BYTES_PER_ELEMENT, "new Uint16Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(4, new Int32Array(2).BYTES_PER_ELEMENT, "new Int32Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(4, new Uint32Array(2).BYTES_PER_ELEMENT, "new Uint32Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(4, new Float32Array(2).BYTES_PER_ELEMENT, "new Float32Array(2).BYTES_PER_ELEMENT");
+            Assert.AreEqual(8, new Float64Array(2).BYTES_PER_ELEMENT, "new Float64Array(2).BYTES_PER_ELEMENT");
+            
+            Assert.AreEqual(1, Int8Array.BYTES_PER_ELEMENT, "Int8Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(1, Uint8Array.BYTES_PER_ELEMENT, "Uint8Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(2, Int16Array.BYTES_PER_ELEMENT, "Int16Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(2, Uint16Array.BYTES_PER_ELEMENT, "Uint16Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(4, Int32Array.BYTES_PER_ELEMENT, "Int32Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(4, Uint32Array.BYTES_PER_ELEMENT, "Uint32Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(4, Float32Array.BYTES_PER_ELEMENT, "Float32Array.BYTES_PER_ELEMENT");
+            Assert.AreEqual(8, Float64Array.BYTES_PER_ELEMENT, "Float64Array.BYTES_PER_ELEMENT");
         }
     }
 });

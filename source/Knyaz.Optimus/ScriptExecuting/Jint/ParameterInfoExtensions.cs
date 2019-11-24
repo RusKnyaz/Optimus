@@ -65,6 +65,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 					return true;
             
 				if(jsValue.IsNumber() && (type == typeof(int) 
+				                          ||type == typeof(ulong)
 				                          || type == typeof(double)
 				                          || type == typeof(short)
 				                          || type == typeof(short?)

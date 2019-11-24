@@ -514,7 +514,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				var clrValue = staticField.GetValue(null);
 
-				jsObject.FastAddProperty(staticField.Name, JsValue.FromObject(jsObject.Engine, clrValue), false, false, false);
+				var name = staticField.GetCustomAttribute<JsNameAttribute>()?.Name ?? staticField.Name;
+
+				jsObject.FastAddProperty(name, JsValue.FromObject(jsObject.Engine, clrValue), false, false, false);
 			}
 		}
 	}
