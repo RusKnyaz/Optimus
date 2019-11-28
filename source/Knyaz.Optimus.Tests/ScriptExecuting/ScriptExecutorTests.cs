@@ -4,6 +4,7 @@ using System.IO;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Moq;
 using NUnit.Framework;
@@ -84,7 +85,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         public void NewXmlHttpRequest()
         {
             var window = Mock.Of<IWindowEx>();
-            var xmlhttp = new XmlHttpRequest(null, () => new object(), null, null);
+            var xmlhttp = new XmlHttpRequest(Mock.Of<IResourceProvider>(), () => new object(), null, null);
             var se = CreateExecutor(window, func => xmlhttp );
             Assert.AreEqual(true, se.Evaluate("XMLHttpRequest != null"));
             Assert.AreEqual(xmlhttp, se.Evaluate("new XMLHttpRequest()"));
@@ -94,7 +95,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         public void XmlHttpRequestStaticFields()
         {
             var window = Mock.Of<IWindowEx>();
-            var se = CreateExecutor(window, func => new XmlHttpRequest(null, () => new object(), null, null) );
+            var se = CreateExecutor(window, func => new XmlHttpRequest(Mock.Of<IResourceProvider>(), () => new object(), null, null) );
 
             Assert.AreEqual(0, se.Evaluate("XMLHttpRequest.UNSENT"));
             Assert.AreEqual(1, se.Evaluate("XMLHttpRequest.OPENED"));
@@ -209,6 +210,21 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             
             Assert.IsNotNull(args);
             Assert.AreEqual(new object[]{"ok"}, args.Item3);
+        }
+
+        [Test]
+        public void SetTimeoutWithNull()
+        {
+	        Tuple<Action<object[]>, double?, object[]> args = null; 
+            
+	        var windowMock = new Mock<IWindowEx>();
+	        windowMock.Setup(x => x.SetTimeout(It.IsAny<Action<object[]>>(), It.IsAny<double?>(), It.IsAny<object[]>()))
+		        .Callback<Action<object[]>, double?, object[]>( (a1,a2,a3) => args = new Tuple<Action<object[]>, double?, object[]>(a1,a2,a3));
+            
+	        Execute(windowMock.Object, "setTimeout(null, 300);");
+            
+	        Assert.IsNotNull(args);
+	        Assert.IsNull(args.Item1);
         }
 
         [Test]
@@ -408,7 +424,7 @@ child.dispatchEvent(evt);");
         {
             var document = DomImplementation.Instance.CreateHtmlDocument();
             var window = Mock.Of<IWindowEx>(x => x.Document == document);
-            var se = CreateExecutor(window, _ => new XmlHttpRequest(null, () => new object(), document, null, null));
+            var se = CreateExecutor(window, _ => new XmlHttpRequest(Mock.Of<IResourceProvider>(), () => new object(), document, null, null));
             var result = se.Evaluate(expression);
             Assert.AreEqual(expected, result);
         }

@@ -11,9 +11,7 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
-	[TestFixture]
-	[Ignore("For manual run")]
-	[Category("manual")]
+	[TestFixture, Explicit]
 	public class OpenSites
 	{
 		private int timeout = 20000;

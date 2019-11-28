@@ -20,6 +20,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 	/// </summary>
 	internal class ClrObject : ObjectInstance, IObjectWrapper
 	{
+		private readonly DomConverter _converter;
 		private IDictionary<EventInfo, FunctionInstance> _attachedEvents;
 		private readonly PropertyInfo _indexPropertyStr;
 		private readonly PropertyInfo _indexPropertyInt;
@@ -27,9 +28,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 		
 		public Object Target { get; }
 
-		public ClrObject(Engine engine, Object obj, ObjectInstance prototype)
+		public ClrObject(Engine engine, Object obj, ObjectInstance prototype, DomConverter converter)
 			: base(engine)
 		{
+			_converter = converter;
 			Target = obj;
 			Prototype = prototype;
 			Extensible = true;
@@ -117,11 +119,13 @@ namespace Knyaz.Optimus.ScriptExecuting
 					}
 					else if (_indexPropertyUlong != null && ulong.TryParse(propertyName, out var uLongIndex))
 					{
-						_indexPropertyUlong.SetValue(Target, value.ToObject(), new object[] {uLongIndex});
+						var val = _converter.ConvertToObject(value, _indexPropertyUlong.PropertyType);
+						
+						_indexPropertyUlong.SetValue(Target, val, new object[] {uLongIndex});
 					}
 					else if (_indexPropertyInt != null && int.TryParse(propertyName, out var intIndex))
 					{
-						_indexPropertyInt.SetValue(Target, value.ToObject(), new object[] {intIndex});
+						_indexPropertyInt.SetValue(Target, DomConverter.ConvertToInt(value), new object[] {intIndex});
 					}
 					else
 					{

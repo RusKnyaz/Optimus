@@ -168,7 +168,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			};
 			engine.Load(Mocks.Page(@"var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');"));
 			Assert.AreEqual(new object[0], log);
-			signal.WaitOne(1000);
+			Assert.IsTrue(signal.WaitOne(1000));
 			CollectionAssert.AreEqual(new[] { "ok" }, log);
 		}
 
@@ -578,8 +578,8 @@ function reqListener () {
 							: (IResource) null));
 			
 			Mock.Get(resourceProvider).Setup(x => x.Preload(It.IsAny<Request>())).Callback<Request>(req => prerequests.Add(req));
-			
-			var engine = new Engine(resourceProvider);
+
+			var engine = EngineBuilder.New().SetResourceProvider(resourceProvider).Build(); 
 			engine.OpenUrl("http://localhost").Wait();
 			
 			Assert.AreEqual(1, prerequests.Count);

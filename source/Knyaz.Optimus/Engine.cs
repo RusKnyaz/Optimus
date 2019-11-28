@@ -31,6 +31,8 @@ namespace Knyaz.Optimus
 		/// </summary>
 		public IResourceProvider ResourceProvider { get; }
 
+		internal IPredictedResourceProvider _predictedResourceProvider;
+
 		/// <summary>
 		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
 		/// </summary>
@@ -74,7 +76,10 @@ namespace Knyaz.Optimus
 		/// Creates new Engine instance with default settings (Js enabled, css disabled).
 		/// </summary>
 		[Obsolete("Use EngineBuilder to initialize Engine")]
-		public Engine(IResourceProvider resourceProvider = null) : this(resourceProvider, null, null)
+		public Engine(IResourceProvider resourceProvider = null) : this(
+			resourceProvider ?? new ResourceProviderBuilder().UsePrediction().Http().Build(), 
+			null, 
+			null)
 		{
 			ScriptExecutor = new ScriptExecutor(() => new JintJsScriptExecutor(Window,
 				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson)));
@@ -85,12 +90,14 @@ namespace Knyaz.Optimus
 			Window window,
 			IScriptExecutor scriptExecutor)
 		{
-			if (resourceProvider == null)
-				resourceProvider = new ResourceProviderBuilder().UsePrediction().Http()
-					.Notify(request => OnRequest?.Invoke(request), response => OnResponse?.Invoke(response))
-					.Build();
+			var rp = resourceProvider ?? throw new ArgumentNullException();
 			
-			ResourceProvider = resourceProvider;
+			_predictedResourceProvider = resourceProvider as IPredictedResourceProvider;
+			
+			ResourceProvider = new NotifyingResourceProvider(rp, 
+				request => OnRequest?.Invoke(request), 
+				arguments => OnResponse?.Invoke(arguments));
+
 			_cookieContainer = new CookieContainer();
 			
 			Console = new Console();
@@ -115,7 +122,10 @@ namespace Knyaz.Optimus
 			return window;
 		}
 
+		[Obsolete("Use ResourceProviderBuilder to subscribe on events")]
 		public event Action<Request> OnRequest;
+		
+		[Obsolete("Use ResourceProviderBuilder to subscribe on events")]
 		public event Action<ReceivedEventArguments> OnResponse;
 
 		/// <summary>
@@ -298,7 +308,7 @@ namespace Knyaz.Optimus
 
 			var html = HtmlParser.Parse(stream).ToList();
 
-			if (ResourceProvider is IPredictedResourceProvider resourceProvider)
+			if (_predictedResourceProvider != null)
 			{
 				foreach (var src in html.OfType<HtmlElement>()
 					.Flat(x => x.Children.OfType<HtmlElement>())
@@ -307,7 +317,7 @@ namespace Knyaz.Optimus
 					.Where(x => !string.IsNullOrEmpty(x))
 					)
 				{
-					resourceProvider.Preload(CreateRequest(src));
+					_predictedResourceProvider.Preload(CreateRequest(src));
 				}
 
 				if (ComputedStylesEnabled)
@@ -319,7 +329,7 @@ namespace Knyaz.Optimus
 					.Select(x => x.Attributes["href"])
 					.Where(x => !string.IsNullOrEmpty(x)))
 					{
-						resourceProvider.Preload(CreateRequest(src));
+						_predictedResourceProvider.Preload(CreateRequest(src));
 					}
 				}
 			}

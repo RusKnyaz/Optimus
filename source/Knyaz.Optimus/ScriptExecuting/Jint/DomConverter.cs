@@ -80,7 +80,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 			if (_bindedTypes.Any(x => x.IsInstanceOfType(value)))
 			{
-				result = new ClrObject(engine, value, GetPrototype(value.GetType()));
+				result = new ClrObject(engine, value, GetPrototype(value.GetType()), this);
 				_cache[value] = result;
 				return true;
 			}
@@ -115,54 +115,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		protected Engine Engine => _getEngine();
 
-		public Action<T> ConvertDelegate<T>(JsValue @this, JsValue jsFunc)
-		{
-			if (jsFunc.IsNull())
-				return null;
-			
-			var callable = jsFunc.AsObject() as ICallable;
-			Action<T> handler = null;
-			if (callable != null)
-			{
-				handler = (Action<T>) _delegatesCache.GetValue(callable, key => (Action<T>) (e =>
-				{
-					JsValue val;
-					TryConvert(e, out val);
-					key.Call(@this, new[] {val});
-				}));
-			}
-
-			return handler;
-		}
-		
-		/// <summary>
-        /// Converts js function to c# delegate with conversion array of arguments.
-        /// </summary>
-		public Action<object[]> ConvertDelegate(JsValue @this, ICallable callable)
-		{
-			Action<object[]> handler = null;
-			if (callable != null)
-			{
-				handler = (Action<object[]>) _delegatesCache.GetValue(callable, key =>
-					(Action<object[]>) (e =>
-					{
-						var args = e == null
-							? new JsValue[0]
-							: e.Select(x =>
-							{
-								TryConvert(x, out var val);
-								return val;
-							}).ToArray();
-
-						key.Call(@this, args);
-					}));
-			}
-
-			return handler;
-		}
-
-
-		readonly ConditionalWeakTable<ICallable, object> _delegatesCache = new ConditionalWeakTable<ICallable, object>();
 
 		public object ConvertFromJs(JsValue jsValue)
 		{
@@ -246,6 +198,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			value.IsString() ? short.Parse(value.AsString()) : (short) value.AsNumber();
 
 		public static int ConvertToInt(JsValue value) => value.IsString() ? int.Parse(value.AsString()) : (int) value.AsNumber();
+		
+		public static ulong ConvertToULong(JsValue value) => value.IsString() ? ulong.Parse(value.AsString()) : (ulong) value.AsNumber();
 
 		public static int? ConvertToIntOption(JsValue value) =>
 			value.IsNull() || value.IsUndefined() ? null :
@@ -270,10 +224,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 		//todo: try to use generic
 		public Delegate ConvertToDelegate(JsValue value, Type type, JsValue jsThis) =>
-			ConvertToClr((FunctionInstance)value.AsObject(), type, jsThis);
+			ConvertToClr(value.IsNull() || value.IsUndefined() ? null : (FunctionInstance)value.AsObject(), type, jsThis);
 		
 		public Delegate ConvertToDelegate(JsValue value, Type type, JsValue jsThis, bool expandArrays) =>
-			ConvertToClr((FunctionInstance)value.AsObject(), type, jsThis, expandArrays);
+			ConvertToClr(value.IsNull() || value.IsUndefined() ? null : (FunctionInstance)value.AsObject(), type, jsThis, expandArrays);
 
 		public object ConvertToObject(JsValue jsValue, Type targetType)
 		{
@@ -303,7 +257,31 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return jsValue.AsString();
 
 			if (jsValue.IsNumber())
-				return jsValue.AsNumber();
+			{
+				var dbl = jsValue.AsNumber();
+
+				if (targetType == typeof(sbyte))
+					return (sbyte) dbl;
+				if (targetType == typeof(byte))
+					return (byte) dbl;
+				if (targetType == typeof(int))
+					return (int) dbl;
+				if (targetType == typeof(uint))
+					return (uint) dbl;
+				if (targetType == typeof(short))
+					return (short) dbl;
+				if (targetType == typeof(ushort))
+					return (ushort) dbl;
+				if (targetType == typeof(long))
+					return (long) dbl;
+				if (targetType == typeof(ulong))
+					return (ulong) dbl;
+				if (targetType == typeof(float))
+					return (float) dbl;
+
+				return dbl;
+			}
+				
 
 			return null;
 		} 
@@ -332,6 +310,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 		
 		public Delegate ConvertToClr(FunctionInstance func, Type targetType, JsValue jsThis, bool expandArrayArgs = false)
 		{
+			if (func == null)
+				return null;
+			
 			if (typeof(Delegate).IsAssignableFrom(targetType))
             {
                 var jsThisInst = jsThis == JsValue.Undefined ? Engine.Global : jsThis;
