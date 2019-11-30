@@ -192,3 +192,13 @@ var engine = EngineBuilder.New().UseJint().Build();
 engine.ScriptExecutor.Execute("text/javascript", "function escape(str){return encodeURI(str)};");
 var page = await engine.OpenUrl("http://localhost", false);//second parameter should be 'false'.
 ```
+
+## Handle request and response
+If you want to modify the request before sent (add cookies, headers) you should use Notify method of ResourceProviderBuilder
+
+```c#
+var engine = EngineBuilder.New().ConfigureResourceProvider(x => x.Notify(
+    request => { /*modify request here */},
+    response => { /*handle response */}
+)).Build();
+```
