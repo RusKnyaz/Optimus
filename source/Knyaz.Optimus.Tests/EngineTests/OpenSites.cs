@@ -29,16 +29,27 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public void Octane()
+		public async Task Octane()
 		{
 			var engine = new Engine();
-			engine.OpenUrl("http://chromium.github.io/octane").Wait(timeout);
-			var startButton = engine.WaitSelector("h1#main-banner", 10000) as HtmlElement;
+			var page = await engine.OpenUrl("http://chromium.github.io/octane");
+			var startButton = page.Document.WaitSelector("h1#main-banner", 10000).FirstOrDefault() as HtmlElement;
 			Assert.IsNotNull(startButton, "Start button not found.");
 
-			startButton.Click();
+			//startButton.Click();
+			engine.ScriptExecutor.Execute("text/javascript", "Run()");
 
+			var richard = (HtmlElement)page.Document.WaitId("Result-Richards");
+			var deltaBlue = (HtmlElement) page.Document.WaitId("Result-DeltaBlue");
+			var regex = (HtmlElement) page.Document.WaitId("Result-RegExp");
+			var zlib = (HtmlElement) page.Document.WaitId("Result-zlib");
+			
 			Thread.Sleep(10000);
+			
+			System.Console.WriteLine($"Richard: {richard.TextContent}");
+			System.Console.WriteLine($"DeltaBlue: {deltaBlue.TextContent}");
+			System.Console.WriteLine($"Regex: {regex.TextContent}");
+			System.Console.WriteLine($"Zlib: {zlib.TextContent}");
 
 			System.Console.WriteLine("Score: " + startButton.InnerHTML);
 		}
@@ -47,8 +58,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Css3test()
 		{
 			var engine = new Engine();
+			engine.AttachConsole();
 			engine.OpenUrl("http://css3test.com").Wait(timeout);
+			
+			Thread.Sleep(10000);
 			var score = engine.WaitId("score");
+			
 			Assert.IsNotNull("score");
 			System.Console.WriteLine("Score: " + score.InnerHTML);
 		}

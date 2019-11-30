@@ -7,18 +7,29 @@ namespace Knyaz.Optimus.ResourceProviders
 	/// </summary>
 	public class ResourceProviderBuilder
 	{
-		private HttpResourceProviderBuilder _httpBuilder;
+		private Func<IResourceProvider> _httpFn;
 		private bool _usePrediction = false;
 		private Action<Request> _onRequset;
 		private Action<ReceivedEventArguments> _onResponse;
 
+
+		/// <summary>
+		/// Sets the resource provider to be used for http/https requests handling.
+		/// </summary>
+		public ResourceProviderBuilder Http(IResourceProvider httpResourceProvider)
+		{
+			_httpFn = () => httpResourceProvider;
+			return this;
+		}
+		
 		/// <summary>
 		/// Configures HttpResourceProvider.
 		/// </summary>
 		public ResourceProviderBuilder Http(Action<HttpResourceProviderBuilder> configureHttpResourceProvider = null)
 		{
-			_httpBuilder = new HttpResourceProviderBuilder();
-			configureHttpResourceProvider?.Invoke(_httpBuilder);
+			var builder = new HttpResourceProviderBuilder();
+			configureHttpResourceProvider?.Invoke(builder);
+			_httpFn = () => builder.Build();
 			return this;
 		}
 
@@ -32,6 +43,11 @@ namespace Knyaz.Optimus.ResourceProviders
 			return this;
 		}
 
+		/// <summary>
+		/// Adds the callback function to be called before the request sent and before the response handled by the engine. 
+		/// </summary>
+		/// <param name="onRequest">The function that can modify the any request before sending.</param>
+		/// <param name="onResponse">The function that can read the response before handling by engine.</param>
 		public ResourceProviderBuilder Notify(Action<Request> onRequest, Action<ReceivedEventArguments> onResponse)
 		{
 			_onRequset = onRequest;
@@ -41,7 +57,7 @@ namespace Knyaz.Optimus.ResourceProviders
 
 		public IResourceProvider Build()
 		{
-			IResourceProvider resourceProvider = new ResourceProvider(_httpBuilder?.Build(), new FileResourceProvider());
+			IResourceProvider resourceProvider = new ResourceProvider(_httpFn?.Invoke(), new FileResourceProvider());
 
 			if (_onRequset != null || _onResponse != null)
 				resourceProvider = new NotifyingResourceProvider(resourceProvider, _onRequset, _onResponse);
