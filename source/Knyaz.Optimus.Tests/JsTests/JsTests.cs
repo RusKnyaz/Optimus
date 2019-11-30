@@ -25,6 +25,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetBody")]
 		[TestCase("SetBodyDiv")]
 		[TestCase("SetBodyNull")]
+	    [TestCase("GetElementsByClassName")]
+	    [TestCase("GetElementsByClassNameAndSlice")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]

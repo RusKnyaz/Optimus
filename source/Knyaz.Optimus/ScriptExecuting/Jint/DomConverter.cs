@@ -68,9 +68,15 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return true;
 			}
 
+			if (value is JsValue[])
+			{
+				result = JsValue.Undefined;
+				return false;
+			}
+
 			if (_cache.TryGetValue(value, out result))
 				return true;
-
+			
 			if (value is IList list)
 			{
 				result = new ListAdapterEx(engine, list);
@@ -284,11 +290,19 @@ namespace Knyaz.Optimus.ScriptExecuting
 				
 
 			return null;
+		}
+
+		public object[] ConvertToObjectArray(JsValue value)
+		{
+			var obj = value.ToObject();
+			if(obj is JsValue[] jsValueArr)
+				return jsValueArr.Select(x => x.ToObject()).ToArray();
+
+			if (obj is object[] objArr)
+				return objArr;
+			
+			throw new ArgumentOutOfRangeException();
 		} 
-
-		public object[] ConvertToObjectArray(JsValue value) => 
-			((JsValue[]) value.ToObject()).Select(x => x.ToObject()).ToArray();
-
 
 		public IDictionary<EventInfo, FunctionInstance> GetAttachedEventsFor(JsValue clrThis)
 		{
@@ -512,85 +526,16 @@ namespace Knyaz.Optimus.ScriptExecuting
 			foreach (var staticField in type.GetFields(BindingFlags.Public | BindingFlags.Static)
 				.Where(p => p.GetCustomAttribute<JsHiddenAttribute>() == null))
 			{
+				var name = staticField.GetCustomAttribute<JsNameAttribute>()?.Name ?? staticField.Name;
+				
 				var clrValue = staticField.GetValue(null);
 
-				jsObject.FastAddProperty(staticField.Name, JsValue.FromObject(jsObject.Engine, clrValue), false, false, false);
+				jsObject.FastAddProperty(name, JsValue.FromObject(jsObject.Engine, clrValue), false, false, false);
 			}
 		}
 	}
 
 	internal class DomItemAttribute : Attribute
 	{
-	}
-
-	/// <summary>
-	/// For of jint's list adapter
-	/// </summary>
-	internal class ListAdapterEx : ArrayInstance, IObjectWrapper
-	{
-		private readonly Engine _engine;
-		private readonly IList _list;
-
-		public ListAdapterEx(Engine engine, IList list)
-			: base(engine)
-		{
-			_engine = engine;
-			_list = list;
-			Prototype = engine.Array;
-		}
-
-		public override void Put(string propertyName, JsValue value, bool throwOnError)
-		{
-			int index;
-			if (int.TryParse(propertyName, out index))
-			{
-				//todo: resize the list if index is greater then count
-
-				if (_list.Count > index)
-					_list[index] = value.ToObject();
-			}
-
-			//base.Put(propertyName, value, throwOnError);
-		}
-
-		public override JsValue Get(string propertyName)
-		{
-			int index;
-			if (int.TryParse(propertyName, out index))
-			{
-				return _list.Count > index ? JsValue.FromObject(_engine, _list[index]) : JsValue.Undefined;
-			}
-
-			return base.Get(propertyName);
-		}
-
-		public override PropertyDescriptor GetOwnProperty(string propertyName)
-		{
-			if (Properties.ContainsKey(propertyName))
-				return Properties[propertyName];
-
-			if (propertyName == "length")
-			{
-				var p = new PropertyDescriptor(
-					new ClrFunctionInstance(_engine, (value, values) => _list.Count),
-					new ClrFunctionInstance(_engine, (value, values) =>
-					{
-						//todo: resize list
-						return value;
-					}));
-
-				Properties.Add(propertyName, p);
-			}
-
-			var index = 0u;
-			if (uint.TryParse(propertyName, out index))
-			{
-				return new IndexDescriptor(Engine, propertyName, Target);
-			}
-
-			return base.GetOwnProperty(propertyName);
-		}
-
-		public object Target { get { return _list; } }
 	}
 }

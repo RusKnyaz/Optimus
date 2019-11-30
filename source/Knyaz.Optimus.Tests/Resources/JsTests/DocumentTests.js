@@ -88,5 +88,26 @@
             var doc = document.implementation.createHTMLDocument();
             Assert.Throws(function () { doc.body = null; });   
         }
+    },
+    "GetElementsByClassName":{
+        run:function () {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div class='c1'></div><div class='c2'></div><div class='c2'></div></body>");
+            var elts = doc.getElementsByClassName('c2');
+            Assert.AreEqual(2, elts.length);
+            Assert.IsNotNull(elts[1]);
+            Assert.AreEqual(elts[1], elts["1"]);
+        }
+    },
+    "GetElementsByClassNameAndSlice":{
+        run:function () {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div class='c1'></div><div class='c2'></div><div class='c2'></div></body>");
+            var elts = doc.getElementsByClassName('c2');
+            var eltsCopy = Array.prototype.slice.call(elts);
+            Assert.AreEqual(2, eltsCopy.length);
+            Assert.IsNotNull(eltsCopy[1]);
+            Assert.AreEqual(eltsCopy[1], eltsCopy["1"]);
+        }
     }
 });
