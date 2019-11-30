@@ -36,8 +36,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var startButton = page.Document.WaitSelector("h1#main-banner", 10000).FirstOrDefault() as HtmlElement;
 			Assert.IsNotNull(startButton, "Start button not found.");
 
-			//startButton.Click();
-			engine.ScriptExecutor.Execute("text/javascript", "Run()");
+			startButton.Click();
 
 			var richard = (HtmlElement)page.Document.WaitId("Result-Richards");
 			var deltaBlue = (HtmlElement) page.Document.WaitId("Result-DeltaBlue");

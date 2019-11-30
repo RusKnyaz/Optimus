@@ -294,6 +294,7 @@ namespace Knyaz.Optimus.Dom
 			switch (invariantTagName)
 			{
 				//todo: fill the list
+				case TagsNames.A: return new HtmlAnchorElement(this);
 				case TagsNames.Br: return new HtmlBrElement(this);
 				case TagsNames.TFoot:
 				case TagsNames.THead:
@@ -522,7 +523,17 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		/// <param name="evt"></param>
 		/// <param name="code"></param>
-		internal void HandleNodeScript(Event evt, string code) => OnHandleNodeScript?.Invoke(evt, code);
+		internal void HandleNodeScript(Event evt, string code, bool async = false)
+		{
+			if (async)
+			{
+				Task.Run(() => OnHandleNodeScript?.Invoke(evt, code));
+			}
+			else
+			{
+				OnHandleNodeScript?.Invoke(evt, code);
+			}
+		}
 
 		/// <summary>
 		/// Called when execution of some code inside attribute event handler requred.

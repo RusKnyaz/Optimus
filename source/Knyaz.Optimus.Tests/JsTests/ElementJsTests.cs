@@ -100,5 +100,14 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Text")]
 		[TestCase("Attr")]
 		public void ElementTypesTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+
+		[TestCase("DefaultValues")]
+		[TestCase("SetText")]
+		[TestCase("GetText")]
+		[TestCase("RelListContains")]
+		[TestCase("ChangeRelGetRelList")]
+		[TestCase("AddToRelList")]
+		[TestCase("ClickOnClick")]
+		public void HtmlAnchorElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 	}
 }
