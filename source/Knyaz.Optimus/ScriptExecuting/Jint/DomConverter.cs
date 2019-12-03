@@ -286,9 +286,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 			return null;
 		} 
 
-		public object[] ConvertToObjectArray(JsValue value) => 
-			((JsValue[]) value.ToObject()).Select(x => x.ToObject()).ToArray();
-
+		public object[] ConvertToObjectArray(JsValue value) =>
+			((JsValue[]) value.ToObject()).Select(x => x == Engine.Global ? _global : x.ToObject()).ToArray();
+		
+		public object[] ConvertToObjectArray(JsValue[] value) =>
+			value.Select(x => x == Engine.Global ? _global : x.ToObject()).ToArray();
+		
 
 		public IDictionary<EventInfo, FunctionInstance> GetAttachedEventsFor(JsValue clrThis)
 		{

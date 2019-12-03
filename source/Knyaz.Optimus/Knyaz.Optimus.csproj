@@ -16,6 +16,7 @@
     <VersionPrefix>2.4.0</VersionPrefix>
       <PackageReleaseNotes>
           Expanded TypedArray API.
+          Expanded Console (info, warn, assert, group and other methods)
       </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

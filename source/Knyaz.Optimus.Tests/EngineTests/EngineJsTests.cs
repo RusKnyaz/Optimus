@@ -37,8 +37,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		private Engine Load(string body, string js)
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>()
-				.Resource("http://localhost", "<html>"+(js != null ? "<head><script src='test.js' defer/></head>" : "")+"<body>" + body + "</body></html>");
+			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
+				"<html>"+(js != null ? "<head><script src='test.js' defer/></head>" : "")+"<body>" + body + "</body></html>");
 			
 			if(js != null)
 				resourceProvider = resourceProvider.Resource("http://localhost/test.js", js);

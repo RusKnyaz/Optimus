@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### New features
 - Expanded TypedArray API
+- Expanded Console API (Added new methods: info, warn, assert, group, ...)
 
 
 ## [2.3] - 2019-11-23

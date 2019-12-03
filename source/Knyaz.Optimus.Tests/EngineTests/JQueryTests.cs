@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.Scripting.Jurassic;
@@ -210,18 +211,13 @@ document.body.appendChild(e);";
 		public void SetHtmlWithScript()
 		{
 			var script = "$('#target')['html']('<script>console.log(1);</script>');";
-			var engine = new Engine();
-			object result = null;
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine((o ?? "null").ToString());
-				result = o;
-			};
+			var console = new Mock<IConsole>();
+			var engine = EngineBuilder.New().UseJint().Window(w => w.SetConsole(console.Object)).Build(); 
 
 			engine.Load("<html><head><script> " + R.JQueryJs +
 			            " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
 
-			Assert.AreEqual(1, result);
+			console.Verify(x => x.Log(1d), Times.Once);
 		}
 	}
 }

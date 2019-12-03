@@ -2,9 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Jint.Native;
-using Knyaz.Optimus.ScriptExecuting.Jint;
 
-namespace Knyaz.Optimus.ScriptExecuting
+namespace Knyaz.Optimus.ScriptExecuting.Jint
 {
     using Engine = global::Jint.Engine;
     
@@ -13,11 +12,17 @@ namespace Knyaz.Optimus.ScriptExecuting
         private readonly Engine _engine;
         private readonly DomConverter _typeConverter;
 
-        public JintJsEngine()
+        public JintJsEngine(object global)
         {
             _typeConverter = new DomConverter(() => _engine);
 
             _engine = new Engine(o => o.AddObjectConverter(_typeConverter));
+
+            if (global != null)
+            {
+	            _typeConverter.SetGlobal(global);
+	            _typeConverter.DefineProperties(_engine.Global, global.GetType());
+            }
         }
 
         public void Execute(string code) => _engine.Execute(code);
@@ -79,12 +84,6 @@ namespace Knyaz.Optimus.ScriptExecuting
             }
 
             return res;
-        }
-
-        public void SetGlobal(object window)
-        {
-	        _typeConverter.SetGlobal(window);
-	        _typeConverter.DefineProperties(_engine.Global, window.GetType());
         }
     }
 }

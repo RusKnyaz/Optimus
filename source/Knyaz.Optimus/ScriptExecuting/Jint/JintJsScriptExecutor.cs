@@ -27,7 +27,8 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 
 		private void CreateEngine(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXmlHttpRequest)
 		{
-			_jsEngine = new JintJsEngine();
+			_jsEngine = new JintJsEngine(window);
+			
 			_jsEngine.Execute("var window = this");
 			_jsEngine.Execute("var self = window");
 			_jsEngine.AddGlobalType(typeof(Node));
@@ -59,7 +60,6 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			_jsEngine.AddGlobalType(typeof(Float64Array));
 			_jsEngine.AddGlobalType(typeof(DataView));
 
-			_jsEngine.SetGlobal(window);
 			
 			_jsEngine.AddGlobalType<Event>(new []{typeof(string),typeof(EventInitOptions)}, 
 				args => new Event(window.Document, args[0]?.ToString(), args.Length > 1 ? (EventInitOptions)args[1] : null));

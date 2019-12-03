@@ -200,16 +200,11 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         [Test]
         public void SetTimeoutWithData()
         {
-            Tuple<Action<object[]>, double?, object[]> args = null; 
-            
             var windowMock = new Mock<IWindowEx>();
-            windowMock.Setup(x => x.SetTimeout(It.IsAny<Action<object[]>>(), It.IsAny<double?>(), It.IsAny<object[]>()))
-                .Callback<Action<object[]>, double?, object[]>( (a1,a2,a3) => args = new Tuple<Action<object[]>, double?, object[]>(a1,a2,a3));
             
             Execute(windowMock.Object, "setTimeout(function(){}, 300, 'ok');");
             
-            Assert.IsNotNull(args);
-            Assert.AreEqual(new object[]{"ok"}, args.Item3);
+            windowMock.Verify(x => x.SetTimeout(It.IsAny<Action<object[]>>(), 300, "ok"));
         }
 
         [Test]

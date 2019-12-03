@@ -7,6 +7,7 @@ using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
@@ -63,6 +64,7 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Gets the browser's console object.
 		/// </summary>
+		[Obsolete("Use own implementation of IConsole and inject it using EngineBuilder")]
 		public Console Console { get; }
 		
 		/// <summary>
@@ -79,7 +81,8 @@ namespace Knyaz.Optimus
 		public Engine(IResourceProvider resourceProvider = null) : this(
 			resourceProvider ?? new ResourceProviderBuilder().UsePrediction().Http().Build(), 
 			null, 
-			null)
+			null,
+			new NullConsole())
 		{
 			ScriptExecutor = new ScriptExecutor(() => new JintJsScriptExecutor(Window,
 				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson)));
@@ -88,7 +91,8 @@ namespace Knyaz.Optimus
 		internal Engine(
 			IResourceProvider resourceProvider, 
 			Window window,
-			IScriptExecutor scriptExecutor)
+			IScriptExecutor scriptExecutor,
+			IConsole console)
 		{
 			var rp = resourceProvider ?? throw new ArgumentNullException();
 			
@@ -100,7 +104,7 @@ namespace Knyaz.Optimus
 
 			_cookieContainer = new CookieContainer();
 			
-			Console = new Console();
+			Console = new Console(console);
 
 			Window = window ?? CreateDefaultWindow();
 			Window.Engine = this;

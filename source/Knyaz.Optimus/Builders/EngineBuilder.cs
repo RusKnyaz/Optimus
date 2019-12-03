@@ -93,7 +93,9 @@ namespace Knyaz.Optimus.ResourceProviders
                 parseJson => new XmlHttpRequest(resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
             
             var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
-            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor) {
+            var console = _windowConfig?._console ?? new NullConsole();
+            
+            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor, console) {
 	            ComputedStylesEnabled = _computedStylesEnabled
             }; 
         }
@@ -102,6 +104,7 @@ namespace Knyaz.Optimus.ResourceProviders
         {
             internal PluginInfo[] _plugins;
             internal Action<string, string, string> _windowOpenHandler;
+            internal IConsole _console;
             
             public WindowConfig SetNavigatorPlugins(PluginInfo[] plugins)
             {
@@ -113,6 +116,12 @@ namespace Knyaz.Optimus.ResourceProviders
             {
                 _windowOpenHandler = windowOpenHandler;
                 return this;
+            }
+
+            public WindowConfig SetConsole(IConsole console)
+            {
+	            _console = console;
+	            return this;
             }
         }
     }
