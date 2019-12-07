@@ -68,6 +68,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return true;
 			}
 
+			if (value is JsValue[])
+			{
+				result = JsValue.Undefined;
+				return false;
+			}
+
 			if (_cache.TryGetValue(value, out result))
 				return true;
 
@@ -286,12 +292,20 @@ namespace Knyaz.Optimus.ScriptExecuting
 			return null;
 		} 
 
-		public object[] ConvertToObjectArray(JsValue value) =>
-			((JsValue[]) value.ToObject()).Select(x => x == Engine.Global ? _global : x.ToObject()).ToArray();
-		
 		public object[] ConvertToObjectArray(JsValue[] value) =>
 			value.Select(x => x == Engine.Global ? _global : x.ToObject()).ToArray();
 		
+		public object[] ConvertToObjectArray(JsValue value)
+		{
+			var obj = value.ToObject();
+			if(obj is JsValue[] jsValueArr)
+				return jsValueArr.Select(x => x == Engine.Global ? _global : x.ToObject()).ToArray();
+
+			if (obj is object[] objArr)
+				return objArr;
+			
+			throw new ArgumentOutOfRangeException();
+		} 
 
 		public IDictionary<EventInfo, FunctionInstance> GetAttachedEventsFor(JsValue clrThis)
 		{
@@ -517,9 +531,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				var clrValue = staticField.GetValue(null);
 
-				var name = staticField.GetCustomAttribute<JsNameAttribute>()?.Name ?? staticField.Name;
-
-				jsObject.FastAddProperty(name, JsValue.FromObject(jsObject.Engine, clrValue), false, false, false);
+				jsObject.FastAddProperty(staticField.Name, JsValue.FromObject(jsObject.Engine, clrValue), false, false, false);
 			}
 		}
 	}

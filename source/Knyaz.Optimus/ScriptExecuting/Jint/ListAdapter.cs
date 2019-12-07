@@ -1,7 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Linq;
 using Jint.Native;
 using Jint.Native.Array;
 using Jint.Runtime.Descriptors;
+using Jint.Runtime.Descriptors.Specialized;
 using Jint.Runtime.Interop;
 
 namespace Knyaz.Optimus.ScriptExecuting
@@ -11,28 +14,17 @@ namespace Knyaz.Optimus.ScriptExecuting
 	/// <summary>
 	/// List to JS Array adapter
 	/// </summary>
-	internal class ListAdapter : ArrayInstance, IObjectWrapper
+	internal class ListAdapterEx : ArrayInstance, IObjectWrapper
 	{
 		private readonly Engine _engine;
 		private readonly IList _list;
 
-		public ListAdapter(Engine engine, IList list):base(engine)
+		public ListAdapterEx(Engine engine, IList list)
+			: base(engine)
 		{
 			_engine = engine;
-			_list = list;
+			_list = list is Array ? list.Cast<object>().ToList() : list;
 			Prototype = engine.Array;
-			
-			var get =
-				new ClrFunctionInstance(engine, (jsThis, values) => JsValue.FromObject(engine, _list.Count));
-			var set = new ClrFunctionInstance(_engine, (value, values) =>
-			{
-				//todo: resize list
-				return value;
-			});
-                
-			var lengthProperty = new PropertyDescriptor(get, set);
-
-			DefineOwnProperty("length", lengthProperty, false);
 		}
 
 		public override void Put(string propertyName, JsValue value, bool throwOnError)
@@ -46,7 +38,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 					_list[index] = value.ToObject();
 			}
 
-			base.Put(propertyName, value, throwOnError);
+			//base.Put(propertyName, value, throwOnError);
 		}
 
 		public override JsValue Get(string propertyName)
@@ -58,6 +50,38 @@ namespace Knyaz.Optimus.ScriptExecuting
 			}
 
 			return base.Get(propertyName);
+		}
+
+		public override PropertyDescriptor GetOwnProperty(string propertyName)
+		{
+			if (Properties.ContainsKey(propertyName))
+				return Properties[propertyName];
+
+			if (propertyName == "length")
+			{
+				var p = new PropertyDescriptor(
+					new ClrFunctionInstance(_engine, (value, values) => _list.Count),
+					new ClrFunctionInstance(_engine, (value, values) =>
+					{
+						//todo: resize list
+						return value;
+					}));
+
+				Properties.Add(propertyName, p);
+			}
+
+			if (Target is Array)
+			{
+				return base.GetOwnProperty(propertyName);
+			}
+			
+			var index = 0u;
+			if (uint.TryParse(propertyName, out index))
+			{
+				return new IndexDescriptor(Engine, propertyName, Target);
+			}
+
+			return base.GetOwnProperty(propertyName);
 		}
 
 		public object Target { get { return _list; } }
