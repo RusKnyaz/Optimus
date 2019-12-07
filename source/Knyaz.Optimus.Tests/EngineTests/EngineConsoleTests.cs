@@ -67,9 +67,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var engine = CreateEngine(consoleMock.Object);
 			
-			engine.ScriptExecutor.Execute("text/javascript", "console.log(window, 1)");
+			engine.ScriptExecutor.Execute("text/javascript", "console.log(window, 1.1)");
 			
-			consoleMock.Verify(x => x.Log(engine.Window, 1d), Times.Once);
+			consoleMock.Verify(x => x.Log(engine.Window, 1.1d), Times.Once);
 		}
 
 		[Test]
@@ -116,9 +116,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var engine = CreateEngine(consoleMock.Object);
 			
-			engine.ScriptExecutor.Execute("text/javascript", "console.warn(window, 1)");
+			engine.ScriptExecutor.Execute("text/javascript", "console.warn(window, 1.1)");
 			
-			consoleMock.Verify(x => x.Warn(engine.Window, 1d), Times.Once);
+			consoleMock.Verify(x => x.Warn(engine.Window, 1.1d), Times.Once);
 		}
 
 		[Test]
@@ -201,9 +201,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var engine = CreateEngine(consoleMock.Object);
 			
-			engine.ScriptExecutor.Execute("text/javascript", "console.assert(false, 'msg', 1)");
+			engine.ScriptExecutor.Execute("text/javascript", "console.assert(false, 'msg', 1.1)");
 			
-			consoleMock.Verify(x => x.Assert(false, "msg", 1.0d), Times.Once);
+			consoleMock.Verify(x => x.Assert(false, "msg", 1.1d), Times.Once);
 		}
 
 		[Test, Ignore("Behaviour is undefined")]

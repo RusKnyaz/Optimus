@@ -97,12 +97,8 @@ namespace Knyaz.Optimus.Tests.Dom
 				.Window(w => w.SetConsole(console.Object))
 				.Build();
 			
-			var page = await engine.OpenUrl("http://loc/");
+			await engine.OpenUrl("http://loc/");
 
-			var a = (HtmlAnchorElement)page.Document.GetElementById("a");
-
-			a.Click();
-			
 			Assert.IsTrue(signal.WaitOne(1000), "Should be called");
 			
 			Assert.AreEqual(new object[]{2d,1d}, log);
