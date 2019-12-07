@@ -33,6 +33,7 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			_jsEngine.Execute("var self = window");
 			_jsEngine.AddGlobalType(typeof(Node));
 			_jsEngine.AddGlobalType(typeof(Element));
+			_jsEngine.AddGlobalType(typeof(HtmlAnchorElement));
 			_jsEngine.AddGlobalType(typeof(HtmlBodyElement));
 			_jsEngine.AddGlobalType(typeof(HtmlButtonElement));
 			_jsEngine.AddGlobalType(typeof(HtmlDivElement));

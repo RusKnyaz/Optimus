@@ -84,6 +84,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 
 		[TestCase("Node")]
 		[TestCase("Element")]
+		[TestCase("HTMLAnchorElement")]
 		[TestCase("HTMLBodyElement")]
 		[TestCase("HTMLButtonElement")]
 		[TestCase("HTMLDivElement")]

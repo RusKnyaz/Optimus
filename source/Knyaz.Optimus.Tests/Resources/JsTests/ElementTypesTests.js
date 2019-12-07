@@ -4,6 +4,7 @@ Test("ElementTypesTests", {
     "HTMLBodyElement": {run: function(){ Assert.AreEqual("function", typeof HTMLBodyElement); }},
     "HTMLButtonElement": {run: function(){ Assert.AreEqual("function", typeof HTMLButtonElement); }},
     "HTMLDivElement": {run: function(){ Assert.AreEqual("function", typeof HTMLDivElement); }},
+    "HTMLAnchorElement": {run: function(){ Assert.AreEqual("function", typeof HTMLAnchorElement); }},
     "HTMLElement": {run: function(){ Assert.AreEqual("function", typeof HTMLElement); }},
     "HTMLIFrameElement": {run: function(){ Assert.AreEqual("function", typeof HTMLIFrameElement); }},
     "HTMLInputElement": {run: function(){ Assert.AreEqual("function", typeof HTMLInputElement); }},

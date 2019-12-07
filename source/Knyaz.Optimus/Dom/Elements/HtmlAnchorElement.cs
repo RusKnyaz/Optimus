@@ -1,4 +1,5 @@
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -7,6 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <seealso cref="https://www.w3.org/TR/2012/WD-html-markup-20121025/a.html#a"/>
 	/// <seealso cref="https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element"/>
 	/// </summary>
+	[JsName("HTMLAnchorElement")]
 	public class HtmlAnchorElement : HtmlElement
 	{
 		private readonly TokenList _relList;

@@ -17,6 +17,7 @@
       <PackageReleaseNotes>
           Expanded TypedArray API.
           Expanded Console (info, warn, assert, group and other methods)
+          Added HTMLAnchorElement type.
       </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
