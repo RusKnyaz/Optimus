@@ -405,6 +405,8 @@ child.dispatchEvent(evt);");
         [TestCase("Object.getPrototypeOf(new XMLHttpRequest()) != null", true)]
         [TestCase("(new XMLHttpRequest()).prototype === undefined", true)]
         
+        [TestCase("HTMLElement.prototype != null", true)]
+        [TestCase("Element.prototype != null", true)]
         [TestCase("HTMLBodyElement.prototype != null", true)]
         [TestCase("HTMLBodyElement.prototype.toString != null", true)]
         [TestCase("HTMLBodyElement.prototype.toString != null", true)]

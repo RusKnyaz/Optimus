@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -7,6 +8,7 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
@@ -28,22 +30,27 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			engine.OpenUrl(url);
 		}
 
+		private Engine Engine() =>
+			EngineBuilder.New().UseJint().Window(w => w.SetConsole(new SystemConsole())).Build();
+
 		[Test]
 		public async Task Octane()
 		{
-			var engine = new Engine();
+			var engine = Engine();
+			engine.AttachConsole();
+			
 			var page = await engine.OpenUrl("http://chromium.github.io/octane");
 			var startButton = page.Document.WaitSelector("h1#main-banner", 10000).FirstOrDefault() as HtmlElement;
 			Assert.IsNotNull(startButton, "Start button not found.");
 
 			startButton.Click();
 
+			Thread.Sleep(10000);
+			
 			var richard = (HtmlElement)page.Document.WaitId("Result-Richards");
 			var deltaBlue = (HtmlElement) page.Document.WaitId("Result-DeltaBlue");
 			var regex = (HtmlElement) page.Document.WaitId("Result-RegExp");
 			var zlib = (HtmlElement) page.Document.WaitId("Result-zlib");
-			
-			Thread.Sleep(10000);
 			
 			System.Console.WriteLine($"Richard: {richard.TextContent}");
 			System.Console.WriteLine($"DeltaBlue: {deltaBlue.TextContent}");

@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.Tests
 		{
 			engine.DocumentChanged += () =>
 			{
-				engine.Document.DomContentLoaded += document => System.Console.Write("DOMContentLoaded");
+				engine.Document.DomContentLoaded += document => System.Console.WriteLine("DOMContentLoaded");
 
 				engine.Scripting.BeforeScriptExecute += script => System.Console.WriteLine(
 					"Executing:" + (
@@ -29,15 +29,9 @@ namespace Knyaz.Optimus.Tests
 					"Error script execution:" + (script.Src ?? script.Id ?? "<script>") + " " + exception.Message);
 			};
 
-			engine.Console.OnLog += o => System.Console.WriteLine(o ?? "<null>");
 			return engine;
 		}
 
-		public static Console ToConsole(this Console console)
-		{
-			console.OnLog += o => System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-			return console;
-		}
 
 		public static List<object> ToList(this Console console)
 		{
