@@ -197,7 +197,7 @@ var page = await engine.OpenUrl("http://localhost", false);//second parameter sh
 If you want to modify the request before sent (add cookies, headers) you should use Notify method of ResourceProviderBuilder
 
 ```c#
-var engine = EngineBuilder.New().ConfigureResourceProvider(x => x.Notify(
+var engine = EngineBuilder.New().ConfigureResourceProvider(x => x.Http().Notify(
     request => { /*modify request here */},
     response => { /*handle response */}
 )).Build();
