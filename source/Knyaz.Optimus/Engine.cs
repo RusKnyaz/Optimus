@@ -293,7 +293,7 @@ namespace Knyaz.Optimus
 		[Obsolete]
 		public void Load(Stream stream)
 		{
-			ScriptExecutor.Clear();
+			ScriptExecutor?.Clear();
 			Document = new Document(Window);
 			BuildDocument(Document, stream);
 		}
