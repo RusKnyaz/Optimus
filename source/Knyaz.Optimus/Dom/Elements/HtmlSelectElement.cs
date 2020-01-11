@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -8,6 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// Represents &lt;SELECT&gt; HTML element.
 	/// </summary>
+	[JsName(("HTMLSelectElement"))]
 	public sealed class HtmlSelectElement : HtmlElement
 	{
 		internal HtmlSelectElement(Document ownerDocument) : base(ownerDocument, TagsNames.Select)

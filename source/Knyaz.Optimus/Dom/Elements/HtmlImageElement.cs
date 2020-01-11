@@ -10,6 +10,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// The HTMLImageElement interface provides special properties and methods  for manipulating the layout and presentation of &lt;img&gt; elements.
 	/// Specs: https://www.w3.org/TR/2011/WD-html5-author-20110705/the-img-element.html#attr-img-ismap
 	/// </summary>
+	[JsName("HTMLImageElement")]
 	public class HtmlImageElement : HtmlElement
 	{
 		private readonly Func<string, Task<IImage>> _loadImage;

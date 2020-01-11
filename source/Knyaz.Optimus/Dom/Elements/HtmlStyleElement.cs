@@ -1,8 +1,11 @@
-﻿namespace Knyaz.Optimus.Dom.Elements
+﻿using Knyaz.Optimus.ScriptExecuting;
+
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents DOM node for STYLE element. https://www.w3.org/TR/html5/document-metadata.html
 	/// </summary>
+	[JsName("HTMLStyleElement")]
 	public sealed class HtmlStyleElement : HtmlElement
 	{
 		class Defaults

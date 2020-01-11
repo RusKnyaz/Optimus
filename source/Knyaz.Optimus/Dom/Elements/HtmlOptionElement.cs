@@ -1,10 +1,12 @@
-﻿using Knyaz.Optimus.Tools;
+﻿using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents &lt;OPTION&gt; element.
 	/// </summary>
+	[JsName("HTMLOptionElement")]
 	public sealed class  HtmlOptionElement : HtmlElement
 	{
 		internal HtmlOptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Option){}

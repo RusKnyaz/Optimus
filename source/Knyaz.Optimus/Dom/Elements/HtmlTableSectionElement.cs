@@ -1,10 +1,12 @@
 using System.Linq;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// The THEAD, TFOOT, and TBODY elements.
 	/// </summary>
+	[JsName("HTMLTableSectionElement")]
 	public sealed class HtmlTableSectionElement : HtmlElement
 	{
 		internal HtmlTableSectionElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
