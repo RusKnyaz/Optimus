@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// Represents &lt;SELECT&gt; HTML element.
 	/// </summary>
-	[JsName(("HTMLSelectElement"))]
+	[JsName("HTMLSelectElement")]
 	public sealed class HtmlSelectElement : HtmlElement
 	{
 		internal HtmlSelectElement(Document ownerDocument) : base(ownerDocument, TagsNames.Select)
@@ -23,8 +23,22 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public override Node AppendChild(Node node)
 		{
-			if (node is HtmlOptionElement option && node.ChildNodes.Count == 0 && !Multiple)
-				SelectedOptions.Add(option);
+			if (node is HtmlOptionElement option)
+			{
+				if (!Multiple)
+				{
+					if (Options.Length == 0 || option.Selected)
+					{
+						SelectedOptions.Clear();
+						SelectedOptions.Add(option);
+					}
+				}
+				else
+				{
+					if (option.Selected)
+						SelectedOptions.Add(option);
+				}
+			}
 
 			return base.AppendChild(node);
 		}
@@ -62,7 +76,11 @@ namespace Knyaz.Optimus.Dom.Elements
 				var optionToRemove = options[index];
 				RemoveChild(optionToRemove);
 				if (SelectedOptions.IndexOf(optionToRemove) != -1)
+				{
 					SelectedOptions.Remove(optionToRemove);
+					if(!Multiple && options.Length > 0)
+						SelectedOptions.Add(options[0]);
+				}
 			}
 		}
 
@@ -79,7 +97,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Reflects the multiple HTML attribute, indicating whether multiple items can be selected.
 		/// </summary>
-		public bool Multiple { get; set; }
+		public bool Multiple 
+		{ 
+			get => HasAttribute("multiple");
+			set => SetFlagAttribute("multiple", value);
+		}
 
 		/// <summary>
 		/// The form control's type. When multiple is true, it returns "select-multiple"; otherwise, it returns "select-one".
@@ -122,7 +144,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public long SelectedIndex
 		{
-			get => SelectedOptions.Count == 0 ? -1 : ChildNodes.IndexOf(SelectedOptions[0]);
+			get => SelectedOptions.Count == 0 ? -1 : Options.IndexOf(SelectedOptions[0]);
 			set
 			{
 				SelectedOptions.Clear();
