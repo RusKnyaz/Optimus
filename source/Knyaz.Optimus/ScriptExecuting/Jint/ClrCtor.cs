@@ -5,6 +5,7 @@ using System.Reflection;
 using Jint.Native;
 using Jint.Native.Function;
 using Jint.Native.Object;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.ScriptExecuting.Jint
 {
@@ -40,14 +41,18 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 		public ObjectInstance Construct(JsValue[] arguments)
 		{
 			var argsValues = arguments.Select(x => x.ToObject()).ToArray();
-			var argTypes = argsValues.Select(x => x.GetType()).ToArray();
-			var exactCtor = _type.GetConstructor(argTypes);
-			if(exactCtor  != null)
+			var argTypes = argsValues.Select(x => x?.GetType()).ToArray();
+
+			if (argTypes.All(x => x != null))
 			{
-				var obj = exactCtor.Invoke(argsValues);
-				JsValue val;
-				if (_converter.TryConvert(obj, out val))
-					return val.ToObject() as ClrObject;
+				var exactCtor = _type.GetConstructor(argTypes);
+				if (exactCtor != null)
+				{
+					var obj = exactCtor.Invoke(argsValues);
+					JsValue val;
+					if (_converter.TryConvert(obj, out val))
+						return val.ToObject() as ClrObject;
+				}
 			}
 
 			foreach (var ctor in _type.GetConstructors())
@@ -101,6 +106,9 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 
 		private bool Convertible(Type valType, Type parType)
 		{
+			if (valType == null)
+				return parType.CanBeNull();
+			
 			if (valType == typeof(double))
 				return parType == typeof(int) ||
 				       parType == typeof(float) ||

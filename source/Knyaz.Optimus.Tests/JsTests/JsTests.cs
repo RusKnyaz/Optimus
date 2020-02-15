@@ -139,6 +139,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Int16FromArrayWithFloats")]
 		[TestCase("Uint16InstatiatedFromArray")]
 		[TestCase("Uint16InstatiatedFromSignedArray")]
+		
+		[TestCase("Uint8ArrayFromNull")]
+		[TestCase("Uint16ArrayFromNull")]
+		[TestCase("Int8ArrayFromNull")]
+		[TestCase("Int16ArrayFromNull")]
 		public void DataViewTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
     }
 }

@@ -74,8 +74,8 @@ namespace Knyaz.Optimus.Scripting.Jurassic
 
         private static bool CanConvert(this object argumentValue, Type type)
         {
-            if (argumentValue == null && !type.IsClass)
-                return false;
+            if (argumentValue == null || argumentValue is Null)
+                return type.IsClass;
 
             if ((argumentValue is string || argumentValue is int || argumentValue is double) && type == typeof(bool))
                 return true;
