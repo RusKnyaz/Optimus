@@ -99,10 +99,19 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetByIndexer")]
 		[TestCase("LocalStorage")]
 		[TestCase("SessionStorage")]
+		[TestCase("StoreObjectItem")]
+		[TestCase("StoreNumberItem")]
+		[TestCase("StoreBoolItem")]
+		[TestCase("StoreBoolKey")]
 		public void StorageTests(string testName)
 		{
-			if(testName == "SetByIndexer" && _jsEngine == JsEngines.Jurassic)
+			if (_jsEngine == JsEngines.Jurassic && (testName == "SetByIndexer" ||
+			                                        testName == "StoreBoolItem" ||
+			                                        testName == "StoreNumberItem"))
+			{
 				Assert.Ignore("Jurassic limitation");
+			}
+				
 		
 			JsTestsRunner.Run(_jsEngine, testName);
 		} 

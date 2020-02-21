@@ -114,8 +114,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 					}
 					else if (_indexPropertyStr != null)
 					{
-						_indexPropertyStr.SetValue(Target, value.ToObject(), new object[] {propertyName});
-							
+						var val = _converter.ConvertToObject(value, _indexPropertyStr.PropertyType);
+						
+						_indexPropertyStr.SetValue(Target, val, new object[] {propertyName});
 					}
 					else if (_indexPropertyUlong != null && ulong.TryParse(propertyName, out var uLongIndex))
 					{
@@ -125,7 +126,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 					}
 					else if (_indexPropertyInt != null && int.TryParse(propertyName, out var intIndex))
 					{
-						_indexPropertyInt.SetValue(Target, DomConverter.ConvertToInt(value), new object[] {intIndex});
+						var val = _converter.ConvertToObject(value, _indexPropertyInt.PropertyType);
+						_indexPropertyInt.SetValue(Target, val, new object[] {intIndex});
 					}
 					else
 					{

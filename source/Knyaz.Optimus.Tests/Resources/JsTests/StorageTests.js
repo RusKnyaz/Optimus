@@ -64,5 +64,33 @@ Test("StorageTests", {
             Assert.IsNotNull(window.sessionStorage, "window.localStorage");
             Assert.IsNotNull(sessionStorage, "localStorage");
         }
+    },
+    "StoreBoolKey":{
+        run:function(){
+            window.localStorage[true]="Hello";
+            Assert.AreEqual("Hello", window.localStorage[true]);
+            Assert.AreEqual("Hello", window.localStorage["true"]);
+        }
+    },
+    "StoreBoolItem":{
+        run:function(){
+            window.localStorage["A"]=true;
+            Assert.AreEqual("true", window.localStorage["A"]);
+            Assert.AreEqual(false, window.localStorage["A"] === true);
+        }
+    },
+    "StoreNumberItem":{
+        run:function(){
+            window.localStorage["A"]=10;
+            Assert.AreEqual("10", window.localStorage["A"]);
+            Assert.AreEqual(false, window.localStorage["A"] === 10);
+            Assert.AreEqual(true, window.localStorage["A"] === "10");
+        }
+    },
+    "StoreObjectItem":{
+        run:function(){
+            window.localStorage["A"]={x:'hi'};
+            Assert.AreEqual("[object Object]", window.localStorage["A"]);
+        }
     }
 });
