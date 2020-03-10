@@ -31,36 +31,11 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			
 			_jsEngine.Execute("var window = this");
 			_jsEngine.Execute("var self = window");
-			_jsEngine.AddGlobalType(typeof(Node));
-			_jsEngine.AddGlobalType(typeof(Element));
-			_jsEngine.AddGlobalType(typeof(HtmlAnchorElement));
-			_jsEngine.AddGlobalType(typeof(HtmlBodyElement));
-			_jsEngine.AddGlobalType(typeof(HtmlButtonElement));
-			_jsEngine.AddGlobalType(typeof(HtmlDivElement));
-			_jsEngine.AddGlobalType(typeof(HtmlElement));
-			_jsEngine.AddGlobalType(typeof(HtmlIFrameElement));
-			_jsEngine.AddGlobalType(typeof(HtmlInputElement));
-			_jsEngine.AddGlobalType(typeof(HtmlTextAreaElement));
-			_jsEngine.AddGlobalType(typeof(HtmlUnknownElement));
-			_jsEngine.AddGlobalType(typeof(HtmlFormElement));
-			_jsEngine.AddGlobalType(typeof(HtmlHtmlElement));
-			_jsEngine.AddGlobalType(typeof(Script));
-			_jsEngine.AddGlobalType(typeof(Comment));
-			_jsEngine.AddGlobalType(typeof(Document));
-			_jsEngine.AddGlobalType(typeof(Text));
-			_jsEngine.AddGlobalType(typeof(Attr));
-			//Perf types
-			_jsEngine.AddGlobalType(typeof(ArrayBuffer));
-			_jsEngine.AddGlobalType(typeof(Int8Array));
-			_jsEngine.AddGlobalType(typeof(UInt8Array));
-			_jsEngine.AddGlobalType(typeof(Int16Array));
-			_jsEngine.AddGlobalType(typeof(UInt16Array));
-			_jsEngine.AddGlobalType(typeof(Int32Array));
-			_jsEngine.AddGlobalType(typeof(UInt32Array));
-			_jsEngine.AddGlobalType(typeof(Float32Array));
-			_jsEngine.AddGlobalType(typeof(Float64Array));
-			_jsEngine.AddGlobalType(typeof(DataView));
 
+			foreach (var type in ScriptingSettings.Default.GlobalTypes)
+			{
+				_jsEngine.AddGlobalType(type);
+			}
 			
 			_jsEngine.AddGlobalType<Event>(new []{typeof(string),typeof(EventInitOptions)}, 
 				args => new Event(window.Document, args[0]?.ToString(), args.Length > 1 ? (EventInitOptions)args[1] : null));
