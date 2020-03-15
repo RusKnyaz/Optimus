@@ -1,8 +1,11 @@
-﻿namespace Knyaz.Optimus.Dom.Elements
+﻿using Knyaz.Optimus.ScriptExecuting;
+
+namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLTableColElement.html
 	/// </summary>
+	[JsName("HTMLTableColElement")]
 	public sealed class HtmlTableColElement : HtmlElement
 	{
 		internal HtmlTableColElement(Document ownerDocument) : base(ownerDocument, TagsNames.Col){}

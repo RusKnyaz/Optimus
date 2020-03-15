@@ -1,10 +1,12 @@
-﻿using Knyaz.Optimus.Tools;
+﻿using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLTableCellElement.html
 	/// </summary>
+	[JsName("HTMLTableCellElement")]
 	public sealed class HtmlTableCellElement : HtmlElement
 	{
 		public HtmlTableCellElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)

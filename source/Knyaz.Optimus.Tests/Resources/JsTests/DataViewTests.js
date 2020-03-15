@@ -1,4 +1,4 @@
-﻿Test("DataViewTests", {
+Test("DataViewTests", {
     "ConstructWithDefaultOffset": {
         run: function () {
             var dv = new DataView(new ArrayBuffer(10));
@@ -209,6 +209,31 @@
         run: function () {
             var arr = new Uint16Array([1, 2, -3]);
             Assert.AreEqual(65533, arr[2]);
+        }
+    },
+    "Uint8ArrayFromNull":{
+        run: function(){
+            var arr = new Uint8Array(null);
+            Assert.AreEqual(0, arr.length);
+        }
+    },
+    "Uint16ArrayFromNull":{
+        run: function(){
+            var arr = new Uint16Array(null);
+            Assert.AreEqual(0, arr.length);
+        }
+    },
+    "Int8ArrayFromNull":{
+        run: function(){
+            var arr = new Int8Array(null);
+            Assert.AreEqual(0, arr.length);
+        }
+    },
+    "Int16ArrayFromNull":{
+        run: function(){
+            var arr = new Int16Array(null);
+            Assert.AreEqual(0, arr.length);
+            Assert.IsNotNull(arr.buffer);
         }
     },
     "BytesPerElement" :{

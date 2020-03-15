@@ -5,14 +5,15 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Perf
 {
-	/// <summary>
-	/// Base class for typed arrays.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <summary> Base class for typed arrays. </summary>
+	/// <typeparam name="T">Array item type.</typeparam>
 	public abstract class TypedArray<T>
 	{
 		protected TypedArray(ArrayBuffer buffer)
 		{
+			if(buffer == null)
+				buffer = new ArrayBuffer(0);
+			
 			if (buffer.Data.Length % _bytesPerElement != 0)
 				throw new ArgumentOutOfRangeException("byte length of "+GetType().Name+" should be a multiple of " + _bytesPerElement);
 

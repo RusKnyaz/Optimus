@@ -1,8 +1,11 @@
+using Knyaz.Optimus.ScriptExecuting;
+
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents 'caption' tag in table.
 	/// </summary>
+	[JsName("HTMLTableCaptionElement")]
 	public sealed class HtmlTableCaptionElement : HtmlElement
 	{
 		internal HtmlTableCaptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Caption)

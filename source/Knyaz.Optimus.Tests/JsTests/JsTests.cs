@@ -1,4 +1,4 @@
-﻿using Knyaz.Optimus.Tests.ScriptExecuting;
+using Knyaz.Optimus.Tests.ScriptExecuting;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
@@ -99,10 +99,19 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetByIndexer")]
 		[TestCase("LocalStorage")]
 		[TestCase("SessionStorage")]
+		[TestCase("StoreObjectItem")]
+		[TestCase("StoreNumberItem")]
+		[TestCase("StoreBoolItem")]
+		[TestCase("StoreBoolKey")]
 		public void StorageTests(string testName)
 		{
-			if(testName == "SetByIndexer" && _jsEngine == JsEngines.Jurassic)
+			if (_jsEngine == JsEngines.Jurassic && (testName == "SetByIndexer" ||
+			                                        testName == "StoreBoolItem" ||
+			                                        testName == "StoreNumberItem"))
+			{
 				Assert.Ignore("Jurassic limitation");
+			}
+				
 		
 			JsTestsRunner.Run(_jsEngine, testName);
 		} 
@@ -150,6 +159,11 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Uint16InstatiatedFromArray")]
 		[TestCase("Uint16InstatiatedFromSignedArray")]
 		[TestCase("BytesPerElement")]
+		
+		[TestCase("Uint8ArrayFromNull")]
+		[TestCase("Uint16ArrayFromNull")]
+		[TestCase("Int8ArrayFromNull")]
+		[TestCase("Int16ArrayFromNull")]
 		public void DataViewTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
     }
 }

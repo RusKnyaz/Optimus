@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -240,7 +241,12 @@ namespace Knyaz.Optimus.ScriptExecuting
 			
 			if (jsValue.IsObject())
 			{
-				switch (jsValue.AsObject())
+				var obj = jsValue.AsObject();
+
+				if (targetType == typeof(string))
+					return obj.ToString();
+				
+				switch (obj)
 				{
 					case ClrObject clr:
 						return clr.Target;
@@ -250,9 +256,16 @@ namespace Knyaz.Optimus.ScriptExecuting
 
 				return jsValue;
 			}
-			
+
 			if (jsValue.IsBoolean())
-				return jsValue.AsBoolean();
+			{
+				var boolVal = jsValue.AsBoolean();
+				if (targetType == typeof(string))
+					return boolVal ? "true" : "false";
+				
+				return boolVal;
+			}
+				
 
 			if (jsValue.IsString())
 				return jsValue.AsString();
@@ -279,6 +292,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 					return (ulong) dbl;
 				if (targetType == typeof(float))
 					return (float) dbl;
+				if (targetType == typeof(string))
+					return dbl.ToString(CultureInfo.InvariantCulture);
 
 				return dbl;
 			}

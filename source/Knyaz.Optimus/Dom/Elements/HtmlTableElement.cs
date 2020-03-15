@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Represents &lt;TABLE&gt; element.
 	/// </summary>
+	[JsName("HTMLTableElement")]
 	public sealed class HtmlTableElement : HtmlElement
 	{
 		internal HtmlTableElement(Document ownerDocument) : base(ownerDocument, TagsNames.Table)

@@ -1,5 +1,6 @@
 ﻿using System;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -8,6 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
     /// This object inherits all of the properties and methods of the HTMLElement interface.
 	/// https://www.w3.org/TR/html5/document-metadata.html#the-link-element
 	/// </summary>
+	[JsName("HTMLLinkElement")]
 	public sealed class HtmlLinkElement : HtmlElement
 	{
 		private class Defaults

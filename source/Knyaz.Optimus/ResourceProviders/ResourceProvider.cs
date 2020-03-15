@@ -28,9 +28,9 @@ namespace Knyaz.Optimus.ResourceProviders
 			{
 				case "http://":
 				case "https://":
-					return HttpResourceProvider;
+					return HttpResourceProvider ?? throw new Exception("http/https resource provider has not been configured.");
 				case "file://":
-					return FileResourceProvider;
+					return FileResourceProvider ?? throw new Exception("file resource provider has not been configured.");
 				case "data://": //mono
 				case "data:":
 					return DataResourceProvider;

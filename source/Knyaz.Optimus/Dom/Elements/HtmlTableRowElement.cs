@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -6,6 +7,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// https://www.w3.org/2003/01/dom2-javadoc/org/w3c/dom/html2/HTMLTableRowElement.html
 	/// </summary>
+	[JsName("HTMLTableRowElement")]
 	public class HtmlTableRowElement : HtmlElement
 	{
 		internal HtmlTableRowElement(Document ownerDocument) : base(ownerDocument, TagsNames.Tr)

@@ -1,10 +1,12 @@
 ﻿using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Reflects 'label' html element
 	/// </summary>
+	[JsName("HTMLLabelElement")]
 	public class HtmlLabelElement : HtmlElement
 	{
 		internal HtmlLabelElement(Document ownerDocument) : base(ownerDocument, TagsNames.Label){}
