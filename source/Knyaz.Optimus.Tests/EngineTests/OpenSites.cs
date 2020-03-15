@@ -11,6 +11,10 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
+
+#if NETCOREAPP2_0
+[Ignore("Rider runs 'Explicits' under Netcore")]
+#endif
 	[TestFixture, Explicit]
 	public class OpenSites
 	{
