@@ -110,5 +110,52 @@ namespace Knyaz.Optimus.Tests.Dom
 				div.Attributes[1].Name == "customattr" &&
 				div.Attributes[2].Name == "abc");
 		}
+		
+		[Test]
+		public static void DataSetFromAttribute()
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument(); 
+			var elt = (HtmlElement)document.CreateElement("div");
+			elt.SetAttribute("data-my-data", "hello");
+			Assert.AreEqual("hello", elt.Dataset["myData"]);
+		}
+		
+		[Test]
+		public static void DataSetToAttribute()
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument();
+			var elt = (HtmlElement)document.CreateElement("div");
+			elt.Dataset["myData"] = "hello";
+			Assert.AreEqual("hello", elt.GetAttribute("data-my-data"));
+			Assert.AreEqual(1, elt.Attributes.Length);
+		}
+
+		[Test]
+		public static void DataSetToExistingAttribute()
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument();
+			var elt = (HtmlElement)document.CreateElement("div");
+			elt.SetAttribute("data-my-data", "hello");
+			elt.Dataset["myData"] = "hi";
+			Assert.AreEqual("hi", elt.GetAttribute("data-my-data"));
+			Assert.AreEqual(1, elt.Attributes.Length);
+		}
+		
+		[Test]
+		public static void DataSetFromAbsentAttribute()
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument();
+			var elt = (HtmlElement)document.CreateElement("div");
+			Assert.IsNull(elt.Dataset["myData"]);
+		}
+		
+		[Test]
+		public static void DataSetByIndexer() 
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument();
+			var elt = (HtmlElement)document.CreateElement("div");
+			elt.SetAttribute("data-my-data", "hello");
+			Assert.AreEqual("hello", elt.Dataset["myData"]);
+		}
 	}
 }

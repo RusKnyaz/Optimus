@@ -41,7 +41,6 @@
     <PackageReference Include="Knyaz.Optimus.Scripting.Jurassic" Version="3.0.0-alpha-25" />
   </ItemGroup>
   <ItemGroup>
-    
     <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />
   </ItemGroup>
   <ItemGroup>

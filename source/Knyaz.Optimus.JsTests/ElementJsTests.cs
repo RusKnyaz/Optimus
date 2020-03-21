@@ -15,7 +15,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		{
 			_jsEngine = jsEngine;
 		}
-		
+
 		[TestCase("SetParent")]
 		[TestCase("SetOwnerDocument")]
 		[TestCase("Remove")]
@@ -44,7 +44,22 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AppendAttributeThrows")]
 		[TestCase("TextElementDispatchesEvent")]
 		[TestCase("Prototype")]
-		public void ElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+		[TestCase("HiddenExist")]
+		[TestCase("DataSetExists")]
+		[TestCase("DataSetFromAttribute")]
+		[TestCase("DataSetToAttribute")]
+		[TestCase("DataSetToExistingAttribute")]
+		[TestCase("DataSetFromAbsentAttribute")]
+		[TestCase("DataSetByIndexer")]
+		[TestCase("DataSetCapitalizeFirstLetter")]
+		[TestCase("DataSetWrongAttributeName")]
+		public void ElementTests(string testName)
+		{
+			if (_jsEngine == JsEngines.Jurassic && (testName == "DataSetToAttribute" || testName == "DataSetToExistingAttribute"))
+				Assert.Ignore("Ignored due to bug in jurassic");
+		
+			JsTestsRunner.Run(_jsEngine, testName);
+		} 
 
 		[TestCase("InputChangeCheckedOnClick")]
 		[TestCase("InputCheckChangingPrevented")]

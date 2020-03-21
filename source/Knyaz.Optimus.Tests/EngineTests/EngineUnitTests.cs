@@ -660,10 +660,10 @@ function reqListener () {
 		[Test]
 		public async Task DocumentWithEmbeddedImage()
 		{
-			var httpResourceProvider = Mocks.HttpResourceProvider()
-				.Resource("http://localhost/", "<html><body><img src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>");
+			//todo: Investigate why this test is unstable.
+			var resourceProvider = Mocks.ResourceProvider(
+				"http://localhost/", "<html><body><img src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>");
 			
-			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();

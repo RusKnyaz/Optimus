@@ -17,5 +17,9 @@
     <ItemGroup>
         <EmbeddedResource Include="Tests\*" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />
+    </ItemGroup>
 
 </Project>

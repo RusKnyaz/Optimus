@@ -161,7 +161,7 @@
     "AddRemoveEventListener" :{
         run:function () {
             var called = false;
-            var handler = function (e) {  called = true;  }; 
+            var handler = function (e) {  called = true;  };
             var elt = document.createElement("div");
             elt.addEventListener("click", handler);
             elt.removeEventListener("click", handler);
@@ -254,7 +254,7 @@
         run:function () {
             var d= document.createElement("div");
             d.innerHTML = "<table><div></div><span></span><tbody></tbody><tr></tr></table>";
-            Assert.AreEqual("<div></div><span></span><table><tbody></tbody><tbody><tr></tr></tbody></table>", 
+            Assert.AreEqual("<div></div><span></span><table><tbody></tbody><tbody><tr></tr></tbody></table>",
                 d.innerHTML.toLowerCase());
         }
     },
@@ -278,7 +278,7 @@
             var at = document.createAttribute("dd");
             var div = document.createElement('div');
             Assert.Throws(function ()  {
-                div.appendChild(at);    
+                div.appendChild(at);
             })
         }
     },
@@ -297,10 +297,75 @@
             Assert.AreEqual("T", result);
         }
     },
+    "HiddenExist":{ 
+        run:function(){
+            var elt = document.createElement("div");
+            Assert.IsNotNull(elt.hidden);
+        }
+    },
+    "DataSetExists":{
+        run:function () {
+            var elt = document.createElement("div");
+            Assert.IsNotNull(elt.dataset);
+        }
+    },
+    "DataSetFromAttribute":{
+        run: function(){
+            var elt = document.createElement("div");
+            elt.setAttribute("data-my-data", "hello");
+            Assert.AreEqual("hello", elt.dataset.myData);
+        }
+    },
+    "DataSetToAttribute":{
+        run:function(){
+            var elt = document.createElement("div");
+            elt.dataset.myData = "hello";
+            Assert.AreEqual("hello", elt.getAttribute("data-my-data"));
+            Assert.AreEqual(1, elt.attributes.length);
+        }
+    },
+    "DataSetToExistingAttribute":{
+        run:function() {
+            var elt = document.createElement("div");
+            elt.setAttribute("data-my-data", "hello");
+            elt.dataset.myData = "hi";
+            Assert.AreEqual("hi", elt.getAttribute("data-my-data"));
+            Assert.AreEqual(1, elt.attributes.length);
+        }
+    },
+    "DataSetFromAbsentAttribute": {
+        run: function(){
+            var elt = document.createElement("div");
+            Assert.IsNull(elt.dataset.myData);
+        }
+    },
+    "DataSetByIndexer":{
+        run: function() {
+            var elt = document.createElement("div");
+            elt.setAttribute("data-my-data", "hello");
+            Assert.AreEqual("hello", elt.dataset["myData"]);
+        }
+    },
+    "DataSetCapitalizeFirstLetter":{
+        run:function(){
+            var elt = document.createElement("div");
+            elt.setAttribute("data--my-data", "hello");
+            Assert.AreEqual("hello", elt.dataset.MyData);
+        }
+    },
+    "DataSetWrongAttributeName":{
+        run:function(){
+            var elt = document.createElement("div");
+            elt.setAttribute("data-my--data", "hello");
+            Assert.IsNull(elt.dataset.myData);
+        }
+    },
     "Prototype":{
         run: function(){
             Assert.IsNotNull(HTMLElement.prototype, "HTMLElement.prototype");
             Assert.IsNotNull(Element.prototype, "Element.prototype");
+            Assert.AreEqual(true, HTMLElement.prototype.hasOwnProperty('dataset'), 
+                "HTMLElement.prototype.hasOwnProperty('dataset')");
         }
     }
 });

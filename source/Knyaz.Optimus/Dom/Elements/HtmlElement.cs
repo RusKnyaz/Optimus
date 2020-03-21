@@ -18,15 +18,18 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static bool Hidden = false;
 		}
 
-		internal HtmlElement(Document ownerDocument, string tagName): base(ownerDocument, tagName)	{}
+		internal HtmlElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName) =>
+			Dataset = new DomStringMap(this);
 
 		protected override void CallDirectEventSubscribers(Event evt)
 		{
 			base.CallDirectEventSubscribers(evt);
-			
+
 			if (evt.Type == "click")
 				Handle("onclick", OnClick, evt);
 		}
+
+		public DomStringMap Dataset { get; }
 
 		/// <summary>
 		/// Gets or sets the 'hidden' attribute value, indicating if the element is hidden or not.
@@ -52,7 +55,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		[JsName("onclick")]
 		public event Func<Event, bool?> OnClick;
-		
+
 		/// <summary>
 		/// Gets a CssStyleDeclaration whose value represents the declarations specified in the attribute, if present. 
 		/// </summary>
@@ -70,7 +73,7 @@ namespace Knyaz.Optimus.Dom.Elements
 					_style = new CssStyleDeclaration {CssText = GetAttribute(Attrs.Style)};
 					_style.OnStyleChanged += css =>
 					{
-						if(GetAttribute(Attrs.Style) != css)
+						if (GetAttribute(Attrs.Style) != css)
 							SetAttribute(Attrs.Style, css);
 					};
 				}
