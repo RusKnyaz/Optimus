@@ -6,12 +6,19 @@ using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.ScriptExecuting.Jint;
+using Knyaz.Optimus.Scripting.Jurassic;
 using Moq;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.ScriptExecuting
 {
     public enum JsEngines { Jint, Jurassic}
+    static class EngineBuilderExtension
+    {
+	    public static EngineBuilder UseEngine(this EngineBuilder builder, JsEngines engine) =>
+		    engine == JsEngines.Jint ? builder.UseJint() : builder.UseJurassic();
+    }
     
     [TestFixture(JsEngines.Jint)]
     [TestFixture(JsEngines.Jurassic)]
