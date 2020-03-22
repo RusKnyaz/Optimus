@@ -7,5 +7,5 @@ namespace Knyaz.Optimus.ScriptExecuting
 	/// <summary>
 	/// Tells that the object[] argument of callback function have to be expanded to arguments list in js handler.
 	/// </summary>
-	internal class JsExpandArrayAttribute : Attribute{}
+	public class JsExpandArrayAttribute : Attribute{}
 }
