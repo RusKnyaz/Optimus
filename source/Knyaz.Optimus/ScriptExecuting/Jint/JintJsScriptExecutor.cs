@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Jint.Runtime;
 using Knyaz.Optimus.Dom;
-using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Tools;
@@ -14,14 +13,11 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 	/// </summary>
 	internal class JintJsScriptExecutor : IJsScriptExecutor
 	{
-		private readonly IWindowEx _window;
-
 		private JintJsEngine _jsEngine;
 		
 		public JintJsScriptExecutor(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXmlHttpRequest)
 		{
-			_window = window ?? throw new ArgumentNullException(nameof(window));
-			CreateEngine(window, createXmlHttpRequest);
+			CreateEngine(window ?? throw new ArgumentNullException(nameof(window)) , createXmlHttpRequest);
 		}
 
 		private void CreateEngine(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXmlHttpRequest)
