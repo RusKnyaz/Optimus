@@ -30,7 +30,8 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			
 			_jsEngine.Execute("var window = this");
 			_jsEngine.Execute("var self = window");
-
+			_jsEngine.Execute("function Image(w, h) { var img = document.createElement('img'); img.width = w || 0; img.height = h||0; return img;}");
+			
 			foreach (var type in ScriptingSettings.Default.GlobalTypes)
 			{
 				_jsEngine.AddGlobalType(type);
@@ -38,19 +39,7 @@ namespace Knyaz.Optimus.ScriptExecuting.Jint
 			
 			_jsEngine.AddGlobalType<Event>(new []{typeof(string),typeof(EventInitOptions)}, 
 				args => new Event(window.Document, args[0]?.ToString(), args.Length > 1 ? (EventInitOptions)args[1] : null));
-			
-			_jsEngine.AddGlobalType<Image>(new []{typeof(int), typeof(int)}, args => {
-				var img = (HtmlImageElement)_window.Document.CreateElement("img");
-				
-				if (args.Length > 0)
-					img.Width = Convert.ToInt32(args[0]);
-				
-				if(args.Length > 1)
-					img.Height = Convert.ToInt32(args[1]);
-
-				return img;
-			});
-			
+		
 			Func<Stream, object> parseJsonFn = s => _jsEngine.ParseJson(s.ReadToEnd());
 
 			_jsEngine.AddGlobalType("XMLHttpRequest", x => createXmlHttpRequest(parseJsonFn));

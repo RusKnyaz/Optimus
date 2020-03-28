@@ -33,5 +33,22 @@ Test("HtmlImageElementTests", {
             Assert.AreEqual(300, img.width, "width");
             Assert.AreEqual(400, img.height, "height");
         }
+    },
+    "TypeOfNewImage":{
+        run: function(){
+            var img = new Image(10,10);
+            Assert.AreEqual("[object HTMLImageElement]", img.toString());
+        }
+    },
+    "PrototypeOfNewImage":{
+        run: function(){
+            var img = new Image(10,10);
+            Assert.AreEqual("[object HTMLImageElementPrototype]", Object.getPrototypeOf(img).toString());
+        }
+    },
+    "NewImageInstanceOfHTMLImageElement":{
+        run: function(){
+            Assert.AreEqual(true, new Image(1,1) instanceof HTMLImageElement);
+        }
     }
 });

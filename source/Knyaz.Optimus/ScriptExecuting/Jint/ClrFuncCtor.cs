@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.ScriptExecuting
         public override bool HasInstance(JsValue v)
         {
             var clrObject = v.TryCast<ClrObject>();
-            if (clrObject != null && clrObject.Target != null)
+            if (clrObject?.Target != null)
             {
                 return clrObject.Target is ClrType;
             }

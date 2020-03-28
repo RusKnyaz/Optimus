@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Tools
 {

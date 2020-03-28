@@ -1,4 +1,4 @@
-﻿using Knyaz.Optimus.Tests.ScriptExecuting;
+using Knyaz.Optimus.Tests.ScriptExecuting;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
@@ -80,6 +80,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("OneArgumentCtor")]
 		[TestCase("TwoArgumentsCtor")]
 		[TestCase("SetWidthAndHeight")]
+		[TestCase("TypeOfNewImage")]
+		[TestCase("PrototypeOfNewImage")]
+		[TestCase("NewImageInstanceOfHTMLImageElement")]
 		public void HtmlImageElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("Node")]
