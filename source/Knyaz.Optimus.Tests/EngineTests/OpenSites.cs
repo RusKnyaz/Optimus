@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -30,7 +29,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[TestCase("https://html5test.com")]
 		public void OpenUrl(string url)
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.OpenUrl(url);
 		}
 
@@ -67,7 +66,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void Css3test()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.AttachConsole();
 			engine.OpenUrl("http://css3test.com").Wait(timeout);
 			
@@ -115,7 +114,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void BrowseOkkam()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception.ToString());
 			engine.OpenUrl("http://okkamtech.com").Wait(timeout);
 			var userName = engine.WaitId("UserName");
@@ -125,7 +124,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void LogonToOkkam()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.AttachConsole();
 			engine.OpenUrl("http://okkamtech.com").Wait(timeout);
 			//engine.OpenUrl("http://localhost:2930");
@@ -150,7 +149,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void LogonToKwintoError()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.AttachConsole();
 			engine.OpenUrl("http://localhost:2930").Wait(timeout);
 
@@ -175,7 +174,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void LogonToKwinto()
 		{
-			var engine = new Engine() {ComputedStylesEnabled = true};
+			var engine = TestingEngine.BuildJintCss();
 			engine.AttachConsole();
 			engine.OpenUrl("http://chi.todosoft.org").Wait(timeout);
 
@@ -198,14 +197,14 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void Open404()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			Assert.Throws<AggregateException>(() => engine.OpenUrl("http://asd.okkamtech.com/").Wait());
 		}
 
 		[Test]
 		public void Redmine()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.OpenUrl("http://red.todosoft.ru").Wait();
 			var login = engine.WaitSelector("a.login").FirstOrDefault() as HtmlElement;
 			Assert.IsNotNull(login, "login button");
@@ -225,7 +224,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void MyUserAgent()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.OpenUrl("http://whatsmyuseragent.org/").Wait();
 			var uaDiv = (HtmlDivElement) engine.WaitSelector("div.user-agent").FirstOrDefault();
 			var ua = uaDiv?.TextContent;
@@ -241,7 +240,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 				.Http(x => x.Proxy(new WebProxy("88.146.227.247", 8080)))
 				.Build();
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 
 			engine.OpenUrl("https://rutracker.org").Wait();
 			System.Console.WriteLine(engine.Document.DocumentElement.InnerHTML);
@@ -250,7 +249,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public async Task OpenHabr()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.OnRequest += request => System.Console.WriteLine(request.Url);
 			engine.OnResponse += arguments => System.Console.WriteLine(arguments.Request.Url);
 			engine.AttachConsole();

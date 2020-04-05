@@ -8,7 +8,6 @@ namespace Knyaz.Optimus.ScriptExecuting
 		private IJsScriptExecutor _jsEngine;
 		
 
-		
 		public ScriptExecutor(Func<IJsScriptExecutor> getJsScriptExecutor)
 		{
 			_getJsScriptExecutor = getJsScriptExecutor;

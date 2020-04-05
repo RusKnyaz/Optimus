@@ -13,6 +13,8 @@ using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.TestingTools;
+using Knyaz.Optimus.Tests.Tools;
 using Moq;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
@@ -26,13 +28,13 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void EmptyHtml()
 		{
-			var engine = new Engine(Mock.Of<IResourceProvider>());
+			var engine = TestingEngine.BuildJint(Mock.Of<IResourceProvider>());
 			engine.Load("<html></html>");
 		}
 		
 		private Engine Load(IResourceProvider resourceProvider)
 		{
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			engine.OpenUrl("http://localhost").Wait();
 			return engine;
 		}
@@ -71,7 +73,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void Text()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.Console.OnLog += System.Console.WriteLine;
 			engine.Load(Mocks.Page(@"var c2 = document.getElementById('content1').innerHTML = 'Hello';", "<span id='content1'></span>"));
 			var elem = engine.Document.GetElementById("content1");
@@ -105,7 +107,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void NonJsScript()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 
 			string loggedValue = null;
 			engine.Console.OnLog += o => loggedValue = o.ToString();
@@ -119,7 +121,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void LoadScriptTest()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 
 			string loggedValue = null;
 			engine.Console.OnLog += o => loggedValue = o.ToString();
@@ -131,7 +133,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void DocumentReadyStateComplete()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.Load("<html><body></body></html>");
 			Assert.AreEqual(DocumentReadyStates.Complete, engine.Document.ReadyState);
 		}
@@ -176,7 +178,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test, Ignore("For manual run")]
 		public void ClearTimeout()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			var log = new List<string>();
 			engine.Console.OnLog += o => log.Add(o == null ? "<null>" : o.ToString());
 			engine.Load(Mocks.Page(
@@ -193,7 +195,7 @@ window.clearTimeout(timer);"));
 		public void Location()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://todosoft.ru", "");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			engine.OpenUrl("http://todosoft.ru");
 			Assert.AreEqual("http://todosoft.ru/", engine.Window.Location.Href);
 			Assert.AreEqual("http:", engine.Window.Location.Protocol);
@@ -203,7 +205,7 @@ window.clearTimeout(timer);"));
 		public void SetLocationHref()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://todosoft.ru", "");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			//todo: write similar test on js
 			engine.Window.Location.Href = "http://todosoft.ru";
 //todo:			Mock.Get(resourceProvider).Verify(x => x.GetResourceAsync("http://todosoft.ru"), Times.Once());
@@ -398,7 +400,7 @@ function reqListener () {
 
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			((Navigator)engine.Window.Navigator).UserAgent = "My favorite browser";
 
 			var log = engine.Console.ToList();
@@ -435,7 +437,7 @@ function reqListener () {
 
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			((Navigator)engine.Window.Navigator).UserAgent = "My favorite browser";
 
 			var log = engine.Console.ToList();
@@ -522,7 +524,7 @@ function reqListener () {
 								: (IResource) null);
 				});
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			engine.OpenUrl("http://localhost").Wait();
 			
 			Assert.AreEqual(2, requests.Count, "requests count");
@@ -535,7 +537,7 @@ function reqListener () {
 		public async Task NotFoundHttpStatusCode()
 		{
 			var resourceProvider = new ResourceProvider(Mocks.HttpResourceProvider(), null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 
 			var result = await engine.OpenUrl("http://some.site") as HttpPage;
 
@@ -572,7 +574,7 @@ function reqListener () {
 		public async Task LoadImageFromData(string url)
 		{
 			var resourceProvider = new ResourceProvider(Mocks.HttpResourceProvider().Resource("http://localhost/",""), null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
 			var loadSignal = new ManualResetEvent(false);
@@ -595,7 +597,7 @@ function reqListener () {
 					"image/bmp");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
 			var loadSignal = new ManualResetEvent(false);
@@ -614,7 +616,7 @@ function reqListener () {
 				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
 			var loadSignal = new ManualResetEvent(false);
@@ -636,7 +638,7 @@ function reqListener () {
 				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.GetElementsByTagName("img").First();
 			
@@ -654,7 +656,7 @@ function reqListener () {
 				.Resource("http://localhost/", "<html><body><img src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();
 			var loadSignal = new ManualResetEvent(false);
@@ -674,7 +676,7 @@ function reqListener () {
 					"image/bmp");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
 			var loadSignal = new ManualResetEvent(false);
@@ -694,7 +696,7 @@ function reqListener () {
 			var httpResourceProvider = Mocks.HttpResourceProvider().Resource("http://localhost/", "");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
 			var errorSignal = new ManualResetEvent(false);
@@ -710,7 +712,7 @@ function reqListener () {
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 
 			var page = await engine.OpenUrl("http://localhost/index.html#some");
 			
@@ -756,7 +758,7 @@ function reqListener () {
 		[Test, Ignore("Failed")]
 		public async Task OverrideBodyOnLoadFromScript()
 		{
-			var engine = new Engine(Mocks.ResourceProvider("http://loc/", 
+			var engine = TestingEngine.BuildJint(Mocks.ResourceProvider("http://loc/", 
 @"<html><body onload='console.log(""body onload attr"")'></body>
 <script>
 	document.body.onload=function(){console.log('body onload script')};
@@ -811,7 +813,7 @@ function reqListener () {
 	console.log('added');
 </script>
 </html>");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			var page = await engine.OpenUrl("http://loc/");
 			Assert.AreEqual(new[]{"added","link onerror","body onload"}, log);
@@ -833,7 +835,7 @@ function reqListener () {
 	console.log('added');
 </script>
 </html>").Resource("http://loc/mystyesheet.css","*{border:1px solid black}");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			var page = await engine.OpenUrl("http://loc/");
 			Assert.AreEqual(new[]{"added","ok","body onload"}, log);

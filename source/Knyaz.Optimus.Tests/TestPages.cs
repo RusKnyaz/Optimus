@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests
@@ -17,7 +18,7 @@ namespace Knyaz.Optimus.Tests
 
 		private Engine Open(string testUrl)
 		{
-			var engine = new Engine().AttachConsole();
+			var engine = TestingEngine.BuildJint().AttachConsole();
 			engine.OpenUrl(GetTestUrl(testUrl));
 			engine.WaitDocumentLoad();
 			return engine;

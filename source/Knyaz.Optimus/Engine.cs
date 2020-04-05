@@ -12,7 +12,6 @@ using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
-using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.Tools;
 using HtmlElement = Knyaz.Optimus.Html.HtmlElement;
 
@@ -74,20 +73,6 @@ namespace Knyaz.Optimus
 
 		readonly CookieContainer _cookieContainer;
 
-		/// <summary>
-		/// Creates new Engine instance with default settings (Js enabled, css disabled).
-		/// </summary>
-		[Obsolete("Use EngineBuilder to initialize Engine")]
-		public Engine(IResourceProvider resourceProvider = null) : this(
-			resourceProvider ?? new ResourceProviderBuilder().UsePrediction().Http().Build(), 
-			null, 
-			null,
-			new NullConsole())
-		{
-			ScriptExecutor = new ScriptExecutor(() => new JintJsScriptExecutor(Window,
-				parseJson => new XmlHttpRequest(ResourceProvider, () => Document, Document, CreateRequest, parseJson)));
-		}
-
 		internal Engine(
 			IResourceProvider resourceProvider, 
 			Window window,
@@ -120,8 +105,7 @@ namespace Knyaz.Optimus
 				UserAgent =
 					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
 			};
-			var window = new Window(() => Document, (url, name, opts) => OnWindowOpen?.Invoke(url, name, opts),
-				navigator);
+			var window = new Window(() => Document, (url, name, opts) => { }, navigator);
 
 			return window;
 		}
@@ -131,11 +115,6 @@ namespace Knyaz.Optimus
 		
 		[Obsolete("Use ResourceProviderBuilder to subscribe on events")]
 		public event Action<ReceivedEventArguments> OnResponse;
-
-		/// <summary>
-		/// Occurs when window.open method called.
-		/// </summary>
-		public event Action<string, string, string> OnWindowOpen;
 
 		/// <summary>
 		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).

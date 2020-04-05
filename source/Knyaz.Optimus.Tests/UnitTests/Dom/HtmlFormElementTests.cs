@@ -2,6 +2,7 @@
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -37,7 +38,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var resources = Mocks.ResourceProvider(
 				"http://a.bc", "<html><body><form id=f></form><input form=f/></body></html>");
 			
-			var engine = new Engine(resources);
+			var engine = TestingEngine.BuildJint(resources);
 			engine.OpenUrl("http://a.bc").Wait();
 			engine.Document.Get<HtmlFormElement>("#f").FirstOrDefault()
 				.Assert(form => form.Elements.Count == 1);

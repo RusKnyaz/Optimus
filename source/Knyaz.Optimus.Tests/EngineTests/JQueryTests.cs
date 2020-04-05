@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
-using Knyaz.Optimus.Scripting.Jurassic;
 using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
 using Knyaz.Optimus.Tests.Resources;
+using Knyaz.Optimus.Tests.TestingTools;
+using Knyaz.Optimus.Tests.Tools;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -20,7 +19,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public void Smoke()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
 			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body></body></html>");
 		}
@@ -34,7 +33,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					"<html><head><script> " + R.JQueryJs + " </script><script src='test.js' " + (defer ? "defer" : "") +
 					"/></head><body><div id='uca'></div></body></html>")
 				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
@@ -49,7 +48,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					"<html><head><script> " + R.JQueryJs +
 					" </script><script src='test.js'/></head><body><div id='uca'></div></body></html>")
 				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
@@ -88,7 +87,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void JQueryCreate()
 		{
 			var script = "var a = $('<input type=\"file\">');console.log(a?'ok':'error');";
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			string result = null;
 			engine.Console.OnLog += o =>
 			{
@@ -108,7 +107,7 @@ var e = document.createElement('div');
 e.id = 'loaded';
 document.body.appendChild(e);";
 
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			string result = null;
 			engine.Console.OnLog += o =>
 			{
@@ -135,7 +134,7 @@ var e = document.createElement('div');
 e.id = 'loaded';
 document.body.appendChild(e);";
 
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			string result = null;
 			engine.Console.OnLog += o =>
 			{
@@ -157,7 +156,7 @@ document.body.appendChild(e);";
 		{
 			var script = @"$(function(){console.log(document.body);});";
 
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			object result = null;
 			engine.Console.OnLog += o => { result = o; };
 			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script>" + script +
@@ -173,7 +172,7 @@ document.body.appendChild(e);";
 		public void Selector(string selector, int exptectedCount)
 		{
 			var script = @"console.log($('" + selector + "').length);";
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			object result = null;
 			engine.Console.OnLog += o =>
 			{
@@ -191,7 +190,7 @@ document.body.appendChild(e);";
 		public void OnWithSelector()
 		{
 			var script = @"$('#a').on('click.some', '.u', function(){console.log('hi');});";
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			object result = null;
 			engine.Console.OnLog += o =>
 			{

@@ -2,6 +2,7 @@
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.Tests.TestingTools;
 using Moq;
 using NUnit.Framework;
 
@@ -23,7 +24,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void SetUp()
 		{
 			_resourceProvider = Mock.Of<IResourceProvider>().Resource("http://localhost", "<html></html>");//default blank page
-			_engine = new Engine(_resourceProvider);
+			_engine = TestingEngine.BuildJint(_resourceProvider);
 		}
 
 		[TestCase("http://localhost", "/Action", "http://localhost/Action")]

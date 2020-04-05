@@ -5,6 +5,7 @@ using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 using Text = Knyaz.Optimus.Dom.Elements.Text;
 using Knyaz.Optimus.Tests.Resources;
+using Knyaz.Optimus.Tests.TestingTools;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -13,7 +14,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	{
 		static Document Load(string html)
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.Load(html);
 			return engine.Document;
@@ -21,7 +22,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		Document Load(string script, string body)
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
 			return engine.Document;
@@ -340,7 +341,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		[Test]
 		public void HtmlWithScriptBindingWithJquery()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.Load("<html><head><script>" + R.JQueryJs+"</script><script> " + R.KnockoutJs + " </script></head>" +
 			            @"<body> <div id='view' data-bind=""html:html""></div> </body>
@@ -355,7 +356,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		[Test]
 		public void SelectOptionsTest()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
 			engine.Load("<html><head><script>" + R.JQueryJs + "</script><script> " + R.KnockoutJs + " </script></head>" +
 						@"<body> <select id='s' data-bind=""options:options""></select> </body>

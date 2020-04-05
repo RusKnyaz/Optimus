@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System.Text;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Configure;
+using Knyaz.Optimus.Tests.TestingTools;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 
 namespace Knyaz.Optimus.Tests.EngineTests
@@ -26,7 +27,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		private Engine Load(IResourceProvider resourceProvider)
 		{
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			_log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			return engine;
@@ -186,7 +187,7 @@ console.log(elems.length);");
 		public void AddScriptAndExecute()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost/module", "console.log('hi from module');");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 
 			var script =
@@ -218,7 +219,7 @@ document.head.appendChild(s);";
 			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
 				$"<html><body><form><script>{modifyingScript}</script><script>{accesingScript}</script></form></body></html>");
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 
 			var log = engine.Console.ToList();
 
@@ -248,7 +249,7 @@ document.head.appendChild(s);";
 			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
 				$"<html><body><form><script id=adding>{scriptThatAddsScript}</script><script id=accessing>{accesingScript}</script></form></body></html>");
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 
 			var log = engine.Console.ToList();
 
@@ -346,7 +347,7 @@ console.log(style['width']);");
 				Mocks.ResourceProvider("http://todosoft.org",Mocks.Page("window.location.href = 'http://todosoft.org/sub';"))
 			   .Resource("http://todosoft.org/sub", Mocks.Page("console.log(window.location.href);console.log(window.location.protocol);"));
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			engine.OpenUrl("http://todosoft.org").Wait();
 
 			Thread.Sleep(1000);
@@ -364,7 +365,7 @@ console.log(style['width']);");
 					       "window.location.href = 'http://todosoft.org/sub';"))
 				.Resource("http://todosoft.org/sub", Mocks.Page("console.log(document.cookie);"));
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://todosoft.org").Wait();
 			
@@ -398,7 +399,7 @@ console.log(xhr.readyState);");
 			var resourceProvider = Mock.Of<IResourceProvider>()
 				.Resource("http://localhost/unicorn.xml", "hello");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = new List<string>();
 			engine.Console.OnLog += o =>
 				{
@@ -428,7 +429,7 @@ client.send();"));
 		[Test]
 		public void AjaxExist()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			var log = new List<string>();
 			engine.Console.OnLog += o =>
 				{
@@ -443,7 +444,7 @@ client.send();"));
 		[Test]
 		public void AddEmbeddedScriptInsideEmbedded()
 		{
-			var engine = new Engine();
+			var engine = TestingEngine.BuildJint();
 			var log = engine.Console.ToList();
 			
 			engine.Load(Mocks.Page(@"
@@ -467,7 +468,7 @@ console.log('afterappend');"));
 		[Test]
 		public void AddScriptAsync()
 		{
-			var engine = new Engine(
+			var engine = TestingEngine.BuildJint(
 				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
 			var log = engine.Console.ToList();
 			
@@ -498,7 +499,7 @@ script.someData = 'hello';
 script.onload = function(){ console.log(this.someData); document.body.innerHtml='<div id=x></div>';};
 			document.head.appendChild(script); ";
 
-			var engine = new Engine(
+			var engine = TestingEngine.BuildJint(
 				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');")
 					.Resource("http://localhost", Mocks.Page(script)));
 			var log = engine.Console.ToList();
@@ -778,7 +779,7 @@ dispatchEvent(evt);");
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id=d></div></body></html>")
 				.Resource("http://localhost/test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
 				 				                                       "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.ComputedStylesEnabled = true;
 			engine.OpenUrl("http://localhost").Wait();
@@ -810,7 +811,6 @@ dispatchEvent(evt);");
 			
 			CollectionAssert.AreEqual(new object[] { "b" }, _log);
 		}
-
 		
 		[Test]
 		public void WindowOpen()
@@ -818,24 +818,34 @@ dispatchEvent(evt);");
 			var resourceProvider = Mocks.ResourceProvider("http://site.net", Mocks.Page("",
 				"<button id=download type=submit onclick=\"window.open('file.txt')\">Download!</button>"))
 				.Resource("file.txt", "Hello");
-			
-			var engine = new Engine(resourceProvider);
 
-			engine.OpenUrl("http://site.net").Wait();
-
+			bool called = false;
 			string calledUrl = null;
 			string calledName = null;
 			string calledOptions = null;
-			engine.OnWindowOpen += (url, name, options) =>
-			{
-				calledUrl = url;
-				calledName = name;
-				calledOptions = options;
-			};
+			
+			var engine = EngineBuilder.New()
+				.UseJint()
+				.SetResourceProvider(resourceProvider)
+				.Window(w => w.SetWindowOpenHandler((url, name, options) =>
+				{
+					called = true;
+					calledUrl = url;
+					calledName = name;
+					calledOptions = options;
+				}))
+				.Build(); 
+				
+				TestingEngine.BuildJint(resourceProvider);
+
+			engine.OpenUrl("http://site.net").Wait();
+			
+			engine.ScriptExecutor.Execute("text/javascript", "window.open('file.txt')");
 
 			var button = engine.Document.GetElementById("download") as HtmlElement;
 			button.Click();
 			
+			Assert.IsTrue(called, "window.open have to be called");
 			Assert.AreEqual("file.txt", calledUrl, "url");
 			Assert.AreEqual(null, calledName, "name");
 			Assert.AreEqual(null, calledOptions, "options");
@@ -850,7 +860,7 @@ dispatchEvent(evt);");
 				<button type=submit id=b onclick=""console.log('onclick')"">Download!</button>
 				</form><script>document.getElementById(""b"").click();</script></body></html>");
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://site.net/").Wait();
 			Assert.AreEqual(new[]{"onclick", "onsubmit"}, log);
@@ -865,7 +875,7 @@ dispatchEvent(evt);");
 				<button type=submit id=b onclick=""console.log('onclick');event.preventDefault();"">Download!</button>
 				</form><script>document.getElementById(""b"").click();</script></body></html>");
 			
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://site.net/").Wait();
 			Assert.AreEqual(new[]{"onclick"}, log);
@@ -879,7 +889,7 @@ dispatchEvent(evt);");
 					"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
 				.Resource("http://site.net/login?username=John&password=123456", "<div id=d></div>");
 			
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/").Wait();
 
 			var doc = engine.Document;
@@ -900,7 +910,7 @@ dispatchEvent(evt);");
 					"<form method=post action='login'><input name=username type=text></form>")
 				.Resource("http://site.net/login", "<div id=d></div>");
 
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net").Wait();
 
 			var doc = engine.Document;
@@ -922,7 +932,7 @@ dispatchEvent(evt);");
 					"<form method=post action='login'><input name=username type=text></form>")
 				.Resource("http://site.net/login", "<div id=d></div>");
 
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net").Wait();
 
 			var doc = engine.Document;
@@ -949,7 +959,7 @@ dispatchEvent(evt);");
 					"<form method=" + method + " action='" + action + "'><input name=username type=text/><input name=password type=password/></form>")
 				.Resource(expected, "<div id=d></div>");
 
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/sub/?var1=x").Wait();
 			
 			var doc = engine.Document;
@@ -969,7 +979,7 @@ dispatchEvent(evt);");
 					"<form method=get action='download'></form>")
 				.Resource("http://site.net/sub/download", "<div id=d></div>", "image/png");
 			
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net/sub").Wait();
 			
 			engine.Document.Get<HtmlFormElement>("form").First().Submit();
@@ -986,7 +996,7 @@ dispatchEvent(evt);");
 				.Resource("http://site.net/login", "<div id=d>login</div>")
 				.Resource("http://site.net/logout", "<div id=d>logout</div>");
 			
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net").Wait();
 			
 			engine.Document.Get<HtmlButtonElement>("button").First().Click();
@@ -1002,7 +1012,7 @@ dispatchEvent(evt);");
 				.Resource("http://site.net/sub",
 					"<form method=get action='download'></form>");
 			
-			var engine = new Engine(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
 			engine.PreHandleResponse += (sender, arags) => arags.Cancel = true;
 			
 			engine.OpenUrl("http://site.net/sub").Wait();
@@ -1022,7 +1032,7 @@ dispatchEvent(evt);");
 				"}, 1, 2, 'x');" +
 				"</script></html>");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.IsNotNull(engine.WaitId("d"));
@@ -1042,7 +1052,7 @@ dispatchEvent(evt);");
 				"}, 100, 2, 'x');" +
 				"</script></html>");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.IsNotNull(engine.WaitId("d"));
@@ -1058,7 +1068,7 @@ dispatchEvent(evt);");
 				"console.log(document.implementation.Instance);" +
 				"</script></html>");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.AreEqual(new object[]{null,null}, log);
@@ -1073,7 +1083,7 @@ dispatchEvent(evt);");
 				"console.log('no error');" +
 				"</script></html>");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.AreEqual(new object[]{"no error"}, log);
@@ -1091,7 +1101,7 @@ dispatchEvent(evt);");
 				"window['myfunc']('3');" +
 				"</script></html>");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.AreEqual(new object[]{"1", "2", "3"}, log);
@@ -1107,7 +1117,7 @@ dispatchEvent(evt);");
 				"console.log('ok');" +
 				"</script></html>");
 
-			var engine = new Engine(resourceProvider);
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var log = engine.Console.ToList();
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.AreEqual(new object[]{0, null, "ok"}, log);
@@ -1135,7 +1145,7 @@ dispatchEvent(evt);");
 				"console.log(navigator.plugins[0][0].type)"+
 				"</script></html>");
 			
-			var engine = new EngineBuilder()
+			var engine = EngineBuilder.New()
 				.SetResourceProvider(resourceProvider)
 				.UseJint()
 				.Window(w => w.SetNavigatorPlugins(plugins))
@@ -1156,7 +1166,7 @@ dispatchEvent(evt);");
 				"console.log(myFunc(\"a b\"));"+
 				"</script></html>");
 			
-			var engine = new EngineBuilder()
+			var engine = EngineBuilder.New()
 				.SetResourceProvider(resourceProvider)
 				.UseJint()
 				.Build();

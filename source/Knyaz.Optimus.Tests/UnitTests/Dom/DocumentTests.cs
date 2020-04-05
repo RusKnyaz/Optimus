@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Tests.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -349,7 +350,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void SetCookie()
 		{
 			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
-			var engine = new Engine(rp);
+			var engine = TestingEngine.BuildJint(rp);
 			engine.OpenUrl("http://knyaz.ru").Wait();
 			var document = engine.Document;
 			
@@ -363,7 +364,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void ChangeCookieValue()
 		{
 			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
-			var engine = new Engine(rp);
+			var engine = TestingEngine.BuildJint(rp);
 			engine.OpenUrl("http://knyaz.ru").Wait();
 			var document = engine.Document;
 			
@@ -378,7 +379,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void RemoveCookie()
 		{
 			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
-			var engine = new Engine(rp);
+			var engine = TestingEngine.BuildJint(rp);
 			engine.OpenUrl("http://knyaz.ru").Wait();
 			var document = engine.Document;
 			
@@ -393,7 +394,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void SetCookieExpiration()
 		{
 			var rp = Mocks.ResourceProvider("http://knyaz.ru", Mocks.Page(""));
-			var engine = new Engine(rp);
+			var engine = TestingEngine.BuildJint(rp);
 			engine.OpenUrl("http://knyaz.ru").Wait();
 			var document = engine.Document;
 			

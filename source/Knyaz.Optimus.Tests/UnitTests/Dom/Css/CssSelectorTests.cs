@@ -4,6 +4,7 @@ using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.TestingTools;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom.Css
@@ -13,7 +14,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	{
 		private Engine Load(string html)
 		{
-			var engine = new Engine { ComputedStylesEnabled = true };
+			var engine = TestingEngine.BuildJintCss();
 			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
 			return engine;
 		}

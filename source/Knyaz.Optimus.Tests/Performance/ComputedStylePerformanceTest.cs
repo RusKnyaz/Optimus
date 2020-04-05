@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Text;
 using Knyaz.Optimus.TestingTools;
+using Knyaz.Optimus.Tests.TestingTools;
+using Knyaz.Optimus.Tests.Tools;
 using NBench;
 
 namespace Knyaz.Optimus.Tests.Performance
@@ -15,7 +17,7 @@ namespace Knyaz.Optimus.Tests.Performance
 		
 		private Engine Load(string html)
 		{
-			var engine = new Engine() { ComputedStylesEnabled = true };
+			var engine = TestingEngine.BuildJintCss();
 			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
 			return engine;
 		}

@@ -35,7 +35,7 @@ namespace Knyaz.Optimus.Tests.TestingTools
 				.ResourceProvider("http://localhost/",srcHtml)
 				.Resource("http://localhost/main.css", "body{background-color:red}");
 
-			var engine = new Engine(resourceProvider) {ComputedStylesEnabled = true};
+			var engine = TestingEngine.BuildJintCss(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			Assert.AreEqual(expectedHtml, page.Document.Save());
 		}

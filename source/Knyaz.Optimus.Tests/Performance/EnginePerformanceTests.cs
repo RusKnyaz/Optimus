@@ -2,6 +2,7 @@
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.Resources;
+using Knyaz.Optimus.Tests.TestingTools;
 using NBench;
 using NUnit.Framework;
 
@@ -38,7 +39,7 @@ ko.applyBindings(new VM());";
 		[MemoryMeasurement(MemoryMetric.TotalBytesAllocated)]
 		public void SimpleKnockout()
 		{
-			var engine = new Engine(_resourceProvider);
+			var engine = TestingEngine.BuildJint(_resourceProvider);
 			var result = engine.OpenUrl("http://local");
 			result.Wait();
 			var doc = result.Result.Document;
