@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Environment
 
 		public WindowTimers Timers => _timers;
 		
-		public Console Console => _engine.Console;
+		public IConsole Console { get; }
 		public Document Document => _engine.Document;
 		public Storage LocalStorage { get; } = new Storage();
 		public Storage SessionStorage { get; }= new Storage();
@@ -28,8 +28,10 @@ namespace Knyaz.Optimus.Environment
 		internal Window(
 			Func<object> getSyncObj, 
 			Action<string, string, string> openWindow,
-			INavigator navigator)
+			INavigator navigator,
+			IConsole console)
 		{
+			Console = console ?? throw new ArgumentNullException(nameof(console));
 			_openWindow = openWindow ?? ((x,y,z) => {});
 			Screen = new Screen
 				{
@@ -53,11 +55,11 @@ namespace Knyaz.Optimus.Environment
 				{
 					if (exception is JavaScriptException jsEx)
 					{
-						_engine.Console.Log($"JavaScript error in timer handler function (Line:{jsEx.LineNumber}, Col:{jsEx.Column}, Source: {jsEx.Source}): {jsEx.Error}");
+						Console.Log($"JavaScript error in timer handler function (Line:{jsEx.LineNumber}, Col:{jsEx.Column}, Source: {jsEx.Source}): {jsEx.Error}");
 					}
 					else
 					{
-						_engine.Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
+						Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
 					}
 				};
 

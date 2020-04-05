@@ -14,16 +14,14 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	{
 		static Document Load(string html)
 		{
-			var engine = TestingEngine.BuildJint();
-			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
 			engine.Load(html);
 			return engine.Document;
 		}
 
 		Document Load(string script, string body)
 		{
-			var engine = TestingEngine.BuildJint();
-			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
 			engine.Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
 			return engine.Document;
 		}
@@ -341,8 +339,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		[Test]
 		public void HtmlWithScriptBindingWithJquery()
 		{
-			var engine = TestingEngine.BuildJint();
-			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
 			engine.Load("<html><head><script>" + R.JQueryJs+"</script><script> " + R.KnockoutJs + " </script></head>" +
 			            @"<body> <div id='view' data-bind=""html:html""></div> </body>
 <script>
@@ -356,8 +353,7 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		[Test]
 		public void SelectOptionsTest()
 		{
-			var engine = TestingEngine.BuildJint();
-			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
 			engine.Load("<html><head><script>" + R.JQueryJs + "</script><script> " + R.KnockoutJs + " </script></head>" +
 						@"<body> <select id='s' data-bind=""options:options""></select> </body>
 <script>

@@ -6,6 +6,7 @@ using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.Scripting.Jurassic;
 using Knyaz.Optimus.Tests.ScriptExecuting;
+using Knyaz.Optimus.Tests.TestingTools;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
@@ -20,6 +21,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 				.Resource("http://test/sample.js", R.GetString("Knyaz.Optimus.Tests.Resources.JsTests.sample.js"));
 
 			var builder = new EngineBuilder()
+				.Window(w => w.SetConsole(SystemConsole.Instance))
 				.SetResourceProvider(resources);
 
 			switch (engineType)
@@ -31,10 +33,6 @@ namespace Knyaz.Optimus.Tests.JsTests
 			var engine = builder.Build();
 
 			engine.OpenUrl("http://test").Wait();
-
-			engine.Console.OnLog += o => {
-				Debug.WriteLine(o.ToString());
-			};
 
 			object res;
 			lock (engine.Document)

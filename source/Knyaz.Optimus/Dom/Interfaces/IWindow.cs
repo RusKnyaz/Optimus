@@ -30,7 +30,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 	public interface IWindowEx : IWindow
 	{
 		Document Document {get;}
-		Console Console { get; }
+		IConsole Console { get; }
 		Storage LocalStorage { get; } 
 		Storage SessionStorage { get; }
 		void Open(string url = null, string windowName = null, string features = null);

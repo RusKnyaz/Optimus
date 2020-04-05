@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Breaking changes
 - Removed Engine(IResourceProvider) constructor. Use EngineBuilder.
 - Removed Engine.OnWindowOpen event. Use EngineBuilder to configure Window object.
+- Removed Knyaz.Optimus.Console class. Use own IConsole implementation.
 
 
 ## [2.4]

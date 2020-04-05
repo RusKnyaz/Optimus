@@ -1,4 +1,5 @@
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Environment
 {
@@ -7,6 +8,9 @@ namespace Knyaz.Optimus.Environment
 	/// </summary>
 	internal class NullConsole : IConsole
 	{
+		[JsHidden]
+		public static NullConsole Instance = new NullConsole();
+		
 		public void Assert(bool assertion, params object[] objs) {}
 
 		public void Assert(bool assertion, string format, params object[] objs) {}

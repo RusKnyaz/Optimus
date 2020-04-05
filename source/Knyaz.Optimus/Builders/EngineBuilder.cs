@@ -69,7 +69,8 @@ namespace Knyaz.Optimus.ResourceProviders
             
             var windowKeeper = new Window[1];
             
-            return windowKeeper[0] = new Window(() => windowKeeper[0].Engine.Document, _windowConfig?._windowOpenHandler, navigator);
+            return windowKeeper[0] = new Window(() => windowKeeper[0].Engine.Document, _windowConfig?._windowOpenHandler, navigator, 
+                _windowConfig?._console ?? NullConsole.Instance);
         }
 
         public Engine Build()
@@ -93,9 +94,8 @@ namespace Knyaz.Optimus.ResourceProviders
                 parseJson => new XmlHttpRequest(resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
             
             var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
-            var console = _windowConfig?._console ?? new NullConsole();
             
-            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor, console) {
+            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor) {
 	            ComputedStylesEnabled = _computedStylesEnabled
             }; 
         }

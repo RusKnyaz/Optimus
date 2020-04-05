@@ -27,7 +27,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public void RequireEmbededLib()
+		public void RequireEmbeddedLib()
 		{
 			var script = @"require(['data'], function(x){console.log('main');console.log(x);});";
 			
@@ -55,19 +55,13 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			CollectionAssert.AreEqual(new[] { "dependency", "main", "val" }, log);
 		}
 		
-		private static List<string> OpenUrlAndGetLog(string url, IResourceProvider resourceProvider)
+		private static List<object> OpenUrlAndGetLog(string url, IResourceProvider resourceProvider)
 		{
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine(o ?? "<null>");
-				log.Add(o.ToString());
-			};
-
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl(url).Wait();
 			System.Threading.Thread.Sleep(5000);
-			return log;
+			return console.LogHistory;
 		}
 	}
 }

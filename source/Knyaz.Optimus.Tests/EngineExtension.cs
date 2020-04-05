@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -6,11 +5,9 @@ namespace Knyaz.Optimus.Tests
 {
 	internal static class EngineExtension
 	{
-		/// <summary>
-		/// Attach System.Console to log engine events;
-		/// </summary>
+		/// <summary> Writes scripting events to the console. </summary>
 		/// <param name="engine"></param>
-		public static Engine AttachConsole(this Engine engine)
+		public static Engine LogEvents(this Engine engine)
 		{
 			engine.DocumentChanged += () =>
 			{
@@ -32,13 +29,6 @@ namespace Knyaz.Optimus.Tests
 			return engine;
 		}
 
-
-		public static List<object> ToList(this Console console)
-		{
-			var log = new List<object>();
-			console.OnLog += x => log.Add(x);
-			return log;
-		}
 
 		public static void Load(this Engine engine, string html)
 		{

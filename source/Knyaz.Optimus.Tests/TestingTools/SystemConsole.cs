@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Tests.TestingTools
 {
@@ -10,6 +11,9 @@ namespace Knyaz.Optimus.Tests.TestingTools
 	/// </summary>
 	internal class SystemConsole : IConsole
 	{
+		[JsHidden]
+		public static SystemConsole Instance = new SystemConsole();
+		
 		private int _indent = 0;
 		
 		public void Assert(bool assertion, params object[] objs)

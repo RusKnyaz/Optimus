@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
-using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
@@ -45,7 +43,6 @@ namespace Knyaz.Optimus
 					throw new InvalidOperationException("ScriptExecutor already has been set.");
 				
 				_scriptExecutor = value;
-				_scriptExecutor.OnException += ex => Console.Log("Unhandled exception in script: " + ex.Message);
 			}
 		}
 
@@ -61,12 +58,6 @@ namespace Knyaz.Optimus
 		public CookieContainer CookieContainer => _cookieContainer; 
 
 		/// <summary>
-		/// Gets the browser's console object.
-		/// </summary>
-		[Obsolete("Use own implementation of IConsole and inject it using EngineBuilder")]
-		public Console Console { get; }
-		
-		/// <summary>
 		/// Gets the current Window object.
 		/// </summary>
 		public Window Window { get; }
@@ -76,8 +67,7 @@ namespace Knyaz.Optimus
 		internal Engine(
 			IResourceProvider resourceProvider, 
 			Window window,
-			IScriptExecutor scriptExecutor,
-			IConsole console)
+			IScriptExecutor scriptExecutor)
 		{
 			var rp = resourceProvider ?? throw new ArgumentNullException();
 			
@@ -88,27 +78,15 @@ namespace Knyaz.Optimus
 				arguments => OnResponse?.Invoke(arguments));
 
 			_cookieContainer = new CookieContainer();
-			
-			Console = new Console(console);
 
-			Window = window ?? CreateDefaultWindow();
+			Window = window ?? throw new ArgumentNullException(nameof(window));
 			Window.Engine = this;
 
 			if (scriptExecutor != null)
 				ScriptExecutor = scriptExecutor; 
 		}
 
-		Window CreateDefaultWindow()
-		{
-			var navigator = new Navigator(new NavigatorPlugins(new PluginInfo[0]))
-			{
-				UserAgent =
-					$"{System.Environment.OSVersion.VersionString} Optimus {GetType().Assembly.GetName().Version.Major}.{GetType().Assembly.GetName().Version.MajorRevision}"
-			};
-			var window = new Window(() => Document, (url, name, opts) => { }, navigator);
-
-			return window;
-		}
+		
 
 		[Obsolete("Use ResourceProviderBuilder to subscribe on events")]
 		public event Action<Request> OnRequest;
@@ -126,7 +104,6 @@ namespace Knyaz.Optimus
 			{
 				if (_document != null)
 				{
-					Document.OnNodeException -= OnNodeException;
 					Document.OnFormSubmit -= OnFormSubmit;
 				}
 
@@ -153,7 +130,6 @@ namespace Knyaz.Optimus
 							s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
 					}
 
-					Document.OnNodeException += OnNodeException;
 					Document.OnFormSubmit += OnFormSubmit;
 					
 					Document.CookieContainer = _cookieContainer;
@@ -178,11 +154,6 @@ namespace Knyaz.Optimus
 			}
 		}
 		
-		
-
-		private void OnNodeException(Node node, Exception exception) =>
-			Console.Log("Node event handler exception: " + exception.Message);
-
 
 		/// <summary>
 		/// Gets the current Uri of the document.

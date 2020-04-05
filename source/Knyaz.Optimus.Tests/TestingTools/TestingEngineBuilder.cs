@@ -1,3 +1,4 @@
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 
@@ -10,9 +11,17 @@ namespace Knyaz.Optimus.Tests.TestingTools
 		public static Engine BuildJint() =>
 			EngineBuilder.New().UseJint().Build();
 		
+		public static Engine BuildJint(IConsole console) =>
+			EngineBuilder.New().UseJint().Window(w => w.SetConsole(console)).Build();
+		
 		/// <summary> Configures engine with Jint and specified resource provider. </summary>
 		public static Engine BuildJint(IResourceProvider resourceProvider)
 			=> EngineBuilder.New().UseJint().SetResourceProvider(resourceProvider).Build();
+		
+		public static Engine BuildJint(IResourceProvider resourceProvider, IConsole console)
+			=> EngineBuilder.New().UseJint().SetResourceProvider(resourceProvider)
+				.Window(w => w.SetConsole(console))
+				.Build();
 		
 		public static Engine BuildJintCss(IResourceProvider resourceProvider)
 			=> EngineBuilder.New().UseJint().SetResourceProvider(resourceProvider).EnableCss().Build();

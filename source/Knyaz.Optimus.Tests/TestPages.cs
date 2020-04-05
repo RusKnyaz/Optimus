@@ -18,7 +18,8 @@ namespace Knyaz.Optimus.Tests
 
 		private Engine Open(string testUrl)
 		{
-			var engine = TestingEngine.BuildJint().AttachConsole();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console).LogEvents();
 			engine.OpenUrl(GetTestUrl(testUrl));
 			engine.WaitDocumentLoad();
 			return engine;
@@ -124,12 +125,10 @@ namespace Knyaz.Optimus.Tests
 			var engine = Open("ajax");
 			var button = engine.WaitId("t");
 
-			var log = new List<object>();
-			engine.Console.OnLog+= o =>{log.Add(o);};
 			Assert.IsNotNull(button);
 
-			Thread.Sleep(1000000);
-			Assert.AreNotEqual(0, log.Count);
+			Thread.Sleep(100000);
+			Assert.AreNotEqual(0, ((TestingConsole)engine.Window.Console).LogHistory.Count);
 			Assert.AreEqual("X-SourceFiles: =?UTF-8?B?QzpccHJvamVjdHNcV2ViQnJvd3NlclxUZXN0UGFnZXNcYWpheFxkYXRhLmh0bWw=",
 				button.InnerHTML);
 		}

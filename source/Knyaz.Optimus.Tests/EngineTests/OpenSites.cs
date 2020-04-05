@@ -40,7 +40,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public async Task Octane()
 		{
 			var engine = Engine();
-			engine.AttachConsole();
+			engine.LogEvents();
 			
 			var page = await engine.OpenUrl("http://chromium.github.io/octane");
 			var startButton = page.Document.WaitSelector("h1#main-banner", 10000).FirstOrDefault() as HtmlElement;
@@ -67,7 +67,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void Css3test()
 		{
 			var engine = TestingEngine.BuildJint();
-			engine.AttachConsole();
+			engine.LogEvents();
 			engine.OpenUrl("http://css3test.com").Wait(timeout);
 			
 			Thread.Sleep(10000);
@@ -125,7 +125,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void LogonToOkkam()
 		{
 			var engine = TestingEngine.BuildJint();
-			engine.AttachConsole();
+			engine.LogEvents();
 			engine.OpenUrl("http://okkamtech.com").Wait(timeout);
 			//engine.OpenUrl("http://localhost:2930");
 
@@ -150,7 +150,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void LogonToKwintoError()
 		{
 			var engine = TestingEngine.BuildJint();
-			engine.AttachConsole();
+			engine.LogEvents();
 			engine.OpenUrl("http://localhost:2930").Wait(timeout);
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
@@ -175,7 +175,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void LogonToKwinto()
 		{
 			var engine = TestingEngine.BuildJintCss();
-			engine.AttachConsole();
+			engine.LogEvents();
 			engine.OpenUrl("http://chi.todosoft.org").Wait(timeout);
 
 			var logonButton = engine.WaitId("logon") as HtmlElement;
@@ -252,7 +252,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var engine = TestingEngine.BuildJint();
 			engine.OnRequest += request => System.Console.WriteLine(request.Url);
 			engine.OnResponse += arguments => System.Console.WriteLine(arguments.Request.Url);
-			engine.AttachConsole();
+			engine.LogEvents();
 			var page = await engine.OpenUrl("https://habr.com");
 			System.Console.WriteLine(page.Document.InnerHTML);
 			//var logo = page.Document.WaitSelector(".logo-wrapper").First();

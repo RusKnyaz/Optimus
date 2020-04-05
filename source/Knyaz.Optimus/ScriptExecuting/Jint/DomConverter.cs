@@ -190,7 +190,11 @@ namespace Knyaz.Optimus.ScriptExecuting
 				return prototype;
 
 			var baseType = type.BaseType;
-			var basePrototype = baseType == typeof(object) ? Engine.Object.PrototypeObject : GetPrototype(baseType); 
+			var basePrototype = 
+				baseType == null || baseType == typeof(object) || baseType.IsInterface
+				? Engine.Object.PrototypeObject 
+				: GetPrototype(baseType); 
+			
 			prototype = new ClrPrototype(Engine, this,type, basePrototype);
 			_prototypes.Add(type, prototype);
 			return prototype;

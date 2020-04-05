@@ -9,7 +9,6 @@ using Moq;
 using NUnit.Framework;
 using Knyaz.Optimus.Tests.Resources;
 using Knyaz.Optimus.Tests.TestingTools;
-using Knyaz.Optimus.Tests.Tools;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -33,8 +32,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					"<html><head><script> " + R.JQueryJs + " </script><script src='test.js' " + (defer ? "defer" : "") +
 					"/></head><body><div id='uca'></div></body></html>")
 				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			var engine = TestingEngine.BuildJint(resourceProvider, SystemConsole.Instance);
 			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
 			return ucaDiv.InnerHTML;
@@ -48,8 +46,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					"<html><head><script> " + R.JQueryJs +
 					" </script><script src='test.js'/></head><body><div id='uca'></div></body></html>")
 				.Resource("http://localhost/test.js", "$('#uca').html('zaza');");
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			engine.Console.OnLog += o => System.Console.WriteLine(o.ToString());
+			var engine = TestingEngine.BuildJint(resourceProvider, SystemConsole.Instance);
 			engine.OpenUrl("http://localhost").Wait();
 			var ucaDiv = engine.Document.GetElementById("uca");
 			Assert.AreEqual("", ucaDiv.InnerHTML);
@@ -66,17 +63,19 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					"$.post('http://localhost/data').done(function(x){console.log(x);});")
 				.Resource("http://localhost/data", "OK");
 
-			var engine = EngineBuilder.New().SetResourceProvider(resourceProvider).UseJint().Build();
+			var console = new Mock<IConsole>();
+			var engine = TestingEngine.BuildJint(resourceProvider, console.Object);
 			
 			var log = new List<string>();
 			var signal = new ManualResetEvent(false);
-			engine.Console.OnLog += o =>
+			
+			console.Setup(x => x.Log(It.IsAny<string>(), It.IsAny<object[]>())).Callback<string, object[]>((msg,_) =>
 			{
-				System.Console.WriteLine(o ?? "<null>");
-				log.Add(o.ToString());
+				System.Console.WriteLine(msg);
+				log.Add(msg);
 				signal.Set();
-			};
-
+			});
+			
 			engine.OpenUrl("http://localhost");
 			Assert.IsTrue(signal.WaitOne(10000));
 			CollectionAssert.AreEqual(new[] {"OK"}, log);
@@ -87,16 +86,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public void JQueryCreate()
 		{
 			var script = "var a = $('<input type=\"file\">');console.log(a?'ok':'error');";
-			var engine = TestingEngine.BuildJint();
-			string result = null;
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine(o.ToString());
-				result = o.ToString();
-			};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
+			
 			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script defer>" + script +
 			            "</script></head><body><div id='uca'></div></body></html>");
-			Assert.AreEqual("ok", result);
+			Assert.AreEqual(new[]{"ok"}, console.LogHistory);
 		}
 
 		[Test]
@@ -107,13 +102,8 @@ var e = document.createElement('div');
 e.id = 'loaded';
 document.body.appendChild(e);";
 
-			var engine = TestingEngine.BuildJint();
-			string result = null;
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine(o.ToString());
-				result = o.ToString();
-			};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			engine.Load("<html><head><script> " + R.JQueryJs +
 			            " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
 			var loaded = engine.WaitId("loaded");
@@ -123,7 +113,7 @@ document.body.appendChild(e);";
 			e.InitEvent("click", true, true);
 			engine.Document.GetElementById("b").DispatchEvent(e);
 
-			Assert.AreEqual("hi", result);
+			Assert.AreEqual(new[]{"hi"}, console.LogHistory);
 		}
 
 		[Test]
@@ -134,13 +124,8 @@ var e = document.createElement('div');
 e.id = 'loaded';
 document.body.appendChild(e);";
 
-			var engine = TestingEngine.BuildJint();
-			string result = null;
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine(o.ToString());
-				result = o.ToString();
-			};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			engine.Load("<html><head><script> " + R.JQueryJs +
 			            " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
 			var loaded = engine.WaitId("loaded");
@@ -148,22 +133,21 @@ document.body.appendChild(e);";
 
 			((HtmlElement) engine.Document.GetElementById("b")).Click();
 
-			Assert.AreEqual("hi", result);
+			Assert.AreEqual(new[]{"hi"}, console.LogHistory);
 		}
 
 		[Test]
 		public void DocumentBody()
 		{
 			var script = @"$(function(){console.log(document.body);});";
-
-			var engine = TestingEngine.BuildJint();
-			object result = null;
-			engine.Console.OnLog += o => { result = o; };
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script>" + script +
 			            "</script></head><body><div id='b'></div></body></html>");
 			Thread.Sleep(1000);
 
-			Assert.IsNotNull(result);
+			Assert.AreEqual(1, console.LogHistory.Count);
+			Assert.IsNotNull(console.LogHistory[0]);
 		}
 
 		[TestCase(".u", 1)]
@@ -172,38 +156,28 @@ document.body.appendChild(e);";
 		public void Selector(string selector, int exptectedCount)
 		{
 			var script = @"console.log($('" + selector + "').length);";
-			var engine = TestingEngine.BuildJint();
-			object result = null;
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine((o ?? "null").ToString());
-				result = o;
-			};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			engine.Load("<html><head><script> " + R.JQueryJs +
 			            " </script></head><body><div class = 'u' id='a'></div><script>" + script +
 			            "</script></body></html>");
 
-			Assert.AreEqual(exptectedCount, result);
+			Assert.AreEqual(new[]{exptectedCount}, console.LogHistory);
 		}
 
 		[Test]
 		public void OnWithSelector()
 		{
 			var script = @"$('#a').on('click.some', '.u', function(){console.log('hi');});";
-			var engine = TestingEngine.BuildJint();
-			object result = null;
-			engine.Console.OnLog += o =>
-			{
-				System.Console.WriteLine((o ?? "null").ToString());
-				result = o;
-			};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			engine.Load("<html><head><script> " + R.JQueryJs +
 			            " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script +
 			            "</script></body></html>");
 
 			var u = engine.Document.GetElementById("u") as HtmlElement;
 			u.Click();
-			Assert.AreEqual("hi", result);
+			Assert.AreEqual(new[]{"hi"}, console.LogHistory);
 		}
 
 		[Test]

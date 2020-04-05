@@ -8,6 +8,7 @@ using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.Scripting.Jurassic;
+using Knyaz.Optimus.Tests.TestingTools;
 using Moq;
 using NUnit.Framework;
 
@@ -49,12 +50,10 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         [Test]
         public void ConsoleLog()
         {
-            var log = new List<object>();
-            var console = new Console();
-            console.OnLog += x => log.Add(x);
+            var console = new TestingConsole();
             var window = Mock.Of<IWindowEx>(x => x.Console == console);
             Execute(window, "console.log('hello')");
-            Assert.AreEqual(new[]{"hello"}, log);
+            Assert.AreEqual(new[]{"hello"}, console.LogHistory);
         }
 
         [Test]
@@ -132,9 +131,10 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         [Test]
         public void Globals()
         {
-            var console = new Console();
+            var console = Mock.Of<IConsole>();
             var navigator = Mock.Of<INavigator>();
             var document = DomImplementation.Instance.CreateHtmlDocument();
+            
             var window = Mock.Of<IWindowEx>(
                 x => x.Console == console &&
                      x.Navigator == navigator &&
@@ -318,11 +318,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
         public void CallEventListener()
         {
             Tuple<string, Action<Event>, bool> args = null;
-            object logObject = null;
-
-            var console = new Console();
-            console.OnLog += x => logObject = x;
-            
+            var console = new TestingConsole();            
             var window = Mock.Of<IWindowEx>(x => x.Console == console);
             Mock.Get(window).Setup(x => x.AddEventListener(It.IsAny<string>(), It.IsAny<Action<Event>>(), It.IsAny<bool>()))
                 .Callback<string, Action<Event>, bool>((a1, a2, a3) => { args = new Tuple<string, Action<Event>, bool>(a1,a2,a3);});
@@ -335,7 +331,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
 
             Assert.IsNotNull(args);
             args.Item2(evt);
-            Assert.AreEqual(evt, logObject);
+            Assert.AreEqual(new[]{evt}, console.LogHistory);
         }
         
        

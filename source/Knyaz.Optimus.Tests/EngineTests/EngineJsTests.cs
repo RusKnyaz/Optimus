@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
@@ -15,28 +14,25 @@ using Knyaz.Optimus.ScriptExecuting.Jint;
 namespace Knyaz.Optimus.Tests.EngineTests
 {
 	[TestFixture]
-	public class EngineJsTests
+	public static class EngineJsTests
 	{
-		private List<object> _log;
-
-
-		private Engine CreateEngineWithScript(string js)
+		private static Engine CreateEngineWithScript(string js)
 		{
 			return Load("<html><head><script>" + js + "</script></head></html>");
 		}
 
-		private Engine Load(IResourceProvider resourceProvider)
+		private static Engine Load(IResourceProvider resourceProvider)
 		{
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			_log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
 			return engine;
 		}
 		
-		private Engine Load(string html) => Load(Mock.Of<IResourceProvider>()
+		private static Engine Load(string html) => Load(Mock.Of<IResourceProvider>()
 			.Resource("http://localhost", html));
 
-		private Engine Load(string body, string js)
+		private static Engine Load(string body, string js)
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
 				"<html>"+(js != null ? "<head><script src='test.js' defer/></head>" : "")+"<body>" + body + "</body></html>");
@@ -48,7 +44,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public void StoreValueInElement()
+		public static void StoreValueInElement()
 		{
 			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
@@ -57,33 +53,33 @@ console.log(e.someVal == 'x');
 var e2 = document.getElementById('d');
 console.log(e2.someVal == 'x');");
 
-			CollectionAssert.AreEqual(new object[] {true, true}, _log);
+			CollectionAssert.AreEqual(new object[] {true, true}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void PassElementValueToClr()
+		public static void PassElementValueToClr()
 		{
 			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
 e.someVal = 'x';
 console.log(e.someVal);");
 
-			CollectionAssert.AreEqual(new object[] {"x"}, _log);
+			CollectionAssert.AreEqual(new object[] {"x"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void SetInnerHtml()
+		public static void SetInnerHtml()
 		{
 			var engine = Load("<div id='d'></div>",
 				@"var e = document.getElementById('d');
 console.log(e.hasChildNodes);
 e.innerHTML = '<h1>1</h1><h2>2</h2><h3>3</h3>';
 console.log(e.hasChildNodes);");
-			CollectionAssert.AreEqual(new object[] {false, true}, _log);
+			CollectionAssert.AreEqual(new object[] {false, true}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void NodeTest()
+		public static void NodeTest()
 		{
 			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
@@ -99,11 +95,11 @@ console.log(e.parentNode.tagName);
 console.log(e.ownerDocument == document);
 console.log(e.getAttribute('id'));");
 
-			CollectionAssert.AreEqual(new object[] {true, true, "DIV", true, "H1", true, "H3", true, "BODY", true, "d"}, _log);
+			CollectionAssert.AreEqual(new object[] {true, true, "DIV", true, "H1", true, "H3", true, "BODY", true, "d"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void NodeAddEventListenerTest()
+		public static void NodeAddEventListenerTest()
 		{
 			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
@@ -115,11 +111,11 @@ var ev = document.createEvent('Event');
 ev.initEvent('click', false, false);
 e.dispatchEvent(ev);");
 
-			CollectionAssert.AreEqual(new object[] {true, true, true, "click"}, _log);
+			CollectionAssert.AreEqual(new object[] {true, true, true, "click"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void EventSubscribeTests()
+		public static void EventSubscribeTests()
 		{
 			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
 				@"var e = document.getElementById('d');
@@ -132,11 +128,11 @@ e.dispatchEvent(ev);
 e.onclick = function(){console.log('click2');};
 e.click();");
 
-			CollectionAssert.AreEqual(new object[] {true, "click", "click2"}, _log);
+			CollectionAssert.AreEqual(new object[] {true, "click", "click2"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void CreateDivTest()
+		public static void CreateDivTest()
 		{
 			var engine = CreateEngineWithScript(
 				@"var div = document.createElement('div');
@@ -146,12 +142,12 @@ console.log(div.tagName);
 console.log(div.parentNode == null);
 console.log(div.appendChild != null);");
 
-			CollectionAssert.AreEqual(new object[] {true, true, "DIV", true, true}, _log);
+			CollectionAssert.AreEqual(new object[] {true, true, "DIV", true, true}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		
 		[Test]
-		public void DocumentElement()
+		public static void DocumentElement()
 		{
 			var engine = CreateEngineWithScript(
 				@"var e = document.documentElement;
@@ -161,34 +157,34 @@ console.log(e.parentNode === document);
 console.log(e.removeChild != null);
 console.log(e.appendChild != null);");
 
-			CollectionAssert.AreEqual(new object[] {true, true, true, true, true}, _log);
+			CollectionAssert.AreEqual(new object[] {true, true, true, true, true}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void GetElementsByTagName()
+		public static void GetElementsByTagName()
 		{
 			var engine = Load("<div id='d'></div><div></div><span></span>",
 				@"var elems = document.body.getElementsByTagName('div');
 console.log(elems.length);");
 
-			CollectionAssert.AreEqual(new object[] {2}, _log);
+			CollectionAssert.AreEqual(new object[] {2}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[TestCase("document.body.childNodes.length", 3)]
 		[TestCase("document.body.childNodes[0] != null", true)]
-		public void ChildNodes(string code, object expectedResult)
+		public static void ChildNodes(string code, object expectedResult)
 		{
 			var engine = Load("<div id='d'></div><div></div><span></span>", $"console.log({code});");
 			
-			CollectionAssert.AreEqual(new object[] {expectedResult}, _log);
+			CollectionAssert.AreEqual(new object[] {expectedResult}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void AddScriptAndExecute()
+		public static void AddScriptAndExecute()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost/module", "console.log('hi from module');");
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 
 			var script =
 				@"var s = document.createElement('script');
@@ -200,13 +196,13 @@ document.head.appendChild(s);";
 			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
 
 			Thread.Sleep(1000);
-			Assert.AreEqual(2, log.Count);
-			Assert.AreEqual("load", log[1]);
-			Assert.AreEqual("hi from module", log[0]);
+			Assert.AreEqual(2, console.LogHistory.Count);
+			Assert.AreEqual("load", console.LogHistory[1]);
+			Assert.AreEqual("hi from module", console.LogHistory[0]);
 		}
 
 		[Test]
-		public async Task AddScriptModifyingDom()
+		public static async Task AddScriptModifyingDom()
 		{
 			var modifyingScript = @"var form = document.body.getElementsByTagName('form')[0];
 			             var div = document.createElement('div')
@@ -219,19 +215,18 @@ document.head.appendChild(s);";
 			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
 				$"<html><body><form><script>{modifyingScript}</script><script>{accesingScript}</script></form></body></html>");
 			
-			var engine = TestingEngine.BuildJint(resourceProvider);
-
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 
 			var page = await engine.OpenUrl("http://localhost");
 
 			page.Assert(x => x.Document.Body.GetElementsByTagName("form")[0].ChildNodes.Count == 3);
 			
-			Assert.AreEqual(log, new[]{true});
+			Assert.AreEqual(console.LogHistory, new[]{true});
 		}
 
 		[Test]
-		public async Task AddScriptThatAddsScriptModifyingDom()
+		public static async Task AddScriptThatAddsScriptModifyingDom()
 		{
 			var modifyingScript = "var form = document.body.getElementsByTagName('form')[0];" +
 			                      " var div = document.createElement('div');" +
@@ -249,52 +244,51 @@ document.head.appendChild(s);";
 			var resourceProvider = Mocks.ResourceProvider("http://localhost", 
 				$"<html><body><form><script id=adding>{scriptThatAddsScript}</script><script id=accessing>{accesingScript}</script></form></body></html>");
 			
-			var engine = TestingEngine.BuildJint(resourceProvider);
-
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 
 			var page = await engine.OpenUrl("http://localhost");
 
 			page.Assert(x => x.Document.Body.GetElementsByTagName("form")[0].ChildNodes.Count == 4);
 			
-			Assert.AreEqual(log, new[]{true});
+			Assert.AreEqual(new[]{true}, console.LogHistory);
 		}
 
 		[Test]
-		public void Navigator()
+		public static void Navigator()
 		{
 			var engine = CreateEngineWithScript(@"
 console.log(navigator != null);
 console.log(navigator.userAgent);");
 
-			Assert.AreEqual(2, _log.Count);
-			Assert.AreEqual(true, _log[0]);
-			Assert.IsTrue(_log[1].ToString().Contains("Optimus"));
+			Assert.AreEqual(2, ((TestingConsole)engine.Window.Console).LogHistory.Count);
+			Assert.AreEqual(true, ((TestingConsole)engine.Window.Console).LogHistory[0]);
+			Assert.IsTrue(((TestingConsole)engine.Window.Console).LogHistory[1].ToString().Contains("Optimus"));
 		}
 
 		[Test]
-		public void SetChildNode()
+		public static void SetChildNode()
 		{
 			var engine = Load("<div id='a'><span></span></div>",
 				@"var d = document.getElementById('a');
 d.childNodes[0] = document.createElement('p');
 console.log(d.childNodes[0].tagName);");
 
-			CollectionAssert.AreEqual(new object[] {"P"}, _log);
+			CollectionAssert.AreEqual(new object[] {"P"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		//The test comes from bootstrap library
 		[Test]
-		public void StyleOfCustom()
+		public static void StyleOfCustom()
 		{
 			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
 				@"var style = document.createElement('bootstrap').style;
 console.log(style ? 'ok' : 'null');");
-			CollectionAssert.AreEqual(new[] {"ok"}, _log);
+			CollectionAssert.AreEqual(new[] {"ok"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void StyleRead()
+		public static void StyleRead()
 		{
 			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
 				@"var style = document.getElementById('content1').style;
@@ -302,38 +296,36 @@ console.log(style.getPropertyValue('width'));
 console.log(style[0]);
 console.log(style['width']);");
 
-			CollectionAssert.AreEqual(new[] {"100pt", "width", "100pt"}, _log);
+			CollectionAssert.AreEqual(new[] {"100pt", "width", "100pt"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void StyleWrite()
+		public static void StyleWrite()
 		{
 			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
 				@"var style = document.getElementById('content1').style;
 style['width'] = '200pt';
 console.log(style['width']);");
 
-			CollectionAssert.AreEqual(new[] {"200pt"}, _log);
+			CollectionAssert.AreEqual(new[] {"200pt"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void Location()
+		public static void Location()
 		{
-			Load("","console.log(window.location.href);console.log(window.location.protocol);");
-			CollectionAssert.AreEqual(new[] {"http://localhost/", "http:"}, _log);
+			var engine = Load("","console.log(window.location.href);console.log(window.location.protocol);");
+			CollectionAssert.AreEqual(new[] {"http://localhost/", "http:"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void HistoryExist()
+		public static void HistoryExist()
 		{
 			var engine = Load("", @"console.log(history != null);console.log(window.history != null);");
-			engine.Console.OnLog += x => _log.Add(x.ToString());
-			
-			CollectionAssert.AreEqual(new[] { true, true }, _log);
+			CollectionAssert.AreEqual(new[] { true, true }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void HistoryPushState()
+		public static void HistoryPushState()
 		{
 			var engine = Load("",@"window.history.pushState(null, null, 'a.html');");
 
@@ -341,7 +333,7 @@ console.log(style['width']);");
 		}
 
 		[Test]
-		public void SetLocationHref()
+		public static void SetLocationHref()
 		{
 			var resourceProvider = 
 				Mocks.ResourceProvider("http://todosoft.org",Mocks.Page("window.location.href = 'http://todosoft.org/sub';"))
@@ -358,26 +350,26 @@ console.log(style['width']);");
 		}
 		
 		[Test]
-		public void SetLocationHrefAndShareCookies()
+		public static void SetLocationHrefAndShareCookies()
 		{
+			var console = new TestingConsole();
 			var resourceProvider = Mocks.ResourceProvider("http://todosoft.org",
 				Mocks.Page("document.cookie='user=ivan';" +
 					       "window.location.href = 'http://todosoft.org/sub';"))
 				.Resource("http://todosoft.org/sub", Mocks.Page("console.log(document.cookie);"));
 
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://todosoft.org").Wait();
 			
 			Thread.Sleep(5000);
 
-			CollectionAssert.AreEqual(new object[]{"user=ivan"}, log);
+			CollectionAssert.AreEqual(new object[]{"user=ivan"}, console.LogHistory);
 		}
 
 		[Test]
-		public void XmlHttpRequestCtor()
+		public static void XmlHttpRequestCtor()
 		{
-			Load("", @"var xhr = new XMLHttpRequest();
+			var engine = Load("", @"var xhr = new XMLHttpRequest();
 console.log(xhr.UNSENT);
 console.log(xhr.OPENED);
 console.log(xhr.HEADERS_RECEIVED);
@@ -390,22 +382,17 @@ console.log(XMLHttpRequest.LOADING);
 console.log(XMLHttpRequest.DONE);
 console.log(xhr.readyState);");
 
-			CollectionAssert.AreEqual(new []{0,1,2,3,4,0,1,2,3,4,0}, _log);
+			CollectionAssert.AreEqual(new []{0,1,2,3,4,0,1,2,3,4,0}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void XmlHttpRequestSend()
+		public static void XmlHttpRequestSend()
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>()
 				.Resource("http://localhost/unicorn.xml", "hello");
 
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-				{
-					log.Add(o == null ? "<null>" : o.ToString());
-					System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-				};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.Load(Mocks.Page(
 				@"var client = new XMLHttpRequest();
 client.onreadystatechange = function () {
@@ -423,29 +410,23 @@ client.send();"));
 			Thread.Sleep(1000);
 
 			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once());
-			CollectionAssert.AreEqual(new[] {"1", "4", "200", "hello"}, log);
+			CollectionAssert.AreEqual(new object[] {1.0d, 4.0d, 200.0d, "hello"}, console.LogHistory);
 		}
 
 		[Test]
-		public void AjaxExist()
+		public static void AjaxExist()
 		{
-			var engine = TestingEngine.BuildJint();
-			var log = new List<string>();
-			engine.Console.OnLog += o =>
-				{
-					log.Add(o == null ? "<null>" : o.ToString());
-					System.Console.WriteLine(o == null ? "<null>" : o.ToString());
-				};
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			engine.Load(Mocks.Page(@"console.log(typeof XMLHttpRequest !== 'undefined');"));
-
-			CollectionAssert.AreEqual(new[] {"True"}, log);
+			CollectionAssert.AreEqual(new[] {true}, console.LogHistory);
 		}
 
 		[Test]
-		public void AddEmbeddedScriptInsideEmbedded()
+		public static void AddEmbeddedScriptInsideEmbedded()
 		{
-			var engine = TestingEngine.BuildJint();
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(console);
 			
 			engine.Load(Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
@@ -462,15 +443,15 @@ console.log('afterappend');"));
 
 			Thread.Sleep(1000);
 
-			CollectionAssert.AreEqual(new[] {"in new script", "ok", "node added", "afterappend"}, log);
+			CollectionAssert.AreEqual(new[] {"in new script", "ok", "node added", "afterappend"}, console.LogHistory);
 		}
 
 		[Test]
-		public void AddScriptAsync()
+		public static void AddScriptAsync()
 		{
+			var console = new TestingConsole();
 			var engine = TestingEngine.BuildJint(
-				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"));
-			var log = engine.Console.ToList();
+				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"), console);
 			
 			engine.Load(Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
@@ -487,11 +468,11 @@ console.log('afterappend');"));
 
 			Thread.Sleep(1000);
 			Assert.AreEqual("nodeadded,afterappend,in new script,onload", 
-				string.Join(",", log));
+				string.Join(",", console.LogHistory));
 		}
 
 		[Test]
-		public async Task AddScriptOnloadThisAccess()
+		public static async Task AddScriptOnloadThisAccess()
 		{
 			var script = @"var script = document.createElement('script');
 script.src = 'script.js';
@@ -499,26 +480,26 @@ script.someData = 'hello';
 script.onload = function(){ console.log(this.someData); document.body.innerHtml='<div id=x></div>';};
 			document.head.appendChild(script); ";
 
+			var console = new TestingConsole();
 			var engine = TestingEngine.BuildJint(
 				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');")
-					.Resource("http://localhost", Mocks.Page(script)));
-			var log = engine.Console.ToList();
+					.Resource("http://localhost", Mocks.Page(script)), console);
 			var page = await engine.OpenUrl("http://localhost");
 			page.Document.WaitId("x", 1000);
-			Assert.AreEqual(new[]{"in new script", "hello"}, log);
+			Assert.AreEqual(new[]{"in new script", "hello"}, console.LogHistory);
 		}
 
 		[TestCase("document.getElementById('d').attributes['id'].name", "id")]
 		[TestCase("document.getElementById('d').attributes[0].name", "id")]
-		public void AttributesTest(string code, string expected)
+		public static void AttributesTest(string code, string expected)
 		{
 			var engine = Load("<div id='d'></div>", $"console.log({code});");
 
-			CollectionAssert.AreEqual(new object[] {expected}, _log);
+			CollectionAssert.AreEqual(new object[] {expected}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test, Description("The sample come from jquery source code")]
-		public void PushApply()
+		public static void PushApply()
 		{
 			var engine = Load("<div></div>", @"var arr = [];
 var push = arr.push;
@@ -529,114 +510,114 @@ push.apply(
 		preferredDoc.childNodes
 	);
 console.log(arr[ preferredDoc.childNodes.length ].nodeType);");
-			CollectionAssert.AreEqual(new object[] {1}, _log);
+			CollectionAssert.AreEqual(new object[] {1}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ArrayPush()
+		public static void ArrayPush()
 		{
 			var engine = Load("<div></div>", @"var arr = [];
 arr.push('x');
 console.log(arr.length);");
-			CollectionAssert.AreEqual(new object[] {1}, _log);
+			CollectionAssert.AreEqual(new object[] {1}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void SliceCall()
+		public static void SliceCall()
 		{
 			var engine = Load("<div></div>", @"var arr = ['a'];
 console.log(arr.slice().length);
 console.log([].slice.call(arr).length);");
-			CollectionAssert.AreEqual(new object[] {1, 1}, _log);
+			CollectionAssert.AreEqual(new object[] {1, 1}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ChildNodesSlice()
+		public static void ChildNodesSlice()
 		{
 			var engine = Load("<div></div>", @"
 console.log(document.body.childNodes.length);
 console.log([].slice.call(document.body.childNodes).length);");
-			CollectionAssert.AreEqual(new object[] {1, 1}, _log);
+			CollectionAssert.AreEqual(new object[] {1, 1}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ResizeArray()
+		public static void ResizeArray()
 		{
 			var engine = Load("<div></div>", @"var arr = [];
 arr.length = 8;
 console.log(arr.length);");
-			CollectionAssert.AreEqual(new object[] {8}, _log);
+			CollectionAssert.AreEqual(new object[] {8}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ShiftArray()
+		public static void ShiftArray()
 		{
 			var engine = Load("<div></div>", @"var arr = [1,2];
 arr.shift();
 console.log(arr[0]);");
-			CollectionAssert.AreEqual(new object[] {2}, _log);
+			CollectionAssert.AreEqual(new object[] {2}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 
 		[Test]
-		public void DocumentBody()
+		public static void DocumentBody()
 		{
-			Load("HI", "document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
-			CollectionAssert.AreEqual(new[] {"hi"}, _log);
+			var engine = Load("HI", "document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
+			CollectionAssert.AreEqual(new[] {"hi"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void GetElementsByClassName()
+		public static void GetElementsByClassName()
 		{
-			Load("<html><body>" +
+			var engine = Load("<html><body>" +
 			     "<div class='a' id='d1'></div>" +
 			     "<div class = 'b' id = 'd2'></div>" +
 			     "<div class='a b' id='d3'></div><script>console.log(document.getElementsByClassName('a').length);</script></body></html>");
 			
-			CollectionAssert.AreEqual(new[] {2}, _log);
+			CollectionAssert.AreEqual(new[] {2}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void GetElementsByClassNameToString()
+		public static void GetElementsByClassNameToString()
 		{
-			Load("<html><head><script>console.log(document.getElementsByClassName.toString());</script></head><body></body></html>");
+			var engine = Load("<html><head><script>console.log(document.getElementsByClassName.toString());</script></head><body></body></html>");
 
-			CollectionAssert.AreEqual(new[] {"function getElementsByClassName() { [native code] }"}, _log);
+			CollectionAssert.AreEqual(new[] {"function getElementsByClassName() { [native code] }"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void SetTimeout()
+		public static void SetTimeout()
 		{
-			Load("<html><head><script>var x = setTimeout(function(){ console.log('called');});</script></head><body></body></html>");
+			var engine = Load("<html><head><script>var x = setTimeout(function(){ console.log('called');});</script></head><body></body></html>");
 			Thread.Sleep(1000);
-			CollectionAssert.AreEqual(new[] { "called" }, _log);
+			CollectionAssert.AreEqual(new[] { "called" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 		[Test]
-		public void ClearTimeout()
+		public static void ClearTimeout()
 		{
-			Load("<html><head><script>var x = setTimeout(function(){ console.log('called');}, 100);clearTimeout(x);</script></head><body></body></html>");
+			var engine = Load("<html><head><script>var x = setTimeout(function(){ console.log('called');}, 100);clearTimeout(x);</script></head><body></body></html>");
 			Thread.Sleep(100);
-			CollectionAssert.AreEqual(new object[0], _log);
+			CollectionAssert.AreEqual(new object[0], ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void SetInterval()
+		public static void SetInterval()
 		{
-			Load("<html><head><script>var x = setInterval(function(){ console.log('called'); clearInterval(x);});</script></head><body></body></html>");
+			var engine = Load("<html><head><script>var x = setInterval(function(){ console.log('called'); clearInterval(x);});</script></head><body></body></html>");
 			Thread.Sleep(100);
-			CollectionAssert.AreEqual(new[]{"called"}, _log);
+			CollectionAssert.AreEqual(new[]{"called"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ClearInterval()
+		public static void ClearInterval()
 		{
 			Load("<html><head><script>var x = setInterval(function(){}, 1000); clearInterval(x);</script></head><body></body></html>");
 		}
 
 		[Test]
-		public void ResponseHeadersRegEx()
+		public static void ResponseHeadersRegEx()
 		{
-			Load(@"<html><head><script>
+			var engine = Load(@"<html><head><script>
 var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
 var headersString = 'X-AspNetMvc-Version: 4.0\nX-Powered-By: ASP.NET\n\n';
 while ( match = rheaders.exec( headersString ) ) { 
@@ -646,15 +627,15 @@ console.log(match[ 2 ]);
 </script></html>");
 
 
-			CollectionAssert.AreEqual(new[] {"x-aspnetmvc-version", "4.0", "x-powered-by", "ASP.NET"}, _log);
+			CollectionAssert.AreEqual(new[] {"x-aspnetmvc-version", "4.0", "x-powered-by", "ASP.NET"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		//There is a difference between js and .net regexp - end line detection.
 		//To fix the issue, i replaced $ with ($:\r|\n|\r\n) in RegExpConstructor;
 		[Test]
-		public void ResponseHeadersRegExBug()
+		public static void ResponseHeadersRegExBug()
 		{
-			Load(@"<html><head><script>
+			var engine = Load(@"<html><head><script>
 var rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg;
 var headersString = 'X-AspNetMvc-Version: 4.0\r\nX-Powered-By: ASP.NET\r\n\r\n';
 while ( match = rheaders.exec( headersString ) ) { 
@@ -664,7 +645,7 @@ console.log(match[ 2 ]);
 </script></html>");
 
 
-			CollectionAssert.AreEqual(new[] {"x-aspnetmvc-version", "4.0", "x-powered-by", "ASP.NET"}, _log);
+			CollectionAssert.AreEqual(new[] {"x-aspnetmvc-version", "4.0", "x-powered-by", "ASP.NET"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		//Bug in jint RegExpPrototype.InitReturnValueArray
@@ -672,46 +653,46 @@ console.log(match[ 2 ]);
 		// array.DefineOwnProperty("length", new PropertyDescriptor(value: lengthValue, writable: false, enumerable: false, configurable: false), true);
 		// in RegExpPrototype.InitReturnValueArray
 		[Test]
-		public void ShiftMatchResult()
+		public static void ShiftMatchResult()
 		{
 			var engine = Load("<div></div>",
 				@"var match = /quick\s(brown).+?(jumps)/ig.exec('The Quick Brown Fox Jumps Over The Lazy Dog');
 match.shift();
 console.log(match[0]);");
-			CollectionAssert.AreEqual(new object[] {"Brown"}, _log);
+			CollectionAssert.AreEqual(new object[] {"Brown"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		
 		[Test]
-		public void WindowAddEventListener()
+		public static void WindowAddEventListener()
 		{
-			Load("<div id=d></div>", @"
+			var engine = Load("<div id=d></div>", @"
 var listener = function(){console.log('ok');};
 addEventListener('click', listener, true);
 var evt = document.createEvent('Event');
 evt.initEvent('click', true,true);
 dispatchEvent(evt);");
 
-			CollectionAssert.AreEqual(new object[] { "ok" }, _log);
+			CollectionAssert.AreEqual(new object[] { "ok" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void WindowAddEventListenerNotBoolArg()
+		public static void WindowAddEventListenerNotBoolArg()
 		{
-			Load("<div id=d></div>", @"
+			var engine = Load("<div id=d></div>", @"
 var listener = function(){console.log('ok');};
 addEventListener('click', listener, 1);
 var evt = document.createEvent('Event');
 evt.initEvent('click', true,true);
 dispatchEvent(evt);");
 
-			CollectionAssert.AreEqual(new object[] { "ok" }, _log);
+			CollectionAssert.AreEqual(new object[] { "ok" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void WindowRemoveEventListener()
+		public static void WindowRemoveEventListener()
 		{
-			Load("<div id=d></div>", @"
+			var engine = Load("<div id=d></div>", @"
 var listener = function(){console.log('ok');};
 addEventListener('click', listener, true);
 removeEventListener('click', listener, true);
@@ -719,71 +700,71 @@ var evt = document.createEvent('Event');
 evt.initEvent('click', true,true);
 dispatchEvent(evt);");
 
-			CollectionAssert.AreEqual(new object[0], _log);
+			CollectionAssert.AreEqual(new object[0], ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void SelectZeroLength()
+		public static void SelectZeroLength()
 		{
-			Load("<select id=s></select>", "console.log(document.getElementById('s').length);");
-			CollectionAssert.AreEqual(new []{0.0}, _log);
+			var engine = Load("<select id=s></select>", "console.log(document.getElementById('s').length);");
+			CollectionAssert.AreEqual(new []{0.0}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void SelectLength()
+		public static void SelectLength()
 		{
-			Load("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
-			CollectionAssert.AreEqual(new[] { 1.0 }, _log);
+			var engine = Load("<select id=s><option/></select>", "console.log(document.getElementById('s').length);");
+			CollectionAssert.AreEqual(new[] { 1.0 }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[TestCase("document.getElementById('s').options.item(0).id")]
 		[TestCase("document.getElementById('s').options[0].id")]
-		public void SelectOptionsItem(string expr)
+		public static void SelectOptionsItem(string expr)
 		{
-			Load("<select id=s><option id=X/></select>", $"console.log({expr});");
-			CollectionAssert.AreEqual(new[] { "X" }, _log);
+			var engine = Load("<select id=s><option id=X/></select>", $"console.log({expr});");
+			CollectionAssert.AreEqual(new[] { "X" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ApplyToJsFunc()
+		public static void ApplyToJsFunc()
 		{
-			Load("", "function log(x){console.log(x);} log.apply(console, ['asd']);");
-			CollectionAssert.AreEqual(new[] { "asd" }, _log);
+			var engine = Load("", "function log(x){console.log(x);} log.apply(console, ['asd']);");
+			CollectionAssert.AreEqual(new[] { "asd" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void ApplyToClrFunc()
+		public static void ApplyToClrFunc()
 		{
-			Load("", "console.log.apply(console, ['asd']);");
-			CollectionAssert.AreEqual(new[] { "asd" }, _log);
+			var engine = Load("", "console.log.apply(console, ['asd']);");
+			CollectionAssert.AreEqual(new[] { "asd" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void Self()
+		public static void Self()
 		{
-			Load("", "console.log(self == window);");
-			CollectionAssert.AreEqual(new[] { true }, _log);
+			var engine = Load("", "console.log(self == window);");
+			CollectionAssert.AreEqual(new[] { true }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void OverrideSelf()
+		public static void OverrideSelf()
 		{
-			Load("", "self = 'a'; console.log(self);");
-			CollectionAssert.AreEqual(new[] { "a" }, _log);
+			var engine = Load("", "self = 'a'; console.log(self);");
+			CollectionAssert.AreEqual(new[] { "a" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]
-		public void GetComputedStyle()
+		public static void GetComputedStyle()
 		{
+			var console = new TestingConsole();
 			var resourceProvider = Mock.Of<IResourceProvider>()
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id=d></div></body></html>")
 				.Resource("http://localhost/test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
 				 				                                       "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.ComputedStylesEnabled = true;
 			engine.OpenUrl("http://localhost").Wait();
-			CollectionAssert.AreEqual(new[] { "block", "block" }, log);
+			CollectionAssert.AreEqual(new[] { "block", "block" }, console.LogHistory);
 		}
 
 		[TestCase("d.style['zoom'] == 1", ExpectedResult = true)]
@@ -794,26 +775,26 @@ dispatchEvent(evt);");
 		[TestCase("d.style['color'] === 1", ExpectedResult = false)]
 		[TestCase("typeof d.style['color']", ExpectedResult = "string")]
 		
-		public object SetStyleNumericValue(string expression)
+		public static object SetStyleNumericValue(string expression)
 		{
-			Load("<div id=d></div>", 
+			var engine = Load("<div id=d></div>", 
 				"var d = document.getElementById('d');" +
 				"d.style['zoom'] = 1;" +
 				"d.style['color'] = 1;" +
 				$"console.log({expression});");
-			return _log[0];
+			return ((TestingConsole)engine.Window.Console).LogHistory[0];
 		}
 
 		[Test]
-		public void OnLoad()
+		public static void OnLoad()
 		{
-			Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad()'></body></html>");
+			var engine = Load("<html><head><script>function OnLoad() { console.log('b'); }</script></head><body onload='OnLoad()'></body></html>");
 			
-			CollectionAssert.AreEqual(new object[] { "b" }, _log);
+			CollectionAssert.AreEqual(new object[] { "b" }, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 		
 		[Test]
-		public void WindowOpen()
+		public static void WindowOpen()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://site.net", Mocks.Page("",
 				"<button id=download type=submit onclick=\"window.open('file.txt')\">Download!</button>"))
@@ -852,37 +833,35 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void FormAutoSubmit()
+		public static void FormAutoSubmit()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://site.net",
 				@"<html><body><form method=get onsubmit=""console.log('onsubmit');event.preventDefault();"" id=f action='http://todosoft.ru/test/file.dat'>
 				<input name=username/>
 				<button type=submit id=b onclick=""console.log('onclick')"">Download!</button>
 				</form><script>document.getElementById(""b"").click();</script></body></html>");
-			
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://site.net/").Wait();
-			Assert.AreEqual(new[]{"onclick", "onsubmit"}, log);
+			Assert.AreEqual(new[]{"onclick", "onsubmit"}, console.LogHistory);
 		}
 		
 		[Test]
-		public void FormAutoSubmitPrevented()
+		public static void FormAutoSubmitPrevented()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://site.net",
 				@"<html><body><form method=get onsubmit=""console.log('onsubmit');event.preventDefault();"" id=f action='http://todosoft.ru/test/file.dat'>
 				<input name=username/>
 				<button type=submit id=b onclick=""console.log('onclick');event.preventDefault();"">Download!</button>
 				</form><script>document.getElementById(""b"").click();</script></body></html>");
-			
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://site.net/").Wait();
-			Assert.AreEqual(new[]{"onclick"}, log);
+			Assert.AreEqual(new[]{"onclick"}, console.LogHistory);
 		}
 
 		[Test]
-		public void SubmitGetForm()
+		public static void SubmitGetForm()
 		{
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
@@ -903,7 +882,7 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void SubmitPostForm()
+		public static void SubmitPostForm()
 		{
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
@@ -925,7 +904,7 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void SubmitFormUtf8()
+		public static void SubmitFormUtf8()
 		{
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
@@ -950,7 +929,7 @@ dispatchEvent(evt);");
 		[TestCase("get","/login?var2=y", "http://site.net/login?username=John&password=123456")]
 		[TestCase("post", "login?var2=y", "http://site.net/sub/login?var2=y")]
 		[TestCase("post","/login?var2=y", "http://site.net/login?var2=y")]
-		public void SubmitFormInSubWithParams(string method, string action, string expected)
+		public static void SubmitFormInSubWithParams(string method, string action, string expected)
 		{
 			//1. initial query should be removed from request on form submit
 			//2. Form action query should be ignored.
@@ -972,7 +951,7 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void SubmitNonHtmlResponse()
+		public static void SubmitNonHtmlResponse()
 		{
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/sub",
@@ -988,7 +967,7 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void OverrideSubmitActionInButton()
+		public static void OverrideSubmitActionInButton()
 		{
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/",
@@ -1006,7 +985,7 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void CancelResponse()
+		public static void CancelResponse()
 		{
 			var httpResources = Mocks.HttpResourceProvider()
 				.Resource("http://site.net/sub",
@@ -1021,7 +1000,7 @@ dispatchEvent(evt);");
 		}
 
 		[Test]
-		public void SetTimeoutArguments()
+		public static void SetTimeoutArguments()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
@@ -1032,15 +1011,15 @@ dispatchEvent(evt);");
 				"}, 1, 2, 'x');" +
 				"</script></html>");
 
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.IsNotNull(engine.WaitId("d"));
-			Assert.AreEqual(new object[]{2d, "x"}, log);
+			Assert.AreEqual(new object[]{2d, "x"}, console.LogHistory);
 		}
 
 		[Test]
-		public void SetIntervalArguments()
+		public static void SetIntervalArguments()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
@@ -1052,46 +1031,44 @@ dispatchEvent(evt);");
 				"}, 100, 2, 'x');" +
 				"</script></html>");
 
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
 			Assert.IsNotNull(engine.WaitId("d"));
-			Assert.AreEqual(new object[]{2d, "x"}, log);
+			Assert.AreEqual(new object[]{2d, "x"}, console.LogHistory);
 		}
 
 		[Test]
-		public void DomImplementationInstanceIsHidden()
+		public static void DomImplementationInstanceIsHidden()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
 				"console.log(document.implementation.instance);" +
 				"console.log(document.implementation.Instance);" +
 				"</script></html>");
-
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
-			Assert.AreEqual(new object[]{null,null}, log);
+			Assert.AreEqual(new object[]{null,null}, console.LogHistory);
 		}
 
 		[Test]
-		public void AddEventListenerNull()
+		public static void AddEventListenerNull()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
 				"addEventListener('load', null);" +
 				"console.log('no error');" +
 				"</script></html>");
-
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
-			Assert.AreEqual(new object[]{"no error"}, log);
+			Assert.AreEqual(new object[]{"no error"}, console.LogHistory);
 		}
 		
 				
 		[Test]
-		public void CustomGlobalFunc()
+		public static void CustomGlobalFunc()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
@@ -1101,14 +1078,14 @@ dispatchEvent(evt);");
 				"window['myfunc']('3');" +
 				"</script></html>");
 
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
-			Assert.AreEqual(new object[]{"1", "2", "3"}, log);
+			Assert.AreEqual(new object[]{"1", "2", "3"}, console.LogHistory);
 		}
 
 		[Test]
-		public void NavigatorMimeTypesSmoke()
+		public static void NavigatorMimeTypesSmoke()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
@@ -1117,14 +1094,14 @@ dispatchEvent(evt);");
 				"console.log('ok');" +
 				"</script></html>");
 
-			var engine = TestingEngine.BuildJint(resourceProvider);
-			var log = engine.Console.ToList();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
-			Assert.AreEqual(new object[]{0, null, "ok"}, log);
+			Assert.AreEqual(new object[]{0, null, "ok"}, console.LogHistory);
 		}
 
 		[Test]
-		public async Task NavigatorPlugins()
+		public static async Task NavigatorPlugins()
 		{
 			var plugins = new [] {
 				new PluginInfo("Pdf reader", "Pdf document reader", "", "",
@@ -1145,39 +1122,34 @@ dispatchEvent(evt);");
 				"console.log(navigator.plugins[0][0].type)"+
 				"</script></html>");
 			
+			var console = new TestingConsole();
 			var engine = EngineBuilder.New()
 				.SetResourceProvider(resourceProvider)
 				.UseJint()
-				.Window(w => w.SetNavigatorPlugins(plugins))
+				.Window(w => w.SetNavigatorPlugins(plugins).SetConsole(console))
 				.Build();
-
-			var log = engine.Console.ToList();
 
 			await engine.OpenUrl("http://localhost");
 			
-			Assert.AreEqual(new object[]{3, 2, "Pdf reader", 1, "application/pdf"}, log);
+			Assert.AreEqual(new object[]{3, 2, "Pdf reader", 1, "application/pdf"}, console.LogHistory);
 		}
 
 		[Test]
-		public async Task PredefineCustomFunction()
+		public static async Task PredefineCustomFunction()
 		{
 			var resourceProvider = Mocks.ResourceProvider("http://localhost",
 				"<html><script>" +
 				"console.log(myFunc(\"a b\"));"+
 				"</script></html>");
 			
-			var engine = EngineBuilder.New()
-				.SetResourceProvider(resourceProvider)
-				.UseJint()
-				.Build();
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console); 
 
 			engine.ScriptExecutor.Execute("text/javascript", "function myFunc(str){return encodeURI(str)};");
 			
-			var log = engine.Console.ToList();
-			
 			await engine.OpenUrl("http://localhost", false);
 			
-			Assert.AreEqual(new[]{"a%20b"}, log);
+			Assert.AreEqual(new[]{"a%20b"}, console.LogHistory);
 		}
 	}
 }
