@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
-using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
@@ -16,11 +16,11 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	public class JQueryTests
 	{
 		[Test]
-		public void Smoke()
+		public async Task Smoke()
 		{
-			var engine = TestingEngine.BuildJint();
+			var engine = TestingEngine.Build("<html><head><script> " + R.JQueryJs + " </script></head><body></body></html>");
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script></head><body></body></html>");
+			await engine.OpenUrl("http://localhost");
 		}
 
 		[TestCase(true, ExpectedResult = "zaza")]
@@ -83,30 +83,36 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 
 		[Test]
-		public void JQueryCreate()
+		public async Task JQueryCreate()
 		{
 			var script = "var a = $('<input type=\"file\">');console.log(a?'ok':'error');";
+			var resources = Mocks.ResourceProvider("http://localhost",
+				"<html><head><script> " + R.JQueryJs + " </script><script defer>" + script +
+				"</script></head><body><div id='uca'></div></body></html>");
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
+			var engine = TestingEngine.BuildJint(resources, console);
 			
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script defer>" + script +
-			            "</script></head><body><div id='uca'></div></body></html>");
+			await engine.OpenUrl("http://localhost");
 			Assert.AreEqual(new[]{"ok"}, console.LogHistory);
 		}
 
 		[Test]
-		public void On()
+		public async Task On()
 		{
 			var script = @"$('#b').on('click', function() {console.log('hi'); });
 var e = document.createElement('div');
 e.id = 'loaded';
 document.body.appendChild(e);";
 
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				"<html><head><script> " + R.JQueryJs +
+				" </script></head><body><div id='b'></div></body><script>" + script +
+				"</script></html>");
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load("<html><head><script> " + R.JQueryJs +
-			            " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
-			var loaded = engine.WaitId("loaded");
+			var engine = TestingEngine.BuildJint(resources, console);
+			var page = await engine.OpenUrl("http://localhost");
+			var loaded = page.Document.WaitId("loaded");
 			Assert.IsNotNull(loaded);
 
 			var e = engine.Document.CreateEvent("Event");
@@ -117,18 +123,21 @@ document.body.appendChild(e);";
 		}
 
 		[Test]
-		public void Bind()
+		public async Task Bind()
 		{
 			var script = @"$('#b').bind('click', function() {console.log('hi'); });
 var e = document.createElement('div');
 e.id = 'loaded';
 document.body.appendChild(e);";
+			var resources = Mocks.ResourceProvider("http://localhost",
+				"<html><head><script> " + R.JQueryJs +
+				" </script></head><body><div id='b'></div></body><script>" +
+				script + "</script></html>");
 
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load("<html><head><script> " + R.JQueryJs +
-			            " </script></head><body><div id='b'></div></body><script>" + script + "</script></html>");
-			var loaded = engine.WaitId("loaded");
+			var engine = TestingEngine.BuildJint(resources, console);
+			var page = await engine.OpenUrl("http://localhost");
+			var loaded = page.Document.WaitId("loaded");
 			Assert.IsNotNull(loaded);
 
 			((HtmlElement) engine.Document.GetElementById("b")).Click();
@@ -141,9 +150,12 @@ document.body.appendChild(e);";
 		{
 			var script = @"$(function(){console.log(document.body);});";
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script><script>" + script +
-			            "</script></head><body><div id='b'></div></body></html>");
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				"<html><head><script> " + R.JQueryJs + " </script><script>" + script +
+				"</script></head><body><div id='b'></div></body></html>"); 
+			var engine = TestingEngine.BuildJint(resources, console);
+			var page = engine.OpenUrl("http://localhost");
 			Thread.Sleep(1000);
 
 			Assert.AreEqual(1, console.LogHistory.Count);
@@ -153,43 +165,48 @@ document.body.appendChild(e);";
 		[TestCase(".u", 1)]
 		[TestCase("div", 1)]
 		[TestCase("#a", 1)]
-		public void Selector(string selector, int exptectedCount)
+		public async Task Selector(string selector, int exptectedCount)
 		{
 			var script = @"console.log($('" + selector + "').length);";
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				"<html><head><script> " + R.JQueryJs +
+				" </script></head><body><div class = 'u' id='a'></div><script>" + script +
+				"</script></body></html>");
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load("<html><head><script> " + R.JQueryJs +
-			            " </script></head><body><div class = 'u' id='a'></div><script>" + script +
-			            "</script></body></html>");
-
+			var engine = TestingEngine.BuildJint(resources, console);
+			await engine.OpenUrl("http://localhost");
 			Assert.AreEqual(new[]{exptectedCount}, console.LogHistory);
 		}
 
 		[Test]
-		public void OnWithSelector()
+		public async Task OnWithSelector()
 		{
 			var script = @"$('#a').on('click.some', '.u', function(){console.log('hi');});";
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				"<html><head><script> " + R.JQueryJs +
+				" </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script +
+				"</script></body></html>");
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load("<html><head><script> " + R.JQueryJs +
-			            " </script></head><body><div id='a'><span class='u' id='u'></span></div><script>" + script +
-			            "</script></body></html>");
-
-			var u = engine.Document.GetElementById("u") as HtmlElement;
+			var engine = TestingEngine.BuildJint(resources, console);
+			var page = await engine.OpenUrl("http://localhost");
+			var u = page.Document.GetElementById("u") as HtmlElement;
 			u.Click();
 			Assert.AreEqual(new[]{"hi"}, console.LogHistory);
 		}
 
 		[Test]
-		public void SetHtmlWithScript()
+		public async Task SetHtmlWithScript()
 		{
 			var script = "$('#target')['html']('<script>console.log(1);</script>');";
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				"<html><head><script> " + R.JQueryJs +
+				" </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
 			var console = new Mock<IConsole>();
-			var engine = EngineBuilder.New().UseJint().Window(w => w.SetConsole(console.Object)).Build(); 
-
-			engine.Load("<html><head><script> " + R.JQueryJs +
-			            " </script></head><body><div id='target'></div><script>" + script + "</script></body></html>");
-
+			var engine = TestingEngine.BuildJint(resources, console.Object); 
+			await engine.OpenUrl("http://localhost");
 			console.Verify(x => x.Log(1d), Times.Once);
 		}
 	}

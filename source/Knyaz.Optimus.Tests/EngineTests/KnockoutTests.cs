@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
@@ -12,30 +13,27 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	[TestFixture]
 	public class KnockoutTests
 	{
-		static Document Load(string html)
+		static async Task<Document> Load(string html)
 		{
-			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
-			engine.Load(html);
-			return engine.Document;
+			var rp = Mocks.ResourceProvider("http://localhost", html);
+			var engine = TestingEngine.BuildJint(rp, SystemConsole.Instance);
+			return (await engine.OpenUrl("http://localhost")).Document;
 		}
 
-		Document Load(string script, string body)
+		static Task<Document> Load(string script, string body) =>
+			Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" +
+			     script + "</script></html>");
+
+		[Test]
+		public async Task KnockoutInclude()
 		{
-			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
-			engine.Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" + script + "</script></html>");
-			return engine.Document;
+			await Load("<html><head><script> " + R.KnockoutJs + " </script></head><body></body></html>");
 		}
 
 		[Test]
-		public void KnockoutInclude()
+		public async Task KnockoutViewModel()
 		{
-			Load("<html><head><script> " + R.KnockoutJs + " </script></head><body></body></html>");
-		}
-
-		[Test]
-		public void KnockoutViewModel()
-		{
-			var document = Load(@"function VM() {
+			var document = await Load(@"function VM() {
 	this.Greeting = ko.observable('Hello');
 }
 ko.applyBindings(new VM());
@@ -49,7 +47,7 @@ ko.applyBindings(new VM());
 		}
 
 		[Test]
-		public void KnockoutClick()
+		public async Task KnockoutClick()
 		{
 			var vm =
 @"function VM() {
@@ -65,7 +63,7 @@ ko.applyBindings(new VM());
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script></head><body><span id = 'c1' data-bind='text:Greeting, click: Click'/></body>" +
 						   "<script>" + vm + "</script></html>");
 
 			var span = (HtmlElement)doc.GetElementById("c1");
@@ -88,7 +86,7 @@ ko.applyBindings(new VM());
 		}
 
 		[Test]
-		public void KnockoutInputAndComputed()
+		public async Task KnockoutInputAndComputed()
 		{
 			var vm =
 @"function VM() {
@@ -98,7 +96,7 @@ ko.applyBindings(new VM());
 }
 ko.applyBindings(new VM());";
 
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>"+
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script></head>"+
 				"<body>" +
 				"<input type='text' data-bind='value:Name' id='in'/>" +
 				"<span id = 'c1' data-bind='text:Greeting'/>" +
@@ -117,9 +115,9 @@ ko.applyBindings(new VM());";
 		}
 
 		[Test]
-		public void KnockoutInputCheckbox()
+		public async Task KnockoutInputCheckbox()
 		{
-			var doc = Load(@"function VM() {
+			var doc = await Load(@"function VM() {
 	var _this = this;	
 	this.Checked = ko.observable(true);
 	this.Click = function(){_this.Checked(!_this.Checked());};
@@ -138,9 +136,9 @@ ko.applyBindings(new VM());",
 		}
 
 		[Test]
-		public void ForeachBinding()
+		public async Task ForeachBinding()
 		{
-			var doc = Load(
+			var doc = await Load(
 @"function VM(peoples) {
 	var _this = this;	
 	this.Peoples = ko.observableArray(peoples);
@@ -168,9 +166,9 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));",
 		}
 
 		[Test]
-		public void ArrayPushAll()
+		public async Task ArrayPushAll()
 		{
-			var doc = Load(
+			var doc = await Load(
 @"function VM() {
 	var _this = this;	
 	this.Peoples = ko.observableArray();
@@ -190,7 +188,7 @@ ko.utils.arrayPushAll(vm.Peoples, [{Name:'Ivan'},{Name:'Vasil'}]);peoples",
 		}
 
 		[Test]
-		public void Template()
+		public async Task Template()
 		{
 			var vm =
 @"function VM() {
@@ -206,7 +204,7 @@ ko.utils.arrayPushAll(vm.Peoples, [{Name:'Ivan'},{Name:'Vasil'}]);peoples",
 ko.applyBindings(new VM());
 ";
 
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"<script type='text/html' id='tmpl'>
 <span id = 'c1' data-bind='text:Greeting, click: Click'/>
 </script>
@@ -232,9 +230,9 @@ ko.applyBindings(new VM());
 		}
 
 		[Test]
-		public void TemplateInsideForeachBinding()
+		public async Task TemplateInsideForeachBinding()
 		{
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"
 <script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
@@ -268,9 +266,9 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]));
 		}
 
 		[Test]
-		public void BindToNode()
+		public async Task BindToNode()
 		{
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script>" +
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script>" +
 @"<script type='text/html' id='itemTemplate'>
 	<span data-bind='text:Name'></span>
 </script>
@@ -304,9 +302,9 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		}
 
 		[Test]
-		public static void ComponentBinding()
+		public static async Task ComponentBinding()
 		{
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
 @"<body> <div id='view' data-bind=""component:{name:'myco'}""></div> </body>
 <script>
 	ko.components.register('myco', { 
@@ -325,9 +323,9 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		}
 
 		[Test]
-		public void HtmlWithScriptBinding()
+		public async Task HtmlWithScriptBinding()
 		{
-			var doc = Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
+			var doc = await Load("<html><head><script> " + R.KnockoutJs + " </script></head>" +
 @"<body> <div id='view' data-bind=""html:html""></div> </body>
 <script>
 	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
@@ -337,31 +335,27 @@ ko.applyBindings(new VM([{Name:'Ivan'},{Name:'Vasil'}]), document.getElementById
 		}
 
 		[Test]
-		public void HtmlWithScriptBindingWithJquery()
+		public async Task HtmlWithScriptBindingWithJquery()
 		{
-			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
-			engine.Load("<html><head><script>" + R.JQueryJs+"</script><script> " + R.KnockoutJs + " </script></head>" +
-			            @"<body> <div id='view' data-bind=""html:html""></div> </body>
+			var document = await Load("<html><head><script>" + R.JQueryJs+"</script><script> " + R.KnockoutJs + " </script></head>" +
+			                           @"<body> <div id='view' data-bind=""html:html""></div> </body>
 <script>
 	ko.applyBindings({ html:'<script type=""text/javascript"">var d = document.createElement(""div"");d.id=""d""; document.body.appendChild(d);</script>' });
 </script>
 </html>");
-			var doc = engine.Document;
-			Assert.IsNotNull(doc.GetElementById("d"));
+			Assert.IsNotNull(document.GetElementById("d"));
 		}
 
 		[Test]
-		public void SelectOptionsTest()
+		public async Task SelectOptionsTest()
 		{
-			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
-			engine.Load("<html><head><script>" + R.JQueryJs + "</script><script> " + R.KnockoutJs + " </script></head>" +
+			var document = await Load("<html><head><script>" + R.JQueryJs + "</script><script> " + R.KnockoutJs + " </script></head>" +
 						@"<body> <select id='s' data-bind=""options:options""></select> </body>
 <script>
 	ko.applyBindings({ options: ['A','B']});
 </script>
 </html>");
-			var doc = engine.Document;
-			var select = doc.GetElementById("s") as HtmlSelectElement;
+			var select = document.GetElementById("s") as HtmlSelectElement;
 			Assert.IsNotNull(select);
 			Assert.AreEqual(2, select.Options.Length);
 		}

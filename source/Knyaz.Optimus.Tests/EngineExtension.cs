@@ -1,6 +1,3 @@
-using System.IO;
-using System.Text;
-
 namespace Knyaz.Optimus.Tests
 {
 	internal static class EngineExtension
@@ -27,15 +24,6 @@ namespace Knyaz.Optimus.Tests
 			};
 
 			return engine;
-		}
-
-
-		public static void Load(this Engine engine, string html)
-		{
-			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
-			{
-				engine.Load(stream);
-			}
 		}
 	}
 }

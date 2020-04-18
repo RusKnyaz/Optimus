@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Knyaz.Optimus.ResourceProviders;
 using NUnit.Framework;
 using Knyaz.Optimus.Tests.Resources;
@@ -19,11 +20,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 		
 		[Test]
-		public void Smoke()
+		public async Task Smoke()
 		{
-			var engine = TestingEngine.BuildJint();
+			var engine = TestingEngine.Build("<html><head><script>\r\n" + requireJs + "\r\n</script></head><body></body></html>");
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
-			engine.Load("<html><head><script>\r\n" + requireJs + "\r\n</script></head><body></body></html>");
+
+			await engine.OpenUrl("http://localhost");
 		}
 
 		[Test]

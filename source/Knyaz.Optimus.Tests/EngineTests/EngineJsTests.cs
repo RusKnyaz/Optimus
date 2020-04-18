@@ -180,20 +180,19 @@ console.log(elems.length);");
 		}
 
 		[Test]
-		public static void AddScriptAndExecute()
+		public static async Task AddScriptAndExecute()
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://localhost/module", "console.log('hi from module');");
-			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(resourceProvider, console);
-
 			var script =
 				@"var s = document.createElement('script');
 s.onload = function(){console.log('load');};
 s.setAttribute('async','true');
 s.setAttribute('src', 'http://localhost/module');
 document.head.appendChild(s);";
-
-			engine.Load("<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/module", "console.log('hi from module');")
+				.Resource("http://localhost", "<html><head><script>" + script + "</script></head><body><div id='uca'></div></body></html>");
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
+			await engine.OpenUrl("http://localhost");
 
 			Thread.Sleep(1000);
 			Assert.AreEqual(2, console.LogHistory.Count);
@@ -386,15 +385,10 @@ console.log(xhr.readyState);");
 		}
 
 		[Test]
-		public static void XmlHttpRequestSend()
+		public static async Task XmlHttpRequestSend()
 		{
-			var resourceProvider = Mock.Of<IResourceProvider>()
-				.Resource("http://localhost/unicorn.xml", "hello");
-
-			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(resourceProvider, console);
-			engine.Load(Mocks.Page(
-				@"var client = new XMLHttpRequest();
+			var resourceProvider = Mocks.ResourceProvider("http://localhost", Mocks.Page(
+					@"var client = new XMLHttpRequest();
 client.onreadystatechange = function () {
   console.log(this.readyState);
   if(this.readyState == this.DONE) {
@@ -405,30 +399,37 @@ client.onreadystatechange = function () {
   }
 };
 client.open(""GET"", ""http://localhost/unicorn.xml"", false);
-client.send();"));
+client.send();"))
+				.Resource("http://localhost/unicorn.xml", "hello");
+
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
+			await engine.OpenUrl("http://localhost");
 
 			Thread.Sleep(1000);
 
-			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Once());
+			Mock.Get(resourceProvider).Verify(x => x.SendRequestAsync(It.IsAny<Request>()), Times.Exactly(2));
 			CollectionAssert.AreEqual(new object[] {1.0d, 4.0d, 200.0d, "hello"}, console.LogHistory);
 		}
 
 		[Test]
-		public static void AjaxExist()
+		public static async Task AjaxExist()
 		{
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				Mocks.Page(@"console.log(typeof XMLHttpRequest !== 'undefined');"));
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load(Mocks.Page(@"console.log(typeof XMLHttpRequest !== 'undefined');"));
+			var engine = TestingEngine.BuildJint(resources, console);
+			await engine.OpenUrl("http://localhost");
 			CollectionAssert.AreEqual(new[] {true}, console.LogHistory);
 		}
 
 		[Test]
-		public static void AddEmbeddedScriptInsideEmbedded()
+		public static async Task AddEmbeddedScriptInsideEmbedded()
 		{
-			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			
-			engine.Load(Mocks.Page(@"
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
 console.log('node added');
 }, false);
@@ -440,6 +441,10 @@ d.innerHTML = ""console.log('in new script');console.log(document.getElementById
 d.onload = function(){console.log('onload');};
 document.head.appendChild(d);
 console.log('afterappend');"));
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resources, console);
+
+			await engine.OpenUrl("http://localhost");
 
 			Thread.Sleep(1000);
 
@@ -447,13 +452,11 @@ console.log('afterappend');"));
 		}
 
 		[Test]
-		public static void AddScriptAsync()
+		public static async Task AddScriptAsync()
 		{
-			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(
-				Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"), console);
-			
-			engine.Load(Mocks.Page(@"
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				Mocks.Page(@"
 			document.addEventListener(""DOMNodeInserted"", function(e){
 console.log('nodeadded');
 }, false);
@@ -464,7 +467,12 @@ d.async = true;
 d.src = ""http://localhost/script.js"";
 d.onload = function(){console.log('onload');};
 document.head.appendChild(d);
-console.log('afterappend');"));
+console.log('afterappend');")).Resource("http://localhost/script.js", "console.log('in new script');");
+			
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resources, console);
+			
+			await engine.OpenUrl("http://localhost");
 
 			Thread.Sleep(1000);
 			Assert.AreEqual("nodeadded,afterappend,in new script,onload", 
@@ -984,21 +992,7 @@ dispatchEvent(evt);");
 			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/logout");
 		}
 
-		[Test]
-		public static void CancelResponse()
-		{
-			var httpResources = Mocks.HttpResourceProvider()
-				.Resource("http://site.net/sub",
-					"<form method=get action='download'></form>");
-			
-			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
-			engine.PreHandleResponse += (sender, arags) => arags.Cancel = true;
-			
-			engine.OpenUrl("http://site.net/sub").Wait();
-			
-			Assert.False(engine.Document.Get<HtmlFormElement>("form").Any());
-		}
-
+		
 		[Test]
 		public static void SetTimeoutArguments()
 		{

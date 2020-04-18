@@ -25,28 +25,28 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	{
 
 		[Test]
-		public void EmptyHtml()
+		public async Task EmptyHtml()
 		{
-			var engine = TestingEngine.BuildJint(Mock.Of<IResourceProvider>());
-			engine.Load("<html></html>");
+			var engine = TestingEngine.BuildJint(Mocks.ResourceProvider("http://localhost", "<html></html>"));
+			await engine.OpenUrl("http://localhost");
 		}
 		
-		private Engine Load(IResourceProvider resourceProvider)
+		private async Task<Document> Load(IResourceProvider resourceProvider)
 		{
 			var engine = TestingEngine.BuildJint(resourceProvider);
-			engine.OpenUrl("http://localhost").Wait();
-			return engine;
+			return (await engine.OpenUrl("http://localhost")).Document;
 		}
-		
+
+
 		[Test]
-		public void GenerateContent()
+		public async Task GenerateContent()
 		{
-			var engine = Load(Mock.Of<IResourceProvider>()
+			var document = await Load(Mock.Of<IResourceProvider>()
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id='content'></div></body></html>")
 				.Resource("http://localhost/test.js", "var elem = document.getElementById('content');elem.innerHTML = 'Hello';"));
 
 			
-			var contentDiv = engine.Document.GetElementById("content");
+			var contentDiv = document.GetElementById("content");
 			Assert.AreEqual("Hello", contentDiv.InnerHTML);
 			Assert.AreEqual(1, contentDiv.ChildNodes.Count);
 			var text = contentDiv.ChildNodes[0] as Text;
@@ -55,37 +55,43 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public void DomManipulation()
+		public async Task DomManipulation()
 		{
-			var engine = Load(Mock.Of<IResourceProvider>()
+			var document = await Load(Mock.Of<IResourceProvider>()
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id='content1'></div><div id='content2'></div></body></html")
 				.Resource("http://localhost/test.js", "var div = document.createElement('div');" +
 			                                     "div.setAttribute('id', 'c3');" +
 			                                     "var c2 = document.getElementById('content2');" +
 			                                     "document.documentElement.getElementsByTagName('body')[0].insertBefore(div, c2);"));
 			
-			Assert.AreEqual(3, engine.Document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
-			var elem = engine.Document.GetElementById("c3");
+			Assert.AreEqual(3, document.DocumentElement.GetElementsByTagName("body")[0].ChildNodes.Count);
+			var elem = document.GetElementById("c3");
 			Assert.IsNotNull(elem);
 		}
 
 		[Test]
-		public void Text()
+		public async Task Text()
 		{
-			var engine = TestingEngine.BuildJint(SystemConsole.Instance);
-			engine.Load(Mocks.Page(@"var c2 = document.getElementById('content1').innerHTML = 'Hello';", "<span id='content1'></span>"));
-			var elem = engine.Document.GetElementById("content1");
+			var html = Mocks.Page(@"var c2 = document.getElementById('content1').innerHTML = 'Hello';",
+				"<span id='content1'></span>");
+			var resources = Mocks.ResourceProvider("http://localhost", html);
+			var engine =TestingEngine.BuildJint(resources, SystemConsole.Instance);
+			var page = await engine.OpenUrl("http://localhost");
+			var elem = page.Document.GetElementById("content1");
 			Assert.AreEqual("Hello", elem.InnerHTML);
 		}
 
 		[Test]
-		public void GetAttribute()
+		public async Task GetAttribute()
 		{
+			var resources = Mocks.ResourceProvider("http://localhost",
+				Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
+					"<span id='content1'></span>"));
 			var consoleMock = new Mock<IConsole>();
-			var engine = EngineBuilder.New().UseJint().Window(w => w.SetConsole(consoleMock.Object)).Build();
+
+			var engine = TestingEngine.BuildJint(resources, consoleMock.Object);
 			string attr = null;
-			engine.Load(Mocks.Page(@"console.log(document.getElementById('content1').getAttribute('id'));",
-				"<span id='content1'></span>"));
+			await engine.OpenUrl("http://localhost");
 			
 			consoleMock.Verify(x => x.Log("content1"), Times.Once);
 		}
@@ -103,49 +109,54 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public void NonJsScript()
+		public async Task NonJsScript()
 		{
-			var engine = TestingEngine.BuildJint();
-			engine.Load("<html><head><script id='template' type='text/html'><div>a</div></script></head></html>");
-			var script = engine.Document.GetElementById("template");
+			var resources = Mocks.ResourceProvider("http://localhost",
+				"<html><head><script id='template' type='text/html'><div>a</div></script></head></html>");
+			var engine = TestingEngine.BuildJint(resources);
+			var page = await engine.OpenUrl("http://localhost");
+			var script = page.Document.GetElementById("template");
 			Assert.AreEqual("<div>a</div>", script.InnerHTML);
 		}
 
 		[Test]
-		public void LoadScriptTest()
+		public async Task LoadScriptTest()
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');");
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');")
+				.Resource("http://localhost", "<html><head><script src='http://localhost/script.js'></script></head></html>");
 			var console = new TestingConsole();
 			var engine = TestingEngine.BuildJint(resourceProvider, console);
-
-			engine.Load("<html><head><script src='http://localhost/script.js'></script></head></html>");
+			await engine.OpenUrl("http://localhost");
 			Assert.AreEqual(new[]{"hello"}, console.LogHistory);
 		}
 
 		[Test]
-		public void DocumentReadyStateComplete()
+		public async Task DocumentReadyStateComplete()
 		{
-			var engine = TestingEngine.BuildJint();
-			engine.Load("<html><body></body></html>");
-			Assert.AreEqual(DocumentReadyStates.Complete, engine.Document.ReadyState);
+			var resources = Mocks.ResourceProvider("http://localhost", "<html><body></body></html>");
+			var engine = TestingEngine.BuildJint(resources);
+			var page = await engine.OpenUrl("http://localhost");
+			Assert.AreEqual(DocumentReadyStates.Complete, page.Document.ReadyState);
 		}
 
 		[Test]
-		public void LoadAndRunScriptAddedInRuntime()
+		public async Task LoadAndRunScriptAddedInRuntime()
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');");
+			var resourceProvider = 
+				Mocks.ResourceProvider("http://localhost/script.js", "console.log('hello');")
+					.Resource("http://localhost", "<html><head></head></html>");
 			
 			var signal = new ManualResetEvent(false);
 			var console = new Mock<IConsole>();
 			console.Setup(x => x.Log(It.IsAny<string>())).Callback(() => signal.Set());
 
-			var engine = Builder(resourceProvider, console.Object).Build();
+			var engine = TestingEngine.BuildJint(resourceProvider, console.Object); 
 
-			engine.Load("<html><head></head></html>");
+			var page = await engine.OpenUrl("http://localhost");
 
-			var script = (Script)engine.Document.CreateElement("script");
+			var script = (Script)page.Document.CreateElement("script");
 			script.Src = "http://localhost/script.js";
-			engine.Document.Head.AppendChild(script);
+			page.Document.Head.AppendChild(script);
 
 			Assert.True(signal.WaitOne(1000));
 
@@ -155,31 +166,32 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		[TestCase("var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');")]
 		[TestCase("var timer = window.setTimeout(function(x){console.log('ok');}, 300);")]
-		public void SetTimeout(string code)
+		public async Task SetTimeout(string code)
 		{
-			
+			var resources = Mocks.ResourceProvider("http://localhost", Mocks.Page(code));
 			var signal = new ManualResetEvent(false);
 			var console = new Mock<IConsole>();
 			console.Setup(x => x.Log(It.IsAny<string>())).Callback(() => signal.Set());
-			var engine = Builder(console.Object).Build();
-			engine.Load(Mocks.Page(code));
+			var engine = TestingEngine.BuildJint(resources, console.Object); 
+			await engine.OpenUrl("http://localhost");
 			Assert.IsTrue(signal.WaitOne(1000));
 			console.Verify(x => x.Log("ok"), Times.Once);
 		}
 
 		[Test, Ignore("For manual run")]
-		public void ClearTimeout()
+		public async Task ClearTimeout()
 		{
+			var resources = Mocks.ResourceProvider(
+				"http://localhost", Mocks.Page(
+					@"var timer = window.setTimeout(function(){console.log('ok');}, 500);
+                                    window.clearTimeout(timer);"));
 			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(console);
-			engine.Load(Mocks.Page(
-@"var timer = window.setTimeout(function(){console.log('ok');}, 500);
-window.clearTimeout(timer);"));
+			var engine = TestingEngine.BuildJint(resources, console);
+			await engine.OpenUrl("http://localhost");
 			Assert.AreEqual(0, console.LogHistory.Count);
 			Thread.Sleep(1000);
 			Assert.AreEqual(0, console.LogHistory.Count);
 		}
-
 		
 
 		[Test]
@@ -203,22 +215,27 @@ window.clearTimeout(timer);"));
 		}
 
 		[Test]
-		public void GetElementsByTagName()
+		public async Task GetElementsByTagName()
 		{
+			var resources = Mocks.ResourceProvider("http://localhost",
+				Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
 			var console = new Mock<IConsole>();
-			var engine = Builder(console.Object).Build();
-			engine.Load(Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
+			var engine = TestingEngine.BuildJint(resources, console.Object);
+			await engine.OpenUrl("http://localhost");
 			console.Verify(x => x.Log(2d), Times.Once);
 		}
 		
 		[Test]
-		public void GetElementsByTagNameByIndex()
+		public async Task GetElementsByTagNameByIndex()
 		{
+			var resources = Mocks.ResourceProvider(
+				"http://localhost",
+				Mocks.Page(@"console.log(document.body.getElementsByTagName('div')[0])",
+					"<div id='content1'></div><div id='content2'></div>"));
 			var console = new Mock<IConsole>();
-			var engine = Builder(console.Object).Build();
-			engine.Load(Mocks.Page(@"console.log(document.body.getElementsByTagName('div')[0])", "<div id='content1'></div><div id='content2'></div>"));
-			
-			console.Verify(x => x.Log(engine.Document.Body.FirstChild), Times.Once);
+			var engine = TestingEngine.BuildJint(resources, console.Object);
+			var page = await engine.OpenUrl("http://localhost");
+			console.Verify(x => x.Log(page.Document.Body.FirstChild), Times.Once);
 		}
 		
 		[Test]
@@ -253,22 +270,24 @@ window.clearTimeout(timer);"));
 		}
 
 		[Test, Ignore("Unstable")]
-		public void AddScriptAsync()
+		public async Task AddScriptAsync()
 		{
+			var resources = Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');")
+				.Resource("http://localhost", "<html><head></head></html>");
+			
 			var console = new TestingConsole();
 			//todo: rewrite it with JS. current test is not stable due to multithreading.
-			var engine = Builder(Mocks.ResourceProvider("http://localhost/script.js", "console.log('in new script');"))
-				.Window(w => w.SetConsole(console)).Build();
-			
-			engine.Load("<html><head></head></html>");
-			engine.Document.AddEventListener("DOMNodeInserted", @event =>
+			var engine = TestingEngine.BuildJint(resources, console); 
+
+			var page = await engine.OpenUrl("http://localhost");
+			page.Document.AddEventListener("DOMNodeInserted", @event =>
 			{
 				console.Log("nodeadded");
 			}, false);
 
 			var onloadSignal = new ManualResetEvent(false);
 			
-			var d = (Script)engine.Document.CreateElement("script");
+			var d = (Script)page.Document.CreateElement("script");
 			d.Id = "aaa";
 			d.Async = true;
 			d.Src = "http://localhost/script.js";
@@ -277,18 +296,20 @@ window.clearTimeout(timer);"));
 				console.Log("onload");
 				onloadSignal.Set();
 			};
-			engine.Document.Head.AppendChild(d);
+			page.Document.Head.AppendChild(d);
 
 			onloadSignal.WaitOne(10000);
 			CollectionAssert.AreEqual(new[] { "nodeadded", "in new script", "onload" }, console.LogHistory);
 		}
 
 		[Test]
-		public void RaiseExecuteScript()
+		public async Task RaiseExecuteScript()
 		{
-			var engine = EngineBuilder.New().UseJint().Build();
-			engine.Load("<html><head></head><body></body></html>");
-			var doc = engine.Document;
+			var resources = Mocks.ResourceProvider(
+				"http://localhost", "<html><head></head><body></body></html>");
+			var engine = TestingEngine.BuildJint(resources); 
+			var page = await engine.OpenUrl("http://localhost");
+			var doc = page.Document;
 			
 			var beforeCount = 0;
 			var afterCount = 0;
@@ -304,12 +325,13 @@ window.clearTimeout(timer);"));
 		}
 
 		[Test]
-		public void AppendScriptAsInnerHtml()
+		public async Task AppendScriptAsInnerHtml()
 		{
 			var console = new Mock<IConsole>();
-			var engine = EngineBuilder.New().UseJint().Window(w => w.SetConsole(console.Object)).Build();
-			engine.Load("<html><head></head><body></body></html>");
-			engine.Document.Body.InnerHTML = "<script>console.log('HI');</script>";
+			var resources = Mocks.ResourceProvider("http://localhost", "<html><head></head><body></body></html>");
+			var engine = TestingEngine.BuildJint(resources, console.Object); 
+			var page = await engine.OpenUrl("http://localhost");
+			page.Document.Body.InnerHTML = "<script>console.log('HI');</script>";
 			console.Verify(x => x.Log("HI"), Times.Once);
 		}
 
@@ -764,9 +786,6 @@ function reqListener () {
 				.Window(w => w.SetConsole(console))
 				.UseJint();
 		
-		private static EngineBuilder Builder(IConsole console) =>
-        			EngineBuilder.New().Window(w => w.SetConsole(console)).UseJint();
-
 		[Test]
 		public async Task BodyOnLoad()
 		{
@@ -800,7 +819,7 @@ function reqListener () {
 </script>
 </html>");
 			var engine = TestingEngine.BuildJint(resourceProvider, console);
-			var page = await engine.OpenUrl("http://loc/");
+			await engine.OpenUrl("http://loc/");
 			Assert.AreEqual(new[]{"added","link onerror","body onload"}, console.LogHistory);
 		}
 		
@@ -823,7 +842,7 @@ function reqListener () {
 			
 			var console = new TestingConsole();
 			var engine = TestingEngine.BuildJint(resourceProvider, console);
-			var page = await engine.OpenUrl("http://loc/");
+			await engine.OpenUrl("http://loc/");
 			Assert.AreEqual(new[]{"added","ok","body onload"}, console.LogHistory);
 		}
 	}

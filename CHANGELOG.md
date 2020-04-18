@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Removed Engine.OnWindowOpen event. Use EngineBuilder to configure Window object.
 - Removed Knyaz.Optimus.Console class. Use own IConsole implementation.
 - Removed Engine.OnResponse and Engine.OnRequest events.
+- Removed Engine.Load method.
 
 ## [2.4]
 

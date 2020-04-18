@@ -1,7 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System.Threading.Tasks;
+using NUnit.Framework;
 using Knyaz.Optimus.Tests.Resources;
 using Knyaz.Optimus.Tests.TestingTools;
-using Knyaz.Optimus.Tests.Tools;
 
 namespace Knyaz.Optimus.Tests.EngineTests
 {
@@ -9,12 +9,12 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	public class JQueryFormTests
 	{
 		[Test]
-		public void Smoke()
+		public async Task Smoke()
 		{
-			var engine = TestingEngine.BuildJint();
+			var engine = TestingEngine.Build("<html><head><script> " + R.JQueryJs + " </script>" +
+			                                 "<script>" + R.JQueryFormJs + "</script></head><body></body></html>");
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
-			engine.Load("<html><head><script> " + R.JQueryJs + " </script>" +
-				"<script>" + R.JQueryFormJs + "</script></head><body></body></html>");
+			await engine.OpenUrl("http://localhost");
 		}
 	}
 }

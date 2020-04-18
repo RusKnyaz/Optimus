@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Environment;
@@ -199,23 +198,9 @@ namespace Knyaz.Optimus
 			req.Cookies = _cookieContainer;
 			return req;
 		}
-		
-		/// <summary>
-		/// Occurs before the document being loaded from response. 
-		/// Can be used to handle non-html response types.
-		/// </summary>
-		public event EventHandler<ResponseEventArgs> PreHandleResponse; 
 
 		private void LoadFromResponse(Document document, IResource resource)
 		{
-			if (PreHandleResponse != null)
-			{
-				var args = new ResponseEventArgs(resource);
-				PreHandleResponse(this, args);
-				if (args.Cancel)
-					return;
-			}
-
 			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
 				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
 
@@ -226,18 +211,6 @@ namespace Knyaz.Optimus
 				
 
 			BuildDocument(document, resource.Stream);
-		}
-
-		/// <summary>
-		/// For tests
-		/// </summary>
-		/// <param name="stream"></param>
-		[Obsolete]
-		public void Load(Stream stream)
-		{
-			ScriptExecutor?.Clear();
-			Document = new Document(Window);
-			BuildDocument(Document, stream);
 		}
 
 		private void BuildDocument(Document document, Stream stream)
@@ -321,16 +294,5 @@ namespace Knyaz.Optimus
 		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
 
 		private IScriptExecutor _scriptExecutor;
-	}
-
-	public class ResponseEventArgs : EventArgs
-	{
-		public bool Cancel { get; set; }
-		public readonly IResource Response;
-
-		public ResponseEventArgs(IResource resource)
-		{
-			Response = resource;
-		}
 	}
 }

@@ -1,6 +1,6 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.TestingTools;
@@ -11,34 +11,39 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	[TestFixture]
 	public class ComputedStyleTests
 	{
-		private Engine Load(string html)
+		private async Task<Document> Load(string html)
 		{
-			var engine = TestingEngine.BuildJintCss();
-			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
+			var engine = CreateEngine(html);
+			return (await engine.OpenUrl("http://localhost")).Document;
+		}
+
+		private static Engine CreateEngine(string html)
+		{
+			var resources = Mocks.ResourceProvider("http://localhost", html);
+			var engine = TestingEngine.BuildJintCss(resources);
 			return engine;
 		}
 
 		[Test]
-		public void EmptyDocumentContainsNoStyleSheets() =>
-			Load("").Document.Assert(doc => doc.StyleSheets.Count == 0);
+		public async Task EmptyDocumentContainsNoStyleSheets() =>
+			(await Load("")).Assert(doc => doc.StyleSheets.Count == 0);
 
 		[Test]
-		public void ComputedStyleTest()
+		public async Task ComputedStyleTest()
 		{
-			var engine =
-				Load(
+			var engine = CreateEngine(
 					"<head><style>div{display:inline-block}.a{width:100px;height:100px}</style></head><body><div class=a id=d></div></body>");
-			var lastStyleSheet = engine.Document.StyleSheets.Last();
+			var document = (await engine.OpenUrl("http://localhost")).Document;
+			var lastStyleSheet = document.StyleSheets.Last();
 			Assert.AreEqual(2, lastStyleSheet.CssRules.Count);
-			var div = engine.Document.GetElementById("d");
+			var div = document.GetElementById("d");
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "100px");
 		}
 
 		[Test]
-		public void ComputedStyleIsAlwaysActual()
+		public async Task ComputedStyleIsAlwaysActual()
 		{
-			var engine = Load("<head><style>div{color:red}</style><body><div id=d></div>");
-			var doc = engine.Document;
+			var doc = await Load("<head><style>div{color:red}</style><body><div id=d></div>");
 			var div = doc.GetElementById("d");
 			var divStyle = div.GetComputedStyle();
 			Assert.AreEqual("red", divStyle.GetPropertyValue("color"));
@@ -49,40 +54,39 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 
 		[Test]//Verified in Chrome
-		public void SpecificHtml5TestCom()
+		public async Task SpecificHtml5TestCom()
 		{
-			var engine = Load(@"<head><style>.pointsPanel h2 > strong {
+			var doc = await Load(@"<head><style>.pointsPanel h2 > strong {
 			font-size: 3.8em;
 		}</style></head><body><div class=""pointsPanel""><h2><strong id=test></strong></h2></div></body>");
-			var doc = engine.Document;
 			var elt = doc.GetElementById("test");
 			elt.GetComputedStyle().Assert(style => style.GetPropertyValue("font-size") == "91.2px");
 		}
 
 		[Test]
-		public void GetDisplayDefaultStyle()
+		public async Task GetDisplayDefaultStyle()
 		{
-			var engine = Load("<body><div id=d><span id=s>ABC</span><span>123</span></div></body>");
-			var spanDisplay = engine.Document.GetElementById("s").GetComputedStyle().GetPropertyValue("display");
+			var document = await Load("<body><div id=d><span id=s>ABC</span><span>123</span></div></body>");
+			var spanDisplay = document.GetElementById("s").GetComputedStyle().GetPropertyValue("display");
 			Assert.AreEqual("inline", spanDisplay);
-			var divDislpay = engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("display");
+			var divDislpay = document.GetElementById("d").GetComputedStyle().GetPropertyValue("display");
 			Assert.AreEqual("block", divDislpay);
 		}
 
 		[Test]
-		public void InheritTest()
+		public async Task InheritTest()
 		{
-			var engine = Load("<body style='color:red'><div id=d style='color:inherit'></div></body>");
-			var div = engine.Document.GetElementById("d");
+			var document = await Load("<body style='color:red'><div id=d style='color:inherit'></div></body>");
+			var div = document.GetElementById("d");
 			var color = div.GetComputedStyle().GetPropertyValue("color");
 			Assert.AreEqual("red", color);
 		}
 
 		[Test]
-		public void SetReset()
+		public async Task SetReset()
 		{
-			var engine = Load("<body><div id=d></div></body>");
-			var div = engine.Document.GetElementById("d") as HtmlElement;
+			var document = await Load("<body><div id=d></div></body>");
+			var div = document.GetElementById("d") as HtmlElement;
 			var computedStyle = div.GetComputedStyle();
 			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
 			div.Style.Display = "none";
@@ -92,10 +96,10 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 
 		[Test]
-		public void SetResetViaIndexer()
+		public async Task SetResetViaIndexer()
 		{
-			var engine = Load("<body><div id=d></div></body>");
-			var div = engine.Document.GetElementById("d") as HtmlElement;
+			var document = await Load("<body><div id=d></div></body>");
+			var div = document.GetElementById("d") as HtmlElement;
 			var computedStyle = div.GetComputedStyle();
 			Assert.AreEqual("block", computedStyle.GetPropertyValue("display"));
 			div.Style["display"] = "none";
@@ -107,10 +111,10 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("div{color:Red} div{color:Blue}", "Blue")]
 		[TestCase("div{color:Red !important} div{color:Blue}", "Red")]
 		[TestCase("div{color:Red !important} div{color:Blue !important}", "Blue")]
-		public void OverrrideProperty(string css, string expectedColor)
+		public async Task  OverrrideProperty(string css, string expectedColor)
 		{
-			var engine = Load("<head><style>"+css+"</style></head><body><div id=d></div></body>");
-			var div = engine.Document.GetElementById("d");
+			var document = await Load("<head><style>"+css+"</style></head><body><div id=d></div></body>");
+			var div = document.GetElementById("d");
 			Assert.AreEqual(expectedColor, div.GetComputedStyle().GetPropertyValue("color"));
 		}
 
@@ -123,70 +127,76 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("<div style='font-size:10px'><div style='font-size:2em'><div id=d style='font-size:1.5em'></div></div></div>", "30px")]
 		[TestCase("<div id=d></div>", "16px")]
 		[TestCase("<style>html{font-size:1.1em}</style><div id=d></div>", "17.6px")]
-		public void FontSize(string html, string expectedSize)
+		public async Task FontSize(string html, string expectedSize)
 		{
-			var engine = Load(html);
+			var document = await Load(html);
 
-			Assert.AreEqual(expectedSize, engine.Document.GetElementById("d").GetComputedStyle().GetPropertyValue("font-size"));
+			Assert.AreEqual(expectedSize, document.GetElementById("d").GetComputedStyle().GetPropertyValue("font-size"));
 		}
 
 		[TestCase("<style>@media screen{div{color:red}}</style><div id=d></div>", "red")]
-		public void Media(string html, string expectedColor)
+		public async Task Media(string html, string expectedColor)
 		{
-			var engine = Load(html);
+			var engine = CreateEngine(html);
+			var document = (await engine.OpenUrl("http://localhost")).Document;
 			var div = engine.Document.GetElementById("d");
 			var style = engine.Window.GetComputedStyle(div);
 			Assert.AreEqual(expectedColor, style.GetPropertyValue("color"));
 		}
 
 		[Test]
-		public void EmSize()
+		public async Task EmSize()
 		{
-			var engine = Load("<style>div{font-size:12px; height:2em; border:0.5em}</style><div id=d></div>");
-			var div = engine.Document.GetElementById("d");
+			var engine = CreateEngine("<style>div{font-size:12px; height:2em; border:0.5em}</style><div id=d></div>");
+			var document = (await engine.OpenUrl("http://localhost")).Document;
+			var div = document.GetElementById("d");
 			engine.Window.GetComputedStyle(div).Assert(style => 
 				style.GetPropertyValue("height") == "24px" &&
 				style.GetPropertyValue("border-left-width") == "6px");
 		}
 
 		[Test]
-		public void GetAutoMargin()
+		public async Task GetAutoMargin()
 		{
-			var engine = Load("<style>div{margin:0px auto}</style><div id=d></div>");
-			var div = engine.Document.GetElementById("d");
+			var engine = CreateEngine("<style>div{margin:0px auto}</style><div id=d></div>");
+			var page = await engine.OpenUrl("http://localhost");
+			var div = page.Document.GetElementById("d");
 			engine.Window.GetComputedStyle(div).Assert(style =>
 				style.GetPropertyValue("margin-left") == "auto" &&
 				style.GetPropertyValue("margin-right") == "auto");
 		}
 
 		[Test]
-		public void GetRelativeWidth()
+		public async Task GetRelativeWidth()
 		{
-			var engine = Load("<div  style='padding:10px;margin:10px;border:10px solid red;width:100px;box-sizing:content-box'><div style='padding:10px;margin:10px;border:10px solid blue;width:100%;box-sizing:content-box' id=d></div></div>");
-			var div = engine.Document.GetElementById("d");
+			var engine = CreateEngine("<div  style='padding:10px;margin:10px;border:10px solid red;width:100px;box-sizing:content-box'><div style='padding:10px;margin:10px;border:10px solid blue;width:100%;box-sizing:content-box' id=d></div></div>");
+			var page = await engine.OpenUrl("http://localhost");
+			var div = page.Document.GetElementById("d");
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "100%");
 		}
 
 		[TestCase("<style>.button.save { width:50% }</style><div class='button save' id=d></div>")]
 		[TestCase(@"<style>.page > .column .left,
 .page > .column.right {	width: 50%;}</style><div class='page'><div class='column'><div class='left' id=d></div></div></div>")]
-		public void ComplexSelector(string html)
+		public async Task ComplexSelector(string html)
 		{
-			var engine = Load(html);
-			var div = engine.Document.GetElementById("d");
+			var engine = CreateEngine(html);
+			var page = await engine.OpenUrl("http://localhost");
+			var div = page.Document.GetElementById("d");
 			Assert.IsNotNull(div);
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("width") == "50%");
 		}
 
 		[Test]
-		public void ColorFromParent()
+		public async Task ColorFromParent()
 		{
-			var engine = Load(@"<style>.resultsTable table thead tr {
+			var engine = CreateEngine(@"<style>.resultsTable table thead tr {
 	color: #fff;
 	background: #0092bf;
 }</style><div class='resultsTable'><table><thead><tr><td id=d></td></tr></thead></table></div>
 ");
-			var div = engine.Document.GetElementById("d");
+			var page = await engine.OpenUrl("http://localhost");
+			var div = page.Document.GetElementById("d");
 			Assert.IsNotNull(div);
 			engine.Window.GetComputedStyle(div).Assert(style => style.GetPropertyValue("color") == "#fff");
 		}
@@ -202,37 +212,37 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase(" * {color:red}</style><style>#d2 {color:green}", "green")]
 		[TestCase("div{color:green} div {color:red}","red")]
 		[TestCase("div,span{color:red} div{color:green}", "green")]
-		public void Priority(string css, string expectedValue)
+		public async Task Priority(string css, string expectedValue)
 		{
-			var engine = Load("<style>"+css+"</style><body><div id=d1 class=c1><div id=d2 class=c2></div></div></body>");
-			var div = engine.Document.GetElementById("d2");
+			var document = await Load("<style>"+css+"</style><body><div id=d1 class=c1><div id=d2 class=c2></div></div></body>");
+			var div = document.GetElementById("d2");
 			Assert.IsNotNull(div);
 			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == expectedValue);
 		}
 
 		[Test]
-		public void StyleIsHightPriority()
+		public async Task StyleIsHightPriority()
 		{
-			var engine = Load("<style>#d2{color:green}</style><body><div id=d1 class=c1><div id=d2 class=c2 style='color:red'></div></div></body>");
-			var div = engine.Document.GetElementById("d2");
+			var document = await Load("<style>#d2{color:green}</style><body><div id=d1 class=c1><div id=d2 class=c2 style='color:red'></div></div></body>");
+			var div = document.GetElementById("d2");
 			Assert.IsNotNull(div);
 			div.GetComputedStyle().Assert(style => style.GetPropertyValue("color") == "red");
 		}
 
 		[Test]
-		public void SetCssTextForElementNotInDocument()
+		public async Task SetCssTextForElementNotInDocument()
 		{
-			var engine = Load("");
-			var div = (HtmlElement)engine.Document.CreateElement("div");
+			var document = await Load("");
+			var div = (HtmlElement)document.CreateElement("div");
 			div.Style.CssText = "background-color:rgba(1,1,1,.5)";
 			Assert.AreEqual("rgba(1,1,1,.5)", div.Style.BackgroundColor);
 		}
 		
 		[Test]
-		public void SetCssTextForElementInDocument()
+		public async Task SetCssTextForElementInDocument()
 		{
-			var engine = Load("<div id=d></div>");
-			var div = (HtmlElement)engine.Document.GetElementById("d");
+			var document = await Load("<div id=d></div>");
+			var div = (HtmlElement)document.GetElementById("d");
 			div.Style.CssText = "background-color:rgba(1,1,1,.5)";
 			Assert.AreEqual("rgba(1,1,1,.5)", div.Style.BackgroundColor);
 		}

@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.TestingTools;
@@ -12,13 +11,13 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	[TestFixture]
 	public class CssSelectorTests
 	{
-		private Engine Load(string html)
+		private async Task<Document> Load(string html)
 		{
-			var engine = TestingEngine.BuildJintCss();
-			engine.Load(new MemoryStream(Encoding.UTF8.GetBytes(html)));
-			return engine;
+			var engine = TestingEngine.Build(html);
+			return (await engine.OpenUrl("http://localhost")).Document;
 		}
 
+		
 		[TestCase("*", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
 		[TestCase(".pointsPanel strong", @"<body><div class=""pointsPanel""><strong name=match></strong></div></body>")]
 		[TestCase(".pointsPanel strong", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
@@ -63,17 +62,17 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("input:-moz-suppressed", "<input type=text class='form-control' name=nomatch></input>")]
 		[TestCase("[data-toggle=\"dropdown\"]", "<span data-toggle=dropdown name=match></span>")]
 		[TestCase("a.user.active", "<a name=match class='user active'></a>")]
-		public void MatchChildTest(string selectorText, string html)
+		public async Task MatchChildTest(string selectorText, string html)
 		{
-			var engine = Load(html);
+			var document = await Load(html);
 			var selector = new CssSelector(selectorText);
-			var matchElts = engine.Document.GetElementsByName("match");
+			var matchElts = document.GetElementsByName("match");
 			foreach (var matchElt in matchElts)
 			{
 				Assert.IsTrue(selector.IsMatches(matchElt), "Have to match: " + matchElt);
 			}
 
-			var notMatchElt = engine.Document.GetElementsByName("nomatch");
+			var notMatchElt = document.GetElementsByName("nomatch");
 			foreach (var elt in notMatchElt)
 			{
 				Assert.IsFalse(selector.IsMatches(elt), elt.ToString());
@@ -81,8 +80,8 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		}
 
 		[Test]
-		public void AsteriskMatchesBody() =>
-			Load("<html><head><style>*{margin:0px}</style></head><body>HI</body></html>").Document
+		public async Task AsteriskMatchesBody() =>
+			(await Load("<html><head><style>*{margin:0px}</style></head><body>HI</body></html>"))
 				.Assert(doc => 
 					doc.Body.TextContent == "HI" &&
 					doc.Body.GetComputedStyle().GetPropertyValue("margin-left") == "0px");
