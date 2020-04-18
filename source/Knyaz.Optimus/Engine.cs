@@ -69,14 +69,10 @@ namespace Knyaz.Optimus
 			Window window,
 			IScriptExecutor scriptExecutor)
 		{
-			var rp = resourceProvider ?? throw new ArgumentNullException();
+			ResourceProvider = resourceProvider ?? throw new ArgumentNullException();
 			
 			_predictedResourceProvider = resourceProvider as IPredictedResourceProvider;
 			
-			ResourceProvider = new NotifyingResourceProvider(rp, 
-				request => OnRequest?.Invoke(request), 
-				arguments => OnResponse?.Invoke(arguments));
-
 			_cookieContainer = new CookieContainer();
 
 			Window = window ?? throw new ArgumentNullException(nameof(window));
@@ -85,14 +81,6 @@ namespace Knyaz.Optimus
 			if (scriptExecutor != null)
 				ScriptExecutor = scriptExecutor; 
 		}
-
-		
-
-		[Obsolete("Use ResourceProviderBuilder to subscribe on events")]
-		public event Action<Request> OnRequest;
-		
-		[Obsolete("Use ResourceProviderBuilder to subscribe on events")]
-		public event Action<ReceivedEventArguments> OnResponse;
 
 		/// <summary>
 		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).
