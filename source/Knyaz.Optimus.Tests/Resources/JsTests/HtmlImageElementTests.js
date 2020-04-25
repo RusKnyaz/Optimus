@@ -1,4 +1,9 @@
 Test("HtmlImageElementTests", {
+    "ImageType":{
+        run:function(){
+            Assert.AreEqual("function", typeof Image);
+        }
+    },
     "NoArgumentsCtor": {
         run: function () {
             var img = new Image();

@@ -1,12 +1,10 @@
 ﻿using System.Collections.Specialized;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Environment
 {
 	/// <summary>
 	/// Storage allows to example add, modify or delete stored data items.
 	/// </summary>
-	[DomItem]
 	public class Storage
 	{
 		readonly NameValueCollection _collection = new NameValueCollection();

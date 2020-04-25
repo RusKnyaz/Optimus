@@ -5,7 +5,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// Represents an HTML attribute of an element.
 	/// </summary>
-	[DomItem]
 	public class Attr : Node
 	{
 		private string _name;

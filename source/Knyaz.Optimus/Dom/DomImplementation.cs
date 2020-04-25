@@ -7,7 +7,6 @@ namespace Knyaz.Optimus.Dom
 	/// <summary>
 	/// Providing methods for documents creation.
 	/// </summary>
-	[DomItem]
 	public class DomImplementation
 	{
 		[JsHidden]

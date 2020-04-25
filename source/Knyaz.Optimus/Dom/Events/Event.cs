@@ -1,12 +1,10 @@
 ﻿using System;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
 	/// <summary>
 	/// Represents the any event occurred in the DOM.
 	/// </summary>
-	[DomItem]
 	public class Event
 	{
 		/// <summary>

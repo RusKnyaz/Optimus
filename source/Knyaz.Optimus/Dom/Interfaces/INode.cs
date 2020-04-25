@@ -1,10 +1,8 @@
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ScriptExecuting;
 using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Dom.Interfaces
 { 
-	[DomItem]
 	public interface INode
  	{
 		Document OwnerDocument { get; }

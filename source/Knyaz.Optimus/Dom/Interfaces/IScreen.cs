@@ -1,8 +1,5 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
-
-namespace Knyaz.Optimus.Dom.Interfaces
+﻿namespace Knyaz.Optimus.Dom.Interfaces
 {
-	[DomItem]
 	public interface IScreen
 	{
 		int Width { get; set; }

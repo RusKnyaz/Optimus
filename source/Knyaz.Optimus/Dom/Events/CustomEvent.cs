@@ -1,12 +1,10 @@
 ﻿using System;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
 	/// <summary>
 	/// Represents events initialized by an application for any purpose.
 	/// </summary>
-	[DomItem]
 	public class CustomEvent : Event
 	{
 		internal CustomEvent(Document owner) : base(owner){}

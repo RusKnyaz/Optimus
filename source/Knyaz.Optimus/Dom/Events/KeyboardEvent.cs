@@ -1,12 +1,10 @@
 ﻿using Knyaz.Optimus.Environment;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
 	/// <summary>
 	/// Describes a user interaction with the keyboard.
 	/// </summary>
-	[DomItem]
 	public class KeyboardEvent : UIEvent
 	{
 		private string _modifiers;

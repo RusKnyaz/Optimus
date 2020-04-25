@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Interfaces
 {
 	/// <summary>
 	/// Represents an element in an HTML document.
 	/// </summary>
-	[DomItem]
 	public interface IElement : INode
 	{
 		/// <summary>

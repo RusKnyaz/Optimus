@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 	public class ScriptingSettings
 	{
 		public static ScriptingSettings Default = new ScriptingSettings(
-			new[]
+			new Type[]
 			{
 				typeof(Node),
 				typeof(Element),
@@ -56,12 +56,10 @@ namespace Knyaz.Optimus.ScriptExecuting
 				typeof(DataView),
 			});
 
+
 		/// <summary> Types that have to be available by scripts. </summary>
 		public readonly IReadOnlyCollection<Type> GlobalTypes;
-		
-		private ScriptingSettings(Type[] globalTypes)
-		{
-			GlobalTypes = Array.AsReadOnly(globalTypes);
-		}
+
+		private ScriptingSettings(Type[] globalTypes) => GlobalTypes = Array.AsReadOnly(globalTypes);
 	}
 }

@@ -1,13 +1,11 @@
 ﻿using Knyaz.Optimus.Dom.Interfaces;
 using System;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Environment
 {
 	/// <summary>
 	/// Represents the location (URL) of the document.
 	/// </summary>
-	[DomItem]
 	public class Location
 	{
 		private readonly IHistory _history;

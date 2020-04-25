@@ -1,11 +1,8 @@
-using Knyaz.Optimus.ScriptExecuting;
-
 namespace Knyaz.Optimus.Dom.Interfaces
 {
 	/// <summary>
 	/// Represents browser console
 	/// </summary>
-	[DomItem]
 	public interface IConsole
 	{
 		/// <summary>

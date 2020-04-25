@@ -3,14 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Collection of element attributes.
 	/// </summary>
-	[DomItem]
 	public class AttributesCollection : IEnumerable<Attr>
 	{
 		internal AttributesCollection() {}

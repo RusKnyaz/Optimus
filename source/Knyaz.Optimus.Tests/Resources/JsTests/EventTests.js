@@ -1,4 +1,9 @@
 Test("EventTests", {
+    "EventType":{
+        run: function(){
+            Assert.AreEqual("function", typeof Event);
+        }
+    },
     "EventConstructor": {
         run: function () {
             var evt = new Event("click");

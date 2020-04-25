@@ -1,13 +1,11 @@
 ﻿using System;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
 	/// <summary>
 	/// Represents DOM changes event.
 	/// </summary>
-	[DomItem]
 	[Obsolete]
 	public class MutationEvent : Event
 	{

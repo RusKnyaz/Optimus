@@ -5,6 +5,8 @@ using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
+using Knyaz.Optimus.ResourceProviders;
+using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Environment
@@ -29,8 +31,10 @@ namespace Knyaz.Optimus.Environment
 			Func<object> getSyncObj, 
 			Action<string, string, string> openWindow,
 			INavigator navigator,
-			IConsole console)
+			IConsole console,
+			Func<Engine> getEngine)
 		{
+			_getEngine = getEngine;
 			Console = console ?? throw new ArgumentNullException(nameof(console));
 			_openWindow = openWindow ?? ((x,y,z) => {});
 			Screen = new Screen
@@ -118,7 +122,7 @@ namespace Knyaz.Optimus.Environment
 		/// <param name="delay">The time, in milliseconds, the timer should wait before the specified function or code is executed. If this parameter is omitted, a value of 0 is used, meaning execute "immediately", or more accurately, as soon as possible. </param>
 		/// <param name="data">Variables to be passed to the handler.</param>
 		/// <returns></returns>
-		public int SetTimeout(Action<object[]> handler, double? delay = null, params object[] data) =>
+		public int SetTimeout([JsExpandArray]Action<object[]> handler, double? delay = null, params object[] data) =>
 			_timers.SetTimeout(handler, (int)(delay ?? 1), data);
 
 		/// <summary>
@@ -131,7 +135,7 @@ namespace Knyaz.Optimus.Environment
 		/// Repeatedly calls a function or executes a code snippet, with a fixed time delay between each call.
 		/// </summary>
 		/// <returns>It returns an interval ID which uniquely identifies the interval, so you can remove it later by calling <see cref="ClearInterval"/></returns>
-		public int SetInterval(Action<object[]> handler, double? delay = null, params object[] data) =>
+		public int SetInterval([JsExpandArray]Action<object[]> handler, double? delay = null, params object[] data) =>
 			_timers.SetInterval(handler, (int)(delay ?? 1), data);
 
 		/// <summary>
@@ -226,5 +230,32 @@ namespace Knyaz.Optimus.Environment
 		/// <param name="features">The comma-separated list of window features given with their corresponding values in the form "name=value"</param>
 		public void Open(string url = null, string windowName = null, string features = null) => 
 			_openWindow(url, windowName, features);
+
+		private Func<Engine> _getEngine;
+		
+		/// <summary> Creates new <see cref="XmlHttpRequest"/> </summary>
+		[JsCtor("XMLHttpRequest")]
+		public XmlHttpRequest NewXmlHttpRequest()
+		{
+			var engine = _getEngine();
+			return new XmlHttpRequest(engine.ResourceProvider, () => Document, Document, engine.CreateRequest);
+		}
+
+		[JsCtor("Image")]
+		public HtmlImageElement NewImage(int? width = 0, int? height = 0)
+		{
+			var img = (HtmlImageElement)Document.CreateElement("img");
+			img.Width = width ?? 0;
+			img.Height = height ?? 0;
+			return img;
+		}
+
+		[JsCtor("Event")]
+		public Event NewEvent(string eventType = null, EventInitOptions options = null)
+		{
+			var evt = Document.CreateEvent("Event");
+			evt.InitEvent(eventType, options != null && options.Bubbles, options != null && options.Cancelable);
+			return evt;
+		}
 	}
 }

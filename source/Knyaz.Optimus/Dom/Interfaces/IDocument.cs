@@ -1,11 +1,9 @@
 ﻿using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
-using Knyaz.Optimus.ScriptExecuting;
 using System;
 
 namespace Knyaz.Optimus.Dom.Interfaces
 {
-	[DomItem]
 	public interface IDocument : INode
 	{
 		Element CreateElement(string tagName);

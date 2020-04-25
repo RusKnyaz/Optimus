@@ -76,6 +76,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		public void HtmlOptionElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 	   
+		[TestCase("ImageType")]
 		[TestCase("NoArgumentsCtor")]
 		[TestCase("OneArgumentCtor")]
 		[TestCase("TwoArgumentsCtor")]
@@ -84,6 +85,12 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("PrototypeOfNewImage")]
 		[TestCase("NewImageInstanceOfHTMLImageElement")]
 		public void HtmlImageElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+		
+		[TestCase("XMLHttpRequestType")]
+		[TestCase("XMLHttpRequestPrototype")]
+		[TestCase("XmlHttpRequestStaticFields")]
+		[TestCase("NewXmlHttpRequest")]
+		public void XmlHttpRequestTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("Node")]
 		[TestCase("Element")]

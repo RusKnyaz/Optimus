@@ -1,11 +1,8 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
-
-namespace Knyaz.Optimus.Dom.Interfaces
+﻿namespace Knyaz.Optimus.Dom.Interfaces
 {
 	/// <summary>
 	/// Interface for css style declaration instances.
 	/// </summary>
-	[DomItem]
 	public interface ICssStyleDeclaration
 	{
 		/// <summary>

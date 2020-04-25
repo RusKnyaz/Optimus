@@ -8,7 +8,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// The base class for the classes representing html elements.
 	/// </summary>
-	[DomItem]
 	[JsName("HTMLElement")]
 	public class HtmlElement : Element
 	{

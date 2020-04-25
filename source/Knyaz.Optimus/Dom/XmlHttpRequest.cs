@@ -15,11 +15,9 @@ namespace Knyaz.Optimus.Dom
 	/// <summary>
 	/// https://xhr.spec.whatwg.org/
 	/// </summary>
-	[DomItem]
 	[JsName("XMLHttpRequest")]
 	public class XmlHttpRequest
 	{
-		private readonly Func<Stream,object> _parseJsonFn;
 		private readonly Func<string, string, Request> _requestFn;
 		private readonly IResourceProvider _resourceProvider;
 		private readonly Func<object> _syncObj;
@@ -34,15 +32,13 @@ namespace Knyaz.Optimus.Dom
 		internal XmlHttpRequest(IResourceProvider resourceProvider, 
 			Func<object> syncObj, 
 			Document owner, 
-			Func<string, string, Request> requestFn,
-			Func<Stream,object> parseJsonFn = null)
+			Func<string, string, Request> requestFn)
 		{
 			_resourceProvider = resourceProvider ?? throw new ArgumentNullException(nameof(resourceProvider));
 			_syncObj = syncObj;
 			_owner = owner;
 			_requestFn = requestFn;
-			ReadyState = UNSENT;
-			_parseJsonFn = parseJsonFn;
+			_readyState = UNSENT;
 		}
 
 		/// <summary>
@@ -187,14 +183,7 @@ namespace Knyaz.Optimus.Dom
 					DocumentBuilder.Build(doc, _stream);
 					return doc;
 				case "json":
-					try
-					{
-						return _parseJsonFn(_stream);
-					}
-					catch
-					{
-						return null;
-					}
+					return JsonObject.FromStream(_stream);
 				default:
 					return _stream.ReadToEnd();
 			}

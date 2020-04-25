@@ -13,7 +13,7 @@
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
-    <VersionPrefix>2.4.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
       <PackageReleaseNotes>
           Expanded TypedArray API.
           Expanded Console (info, warn, assert, group and other methods)

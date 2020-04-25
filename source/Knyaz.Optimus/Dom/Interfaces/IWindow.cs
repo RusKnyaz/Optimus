@@ -1,5 +1,7 @@
 ﻿using Knyaz.Optimus.Dom.Css;
 using System;
+using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ScriptExecuting;
 
@@ -23,17 +25,21 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		ICssStyleDeclaration GetComputedStyle(IElement element);
 		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
 		MediaQueryList MatchMedia(string query);
-	}
-	
-	
-	//todo: join with IWindow in next major version
-	public interface IWindowEx : IWindow
-	{
+		
 		Document Document {get;}
 		IConsole Console { get; }
 		Storage LocalStorage { get; } 
 		Storage SessionStorage { get; }
 		void Open(string url = null, string windowName = null, string features = null);
 		void Alert(string msg);
+	}
+	
+	public interface IWindowEx : IWindow
+	{
+		XmlHttpRequest NewXmlHttpRequest();
+
+		HtmlImageElement NewImage(int? width = 0, int? height = 0);
+
+		Event NewEvent(string eventType = null, EventInitOptions options = null);
 	}
 }

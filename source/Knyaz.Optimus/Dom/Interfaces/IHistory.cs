@@ -1,8 +1,6 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
-
+﻿
 namespace Knyaz.Optimus.Dom.Interfaces
 {
-	[DomItem]
 	public interface IHistory
 	{
 		long Length { get; }

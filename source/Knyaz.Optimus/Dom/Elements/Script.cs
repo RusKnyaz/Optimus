@@ -7,7 +7,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// Represents &lt;SCRIPT&gt; element.
 	/// </summary>
-	[DomItem]
 	[JsName("HTMLScriptElement")]
 	public sealed class Script : HtmlElement
 	{

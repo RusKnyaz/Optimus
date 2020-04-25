@@ -57,7 +57,7 @@ namespace Knyaz.Optimus.ResourceProviders
 	        return this;
         }
 
-        private Window BuildWindow()
+        private Window BuildWindow(Func<Engine> getEngine)
         {
             var navigatorPlugins = new NavigatorPlugins(_windowConfig?._plugins ?? new PluginInfo[0]);
             
@@ -70,28 +70,19 @@ namespace Knyaz.Optimus.ResourceProviders
             var windowKeeper = new Window[1];
             
             return windowKeeper[0] = new Window(() => windowKeeper[0].Engine.Document, _windowConfig?._windowOpenHandler, navigator, 
-                _windowConfig?._console ?? NullConsole.Instance);
+                _windowConfig?._console ?? NullConsole.Instance, getEngine);
         }
 
         public Engine Build()
         {
-            var window = BuildWindow();
+            var resourceProvider = _resourceProvider ?? new ResourceProviderBuilder().UsePrediction().Http()
+                .Build();
+            
             var engineKeeper = new Engine[1];
             
-            Request CreateRequest(string uri, string method = "GET")
-            {
-                var req = new Request(method, engineKeeper[0].LinkProvider.MakeUri(uri));
-                req.Headers["User-Agent"] = window.Navigator.UserAgent;
-                req.Cookies = engineKeeper[0].CookieContainer;
-                return req;
-            }
+            var window = BuildWindow(() => engineKeeper[0]);
             
-            var resourceProvider = _resourceProvider ?? new ResourceProviderBuilder().UsePrediction().Http()
-	            .Build();
-            
-            var exeCtx = new ScriptExecutionContext(
-                window,
-                parseJson => new XmlHttpRequest(resourceProvider, () => window.Document, window.Document, CreateRequest, parseJson));
+            var exeCtx = new ScriptExecutionContext(window);
             
             var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
             
@@ -128,15 +119,13 @@ namespace Knyaz.Optimus.ResourceProviders
 
     public class ScriptExecutionContext
     {
-        public ScriptExecutionContext(IWindowEx window, Func<Func<Stream, object>, XmlHttpRequest> createXhr)
+        public ScriptExecutionContext(IWindowEx window)
         {
             Window = window;
-            CreateXhr = createXhr;
         }
 
         public IWindowEx Window { get; }
 
-        public Func<Func<Stream, object>, XmlHttpRequest> CreateXhr { get; }
-        
+        public ScriptingSettings Settings => ScriptingSettings.Default;
     }
 }

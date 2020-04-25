@@ -8,7 +8,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/html-markup/input.text.html
 	/// </summary>
-	[DomItem]
 	[JsName("HTMLInputElement")]
 	public sealed class HtmlInputElement : HtmlElement, IResettableElement, IFormElement
 	{
