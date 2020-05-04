@@ -53,12 +53,9 @@ namespace ConsoleApplication1
  - Knyaz.Optimus - The main assembly with implementation of web browser (without GUI and rendering).
  - Knyaz.Optimus.Tests - Acceptance tests library.
  - Knyaz.Optimus.JsTests - Simple Js tests. 
+ - Knyaz.Optimus.UnitTests - Pure unit tests.
  - Knyaz.Optimus.WfApp - Simple test application with DOM explorer and Log window.
  
-## Dependencies
-
- - [Jint](https://github.com/sebastienros/jint) - JavaScript execution engine.
-
 ## License
 
 Optimus is released under the [MIT license](https://raw.githubusercontent.com/RusKnyaz/Optimus/develop/LICENSE.txt).

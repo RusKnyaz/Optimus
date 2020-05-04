@@ -871,12 +871,11 @@ dispatchEvent(evt);");
 		[Test]
 		public static void SubmitGetForm()
 		{
-			var httpResources = Mocks.HttpResourceProvider()
-				.Resource("http://site.net/",
+			var resources = Mocks.ResourceProvider("http://site.net/",
 					"<form method=get action='/login'><input name=username type=text/><input name=password type=password/></form>")
 				.Resource("http://site.net/login?username=John&password=123456", "<div id=d></div>");
 			
-			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(resources);
 			engine.OpenUrl("http://site.net/").Wait();
 
 			var doc = engine.Document;
@@ -941,12 +940,11 @@ dispatchEvent(evt);");
 		{
 			//1. initial query should be removed from request on form submit
 			//2. Form action query should be ignored.
-			var httpResources = Mocks.HttpResourceProvider()
-				.Resource("http://site.net/sub/?var1=x",
+			var resources = Mocks.ResourceProvider("http://site.net/sub/?var1=x",
 					"<form method=" + method + " action='" + action + "'><input name=username type=text/><input name=password type=password/></form>")
 				.Resource(expected, "<div id=d></div>");
 
-			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(resources);
 			engine.OpenUrl("http://site.net/sub/?var1=x").Wait();
 			
 			var doc = engine.Document;
@@ -961,12 +959,11 @@ dispatchEvent(evt);");
 		[Test]
 		public static void SubmitNonHtmlResponse()
 		{
-			var httpResources = Mocks.HttpResourceProvider()
-				.Resource("http://site.net/sub",
+			var resources = Mocks.ResourceProvider("http://site.net/sub",
 					"<form method=get action='download'></form>")
 				.Resource("http://site.net/sub/download", "<div id=d></div>", "image/png");
 			
-			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.BuildJint(resources);
 			engine.OpenUrl("http://site.net/sub").Wait();
 			
 			engine.Document.Get<HtmlFormElement>("form").First().Submit();
