@@ -28,6 +28,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetBodyNull")]
 	    [TestCase("GetElementsByClassName")]
 	    [TestCase("GetElementsByClassNameAndSlice")]
+	    [TestCase("InstanceOf")]
+	    [TestCase("Prototype")]
+	    [TestCase("Properties")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]
@@ -62,6 +65,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("CompareObjectWithWindow")]
 		[TestCase("CompareObjectWithWindowInverted")]
 		[TestCase("CallAndCompareThisIsUndefined")]
+		[TestCase("Misc")]
+		[TestCase("Splice")]
 		public void JavaScriptTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
 		[TestCase("Clone")]
@@ -158,8 +163,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Int16FromArrayBuffer")]
 		[TestCase("Int16FromArray")]
 		[TestCase("Int16FromArrayWithFloats")]
-		[TestCase("Uint16InstatiatedFromArray")]
-		[TestCase("Uint16InstatiatedFromSignedArray")]
+		[TestCase("Uint16InstantiatedFromArray")]
+		[TestCase("Uint16InstantiatedFromSignedArray")]
 		[TestCase("BytesPerElement")]
 		
 		[TestCase("Uint8ArrayFromNull")]
@@ -167,5 +172,14 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Int8ArrayFromNull")]
 		[TestCase("Int16ArrayFromNull")]
 		public void DataViewTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
-    }
+		
+		[TestCase("XMLHttpRequestType")]
+		[TestCase("XMLHttpRequestPrototype")]
+		[TestCase("XmlHttpRequestStaticFields")]
+		[TestCase("NewXmlHttpRequest")]
+		public void XmlHttpRequestTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+
+		[TestCase("FunctionsDefined")]
+		public void WindowTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+	}
 }

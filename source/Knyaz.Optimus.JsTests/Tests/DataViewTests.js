@@ -196,7 +196,7 @@ Test("DataViewTests", {
             Assert.AreEqual(2, arr.length);
         }
     },
-    "Uint16InstatiatedFromArray" : {
+    "Uint16InstantiatedFromArray" : {
         run: function () {
             var arr = new Uint16Array([1, 2, 3]);
             Assert.AreEqual(1, arr[0]);
@@ -205,7 +205,7 @@ Test("DataViewTests", {
             Assert.AreEqual(3, arr.length);
         }
     },
-    "Uint16InstatiatedFromSignedArray" : {
+    "Uint16InstantiatedFromSignedArray" : {
         run: function () {
             var arr = new Uint16Array([1, 2, -3]);
             Assert.AreEqual(65533, arr[2]);

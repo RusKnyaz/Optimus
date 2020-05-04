@@ -64,5 +64,20 @@ Test("JavaScriptTests", {
             var res = window === document.body;
             Assert.AreEqual(false, res);
         }
+    },
+    "Misc":{
+        run:function(){
+            Assert.AreEqual(false, 'alert' in {});
+            Assert.AreEqual(false, ({}===this), "({}===this)");
+            Assert.AreEqual(false, (function(){var data; return data !== undefined;})(), "(function(){var data; return data !== undefined;})()");
+        }
+    },
+    "Splice":{
+        run:function(){
+            var result = (function (){var x = [1,2,3]; x.splice(1,0,4);return x;})();
+            Assert.AreEqual(
+                JSON.stringify([1, 4, 2, 3]), 
+                JSON.stringify(result));        
+        }
     }
 });

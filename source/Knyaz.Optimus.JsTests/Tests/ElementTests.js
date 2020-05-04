@@ -296,5 +296,11 @@
             txt.dispatchEvent(evt);
             Assert.AreEqual("T", result);
         }
+    },
+    "Prototype":{
+        run: function(){
+            Assert.IsNotNull(HTMLElement.prototype, "HTMLElement.prototype");
+            Assert.IsNotNull(Element.prototype, "Element.prototype");
+        }
     }
 });

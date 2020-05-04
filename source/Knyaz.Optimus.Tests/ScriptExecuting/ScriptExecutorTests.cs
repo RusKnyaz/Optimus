@@ -64,29 +64,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             Mock.Get(window).Verify(x => x.Alert("hi"), Times.Once());
         }
         
-        [TestCase("addEventListener")]
-        [TestCase("removeEventListener")]
-        [TestCase("setTimeout")]
-        [TestCase("setInterval")]
-        [TestCase("clearTimeout")]
-        [TestCase("clearInterval")]
-        public void GlobalFunctions(string func)
-        {
-            var window = Mock.Of<IWindowEx>();
-            Assert.AreEqual(true, Evaluate(window, func+"!== null;"));
-        }
-        
-
-        [Test]
-        public void Window()
-        {
-            var window = Mock.Of<IWindowEx>();
-            var xhr = new XmlHttpRequest(Mock.Of<IResourceProvider>(), null, null, null);
-            Mock.Get(window).Setup(x => x.NewXmlHttpRequest()).Returns(xhr);
-            Assert.AreEqual(true, Evaluate(window, "window != null"), "window != null");
-            Assert.AreEqual(true, Evaluate(window, "window === self"), "window === self");
-        }
-        
+     
         [Test]
         public void AccessArrayWithEmptyString()
         {
@@ -362,71 +340,6 @@ child.dispatchEvent(evt);");
             Assert.AreEqual(true, result);
         }
 
-        [TestCase("'alert' in {}", false)]
-        [TestCase("Object.getPrototypeOf(document) != null", true)]
-        [TestCase("document.write != null", true)]
-        [TestCase("Object.getPrototypeOf(document).write != null", true)]
-        [TestCase("Object.getPrototypeOf(document).write === document.write", true)]
-        [TestCase("'body' in Object.getPrototypeOf(document)", true)]
-        [TestCase("document.prototype === undefined", true)]
-        
-        [TestCase("HTMLElement.prototype != null", true)]
-        [TestCase("Element.prototype != null", true)]
-        [TestCase("HTMLBodyElement.prototype != null", true)]
-        [TestCase("HTMLBodyElement.prototype.toString != null", true)]
-        [TestCase("HTMLBodyElement.prototype.toString != null", true)]
-        [TestCase("HTMLBodyElement.prototype.addEventListener != null", true)]
-        [TestCase("HTMLBodyElement.prototype.prototype", null)]
-        [TestCase("HTMLBodyElement.prototype.toString()", "[object HTMLBodyElementPrototype]")]
-        [TestCase("Object.getPrototypeOf(document).toString()", "[object HTMLDocumentPrototype]")]
-        [TestCase("Object.getPrototypeOf(document.body) != null", true)]
-        [TestCase("Object.getPrototypeOf(HTMLBodyElement.prototype).toString()", "[object HTMLElementPrototype]")]
-        [TestCase("HTMLBodyElement.prototype == Object.getPrototypeOf(document.body)", true)]
-        public void Prototypes(string expression, object expected)
-        {
-            var document = DomImplementation.Instance.CreateHtmlDocument();
-            var xhr = new XmlHttpRequest(Mock.Of<IResourceProvider>(), () => new object(), document, null);
-            var window = Mock.Of<IWindowEx>(x => x.Document == document && x.NewXmlHttpRequest() == xhr);
-            var result = Evaluate(window, expression);
-            Assert.AreEqual(expected, result);
-        }
-        
-        [TestCase("document == document", ExpectedResult = true)]
-        [TestCase("document != null", ExpectedResult = true)]
-        [TestCase("'ownerDocument' in document", ExpectedResult = true)]
-        [TestCase("document.hasOwnProperty('ownerDocument')", ExpectedResult = false)]
-        [TestCase("document.ownerDocument === null", ExpectedResult = true)]
-        [TestCase("document.parentNode === null", ExpectedResult = true)]
-        [TestCase("document.documentElement != null", ExpectedResult = true)]
-        [TestCase("document.appendChild != null", ExpectedResult = true)]
-        [TestCase("document.appendChild == document.appendChild", ExpectedResult = true)]
-        [TestCase("document.body.appendChild == document.body.appendChild", ExpectedResult = true)]
-        [TestCase("document.toString()", ExpectedResult = "[object HTMLDocument]")]
-        public object Document(string expression)
-        {
-            var document = DomImplementation.Instance.CreateHtmlDocument();
-            var window = Mock.Of<IWindowEx>(x => x.Document == document);
-            return Evaluate(window, expression);
-        }
-        
-        [TestCase("document.body instanceof String", ExpectedResult = false)]
-        [TestCase("document.body instanceof Element", ExpectedResult = true)]
-        [TestCase("document.body instanceof HTMLElement", ExpectedResult = true)]
-        [TestCase("document.body instanceof HTMLBodyElement", ExpectedResult = true)]
-        public object InstanceOfHtmlElement(string expression)
-        {
-            var document = DomImplementation.Instance.CreateHtmlDocument();
-            var window = Mock.Of<IWindowEx>(x => x.Document == document);
-            return Evaluate(window, expression);
-        }
-
-        [Test]
-        public void Splice()
-        {
-            var window = Mock.Of<IWindowEx>();
-            var result = Evaluate(window, "(function (){var x = [1,2,3]; x.splice(1,0,4);return x;})()");
-            Assert.AreEqual(new[] {1, 4, 2, 3}, result);
-        }
 
         [Test]
         public void Comment()
@@ -437,21 +350,7 @@ child.dispatchEvent(evt);");
             Assert.AreEqual(16, result);
         }
         
-        [TestCase("window.setTimeout != null", ExpectedResult = true)]
-        [TestCase("window.clearTimeout != null", ExpectedResult = true)]
-        [TestCase("window.addEventListener != null", ExpectedResult = true)]
-        [TestCase("window.removeEventListener != null", ExpectedResult = true)]
-        [TestCase("window.dispatchEvent != null", ExpectedResult = true)]
-        [TestCase("window.setInterval != null", ExpectedResult = true)]
-        [TestCase("window.clearInterval != null", ExpectedResult = true)]
-        public object WindowApi(string expr) => Evaluate(Mock.Of<IWindowEx>(), expr);
         
-        [TestCase("({}===this)", ExpectedResult = false)]
-        [TestCase("alert == alert", ExpectedResult = true)]
-        [TestCase("setInterval == setInterval", ExpectedResult = true)]
-        [TestCase("(function(){var data; return data !== undefined;})()", ExpectedResult = false)]
-        public object Misc(string expr) => Evaluate(Mock.Of<IWindowEx>(), expr);
-
         [Test]
         public void Test()
         {
@@ -475,7 +374,5 @@ return ev;})()");
 	        var result = Evaluate(window, "document.body.attributes['id'].value");
 	        Assert.AreEqual("bodyid", result);
         }
-        
-        
     }
 }

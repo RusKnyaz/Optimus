@@ -109,5 +109,40 @@
             Assert.IsNotNull(eltsCopy[1]);
             Assert.AreEqual(eltsCopy[1], eltsCopy["1"]);
         }
+    },
+    "InstanceOf":{
+        run:function () {
+            Assert.AreEqual(false, document.body instanceof String, "document.body instanceof String");
+            Assert.AreEqual(true, document.body instanceof Element, "document.body instanceof Element");
+            Assert.AreEqual(true, document.body instanceof HTMLElement, "document.body instanceof HTMLElement");
+            Assert.AreEqual(true, document.body instanceof HTMLBodyElement, "document.body instanceof HTMLBodyElement");
+        }
+    },
+    "Prototype":{
+        run:function() {
+            Assert.IsNotNull(Object.getPrototypeOf(document), "Object.getPrototypeOf(document)");
+            Assert.IsNotNull(Object.getPrototypeOf(document).write, "Object.getPrototypeOf(document).write");
+            Assert.AreEqual(document.write, Object.getPrototypeOf(document).write, "Object.getPrototypeOf(document).write === document.write");
+            Assert.AreEqual("[object HTMLDocumentPrototype]", Object.getPrototypeOf(document).toString(), "Object.getPrototypeOf(document).toString()");
+            Assert.AreEqual(true, 'body' in Object.getPrototypeOf(document), "'body' in Object.getPrototypeOf(document)");
+        }
+    },
+    "Properties":{
+        run:function(){
+            Assert.AreEqual(undefined, document.prototype, "document.prototype === undefined");
+            Assert.IsNotNull(document, "document");
+            Assert.IsNotNull(document.write, "document.write");
+            Assert.AreEqual(document, document, "document == document");
+            Assert.AreEqual(true, 'ownerDocument' in document, "'ownerDocument' in document");
+            Assert.AreEqual(false, document.hasOwnProperty('ownerDocument'), "document.hasOwnProperty('ownerDocument')");
+            Assert.IsNull(document.ownerDocument, "document.ownerDocument");
+            Assert.IsNull(document.parentNode, "document.parentNode");
+            Assert.IsNotNull(document.documentElement, "document.documentElement");
+            Assert.IsNotNull(document.appendChild, "document.appendChild");
+            Assert.AreEqual(document.appendChild, document.appendChild, "document.appendChild == document.appendChild");
+            Assert.AreEqual(document.body.appendChild, document.body.appendChild, "document.body.appendChild == document.body.appendChild");
+            Assert.AreEqual("[object HTMLDocument]", document.toString(), "document.toString()");
+            
+        }
     }
 });

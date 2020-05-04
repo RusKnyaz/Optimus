@@ -43,6 +43,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetInnerHtmlText")]
 		[TestCase("AppendAttributeThrows")]
 		[TestCase("TextElementDispatchesEvent")]
+		[TestCase("Prototype")]
 		public void ElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("InputChangeCheckedOnClick")]
@@ -85,12 +86,6 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("NewImageInstanceOfHTMLImageElement")]
 		public void HtmlImageElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
-		[TestCase("XMLHttpRequestType")]
-		[TestCase("XMLHttpRequestPrototype")]
-		[TestCase("XmlHttpRequestStaticFields")]
-		[TestCase("NewXmlHttpRequest")]
-		public void XmlHttpRequestTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
-
 		[TestCase("Node")]
 		[TestCase("Element")]
 		[TestCase("HTMLAnchorElement")]
@@ -132,5 +127,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AddToRelList")]
 		[TestCase("ClickOnClick")]
 		public void HtmlAnchorElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+		
+		[TestCase("Prototype")]
+		public void HtmlBodyElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 	}
 }
