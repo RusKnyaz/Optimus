@@ -1,18 +1,19 @@
-using Knyaz.Optimus.Tests.ScriptExecuting;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests
 {
+	public enum JsEngines { Jint, Jurassic}
+	
 	/// <summary>
 	/// This stuff runs JS tests from Resources/JsTests/*.js files.
 	/// </summary>
 	[TestFixture(JsEngines.Jint)]
 	[TestFixture(JsEngines.Jurassic)]
-	public class JsTests
+	public class CommonTests
 	{
 		private readonly JsEngines _jsEngine;
 
-		public JsTests(JsEngines jsEngine) => _jsEngine = jsEngine;
+		public CommonTests(JsEngines jsEngine) => _jsEngine = jsEngine;
 	    
 	    [TestCase("ImplementationCreateHtmlDocument")]
 		[TestCase("ImplementationCreateDocumentType")]

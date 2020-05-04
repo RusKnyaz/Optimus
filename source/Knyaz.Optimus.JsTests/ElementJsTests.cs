@@ -1,4 +1,3 @@
-using Knyaz.Optimus.Tests.ScriptExecuting;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.JsTests

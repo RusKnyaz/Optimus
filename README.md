@@ -52,6 +52,7 @@ namespace ConsoleApplication1
 
  - Knyaz.Optimus - The main assembly with implementation of web browser (without GUI and rendering).
  - Knyaz.Optimus.Tests - Acceptance tests library.
+ - Knyaz.Optimus.JsTests - Simple Js tests. 
  - Knyaz.Optimus.WfApp - Simple test application with DOM explorer and Log window.
  
 ## Dependencies
