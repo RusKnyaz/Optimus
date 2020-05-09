@@ -1,3 +1,9 @@
+var loadDoc = function(html){
+    var doc = document.implementation.createHTMLDocument();
+    doc.write(html);
+    return doc;
+};
+
 Test("JavaScriptTests", {
     "CallThisIsObj":{
         run: function () {
@@ -78,6 +84,52 @@ Test("JavaScriptTests", {
             Assert.AreEqual(
                 JSON.stringify([1, 4, 2, 3]), 
                 JSON.stringify(result));        
+        }
+    },
+    "PushApply":{
+        description:"The sample come from jquery source code",
+        run:function(){
+            var doc = loadDoc("<div></div>").body;
+            var arr = [];
+            var push = arr.push;
+            var slice = arr.slice;
+            push.apply((arr = slice.call(doc.childNodes)), doc.childNodes );
+            Assert.AreEqual(1, arr[ doc.childNodes.length ].nodeType);
+        }
+    }, 
+    "ArrayPush":{
+        run:function () {
+            var arr = [];
+            arr.push('x');
+            Assert.AreEqual(1, arr.length);
+        }    
+    },
+    "SliceCall":{
+        run:function(){
+            var arr = ['a'];
+            Assert.AreEqual(1, arr.slice().length);
+            Assert.AreEqual(1, [].slice.call(arr).length);
+        }
+    },
+    "ChildNodesSlice":{
+        run:function () {
+            var doc = loadDoc("<div></div>")
+            Assert.AreEqual(1, doc.body.childNodes.length);
+            Assert.AreEqual(1, [].slice.call(doc.body.childNodes).length);
+        }
+    },
+    "ResizeArray":{
+        run:function () {
+            var arr = [];
+            arr.length = 8;
+            Assert.AreEqual(8, arr.length);
+        }
+    },
+    "ShiftArray":{
+        run:function () {
+            var arr = [1,2];
+            arr.shift();
+            Assert.AreEqual(2, arr[0]);
         }
     }
 });

@@ -68,37 +68,6 @@ console.log(e.someVal);");
 		}
 
 		[Test]
-		public static void SetInnerHtml()
-		{
-			var engine = Load("<div id='d'></div>",
-				@"var e = document.getElementById('d');
-console.log(e.hasChildNodes);
-e.innerHTML = '<h1>1</h1><h2>2</h2><h3>3</h3>';
-console.log(e.hasChildNodes);");
-			CollectionAssert.AreEqual(new object[] {false, true}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void NodeTest()
-		{
-			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
-				@"var e = document.getElementById('d');
-console.log(e != null);
-console.log(e == document.getElementById('d'));
-console.log(e.tagName);
-console.log(e.firstChild != null);
-console.log(e.firstChild.tagName);
-console.log(e.lastChild != null);
-console.log(e.lastChild.tagName);
-console.log(e.parentNode != null);
-console.log(e.parentNode.tagName);
-console.log(e.ownerDocument == document);
-console.log(e.getAttribute('id'));");
-
-			CollectionAssert.AreEqual(new object[] {true, true, "DIV", true, "H1", true, "H3", true, "BODY", true, "d"}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
 		public static void NodeAddEventListenerTest()
 		{
 			var engine = Load("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>",
@@ -146,39 +115,6 @@ console.log(div.appendChild != null);");
 		}
 
 		
-		[Test]
-		public static void DocumentElement()
-		{
-			var engine = CreateEngineWithScript(
-				@"var e = document.documentElement;
-console.log(e == e);
-console.log(e.ownerDocument === document);
-console.log(e.parentNode === document);
-console.log(e.removeChild != null);
-console.log(e.appendChild != null);");
-
-			CollectionAssert.AreEqual(new object[] {true, true, true, true, true}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void GetElementsByTagName()
-		{
-			var engine = Load("<div id='d'></div><div></div><span></span>",
-				@"var elems = document.body.getElementsByTagName('div');
-console.log(elems.length);");
-
-			CollectionAssert.AreEqual(new object[] {2}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[TestCase("document.body.childNodes.length", 3)]
-		[TestCase("document.body.childNodes[0] != null", true)]
-		public static void ChildNodes(string code, object expectedResult)
-		{
-			var engine = Load("<div id='d'></div><div></div><span></span>", $"console.log({code});");
-			
-			CollectionAssert.AreEqual(new object[] {expectedResult}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
 		[Test]
 		public static async Task AddScriptAndExecute()
 		{
@@ -259,55 +195,13 @@ document.head.appendChild(s);";
 			var engine = CreateEngineWithScript(@"
 console.log(navigator != null);
 console.log(navigator.userAgent);");
-
+			
 			Assert.AreEqual(2, ((TestingConsole)engine.Window.Console).LogHistory.Count);
 			Assert.AreEqual(true, ((TestingConsole)engine.Window.Console).LogHistory[0]);
 			Assert.IsTrue(((TestingConsole)engine.Window.Console).LogHistory[1].ToString().Contains("Optimus"));
 		}
 
-		[Test]
-		public static void SetChildNode()
-		{
-			var engine = Load("<div id='a'><span></span></div>",
-				@"var d = document.getElementById('a');
-d.childNodes[0] = document.createElement('p');
-console.log(d.childNodes[0].tagName);");
-
-			CollectionAssert.AreEqual(new object[] {"P"}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		//The test comes from bootstrap library
-		[Test]
-		public static void StyleOfCustom()
-		{
-			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
-				@"var style = document.createElement('bootstrap').style;
-console.log(style ? 'ok' : 'null');");
-			CollectionAssert.AreEqual(new[] {"ok"}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void StyleRead()
-		{
-			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
-				@"var style = document.getElementById('content1').style;
-console.log(style.getPropertyValue('width'));
-console.log(style[0]);
-console.log(style['width']);");
-
-			CollectionAssert.AreEqual(new[] {"100pt", "width", "100pt"}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void StyleWrite()
-		{
-			var engine = Load("<span id='content1' style='width:100pt; heigth:100pt'></span>",
-				@"var style = document.getElementById('content1').style;
-style['width'] = '200pt';
-console.log(style['width']);");
-
-			CollectionAssert.AreEqual(new[] {"200pt"}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
+	
 
 		[Test]
 		public static void Location()
@@ -505,67 +399,6 @@ script.onload = function(){ console.log(this.someData); document.body.innerHtml=
 
 			CollectionAssert.AreEqual(new object[] {expected}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
-
-		[Test, Description("The sample come from jquery source code")]
-		public static void PushApply()
-		{
-			var engine = Load("<div></div>", @"var arr = [];
-var push = arr.push;
-var slice = arr.slice;
-var preferredDoc = document;
-push.apply(
-		(arr = slice.call(preferredDoc.childNodes)),
-		preferredDoc.childNodes
-	);
-console.log(arr[ preferredDoc.childNodes.length ].nodeType);");
-			CollectionAssert.AreEqual(new object[] {1}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void ArrayPush()
-		{
-			var engine = Load("<div></div>", @"var arr = [];
-arr.push('x');
-console.log(arr.length);");
-			CollectionAssert.AreEqual(new object[] {1}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void SliceCall()
-		{
-			var engine = Load("<div></div>", @"var arr = ['a'];
-console.log(arr.slice().length);
-console.log([].slice.call(arr).length);");
-			CollectionAssert.AreEqual(new object[] {1, 1}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void ChildNodesSlice()
-		{
-			var engine = Load("<div></div>", @"
-console.log(document.body.childNodes.length);
-console.log([].slice.call(document.body.childNodes).length);");
-			CollectionAssert.AreEqual(new object[] {1, 1}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void ResizeArray()
-		{
-			var engine = Load("<div></div>", @"var arr = [];
-arr.length = 8;
-console.log(arr.length);");
-			CollectionAssert.AreEqual(new object[] {8}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void ShiftArray()
-		{
-			var engine = Load("<div></div>", @"var arr = [1,2];
-arr.shift();
-console.log(arr[0]);");
-			CollectionAssert.AreEqual(new object[] {2}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
 
 		[Test]
 		public static void DocumentBody()

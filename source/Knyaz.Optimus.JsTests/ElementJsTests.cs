@@ -40,6 +40,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("TableDoesNotAcceptDivs")]
 		[TestCase("TableCreatedBodies")]
 		[TestCase("TableWrongTBody")]
+		[TestCase("SetInnerHtml")]
 		[TestCase("SetInnerHtmlText")]
 		[TestCase("AppendAttributeThrows")]
 		[TestCase("TextElementDispatchesEvent")]
@@ -53,6 +54,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("DataSetByIndexer")]
 		[TestCase("DataSetCapitalizeFirstLetter")]
 		[TestCase("DataSetWrongAttributeName")]
+		[TestCase("Node")]
+		[TestCase("SetChildNode")]
 		public void ElementTests(string testName)
 		{
 			if (_jsEngine == JsEngines.Jurassic && (testName == "DataSetToAttribute" || testName == "DataSetToExistingAttribute"))
@@ -144,6 +147,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		public void HtmlAnchorElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
 		[TestCase("Prototype")]
+		[TestCase("ChildNodes")]
 		public void HtmlBodyElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 	}
 }

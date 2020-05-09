@@ -15,6 +15,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 
 		public CommonTests(JsEngines jsEngine) => _jsEngine = jsEngine;
 	    
+		[TestCase("DocumentElement")]
 	    [TestCase("ImplementationCreateHtmlDocument")]
 		[TestCase("ImplementationCreateDocumentType")]
 		[TestCase("ImplementationCreateDocumentWithDocTypeSvg")]
@@ -26,6 +27,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetBody")]
 		[TestCase("SetBodyDiv")]
 		[TestCase("SetBodyNull")]
+	    [TestCase("GetElementsByTagName")]
+		[TestCase("GetElementsByTagNameByIndex")]
 	    [TestCase("GetElementsByClassName")]
 	    [TestCase("GetElementsByClassNameAndSlice")]
 	    [TestCase("InstanceOf")]
@@ -67,6 +70,12 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("CallAndCompareThisIsUndefined")]
 		[TestCase("Misc")]
 		[TestCase("Splice")]
+		[TestCase("PushApply")]
+		[TestCase("ArrayPush")]
+		[TestCase("SliceCall")]
+		[TestCase("ChildNodesSlice")]
+		[TestCase("ResizeArray")]
+		[TestCase("ShiftArray")]
 		public void JavaScriptTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
 		[TestCase("Clone")]
@@ -181,5 +190,10 @@ namespace Knyaz.Optimus.Tests.JsTests
 
 		[TestCase("FunctionsDefined")]
 		public void WindowTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+		
+		[TestCase("StyleOfCustom")]
+		[TestCase("StyleRead")]
+		[TestCase("StyleWrite")]
+		public void StyleTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 	}
 }

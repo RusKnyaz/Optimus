@@ -215,30 +215,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		}
 
 		[Test]
-		public async Task GetElementsByTagName()
-		{
-			var resources = Mocks.ResourceProvider("http://localhost",
-				Mocks.Page("console.log(document.getElementsByTagName('div').length);", "<div></div><div></div>"));
-			var console = new Mock<IConsole>();
-			var engine = TestingEngine.BuildJint(resources, console.Object);
-			await engine.OpenUrl("http://localhost");
-			console.Verify(x => x.Log(2d), Times.Once);
-		}
-		
-		[Test]
-		public async Task GetElementsByTagNameByIndex()
-		{
-			var resources = Mocks.ResourceProvider(
-				"http://localhost",
-				Mocks.Page(@"console.log(document.body.getElementsByTagName('div')[0])",
-					"<div id='content1'></div><div id='content2'></div>"));
-			var console = new Mock<IConsole>();
-			var engine = TestingEngine.BuildJint(resources, console.Object);
-			var page = await engine.OpenUrl("http://localhost");
-			console.Verify(x => x.Log(page.Document.Body.FirstChild), Times.Once);
-		}
-		
-		[Test]
 		public void Ajax()
 		{
 			var resourceProvider = Mock.Of<IResourceProvider>().Resource("http://localhost/unicorn.xml", "hello");

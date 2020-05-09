@@ -1,4 +1,15 @@
 ﻿Test("DocumentTests", {
+    "DocumentElement": {
+        run: function () {
+            var e = document.documentElement;
+            Assert.IsTrue(e == e, "e == e")
+            Assert.IsTrue(e.ownerDocument === document, "e.ownerDocument === document")
+            Assert.IsTrue(e.ownerDocument === document, "e.ownerDocument === document");
+            Assert.IsTrue(e.parentNode === document, "e.parentNode === document");
+            Assert.IsNotNull(e.removeChild, "e.removeChild != null");
+            Assert.IsNotNull(e.appendChild, "e.appendChild != null");
+        }
+    },
     "ImplementationCreateHtmlDocument": {
         run: function () {
             var doc = document.implementation.createHTMLDocument("NewDoc");
@@ -87,6 +98,22 @@
         run:function () {
             var doc = document.implementation.createHTMLDocument();
             Assert.Throws(function () { doc.body = null; });   
+        }
+    },
+    "GetElementsByTagName":{
+        run:function() {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<div id='d'></div><div></div><span></span>");
+            var elements = doc.body.getElementsByTagName('div');
+            Assert.AreEqual(2, elements.length);
+        }
+    },
+    "GetElementsByTagNameByIndex":{
+        run:function() {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<div id='content1'></div><div id='content2'></div>");
+            Assert.IsNotNull(doc.body.getElementsByTagName('div')[0]);
+            Assert.AreEqual(doc.body.firstChild, doc.body.getElementsByTagName('div')[0]);
         }
     },
     "GetElementsByClassName":{

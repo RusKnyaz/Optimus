@@ -266,6 +266,13 @@
                 d.innerHTML.toLowerCase())
         }
     },
+    "SetInnerHtml":{
+        run:function () {
+            var div = document.createElement("div");
+            div.innerHTML = "<h1>1</h1><h2>2</h2><h3>3</h3>";
+            Assert.AreEqual(3, div.childNodes.length);
+        }
+    },
     "SetInnerHtmlText":{
         run:function () {
             var div = document.createElement("div");
@@ -366,6 +373,33 @@
             Assert.IsNotNull(Element.prototype, "Element.prototype");
             Assert.AreEqual(true, HTMLElement.prototype.hasOwnProperty('dataset'), 
                 "HTMLElement.prototype.hasOwnProperty('dataset')");
+        }
+    },
+    "Node":{
+        run: function() {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<div id='d'><h1>1</h1><h2>2</h2><h3>3</h3></div>");
+            var e = doc.getElementById('d');
+            Assert.IsNotNull(e, "e!=null");
+            Assert.AreEqual(e, doc.getElementById('d'));
+            Assert.AreEqual("DIV", e.tagName);
+            Assert.IsNotNull(e.firstChild, "e.firstChild");
+            Assert.AreEqual("H1", e.firstChild.tagName);
+            Assert.IsNotNull(e.lastChild, "e.lastChild");
+            Assert.AreEqual("H3", e.lastChild.tagName);
+            Assert.IsNotNull(e.parentNode, "e.parentNode");
+            Assert.AreEqual("BODY", e.parentNode.tagName);
+            Assert.AreEqual(doc, e.ownerDocument);
+            Assert.AreEqual("d", e.getAttribute('id'));
+        }
+    },
+    "SetChildNode":{
+        run: function(){
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<div id='a'><span></span></div>");
+            var d = doc.getElementById('a');
+            d.childNodes[0] = doc.createElement('p');
+            Assert.AreEqual("SPAN", d.childNodes[0].tagName, "child must not be changed");    
         }
     }
 });

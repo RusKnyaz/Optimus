@@ -54,6 +54,9 @@ var Assert = {
         if (x != null)
             throw "Expected null but was " + x;
     },
+    IsTrue : function(x, msg){
+        this.AreEqual(true, x, msg);
+    },
     AreNotEqual: function (x1, x2, msg) {
         if (x1 != x2)
             return;

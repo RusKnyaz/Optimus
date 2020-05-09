@@ -10,5 +10,13 @@ Test("HtmlBodyElementTests", {
             Assert.AreEqual("[object HTMLElementPrototype]", Object.getPrototypeOf(HTMLBodyElement.prototype).toString(), "Object.getPrototypeOf(HTMLBodyElement.prototype).toString()");
             Assert.AreEqual(Object.getPrototypeOf(document.body), HTMLBodyElement.prototype, "HTMLBodyElement.prototype == Object.getPrototypeOf(document.body)");
         }
+    },
+    "ChildNodes":{
+        run: function () {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div id='d'></div><div></div><span></span></body>");
+            Assert.AreEqual(3, doc.body.childNodes.length);
+            Assert.IsNotNull(doc.body.childNodes[0]);
+        }
     }
 });
