@@ -28,12 +28,22 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetBodyDiv")]
 		[TestCase("SetBodyNull")]
 	    [TestCase("GetElementsByTagName")]
+		[TestCase("GetElementsByTagNameReturnsHTMLCollection")]
 		[TestCase("GetElementsByTagNameByIndex")]
-	    [TestCase("GetElementsByClassName")]
-	    [TestCase("GetElementsByClassNameAndSlice")]
+		[TestCase("GetElementsByTagNameIsLive")]
+
+		[TestCase("GetElementsByClassName")]
+		[TestCase("GetElementsByClassNameAndSlice")]
+		[TestCase("GetElementsByClassNameReturnsHTMLCollection")]
+		[TestCase("GetElementsByClassNameReturnsLiveCollection")]
+		
+		[TestCase("GetElementsByNameReturnsLiveCollection")]
+		[TestCase("GetElementsByNameReturnsNodeList")]
 	    [TestCase("InstanceOf")]
 	    [TestCase("Prototype")]
 	    [TestCase("Properties")]
+		[TestCase("QuerySelectorAllReturnsNodeList")]
+		[TestCase("QuerySelectorAllReturnsStaticCollection")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]

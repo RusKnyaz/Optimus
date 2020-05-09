@@ -76,5 +76,14 @@ var Assert = {
         }
         
         throw "Expected exception, but was not."
+    },
+    InstanceOf:function(obj, type, msg){
+        if(!(obj instanceof type)){
+            var error = "Expected object to be \r\n\'" + type.toString() + "\' type";
+            if (msg)
+                error = msg + "\r\n" + error;
+
+            throw error;
+        }
     }
 };

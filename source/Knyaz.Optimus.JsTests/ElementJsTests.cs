@@ -56,6 +56,8 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("DataSetWrongAttributeName")]
 		[TestCase("Node")]
 		[TestCase("SetChildNode")]
+		[TestCase("ChildNodesIsNodeList")]
+		[TestCase("ChildNodesIsLive")]
 		public void ElementTests(string testName)
 		{
 			if (_jsEngine == JsEngines.Jurassic && (testName == "DataSetToAttribute" || testName == "DataSetToExistingAttribute"))

@@ -401,5 +401,21 @@
             d.childNodes[0] = doc.createElement('p');
             Assert.AreEqual("SPAN", d.childNodes[0].tagName, "child must not be changed");    
         }
+    },
+    "ChildNodesIsNodeList":{
+        run: function(){
+            var doc = document.implementation.createHTMLDocument();
+            Assert.InstanceOf(doc.body.childNodes, NodeList)
+        }    
+    },
+    "ChildNodesIsLive":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div id='d'></div><div></div><span></span></body>");
+            var nodes = doc.body.childNodes;
+            Assert.AreEqual(3, nodes.length, "original count");
+            doc.body.innerHTML = "";//clear body
+            Assert.AreEqual(0, nodes.length, "updated count");
+        }
     }
 });

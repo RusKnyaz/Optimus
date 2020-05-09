@@ -116,6 +116,25 @@
             Assert.AreEqual(doc.body.firstChild, doc.body.getElementsByTagName('div')[0]);
         }
     },
+    "GetElementsByTagNameReturnsHTMLCollection":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            var elts = doc.getElementsByTagName("custom");
+            Assert.AreEqual("[object HTMLCollection]", elts.toString());
+        }
+    },
+    "GetElementsByTagNameIsLive":{
+        run:function() {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<div id='d'></div><div></div><span></span>");
+            var elements = doc.body.getElementsByTagName('div');
+            Assert.AreEqual(2, elements.length);
+            doc.body.lastChild.remove();
+            Assert.AreEqual(2, elements.length);
+            doc.body.lastChild.remove();
+            Assert.AreEqual(1, elements.length);
+        }
+    },
     "GetElementsByClassName":{
         run:function () {
             var doc = document.implementation.createHTMLDocument();
@@ -124,6 +143,24 @@
             Assert.AreEqual(2, elts.length);
             Assert.IsNotNull(elts[1]);
             Assert.AreEqual(elts[1], elts["1"]);
+        }
+    },
+    "GetElementsByClassNameReturnsHTMLCollection":{
+        run:function () {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div class='c1'></div><div class='c2'></div><div class='c2'></div></body>");
+            var elts = doc.getElementsByClassName('c2');
+            Assert.AreEqual("[object HTMLCollection]", elts.toString());
+        }
+    },
+    "GetElementsByClassNameIsLive":{
+        run:function () {
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div class='c1'></div><div class='c2'></div><div class='c2'></div></body>");
+            var elts = doc.getElementsByClassName('c2');
+            Assert.AreEqual(2, elts.length);
+            elts[0].innerHTML="<p class=c2></p>";
+            Assert.AreEqual(3, elts.length);
         }
     },
     "GetElementsByClassNameAndSlice":{
@@ -135,6 +172,22 @@
             Assert.AreEqual(2, eltsCopy.length);
             Assert.IsNotNull(eltsCopy[1]);
             Assert.AreEqual(eltsCopy[1], eltsCopy["1"]);
+        }
+    },
+    "GetElementsByNameReturnsLiveCollection":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            var customs = doc.getElementsByName("custom");
+            Assert.AreEqual(0, customs.length);
+            doc.body.innerHTML="<div name=custom></div>";
+            Assert.AreEqual(1, customs.length);
+        }
+    },
+    "GetElementsByNameReturnsNodeList":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            var elts = doc.getElementsByName("custom");
+            Assert.AreEqual("[object NodeList]", elts.toString());
         }
     },
     "InstanceOf":{
@@ -170,6 +223,26 @@
             Assert.AreEqual(document.body.appendChild, document.body.appendChild, "document.body.appendChild == document.body.appendChild");
             Assert.AreEqual("[object HTMLDocument]", document.toString(), "document.toString()");
             
+        }
+    },
+    "QuerySelectorAllReturnsNodeList":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            Assert.AreEqual("[object NodeList]", doc.querySelectorAll("*").toString());
+        }
+    },
+    "QuerySelectorAllReturnsStaticCollection":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<div class=x></div>")
+            var xClass = doc.querySelectorAll(".x");
+            Assert.AreEqual(1, xClass.length);
+            doc.write("<div class=x></div>");
+            //ensure that node is added.
+            var newXClass = doc.querySelectorAll(".x");
+            Assert.AreEqual(2, newXClass.length);
+            //original query result should not be changed.            
+            Assert.AreEqual(1, xClass.length);
         }
     }
 });
