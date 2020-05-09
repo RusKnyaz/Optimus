@@ -1,5 +1,4 @@
 using Knyaz.Optimus.Dom.Elements;
-using System.Collections.Generic;
 
 namespace Knyaz.Optimus.Dom.Interfaces
 { 
@@ -20,6 +19,6 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		int NodeType { get; }
 		string NodeName { get; }
 		int CompareDocumentPosition(Node node);
-		IList<Node> ChildNodes { get; }
+		NodeList ChildNodes { get; }
  	}
  }

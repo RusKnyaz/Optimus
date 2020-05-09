@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
+using Knyaz.Optimus.Dom.Interfaces;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom
@@ -168,7 +169,7 @@ namespace Knyaz.Optimus.Tests.Dom
 
 			var result = document.GetElementsByClassName("a");
 
-			Assert.AreEqual(2, result.Length);
+			Assert.AreEqual(2, result.Count);
 			CollectionAssert.AreEqual(new[] { document.GetElementById("d1"), document.GetElementById("d3") }, result);
 		}
 
@@ -265,7 +266,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void GetElementsByTagName(string html, string tagName, int expectedCount)
 		{
 			var tags = Document(html).GetElementsByTagName("span");
-			Assert.AreEqual(expectedCount, tags.Length);
+			Assert.AreEqual(expectedCount, tags.Count);
 		}
 
 		[TestCase("<table><tbody><tr id=row_0><td></td></tr><tr id=row_1><td></td></tr></tbody></table>", "tr[id^='row_']", "row_0,row_1")]
@@ -283,7 +284,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var doc = new Document();
 			doc.Write(html);
 
-			var items = doc.QuerySelectorAll(selector).Select(x => x.Id).ToArray();
+			var items = doc.QuerySelectorAll(selector).OfType<IElement>().Select(x => x.Id).ToArray();
 
 			CollectionAssert.AreEqual(string.IsNullOrEmpty(expectedIds) ? new string[0] : expectedIds.Split(','), items);
 		}

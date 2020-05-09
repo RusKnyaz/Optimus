@@ -176,7 +176,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			set
 			{
 				while (value > _owner.Length)
-					_owner.ChildNodes.Add(_owner.OwnerDocument.CreateElement("option"));
+					_owner.AppendChild(_owner.OwnerDocument.CreateElement("option"));
 
 				while (value < _owner.Length)
 					_owner.Remove(_owner.Length - 1);

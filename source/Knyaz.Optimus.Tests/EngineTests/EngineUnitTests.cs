@@ -105,7 +105,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var engine = Builder(resourceProvider).Build();
 			engine.OpenUrl("http://localhost");
 			engine.WaitId("c");
-			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Length);
+			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Count);
 		}
 
 		[Test]

@@ -34,6 +34,10 @@
     table.style["width"] = "100%";
 
     table.innerHTML = "<col width=200/><col/><col/>";
+    
+    var failed = 0;
+    var success = 0;
+    var inconclusive = 0;
 
     for (var fixtureName in Tests)  {
         var fixture = Tests[fixtureName];
@@ -59,15 +63,19 @@
                 if (result != null) {
                     td2.style["color"] = "red";
                     td2.textContent = "failed: " + result;
+                    failed++;
                 }
                 else {
                     td2.style["color"] = "green";
                     td2.textContent = "success";
+                    success++;
                 }
             }
             catch (ex) {
+                failed++;
                 td2.style["color"] = "red";
                 td2.textContent = "exception:" + ex;
+                inconclusive++;
             }
 
             tr.appendChild(td2);
@@ -79,5 +87,9 @@
             table.appendChild(tr);
         }
     }
+    
+    var total = document.createElement("div");
+    total.innerText = "Failed: " + failed + ", Succeeded: " + success + ", Total: " + (failed+success+inconclusive);
+    table.parentNode.insertBefore(total, table);
 </script>
 </html>

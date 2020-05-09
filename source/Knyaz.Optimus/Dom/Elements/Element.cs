@@ -30,11 +30,11 @@ namespace Knyaz.Optimus.Dom.Elements
 			};
 		}
 
-		public override IList<Node> ChildNodes => _childNodes; 
-		
+		protected internal override IEnumerable<Node> Children => _childNodes;
+
 		public override Node RemoveChild(Node node)
 		{
-			ChildNodes.Remove(node);
+			_childNodes.Remove(node);
 			OwnerDocument?.HandleNodeRemoved(this, node);
 			return node;
 		}
@@ -57,7 +57,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			else
 			{
 				UnattachFromParent(node);
-				ChildNodes.Add(node);
+				_childNodes.Add(node);
 				RegisterNode(node);
 			}
 			return node;
@@ -67,9 +67,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		{
 			UnattachFromParent(newChild);
 			if (refNode == null)
-				ChildNodes.Add(newChild);
+				_childNodes.Add(newChild);
 			else
-				ChildNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
+				_childNodes.Insert(ChildNodes.IndexOf(refNode), newChild);
 			RegisterNode(newChild);
 			return newChild;
 		}
@@ -121,28 +121,20 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal Element(Document ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
 
-		/// <summary>
-		/// Get the tag name of an element.
-		/// </summary>
+		/// <summary> Get the tag name of an element. </summary>
 		public string TagName { get; private set; }
 
-		/// <summary>
-		/// Sets or gets the value of the 'class' attribute.
-		/// </summary>
+		/// <summary> Sets or gets the value of the 'class' attribute. </summary>
 		public string ClassName
 		{
 			get { return GetAttribute("class", ""); }
 			set { SetAttribute("class", value); }
 		}
 
-		/// <summary>
-		/// Returns a live DOMTokenList collection of the class attributes of the element.
-		/// </summary>
+		/// <summary> Returns a live DOMTokenList collection of the class attributes of the element. </summary>
 		public ITokenList ClassList => _classList;
 
-		/// <summary>
-		/// Represents the element's identifier, reflecting the id global attribute.
-		/// </summary>
+		/// <summary> Represents the element's identifier, reflecting the id global attribute. </summary>
 		public string Id
 		{
 			get => GetAttribute(Attrs.Id, string.Empty);
@@ -229,7 +221,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 			set
 			{
-				ChildNodes.Clear();
+				_childNodes.Clear();
 				DocumentBuilder.Build(this, value, NodeSources.Script);
 			} 
 		}
@@ -249,46 +241,43 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		/// <summary>
-		/// Returns a collection containing all descendant elements with the specified tag name.
-		/// </summary>
+		/// <summary> Returns a collection containing all descendant elements with the specified tag name. </summary>
 		/// <param name="tagName">A string that specifies the tagname to search for. The value "*" matches all tags</param>
-		public Element[] GetElementsByTagName(string tagName)
+		public HtmlCollection GetElementsByTagName(string tagName)
 		{
 			var invariantName = tagName.ToUpperInvariant();
 			
 			return tagName == "*" 
-				? Descendants.ToArray() 
-				: Descendants.Where(x => x.TagName == invariantName).ToArray();
+				? new HtmlCollection(() => Descendants.OfType<HtmlElement>()) 
+				: new HtmlCollection(() => Descendants.OfType<HtmlElement>().Where(x => x.TagName == invariantName));
 		}
 
 		private IEnumerable<Element> Descendants => ChildNodes.SelectMany(x => x.Flatten()).OfType<Element>();
 
 
 		private static char[] _spaceSplitter = new[] {' '};
-		/// <summary>
-		/// Returns a collection containing all descendant elements with the specified class name.
-		/// </summary>
+		/// <summary> Returns a collection containing all descendant elements with the specified class name. </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		public Element[] GetElementsByClassName(string name)
+		public HtmlCollection GetElementsByClassName(string name)
 		{
-			var classes = name.Split(_spaceSplitter, StringSplitOptions.RemoveEmptyEntries);
-			
-			switch (classes.Length)
+			return new HtmlCollection(() =>
 			{
-				case 0:
-					return new Element[0];
-				case 1:
-					return Descendants.Where(x => x.ClassList.Contains(name)).ToArray();
-				default:
-					return Descendants.Where(x => classes.All(c => x.ClassList.Contains(c))).ToArray();
-			}
+				var classes = name.Split(_spaceSplitter, StringSplitOptions.RemoveEmptyEntries);
+			
+				switch (classes.Length)
+				{
+					case 0:
+						return Enumerable.Empty<HtmlElement>();
+					case 1:
+						return Descendants.OfType<HtmlElement>().Where(x => x.ClassList.Contains(name));
+					default:
+						return Descendants.OfType<HtmlElement>().Where(x => classes.All(c => x.ClassList.Contains(c)));
+				}	
+			});
 		}
 
-		/// <summary>
-		/// Retrieves an attribute value by name.
-		/// </summary>
+		/// <summary> Retrieves an attribute value by name. </summary>
 		/// <param name="name">The name of the attribute to retrieve.</param>
 		/// <returns>The <see cref="Attr"/> value as a string, or the string.Empty if that attribute does not have a specified or default value.</returns>
 		public string GetAttribute(string name)
@@ -297,9 +286,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			return node == null ? null : node.Value;
 		}
 
-		/// <summary>
-		/// Returns the top-level document object for this node.
-		/// </summary>
+		/// <summary> Returns the top-level document object for this node. </summary>
 		public override Document OwnerDocument
 		{
 			get => base.OwnerDocument;
@@ -315,9 +302,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			}
 		}
 
-		/// <summary>
-		/// Removes the specified attribute node.
-		/// </summary>
+		/// <summary> Removes the specified attribute node. </summary>
 		/// <param name="attr">The <see cref="Attr"/> node to remove from the attribute list.</param>
 		public void RemoveAttributeNode(Attr attr)
 		{
@@ -406,22 +391,16 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <param name="name">The name of the attribute to check.</param>
 		public bool HasAttribute(string name) => Attributes.ContainsKey(name);
 
-		/// <summary>
-		/// Indicates whether this node (if it is an element) has any attributes.
-		/// </summary>
+		/// <summary> Indicates whether this node (if it is an element) has any attributes. </summary>
 		/// <returns><c>true</c> if this node has any attributes, <c>false</c> otherwise.</returns>
 		public bool HasAttributes() => Attributes.Length > 0;
 
-		/// <summary>
-		/// Checks whether a node is a descendant of a given Element or not.
-		/// </summary>
+		/// <summary> Checks whether a node is a descendant of a given Element or not. </summary>
 		/// <param name="element">The node to search.</param>
 		/// <returns><c>True</c> if node found, <c>False</c> otherwise.</returns>
 		public bool Contains(INode element) => ChildNodes.Flat(x => x.ChildNodes).Contains(element);
 
-		/// <summary>
-		/// For an Element the NodeName is tag name.
-		/// </summary>
+		/// <summary> For an Element the NodeName is tag name. </summary>
 		public override string NodeName => TagName;
 
 		public override string ToString() => $"[object {GetType().GetCustomAttribute<JsNameAttribute>()?.Name ?? GetType().Name}]";
@@ -443,9 +422,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			return node;
 		}
 
-		/// <summary>
-		/// Retrieves an attribute node by name.
-		/// </summary>
+		/// <summary> Retrieves an attribute node by name. </summary>
 		/// <param name="name">The name (nodeName) of the attribute to retrieve.</param>
 		/// <returns>The <see cref="Attr"/> node with the specified name (nodeName) or <c>null</c> if there is no such attribute.</returns>
 		public Attr GetAttributeNode(string name) => Attributes.ContainsKey(name) ? Attributes[name] : null;
@@ -545,12 +522,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Returns all descendant elements that matches a specified CSS selector(s).
 		/// </summary>
-		public virtual IReadOnlyList<IElement> QuerySelectorAll(string query) =>
-			((CssSelector)query).Select(this).ToList().AsReadOnly();
+		public virtual NodeList QuerySelectorAll(string query)
+		{
+			var result =((CssSelector)query).Select(this).OfType<HtmlElement>().ToList();
+			return new NodeList(() => result);
+		}
+			
 
-		/// <summary>
-		/// Returns nearest ancestor or itself which satisfies to specified selector.
-		/// </summary>
+		/// <summary> Returns nearest ancestor or itself which satisfies to specified selector. </summary>
 		/// <param name="query"></param>
 		/// <returns></returns>
 		public IElement Closest(string query)

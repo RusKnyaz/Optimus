@@ -15,14 +15,10 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom
 {
-	/// <summary>
-	/// Available values of the <see cref="Document.ReadyState"/> property.
-	/// </summary>
+	/// <summary> Available values of the <see cref="Document.ReadyState"/> property. </summary>
 	public static class DocumentReadyStates
 	{
-		/// <summary>
-		/// The document is still loading.
-		/// </summary>
+		/// <summary> The document is still loading. </summary>
 		public const string Loading = "loading";
 		/// <summary>
 		/// The document has finished loading and the document has been parsed but sub-resources such as images, stylesheets and frames are still loading.
@@ -55,9 +51,7 @@ namespace Knyaz.Optimus.Dom
 			ReadyState = DocumentReadyStates.Loading;
 		}
 
-		/// <summary>
-		/// Get or set the cookies associated with the current document. 
-		/// </summary>
+		/// <summary> Get or set the cookies associated with the current document. </summary>
 		public string Cookie
 		{
 			get
@@ -79,9 +73,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 		
-		/// <summary>
-		/// Creates new <sse cref="Document"/> instance.
-		/// </summary>
+		/// <summary> Creates new <sse cref="Document"/> instance. </summary>
 		/// <param name="window">The Window object ot be associated with the document. Can be null.</param>
 		internal Document(string namespaceUri, string qualifiedNameStr, DocType docType, IWindow window) : base(null)
 		{
@@ -174,19 +166,13 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public IWindow DefaultView { get; }
 
-		/// <summary>
-		/// Gets the Document Element of the document (the &lt;html&gt; element)
-		/// </summary>
+		/// <summary> Gets the Document Element of the document (the &lt;html&gt; element) </summary>
 		public Element DocumentElement { get; private set; }
 
-		/// <summary>
-		/// Gets the (loading) status of the document.
-		/// </summary>
+		/// <summary> Gets the (loading) status of the document. </summary>
 		public string ReadyState { get; private set; }
 
-		/// <summary>
-		/// This is always #document.
-		/// </summary>
+		/// <summary> This is always #document. </summary>
 		public override string NodeName => "#document";
 
 		/// <summary>
@@ -195,24 +181,16 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public Location Location => DefaultView.Location;
 
-		/// <summary>
-		/// Sets or gets the location of the document
-		/// </summary>
+		/// <summary> Sets or gets the location of the document </summary>
 		public string DocumentURI { get => DefaultView.Location.Href; set => DefaultView.Location.Href = value;}
 
-		/// <summary>
-		/// Returns a collection of all &lt;form&gt; elements in the document.
-		/// </summary>
+		/// <summary> Returns a collection of all &lt;form&gt; elements in the document. </summary>
 		public IEnumerable<HtmlFormElement> Forms => GetElementsByTagName("form").Cast<HtmlFormElement>();
 
-		/// <summary>
-		/// Returns a collection of &lt;script&gt; elements in the document.
-		/// </summary>
+		/// <summary> Returns a collection of &lt;script&gt; elements in the document. </summary>
 		public IEnumerable<Script> Scripts => GetElementsByTagName("script").Cast<Script>();
 
-		/// <summary>
-		/// Writes HTML expressions or JavaScript code to a document.
-		/// </summary>
+		/// <summary> Writes HTML expressions or JavaScript code to a document. </summary>
 		/// <param name="text"></param>
 		public void Write(string text)
 		{
@@ -222,9 +200,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		/// <summary>
-		/// Same as write(), but adds a newline character after each statement
-		/// </summary>
+		/// <summary> Same as write(), but adds a newline character after each statement </summary>
 		public void WriteLn(string text)
 		{
 			throw new NotImplementedException("Please use write instead.");
@@ -279,9 +255,7 @@ namespace Knyaz.Optimus.Dom
 		}
 		
 
-		/// <summary>
-		/// Creates an Element node.
-		/// </summary>
+		/// <summary> Creates an Element node. </summary>
 		/// <param name="tagName">The tag name of element to be created.</param>
 		public Element CreateElement(string tagName)
 		{
@@ -342,47 +316,29 @@ namespace Knyaz.Optimus.Dom
 			return new Attr(name, this);
 		}
 
-		/// <summary>
-		/// Returns the first element of the document that has the ID attribute with the specified value.
-		/// </summary>
+		/// <summary> Returns the first element of the document that has the ID attribute with the specified value. </summary>
 		public Element GetElementById(string id)
 		{
 			return DocumentElement.Flatten().OfType<Element>().FirstOrDefault(x => x.Id == id);
 		}
 
-		/// <summary>
-		/// Returns a collection containing all elements of the document with a specified name.
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		public IReadOnlyCollection<Element> GetElementsByName(string name)
-		{
-			return DocumentElement.Flatten().OfType<Element>().Where(x => x.GetAttribute("name") == name).ToList().AsReadOnly();
-		}
+		/// <summary> Returns a collection containing all elements of the document with a specified name. </summary>
+		/// <param name="name">Value of the name attribute of the element(s) to be found.</param>
+		/// <returns>Live <see cref="NodeList"/> Collection which it automatically updated as the document changed.</returns>
+		public NodeList GetElementsByName(string name) => 
+			new NodeList(() => DocumentElement.Flatten().OfType<Element>().Where(x => x.GetAttribute("name") == name));
 
-		/// <summary>
-		/// Creates an empty DocumentFragment node.
-		/// </summary>
+		/// <summary> Creates an empty DocumentFragment node. </summary>
 		public DocumentFragment CreateDocumentFragment()
 		{
 			return new DocumentFragment(this);
 		}
 
-		/// <summary>
-		/// Creates a Text node.
-		/// </summary>
-		public Text CreateTextNode(string data)
-		{
-			return new Text(this) {Data = data};	
-		}
+		/// <summary> Creates a Text node. </summary>
+		public Text CreateTextNode(string data) => new Text(this) {Data = data};
 
-		/// <summary>
-		/// Creates a Comment node with the specified text.
-		/// </summary>
-		public Comment CreateComment(string data)
-		{
-			return new Comment(this) { Data = data };
-		}
+		/// <summary> Creates a Comment node with the specified text. </summary>
+		public Comment CreateComment(string data) => new Comment(this) { Data = data };
 
 		/// <summary>
 		/// Sets or gets the document's body (the &lt;body&gt; element)
@@ -510,12 +466,14 @@ namespace Knyaz.Optimus.Dom
 		/// <returns>Found element or <c>null</c>.</returns>
 		public override IElement QuerySelector(string query) => new CssSelector(query).Select(DocumentElement).FirstOrDefault();
 
-		/// <summary>
-		/// Gets a collection containing all elements that matches a specified CSS selector(s) in the document
-		/// </summary>
+		/// <summary> Gets a collection containing all elements that matches a specified CSS selector(s) in the document. </summary>
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>The Readonly collection of found elements.</returns>
-		public override IReadOnlyList<IElement> QuerySelectorAll(string query) => new CssSelector(query).Select(DocumentElement).ToList().AsReadOnly();
+		public override NodeList QuerySelectorAll(string query)
+		{
+			var result = new CssSelector(query).Select(DocumentElement).OfType<HtmlElement>().ToList();
+			return new NodeList(() => result);
+		}
 
 		/// <summary>
 		/// Document nodes call this method when execution of some event handler script required. 
@@ -535,9 +493,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		/// <summary>
-		/// Called when execution of some code inside attribute event handler requred.
-		/// </summary>
+		/// <summary> Called when execution of some code inside attribute event handler required. </summary>
 		internal event Action<Event, string> OnHandleNodeScript;
 	}
 }

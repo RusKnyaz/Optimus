@@ -1,4 +1,10 @@
-﻿Test("DocumentTests", {
+﻿function loadDoc(html) {
+    var doc = document.implementation.createHTMLDocument();
+    doc.write(html);
+    return doc;
+}
+
+Test("DocumentTests", {
     "DocumentElement": {
         run: function () {
             var e = document.documentElement;
@@ -133,6 +139,20 @@
             Assert.AreEqual(2, elements.length);
             doc.body.lastChild.remove();
             Assert.AreEqual(1, elements.length);
+        }
+    },
+    "GetElementsByTagNameNamedItem":{
+        run : function () {
+            var doc = loadDoc("<P id=p1></P><p id=p2></p>") 
+            var p2 = doc.getElementsByTagName("P").namedItem("p2");
+            Assert.AreEqual("p2", p2.id);
+        }
+    },
+    "GetElementsByTagNameNamedItemIndexer":{
+        run : function () {
+            var doc = loadDoc("<P id=p1></P><p id=p2></p>")
+            var p1 = doc.getElementsByTagName("P")["p1"];
+            Assert.AreEqual("p1", p1.id);
         }
     },
     "GetElementsByClassName":{

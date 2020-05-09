@@ -201,8 +201,6 @@ console.log(navigator.userAgent);");
 			Assert.IsTrue(((TestingConsole)engine.Window.Console).LogHistory[1].ToString().Contains("Optimus"));
 		}
 
-	
-
 		[Test]
 		public static void Location()
 		{
@@ -306,17 +304,6 @@ client.send();"))
 			CollectionAssert.AreEqual(new object[] {1.0d, 4.0d, 200.0d, "hello"}, console.LogHistory);
 		}
 
-		[Test]
-		public static async Task AjaxExist()
-		{
-			var resources = Mocks.ResourceProvider(
-				"http://localhost",
-				Mocks.Page(@"console.log(typeof XMLHttpRequest !== 'undefined');"));
-			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(resources, console);
-			await engine.OpenUrl("http://localhost");
-			CollectionAssert.AreEqual(new[] {true}, console.LogHistory);
-		}
 
 		[Test]
 		public static async Task AddEmbeddedScriptInsideEmbedded()
@@ -405,25 +392,6 @@ script.onload = function(){ console.log(this.someData); document.body.innerHtml=
 		{
 			var engine = Load("HI", "document.addEventListener('DOMContentLoaded', function(){console.log(document.body ? 'hi' : 'nehi');}, true);");
 			CollectionAssert.AreEqual(new[] {"hi"}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void GetElementsByClassName()
-		{
-			var engine = Load("<html><body>" +
-			     "<div class='a' id='d1'></div>" +
-			     "<div class = 'b' id = 'd2'></div>" +
-			     "<div class='a b' id='d3'></div><script>console.log(document.getElementsByClassName('a').length);</script></body></html>");
-			
-			CollectionAssert.AreEqual(new[] {2}, ((TestingConsole)engine.Window.Console).LogHistory);
-		}
-
-		[Test]
-		public static void GetElementsByClassNameToString()
-		{
-			var engine = Load("<html><head><script>console.log(document.getElementsByClassName.toString());</script></head><body></body></html>");
-
-			CollectionAssert.AreEqual(new[] {"function getElementsByClassName() { [native code] }"}, ((TestingConsole)engine.Window.Console).LogHistory);
 		}
 
 		[Test]

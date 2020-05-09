@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Knyaz.Optimus.Dom.Elements;
+﻿using Knyaz.Optimus.Dom.Elements;
 
 namespace Knyaz.Optimus.Dom.Interfaces
 {
@@ -17,36 +16,25 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		string InnerHTML { get; set; }
 		string TextContent { get; set; }
 
-		/// <summary>
-		/// Returns a collection containing all descendant elements with the specified tag name.
-		/// </summary>
+		/// <summary> Returns a collection containing all descendant elements with the specified tag name. </summary>
 		/// <param name="tagNameSelector">A string that specifies the tagname to search for. The value "*" matches all tags</param>
-		Element[] GetElementsByTagName(string tagNameSelector);
+		HtmlCollection GetElementsByTagName(string tagNameSelector);
 
-		/// <summary>
-		/// Returns a collection containing all descendant elements with the specified class name.
-		/// </summary>
+		/// <summary>Returns a collection containing all descendant elements with the specified class name.</summary>
 		/// <param name="name">The class name (or multiple names divided by spaces) of the elements to get.</param>
-		/// <returns></returns>
-		Element[] GetElementsByClassName(string name);
+		HtmlCollection GetElementsByClassName(string name);
 
-		/// <summary>
-		/// Retrieves an attribute value by name.
-		/// </summary>
+		/// <summary> Retrieves an attribute value by name. </summary>
 		/// <param name="name">The name of the attribute to retrieve.</param>
 		/// <returns>The <see cref="Attr"/> value as a string, or the string.Empty if that attribute does not have a specified or default value.</returns>
 		Attr GetAttributeNode(string name);
 
-		/// <summary>
-		/// Retrieves an attribute node by name.
-		/// </summary>
+		/// <summary> Retrieves an attribute node by name. </summary>
 		/// <param name="name">The name (nodeName) of the attribute to retrieve.</param>
 		/// <returns>The <see cref="Attr"/> node with the specified name (nodeName) or <c>null</c> if there is no such attribute.</returns>
 		string GetAttribute(string name);
 
-		/// <summary>
-		/// Removes an attribute by name.
-		/// </summary>
+		/// <summary> Removes an attribute by name. </summary>
 		/// <param name="name">The name of the attribute to remove.</param>
 		void RemoveAttribute(string name);
 
@@ -64,9 +52,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		/// <returns>If the newAttr attribute replaces an existing attribute, the replaced Attr node is returned, otherwise null is returned.</returns>
 		Attr SetAttributeNode(Attr attr);
 
-		/// <summary>
-		/// Removes the specified attribute node.
-		/// </summary>
+		/// <summary> Removes the specified attribute node. </summary>
 		/// <param name="attr">The <see cref="Attr"/> node to remove from the attribute list.</param>
 		void RemoveAttributeNode(Attr attr);
 
@@ -97,6 +83,6 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		/// <summary>
 		/// Returns all descendant elements that matches a specified CSS selector(s).
 		/// </summary>
-		IReadOnlyList<IElement> QuerySelectorAll(string query);
+		NodeList QuerySelectorAll(string query);
 	}
 }

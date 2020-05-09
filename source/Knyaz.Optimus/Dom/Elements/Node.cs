@@ -4,6 +4,7 @@ using System.Linq;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ScriptExecuting;
+using Knyaz.Optimus.Tools;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -33,6 +34,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
 			EventTarget.CallDirectEventSubscribers += x => CallDirectEventSubscribers(x);
 			EventTarget.AfterEventDispatch += x => AfterEventDispatch(x);
+			ChildNodes = new NodeList(() => Children);
 		}
 		
 		protected virtual void BeforeEventDispatch(Event evt) {}
@@ -74,14 +76,17 @@ namespace Knyaz.Optimus.Dom.Elements
 			newChild.DispatchEvent(evt);
 		}
 
-		protected void UnattachFromParent(Node node) => node.ParentNode?.ChildNodes.Remove(node);
+		protected void UnattachFromParent(Node node) => node.ParentNode?.RemoveChild(node);
 
-		private static readonly List<Node> emptyList = new List<Node>(0); 
-		
+		private static readonly List<Node> emptyList = new List<Node>(0);
+
+		internal protected virtual IEnumerable<Node> Children => emptyList;
+			
+
 		/// <summary>
 		/// Gets a live collection of child nodes of the given element.
 		/// </summary>
-		public virtual IList<Node> ChildNodes => emptyList;
+		public virtual NodeList ChildNodes { get; }
 
 		/// <summary>
 		/// Removes a child node from the DOM.

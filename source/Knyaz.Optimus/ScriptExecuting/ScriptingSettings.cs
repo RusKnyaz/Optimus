@@ -14,6 +14,8 @@ namespace Knyaz.Optimus.ScriptExecuting
 			{
 				typeof(Node),
 				typeof(Element),
+				typeof(NodeList),
+				typeof(HtmlCollection),
 				typeof(HtmlAnchorElement),
 				typeof(HtmlBodyElement),
 				typeof(HtmlButtonElement),

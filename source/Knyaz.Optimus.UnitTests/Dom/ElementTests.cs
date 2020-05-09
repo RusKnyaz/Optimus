@@ -237,7 +237,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var doc = new Document();
 			doc.Write("<div class='a b c'></div>");
 			var res = doc.GetElementsByClassName(selector);
-			return res.Length;
+			return res.Count;
 		}
 
 		[TestCase("span", ExpectedResult = 1)]
@@ -247,7 +247,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			var doc = new Document();
 			doc.Write("<div><div><span></span></div></div>");
-			return doc.Body.GetElementsByTagName(tagName).Length;
+			return doc.Body.GetElementsByTagName(tagName).Count;
 		}
 		
 		[TestCase("<div id='a'></div>", ExpectedResult = 0)]
@@ -259,7 +259,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var doc = new Document();
 			doc.Write("<html><body>" + html + "</body></html>");
 
-			return doc.GetElementById("a").GetElementsByTagName("strong").Length;
+			return doc.GetElementById("a").GetElementsByTagName("strong").Count;
 		}
 
 		[Test]

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
+using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.TestingTools;
 using NUnit.Framework;
 
@@ -65,13 +66,13 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		{
 			var document = Load(html);
 			var selector = new CssSelector(selectorText);
-			var matchElts = document.GetElementsByName("match");
+			var matchElts = document.GetElementsByName("match").OfType<IElement>();
 			foreach (var matchElt in matchElts)
 			{
 				Assert.IsTrue(selector.IsMatches(matchElt), "Have to match: " + matchElt);
 			}
 
-			var notMatchElt = document.GetElementsByName("nomatch");
+			var notMatchElt = document.GetElementsByName("nomatch").OfType<IElement>();
 			foreach (var elt in notMatchElt)
 			{
 				Assert.IsFalse(selector.IsMatches(elt), elt.ToString());

@@ -31,11 +31,13 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("GetElementsByTagNameReturnsHTMLCollection")]
 		[TestCase("GetElementsByTagNameByIndex")]
 		[TestCase("GetElementsByTagNameIsLive")]
+		[TestCase("GetElementsByTagNameNamedItem")]
+		[TestCase("GetElementsByTagNameNamedItemIndexer")]
 
 		[TestCase("GetElementsByClassName")]
 		[TestCase("GetElementsByClassNameAndSlice")]
 		[TestCase("GetElementsByClassNameReturnsHTMLCollection")]
-		[TestCase("GetElementsByClassNameReturnsLiveCollection")]
+		[TestCase("GetElementsByClassNameIsLive")]
 		
 		[TestCase("GetElementsByNameReturnsLiveCollection")]
 		[TestCase("GetElementsByNameReturnsNodeList")]
