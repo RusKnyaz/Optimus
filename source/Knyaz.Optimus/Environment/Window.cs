@@ -1,11 +1,9 @@
 ﻿using System;
-using Jint.Runtime;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;
-using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 using Knyaz.Optimus.Tools;
 
@@ -55,17 +53,7 @@ namespace Knyaz.Optimus.Environment
 			Location = new Location(History, () => _engine.Uri, s => _engine.OpenUrl(s));
 
 			_timers = new WindowTimers(getSyncObj);
-			_timers.OnException += exception =>
-				{
-					if (exception is JavaScriptException jsEx)
-					{
-						Console.Log($"JavaScript error in timer handler function (Line:{jsEx.LineNumber}, Col:{jsEx.Column}, Source: {jsEx.Source}): {jsEx.Error}");
-					}
-					else
-					{
-						Console.Log("Unhandled exception in timer handler function: " + exception.ToString());
-					}
-				};
+			_timers.OnException += exception => { Console.Log("Unhandled exception in timer handler function: " + exception.ToString()); };
 
 			_eventTarget = new EventTarget(this, () => null, () => _engine.Document);
 		}

@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace Knyaz.Optimus.Tests.EngineTests
 {
 
-#if NETCOREAPP2_0
+#if NETCOREAPP3_1
 [Ignore("Rider runs 'Explicits' under Netcore")]
 #endif
 	[TestFixture, Explicit]

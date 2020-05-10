@@ -1,5 +1,4 @@
 using System;
-using Jint.Native;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
