@@ -8,6 +8,8 @@ using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests
 {
+
+	//todo: rewrite tests using ResourceProvider mocks.
 	[TestFixture, Ignore("For manual run")]
 	public class TestPages
 	{
