@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.Dom;
+﻿using Knyaz.NUnit.AssertExpressions;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
@@ -16,18 +17,12 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void CreateElement()
-		{
-			var br = _document.CreateElement("br");
-			Assert.IsInstanceOf<HtmlBrElement>(br);
-		}
+		public void CreateElement() =>
+			_document.CreateElement("br").Assert(brElement => brElement is HtmlBrElement);
 
 		[Test]
-		public void Defaults()
-		{
-			((HtmlBrElement) _document.CreateElement("br"))
-				.Assert(br => br.Clear == "");
-		}
+		public void Defaults() => 
+			((HtmlBrElement) _document.CreateElement("br")).Assert(br => br.Clear == "");
 
 		[Test]
 		public void SetClearUsingAttribute()

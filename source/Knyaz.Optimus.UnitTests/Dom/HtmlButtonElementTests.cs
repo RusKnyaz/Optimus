@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.Dom;
+﻿using Knyaz.NUnit.AssertExpressions;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
@@ -30,10 +31,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void Defaults()
-		{
-			_button.Assert(b => b.Disabled == false);
-		}
+		public void Defaults() => _button.Assert(button => button.Disabled == false);
 
 		[TestCase("<button id=b autofocus></button>", true)]
 		[TestCase("<button id=b autofocus=1></button>", true)]

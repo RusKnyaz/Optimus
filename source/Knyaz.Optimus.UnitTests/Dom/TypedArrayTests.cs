@@ -1,6 +1,7 @@
 ﻿using Knyaz.Optimus.Dom.Perf;
 using NUnit.Framework;
 using System;
+using Knyaz.NUnit.AssertExpressions;
 
 namespace Knyaz.Optimus.Tests.Dom
 {

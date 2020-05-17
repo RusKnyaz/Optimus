@@ -5,6 +5,7 @@ using Knyaz.Optimus.TestingTools;
 using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Tests.TestingTools;
 using Knyaz.Optimus.ScriptExecuting.Jint;

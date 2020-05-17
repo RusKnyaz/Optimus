@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.TestingTools;

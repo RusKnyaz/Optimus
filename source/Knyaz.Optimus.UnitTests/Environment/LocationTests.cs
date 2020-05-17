@@ -1,11 +1,14 @@
 ﻿using System;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Environment;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Environment
 {
+	[TestFixture]
 	public class LocationTests
 	{
+		
 		Location CreateLocation(string href)
 		{
 			var uri = new Uri(href);

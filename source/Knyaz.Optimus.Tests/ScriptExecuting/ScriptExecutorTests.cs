@@ -1,4 +1,5 @@
 using System;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.Dom.Interfaces;

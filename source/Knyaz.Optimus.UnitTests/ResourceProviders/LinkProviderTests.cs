@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.ResourceProviders;
+﻿using Knyaz.NUnit.AssertExpressions;
+using Knyaz.Optimus.ResourceProviders;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.UnitTests.ResourceProviders

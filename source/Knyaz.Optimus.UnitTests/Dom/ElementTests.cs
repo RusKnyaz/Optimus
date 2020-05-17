@@ -2,6 +2,7 @@
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Knyaz.NUnit.AssertExpressions;
 
 namespace Knyaz.Optimus.Tests.Dom
 {

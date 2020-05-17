@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.Dom;
+﻿using Knyaz.NUnit.AssertExpressions;
+using Knyaz.Optimus.Dom;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests.Dom

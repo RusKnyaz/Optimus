@@ -1,4 +1,5 @@
 ﻿using System;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Tools;
 using NUnit.Framework;
 

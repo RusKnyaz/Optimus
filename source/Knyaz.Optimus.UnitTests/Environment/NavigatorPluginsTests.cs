@@ -1,3 +1,4 @@
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Environment;
 using NUnit.Framework;

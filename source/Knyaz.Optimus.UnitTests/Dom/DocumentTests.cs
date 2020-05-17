@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;

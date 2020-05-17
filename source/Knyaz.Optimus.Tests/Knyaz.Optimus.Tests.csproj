@@ -28,7 +28,9 @@
     <EmbeddedResource Include="Resources\ya.js" />
     <EmbeddedResource Include="Resources\Large_Html.txt" />
   </ItemGroup>
+
   <ItemGroup>
+    <PackageReference Include="Knyaz.NUnit.AssertExpressions" Version="1.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="Moq" Version="4.7.142" />
     <PackageReference Include="NBench" Version="1.0.4" />

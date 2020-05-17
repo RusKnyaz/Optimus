@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;

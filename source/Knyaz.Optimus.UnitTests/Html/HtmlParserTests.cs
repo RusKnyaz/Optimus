@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Html;
 using NUnit.Framework;
 
@@ -45,25 +46,18 @@ namespace Knyaz.Optimus.Tests.Html
 		}
 
 		[Test]
-		public void TextIsNotParent()
-		{
-			var elem = Parse("<head>\r\n\t<script>somecode</script>\r\n</head>").Cast<HtmlElement>().Single();
+		public void TextIsNotParent() =>
+			Parse("<head>\r\n\t<script>somecode</script>\r\n</head>")
+				.Cast<HtmlElement>()
+				.Single()
+				.Assert(headElement =>
+					headElement.Name == "head" && 
+					(headElement.Children.First() as HtmlText).Value == "\n\n\t" &&
+					(headElement.Children.Skip(1).First() as HtmlElement).Name == "script");
 
-			elem.Assert(e =>
-				e.Name == "head" && 
-				(e.Children.First() as HtmlText).Value == "\n\n\t" &&
-				(e.Children.Skip(1).First() as HtmlElement).Name == "script");
-		}
-		
 		[Test]
-		public void Text()
-		{
-			var elems = Parse("Hello").ToArray();
-
-			Assert.AreEqual(1, elems.Length);
-			var elem = elems[0];
-			Assert.AreEqual("Hello", ((HtmlText) elem).Value);
-		}
+		public void Text() => 
+			Parse("Hello").ToArray().Assert(elements => ((HtmlText)elements[0]).Value == "Hello");
 
 		[Test]
 		public void Comment()
