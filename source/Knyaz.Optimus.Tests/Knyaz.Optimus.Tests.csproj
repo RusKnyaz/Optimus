@@ -39,7 +39,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
     <PackageReference Include="Knyaz.Optimus.Scripting.Jint" Version="1.0.0-alpha-14" />
-    <PackageReference Include="Knyaz.Optimus.Scripting.Jurassic" Version="3.0.0-alpha-25" />
+    <PackageReference Include="Knyaz.Optimus.Scripting.Jurassic" Version="3.0.0-alpha-27" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />

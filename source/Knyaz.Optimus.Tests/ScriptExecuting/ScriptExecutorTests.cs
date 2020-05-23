@@ -267,8 +267,13 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
             Tuple<string, Action<Event>, bool> args = null;
             var console = new TestingConsole();            
             var window = Mock.Of<IWindowEx>(x => x.Console == console);
-            Mock.Get(window).Setup(x => x.AddEventListener(It.IsAny<string>(), It.IsAny<Action<Event>>(), It.IsAny<bool>()))
-                .Callback<string, Action<Event>, bool>((a1, a2, a3) => { args = new Tuple<string, Action<Event>, bool>(a1,a2,a3);});
+            Mock.Get(window).Setup(x => 
+                    x.AddEventListener(
+                        It.IsAny<string>(), 
+                        It.IsAny<Action<Event>>(), 
+                        It.IsAny<bool>()))
+                .Callback<string, Action<Event>, bool>((a1, a2, a3) =>
+                    { args = new Tuple<string, Action<Event>, bool>(a1,a2,a3);});
             
             Execute(window,  
                 @"var listener = function(e){console.log(e);};

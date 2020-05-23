@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Knyaz.Optimus.Dom.Interfaces;
 
@@ -6,6 +7,7 @@ namespace Knyaz.Optimus.Tests.TestingTools
 	public class TestingConsole : IConsole
 	{
 		public readonly List<object> LogHistory = new List<object>();
+		public event Action<object> OnLog;
 		
 		public void Assert(bool assertion, params object[] objs)
 		{
@@ -56,11 +58,20 @@ namespace Knyaz.Optimus.Tests.TestingTools
 		public void Log(params object[] objs)
 		{
 			if (objs == null)
+			{
 				LogHistory.Add(null);
+				OnLog?.Invoke(null);
+			}
 			else if (objs.Length == 1)
+			{
 				LogHistory.Add(objs[0]);
+				OnLog?.Invoke(objs[0]);
+			}
 			else
+			{
 				LogHistory.Add(objs);
+				OnLog?.Invoke(objs);
+			}
 		}
 
 		public void Time(string label)

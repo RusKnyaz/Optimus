@@ -1,10 +1,10 @@
-using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
+using Knyaz.Optimus.Tests.TestingTools;
 using Moq;
 using NUnit.Framework;
 
@@ -75,15 +75,12 @@ namespace Knyaz.Optimus.Tests.Dom
 		public async Task HrefJavaScriptOnClickOrder()
 		{
 			var signal = new AutoResetEvent(false);
-			var console = new Mock<IConsole>();
-			var log = new ArrayList();
+			var console = new TestingConsole();
 
-			console.Setup(x => x.Log(It.IsAny<double>())).Callback<object[]>(x =>
-			{
-				log.Add(x[0]);
-				if(log.Count == 2)
+			console.OnLog += x => {
+				if(console.LogHistory.Count == 2)
 					signal.Set();
-			});
+			};
 			
 			var resourceProvider = Mocks.ResourceProvider("http://loc/",
 				"<html><body><a id=a href='JavaScript:console.log(1)'><div id=d></div></a>" +
@@ -94,14 +91,14 @@ namespace Knyaz.Optimus.Tests.Dom
 			var engine = EngineBuilder.New()
 				.SetResourceProvider(resourceProvider)
 				.UseJint()
-				.Window(w => w.SetConsole(console.Object))
+				.Window(w => w.SetConsole(console))
 				.Build();
 			
 			await engine.OpenUrl("http://loc/");
 
-			Assert.IsTrue(signal.WaitOne(1000), "Should be called");
+			signal.WaitOne(5000);
 			
-			Assert.AreEqual(new object[]{2d,1d}, log);
+			Assert.AreEqual(new object[]{2d,1d}, console.LogHistory);
 		}
 	}
 }
