@@ -157,7 +157,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			
 			page.Document.Get<HtmlButtonElement>("button").First().Click();
 			
-			page.Document.Assert(document =>
+			engine.Document.Assert(document =>
 				document.WaitId("d").InnerHTML == "logout" &&
 				document.Location.Href == "http://site.net/logout"
 			);
