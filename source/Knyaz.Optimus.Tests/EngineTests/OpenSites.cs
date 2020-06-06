@@ -250,7 +250,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		public async Task OpenHabr()
 		{
 			var engine = TestingEngine.BuildJint();
-			engine.LogEvents();
 			var page = await engine.OpenUrl("https://habr.com");
 			System.Console.WriteLine(page.Document.InnerHTML);
 			//var logo = page.Document.WaitSelector(".logo-wrapper").First();

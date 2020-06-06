@@ -51,11 +51,16 @@ namespace Knyaz.Optimus.Tests.TestingTools
 		{
 		}
 
-		public void Log(string format, params object[] objs) => LogHistory.Add(format);
+		public void Log(string format, params object[] objs) => Log((object)format);
 
 		public void Log(params object[] objs)
 		{
-			LogHistory.AddRange(objs);
+			if (objs == null)
+				LogHistory.Add(null);
+			else if (objs.Length == 1)
+				LogHistory.Add(objs[0]);
+			else
+				LogHistory.Add(objs);
 		}
 
 		public void Time(string label)
