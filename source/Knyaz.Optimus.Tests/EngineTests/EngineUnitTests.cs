@@ -332,11 +332,8 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[TestCase("http://chromium.github.io/octane", "js/jquery.js", "http://chromium.github.io/octane/js/jquery.js")]
 		public async Task OpenUrlWithResource(string url, string resUrl, string expectedResUrl)
 		{
-			var httpResourceProvider = Mocks.HttpResourceProvider()
-				.Resource(url.TrimEnd('/'), "<html><head><script src='"+resUrl+"'></script></head></html>")
+			var resourceProvider = Mocks.ResourceProvider(url.TrimEnd('/'), "<html><head><script src='"+resUrl+"'></script></head></html>")
 				.Resource(expectedResUrl, "console.log('ok');");
-
-			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 
 			var consoleMock = new Mock<IConsole>();
 
@@ -403,8 +400,7 @@ function reqListener () {
 		[TestCase("hello", null)]//bad json
 		public void XmlHttpRequestJson(string json, string expectedMsg)
 		{
-			var httpResourceProvider = Mocks.HttpResourceProvider()
-				.Resource("http://localhost/", @"<html><script>
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/", @"<html><script>
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', 'data.json', true);
 	xhr.responseType = 'json';
@@ -420,8 +416,6 @@ function reqListener () {
 	};
 	xhr.send(null);</script></html>")
 				.Resource("http://localhost/data.json", json);
-
-			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 
 			var console = new TestingConsole();
 			var engine = TestingEngine.BuildJint(resourceProvider, console);
@@ -558,7 +552,7 @@ function reqListener () {
 		[TestCase("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAYAAACzzX7wAAAABHNCSVQICAgIfAhkiAAAABZJREFUCJlj/P///38GPIAJnyR1FAAABqwEBGR0hh0AAAAASUVORK5CYII=")]
 		public async Task LoadImageFromData(string url)
 		{
-			var resourceProvider = new ResourceProvider(Mocks.HttpResourceProvider().Resource("http://localhost/",""), null);
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/","");
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
@@ -574,14 +568,12 @@ function reqListener () {
 		[Test]
 		public async Task LoadBmpFromUrlAndGetSize()
 		{
-			var httpResourceProvider = Mocks.HttpResourceProvider()
-				.Resource("http://localhost/", "")
+			var resourceProvider = Mocks.ResourceProvider("http://localhost/", "")
 				.Resource("http://localhost/image.bmp",
 					Convert.FromBase64String(
 						"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"),
 					"image/bmp");
 			
-			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
@@ -596,11 +588,10 @@ function reqListener () {
 		[Test]
 		public async Task GetImageRawData()
 		{
-			var httpResourceProvider = Mocks.HttpResourceProvider()
-				.Resource("http://localhost/", "")
+			var resourceProvider = 
+				Mocks.ResourceProvider("http://localhost/", "")
 				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
 			
-			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
@@ -618,11 +609,10 @@ function reqListener () {
 		[Test]
 		public async Task DocumentWithImage()
 		{
-			var httpResourceProvider = Mocks.HttpResourceProvider()
-				.Resource("http://localhost/", "<html><body><img src='image.bmp'/></body></html>")
+			var resourceProvider = 
+				Mocks.ResourceProvider("http://localhost/", "<html><body><img src='image.bmp'/></body></html>")
 				.Resource("http://localhost/image.bmp", new byte[]{1,2,3,2,1},"image/bmp");
 			
-			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.GetElementsByTagName("img").First();

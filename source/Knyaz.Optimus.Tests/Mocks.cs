@@ -34,6 +34,9 @@ namespace Knyaz.Optimus.Tests
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, string data, string mimeType = "text/html") => 
 			resourceProvider.Resource(new Uri(url, UriKind.RelativeOrAbsolute), data, mimeType);
+		
+		public static IResourceProvider Resource(this IResourceProvider resourceProvider, string url, byte[] data, string mimeType = "text/html") => 
+			resourceProvider.Resource(new Uri(url, UriKind.RelativeOrAbsolute), data, mimeType);
 
 		public static IResourceProvider Resource(this IResourceProvider resourceProvider, Uri url, byte[] data, string mimeType = "text/html")
 		{
