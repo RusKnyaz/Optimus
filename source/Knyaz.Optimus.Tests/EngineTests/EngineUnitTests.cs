@@ -552,7 +552,7 @@ function reqListener () {
 		[TestCase("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAYAAACzzX7wAAAABHNCSVQICAgIfAhkiAAAABZJREFUCJlj/P///38GPIAJnyR1FAAABqwEBGR0hh0AAAAASUVORK5CYII=")]
 		public async Task LoadImageFromData(string url)
 		{
-			var resourceProvider = Mocks.ResourceProvider("http://localhost/","");
+			var resourceProvider = new ResourceProvider(Mocks.HttpResourceProvider().Resource("http://localhost/",""), null);
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			var img = (HtmlImageElement)page.Document.CreateElement(TagsNames.Img);
@@ -628,15 +628,23 @@ function reqListener () {
 		public async Task DocumentWithEmbeddedImage()
 		{
 			//todo: Investigate why this test is unstable.
-			var resourceProvider = Mocks.ResourceProvider(
-				"http://localhost/", "<html><body><img src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>");
+			var resourceProvider =
+				new ResourceProvider(
+					Mocks.HttpResourceProvider()
+						.Resource("http://localhost/", "<html><body><img " +
+						                               "onload='document.body.appendChild(document.createElement(\"span\"))' " +
+						                               "src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>"
+				                 ),
+				null);
 			
-			var engine = TestingEngine.BuildJint(resourceProvider);
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
 			var page = await engine.OpenUrl("http://localhost");
+			
+			Assert.IsNotNull(page.Document.WaitSelector("span", 1000), "Onload fired");
+			
 			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();
-			var loadSignal = new ManualResetEvent(false);
-			img.OnLoad += evt => { loadSignal.Set(); };
-			Assert.IsTrue(loadSignal.WaitOne(1000), "loaded");
+			
 			Assert.AreEqual(8, img.NaturalWidth);
 			Assert.AreEqual(4, img.NaturalHeight);
 		}
