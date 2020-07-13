@@ -623,39 +623,38 @@ function reqListener () {
 			Assert.IsTrue(loadSignal.WaitOne(1000));
 			Assert.IsTrue(img.Complete);
 		}
+
+		private static string Img64 =
+			"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////";
 		
 		[Test]
 		public async Task DocumentWithEmbeddedImage()
 		{
-			//todo: Investigate why this test is unstable.
-			var resourceProvider =
-				new ResourceProvider(
-					Mocks.HttpResourceProvider()
-						.Resource("http://localhost/", "<html><body><img " +
-						                               "onload='document.body.appendChild(document.createElement(\"span\"))' " +
-						                               "src='data:image/bmp;base64,Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////'/></body></html>"
-				                 ),
-				null);
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/",
+					"<html><body><img " +
+					"onload='document.body.appendChild(document.createElement(\"span\"))' " +
+					$"src='data:image/bmp;base64,{Img64}'/></body></html>"
+				); 
 			
-			var console = new TestingConsole();
-			var engine = TestingEngine.BuildJint(resourceProvider, console);
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var engine = TestingEngine.BuildJint(resourceProvider);
 			var page = await engine.OpenUrl("http://localhost");
 			
 			Assert.IsNotNull(page.Document.WaitSelector("span", 1000), "Onload fired");
-			
-			var img = (HtmlImageElement)page.Document.GetElementsByTagName(TagsNames.Img).First();
-			
-			Assert.AreEqual(8, img.NaturalWidth);
-			Assert.AreEqual(4, img.NaturalHeight);
+
+			((HtmlImageElement) page.Document.GetElementsByTagName(TagsNames.Img).First())
+				.Assert(img => img.NaturalWidth == 8 && img.NaturalHeight == 4);
 		}
+		
 		[Test]
 		public async Task SetAndResetImage()
 		{
 			var httpResourceProvider = Mocks.HttpResourceProvider()
 				.Resource("http://localhost/", "")
 				.Resource("http://localhost/image.bmp",
-					Convert.FromBase64String(
-						"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"),
+					Convert.FromBase64String(Img64),
 					"image/bmp");
 			
 			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
