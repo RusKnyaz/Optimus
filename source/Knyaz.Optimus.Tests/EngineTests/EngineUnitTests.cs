@@ -627,6 +627,39 @@ function reqListener () {
 		private static string Img64 =
 			"Qk2WAAAAAAAAADYAAAAoAAAACAAAAAQAAAABABgAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////";
 		
+		[Test, Ignore("To be fixed")]
+		public async Task DocumentWithEmbeddedImageEventsOrder()
+		{
+			var httpResourceProvider = Mocks.HttpResourceProvider()
+				.Resource("http://localhost/",
+					"<html><body onload='console.log(\"body\")'>" +
+					"<img src='data:image/bmp;base64,{Img64}'/>" +
+					"<script>" +
+					"document.getElementsByTagName('img')[0].onload=function(){console.log('img');}"+
+					"document.addEventListener('DOMContentLoaded', function(){console.log('DOMContentLoaded-C');}, true);"+
+					"document.addEventListener('DOMContentLoaded', function(){console.log('DOMContentLoaded-B');}, false);"+
+					"</script>" +
+					"</body></html>"
+				); 
+			
+			var resourceProvider = new ResourceProvider(httpResourceProvider, null);
+			
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
+			var page = await engine.OpenUrl("http://localhost");
+			Thread.Sleep(5000);//rewrite
+			
+			Assert.AreEqual(new[] {
+				"DOMContentLoaded-C",
+				"DOMContentLoaded-B",
+				"img",
+				"body"
+			}, console.LogHistory);
+			
+			((HtmlImageElement) page.Document.GetElementsByTagName(TagsNames.Img).First())
+				.Assert(img => img.NaturalWidth == 8 && img.NaturalHeight == 4);
+		}
+		
 		[Test]
 		public async Task DocumentWithEmbeddedImage()
 		{
