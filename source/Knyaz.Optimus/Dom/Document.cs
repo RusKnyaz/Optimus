@@ -481,16 +481,9 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		/// <param name="evt"></param>
 		/// <param name="code"></param>
-		internal void HandleNodeScript(Event evt, string code, bool async = false)
+		internal void HandleNodeScript(Event evt, string code)
 		{
-			if (async)
-			{
-				Task.Run(() => OnHandleNodeScript?.Invoke(evt, code));
-			}
-			else
-			{
-				OnHandleNodeScript?.Invoke(evt, code);
-			}
+			OnHandleNodeScript?.Invoke(evt, code);
 		}
 
 		/// <summary> Called when execution of some code inside attribute event handler required. </summary>

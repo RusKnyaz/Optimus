@@ -62,13 +62,10 @@ namespace Knyaz.Optimus.Dom.Elements
 			set => TextContent = value; 
 		}
 
-		internal bool IsExternalScript => !string.IsNullOrEmpty(Src);
-
 		/// <summary>
 		/// Indicates whether the script was executed or not.
 		/// </summary>
 		internal bool Executed { get; set; }
-		internal string Code { get; set; }
 
 		/// <summary>
 		/// Fired immediately after an element has been loaded.

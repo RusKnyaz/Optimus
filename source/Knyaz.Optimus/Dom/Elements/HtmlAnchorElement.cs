@@ -37,9 +37,7 @@ namespace Knyaz.Optimus.Dom.Elements
 
 				var code = href.Substring(idx + 1);
 				
-				
-				//todo: call async
-				OwnerDocument.HandleNodeScript(evt, code, true);
+				OwnerDocument.HandleNodeScript(evt, code);
 			}
 		}
 		

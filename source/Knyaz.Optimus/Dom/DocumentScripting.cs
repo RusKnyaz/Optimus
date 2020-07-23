@@ -17,7 +17,8 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	public class DocumentScripting : IDisposable
 	{
-		private readonly Queue<Tuple<Task, Script>> _unresolvedDelayedResources;
+		private readonly Queue<Tuple<Task<string>, Script>> _deferredScripts = 
+			new Queue<Tuple<Task<string>, Script>>();
 		private readonly IDocument _document;
 		private readonly IScriptExecutor _scriptExecutor;
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
@@ -33,16 +34,27 @@ namespace Knyaz.Optimus.Dom
 			document.NodeInserted += OnDocumentNodeInserted;
 			document.DomContentLoaded += OnDocumentDomContentLoaded;
 			document.OnHandleNodeScript += OnHandleNodeScript;
-			_unresolvedDelayedResources = new Queue<Tuple<Task, Script>>();
 		}
-
+		
 		private void OnHandleNodeScript(Event evt, string handlerCode)
 		{
+			//the code in the 'href' attribute of the anchor element have to be executed asynchronously
+			var async = evt.Type == "click" && evt.CurrentTarget is HtmlAnchorElement anchor &&
+				string.IsNullOrEmpty(anchor.GetAttribute("onclick"));
+
 			handlerCode = handlerCode.Trim();
 			if (handlerCode.Last() != ';')
 				handlerCode += ";";
-			
-			_scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + "}", evt.Target, evt);
+
+			if (async)
+			{
+				Task.Run(
+					() => _scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + "}", evt.Target, evt));
+			}
+			else
+			{
+				_scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + "}", evt.Target, evt);	
+			}
 		}
 
 		void OnDocumentNodeInserted (Node node)
@@ -56,94 +68,90 @@ namespace Knyaz.Optimus.Dom
 			//Prevent 'Collection was modified' exception.
 			var tmpChildNodes = node.Flatten().OfType<HtmlElement>().ToArray();
 			
-			foreach (var elt in tmpChildNodes)
+			foreach (var script in tmpChildNodes.OfType<Script>())
 			{
-				if (elt is Script script)
+				var remote = IsExternalScript(script);
+				var async = script.Async && remote || script.Source == NodeSources.Script;
+				var defer = script.Defer && remote && !async && script.Source == NodeSources.DocumentBuilder;
+
+				if (defer)
 				{
-					var remote = script.IsExternalScript;
-					var async = script.Async && remote || script.Source == NodeSources.Script;
-					var defer = script.Defer && remote && !async && script.Source == NodeSources.DocumentBuilder;
+					_deferredScripts.Enqueue(new Tuple<Task<string>, Script>(LoadAsync(script, _getResourceAsyncFn), script));
+				}
+				else if (remote) //script that have to be loaded
+				{
+					var task = 
+						LoadAsync(script, _getResourceAsyncFn)
+						.ContinueWith(t => ExecuteScript(new ScriptInfo(script, t.Result)));
 
-					if (defer)
-					{
-						_unresolvedDelayedResources.Enqueue(new Tuple<Task, Script>(LoadAsync(script, _getResourceAsyncFn), script));
-					}
-					else if (remote)
-					{
-						var task = 
-							LoadAsync(script, _getResourceAsyncFn)
-							.ContinueWith((t, s) => ExecuteScript((Script) s), script);
-
-						if (!async)
-							task.Wait();
-					}
-					else if (!string.IsNullOrEmpty(script.Text) && script.Type == "text/javascript" || string.IsNullOrEmpty(script.Type))
-					{
-						ExecuteScript(script);
-					}
+					if (!async)
+						task.Wait();
+				}
+				else if (!string.IsNullOrEmpty(script.Text) && script.Type == "text/javascript" || string.IsNullOrEmpty(script.Type))
+				{
+					ExecuteScript(new ScriptInfo(script, script.Text));
 				}
 			}
 		}
 
 		//todo: revise it. it shouldn't be here.
-		internal static Task LoadAsync(Script script, Func<string, Task<IResource>> getResourceAsyncFn)
+		internal static async Task<string> LoadAsync(Script script, Func<string, Task<IResource>> getResourceAsyncFn)
 		{
 			if (string.IsNullOrEmpty(script.Src))
 				throw new InvalidOperationException("Src not set.");
 
-			return getResourceAsyncFn(script.Src).ContinueWith(
-				resource =>
+			var resource = await getResourceAsyncFn(script.Src);
+
+			try
+			{
+				using (var reader = new StreamReader(resource.Stream))
+					return reader.ReadToEnd();
+			}
+			catch
+			{
+				lock (script.OwnerDocument)
 				{
-					try
-					{
-						using (var reader = new StreamReader(resource.Result.Stream))
-						{
-							script.Code = reader.ReadToEnd();//wrong.
-						}
-					}
-					catch
-					{
-						lock (script.OwnerDocument)
-						{
-							script.RaiseEvent("error", false, false);
-						}
-					}
-				});
+					script.RaiseEvent("error", false, false);
+				}
+			}
+
+			return null;
 		}
 
 		void OnDocumentDomContentLoaded (IDocument document)
 		{
-			while (_unresolvedDelayedResources.Count > 0)
+			//Execute deferred scripts
+			while (_deferredScripts.Count > 0)
 			{
-				var scriptTask = _unresolvedDelayedResources.Dequeue();
-				scriptTask.Item1.Wait();
-				ExecuteScript(scriptTask.Item2);
+				var scriptTask = _deferredScripts.Dequeue();
+				ExecuteScript(new ScriptInfo(scriptTask.Item2, scriptTask.Item1.Result));
 			}
 		}
 
-		private void ExecuteScript(Script script)
+		private void ExecuteScript(ScriptInfo script)
 		{
-			if (script.Executed)
+			if (script.Node.Executed)
 				return;
 
-			lock (script.OwnerDocument)
+			lock (script.Node.OwnerDocument)
 			{
-				RaiseBeforeScriptExecute(script);
+				RaiseBeforeScriptExecute(script.Node);
 
 				try
 				{
-					_scriptExecutor.Execute(script.Type ?? "text/javascript", 
-						script.IsExternalScript ? script.Code : script.Text);
-					script.Executed = true;
-					if (script.IsExternalScript)
-						script.RaiseEvent("load", true, false);
+					_scriptExecutor.Execute(
+						script.Node.Type ?? "text/javascript", 
+						script.Code);
+					script.Node.Executed = true;
+					if (IsExternalScript(script.Node))
+						script.Node.RaiseEvent("load", true, false);
 				}
 				catch (Exception ex)
 				{
-					RaiseScriptExecutionError(script, ex);
+					RaiseScriptExecutionError(script.Node, ex);
 				}
 
-				RaiseAfterScriptExecute(script);
+				RaiseAfterScriptExecute(script.Node);
 			}
 		}
 
@@ -199,6 +207,20 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		#endregion
+
+		class ScriptInfo
+		{
+			public readonly Script Node;
+			public readonly string Code;
+
+			public ScriptInfo(Script node, string code)
+			{
+				Node = node;
+				Code = code;
+			}
+		}
+		
+		private static bool IsExternalScript(Script script) => !string.IsNullOrEmpty(script.Src);
 	}
 }
 
