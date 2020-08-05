@@ -49,7 +49,11 @@ namespace Knyaz.Optimus.Dom
 			if (async)
 			{
 				Task.Run(
-					() => _scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + "}", evt.Target, evt));
+					() =>
+					{
+						lock(_document)
+							return _scriptExecutor.EvalFuncAndCall("function (event){" + handlerCode + "}", evt.Target, evt);
+					});
 			}
 			else
 			{
