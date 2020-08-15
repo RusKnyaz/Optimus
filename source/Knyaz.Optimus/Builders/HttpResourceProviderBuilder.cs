@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace Knyaz.Optimus.ResourceProviders
@@ -11,6 +12,7 @@ namespace Knyaz.Optimus.ResourceProviders
     {
         private WebProxy _proxy;
         private AuthenticationHeaderValue _auth;
+        private Action<HttpClientHandler> _handler;
 
         /// <summary>
         /// setup basic authorization login/password
@@ -31,7 +33,22 @@ namespace Knyaz.Optimus.ResourceProviders
 
         internal HttpResourceProvider Build()
         {
-            return new HttpResourceProvider(_proxy, _auth);
+            return new HttpResourceProvider(_auth, handler =>
+            {
+                if (_proxy != null)
+                {
+                    handler.Proxy = _proxy;
+                    handler.UseProxy = true;
+                }
+                
+                _handler?.Invoke(handler);
+            });
+        }
+
+        public HttpResourceProviderBuilder ConfigureClientHandler(Action<HttpClientHandler> handler)
+        {
+            _handler = handler;
+            return this;
         }
     }
 }

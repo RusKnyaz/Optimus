@@ -14,20 +14,22 @@ namespace Knyaz.Optimus.ResourceProviders
 	class HttpResourceProvider : IResourceProvider
 	{
 		private readonly Func<Request, HttpClient> _getClientFn;
-
-		public HttpResourceProvider(WebProxy proxy, AuthenticationHeaderValue auth)
+		
+		public HttpResourceProvider(AuthenticationHeaderValue auth, Action<HttpClientHandler> handlerConfig)
 		{
-			_getClientFn = req => new HttpClient(new HttpClientHandler
+			_getClientFn = req =>
 			{
-				CookieContainer = req.Cookies,
-				Proxy = proxy,
-				UseProxy = proxy != null,
-			})
-			{
-				Timeout = req.Timeout > 0
-				? TimeSpan.FromMilliseconds(req.Timeout)
-				: Timeout.InfiniteTimeSpan,
-				DefaultRequestHeaders = {Authorization = auth}
+				var handler = new HttpClientHandler {CookieContainer = req.Cookies};
+				
+				handlerConfig?.Invoke(handler);
+				
+				return new HttpClient(handler)
+				{
+					Timeout = req.Timeout > 0
+						? TimeSpan.FromMilliseconds(req.Timeout)
+						: Timeout.InfiniteTimeSpan,
+					DefaultRequestHeaders = {Authorization = auth},
+				};
 			};
 		}
 
