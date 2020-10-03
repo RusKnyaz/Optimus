@@ -567,8 +567,7 @@ dispatchEvent(evt);");
 				.Resource("http://localhost", "<html><head><script src='test.js' defer/></head><body><div id=d></div></body></html>")
 				.Resource("http://localhost/test.js", "console.log(window.getComputedStyle(document.getElementById('d')).getPropertyValue('display'));" +
 				 				                                       "console.log(getComputedStyle(document.getElementById('d')).getPropertyValue('display'));");
-			var engine = TestingEngine.BuildJint(resourceProvider, console);
-			engine.ComputedStylesEnabled = true;
+			var engine = TestingEngine.BuildJintCss(resourceProvider, console);
 			engine.OpenUrl("http://localhost").Wait();
 			CollectionAssert.AreEqual(new[] { "block", "block" }, console.LogHistory);
 		}

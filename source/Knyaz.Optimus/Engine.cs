@@ -19,6 +19,7 @@ namespace Knyaz.Optimus
 	/// </summary>
 	public partial class Engine: IDisposable
 	{
+		private readonly Func<Document, DocumentStyling> _docStylingFn;
 		private Document _document;
 		private Uri _uri;
 		internal readonly LinkProvider LinkProvider = new LinkProvider();
@@ -63,11 +64,12 @@ namespace Knyaz.Optimus
 
 		readonly CookieContainer _cookieContainer;
 
-		internal Engine(
-			IResourceProvider resourceProvider, 
+		internal Engine(IResourceProvider resourceProvider,
 			Window window,
-			IScriptExecutor scriptExecutor)
+			IScriptExecutor scriptExecutor, 
+			Func<Document, DocumentStyling> docStyling)
 		{
+			_docStylingFn = docStyling;
 			ResourceProvider = resourceProvider ?? throw new ArgumentNullException();
 			
 			_predictedResourceProvider = resourceProvider as IPredictedResourceProvider;
@@ -121,11 +123,8 @@ namespace Knyaz.Optimus
 					
 					Document.CookieContainer = _cookieContainer;
 
-					if (_computedStylesEnabled)
-					{
-						EnableDocumentStyling();
-					}
-
+					Styling = _docStylingFn?.Invoke(_document);
+					
 					Document.GetImage = async url =>
 					{
 						var request = CreateRequest(url);
@@ -235,7 +234,7 @@ namespace Knyaz.Optimus
 					_predictedResourceProvider.Preload(CreateRequest(src));
 				}
 
-				if (ComputedStylesEnabled)
+				if (_docStylingFn != null)
 				{
 					foreach (var src in html.OfType<HtmlElement>()
 					.Flat(x => x.Children.OfType<HtmlElement>())
@@ -254,39 +253,6 @@ namespace Knyaz.Optimus
 		}
 
 		public void Dispose() => Window.Dispose();
-
-		private bool _computedStylesEnabled;
-		
-		/// <summary>
-		/// Enables or disables the css loading and styles evaluation.
-		/// </summary>
-		public bool ComputedStylesEnabled
-		{
-			get => _computedStylesEnabled;
-			set
-			{
-				if (_computedStylesEnabled == value)
-					return;
-
-				_computedStylesEnabled = value;
-				if (_document == null) 
-					return;
-
-				if(_computedStylesEnabled)
-					EnableDocumentStyling();
-				else
-				{
-					Styling.Dispose();
-					Styling = null;
-				}
-			}
-		}
-
-		private void EnableDocumentStyling()
-		{
-			Styling = new DocumentStyling(_document, s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
-			Styling.LoadDefaultStyles();
-		}
 
 		/// <summary>
 		/// Gets the current media settings (used in computed styles evaluation).

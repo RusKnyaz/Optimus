@@ -48,23 +48,7 @@
     <None Remove="Resources\moz_default.css" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\moz_default.css" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Resources\Resource.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resource.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Resource.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
@@ -74,5 +58,8 @@
   </Target>
   <ItemGroup>
     <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources" />
   </ItemGroup>
 </Project>

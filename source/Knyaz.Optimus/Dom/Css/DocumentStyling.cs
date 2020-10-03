@@ -18,9 +18,13 @@ namespace Knyaz.Optimus.Dom.Css
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
 		public int Version = 0;
 
-		public DocumentStyling(Document document, Func<string, Task<IResource>> getResourceAsyncFn)
+		public DocumentStyling(
+			Document document,
+			CssStyleSheet defaultStyleSheet,
+			Func<string, Task<IResource>> getResourceAsyncFn)
 		{
 			_document = document;
+			_userAgentStyleSheet = defaultStyleSheet;
 			_getResourceAsyncFn = getResourceAsyncFn;
 			document.NodeInserted += OnNodeInserted;
 			_document.StyleSheets.Changed += OnStyleChanged;
@@ -72,15 +76,6 @@ namespace Knyaz.Optimus.Dom.Css
 			task.Wait();
 			var stream = task.Result.Stream;
 			return new StreamReader(stream);
-		}
-
-		public void LoadDefaultStyles()
-		{
-			using (var stream = GetType().Assembly.GetManifestResourceStream("Knyaz.Optimus.Resources.moz_default.css"))
-			using (var reader = new StreamReader(stream))
-			{
-				_userAgentStyleSheet = StyleSheetBuilder.CreateStyleSheet(reader, GetImport); 
-			}
 		}
 
 		private void AddStyleToDocument(TextReader content)

@@ -1,3 +1,6 @@
+using System.IO;
+using System.Reflection;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
@@ -31,9 +34,26 @@ namespace Knyaz.Optimus.Tests.TestingTools
 				.Build();
 		
 		public static Engine BuildJintCss(IResourceProvider resourceProvider)
-			=> EngineBuilder.New().UseJint().SetResourceProvider(resourceProvider).EnableCss().Build();
+			=> EngineBuilder.New().UseJint().SetResourceProvider(resourceProvider)
+				.EnableCssMoz()
+				.Build();
+		
+		public static Engine BuildJintCss(IResourceProvider resourceProvider, IConsole console)
+			=> EngineBuilder.New().UseJint().SetResourceProvider(resourceProvider)
+				.Window(w => w.SetConsole(console))
+				.EnableCssMoz()
+				.Build();
 		
 		public static Engine BuildJintCss()
-			=> EngineBuilder.New().UseJint().EnableCss().Build();
+			=> EngineBuilder.New().UseJint().EnableCssMoz().Build();
+
+		private static EngineBuilder EnableCssMoz(this EngineBuilder builder)
+		{
+			var stream = Assembly.GetExecutingAssembly()
+				.GetManifestResourceStream("Knyaz.Optimus.Tests.Resources.moz_default.css"); 
+			var defaultCss = StyleSheetBuilder.CreateStyleSheet(new StreamReader(stream));
+			builder.EnableCss(config => config.UserAgentStyleSheet = defaultCss);
+			return builder;
+		}
 	}
 }

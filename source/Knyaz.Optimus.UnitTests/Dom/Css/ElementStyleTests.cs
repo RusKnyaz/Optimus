@@ -1,4 +1,5 @@
-﻿using Knyaz.NUnit.AssertExpressions;
+﻿using System.IO;
+using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
@@ -44,19 +45,14 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[Test]
 		public void DefaultComputedStyle()
 		{
-			Mock.Get(_window).Setup(x => x.MatchMedia(It.IsAny<string>())).Returns<string>(s => new MediaQueryList(s, () => new MediaSettings()));
-
+			var defaultStyleSheet = StyleSheetBuilder.CreateStyleSheet(new StringReader("DIV {display:block;font-size:16px;}"), s => null);
+			var styling = new DocumentStyling(_document, defaultStyleSheet, null);
+			
 			_document.Body.AppendChild(_div);
-			var styling = new DocumentStyling(_document, null);
-			styling.LoadDefaultStyles();
-
-			Mock.Get(_window).Setup(x => x.GetComputedStyle(It.IsAny<IElement>()))
-				.Returns<IElement>(elt => styling.GetComputedStyle(elt));
 
 			styling.GetComputedStyle(_div).Assert(style =>
 				style.GetPropertyValue("display") == "block" &&
-				style.GetPropertyValue("font-size") == "16px" &&
-				style.GetPropertyValue("font-family") == "\"Times New Roman\"");
+				style.GetPropertyValue("font-size") == "16px");
 		}
 
 		[Test]

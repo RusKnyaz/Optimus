@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Removed Knyaz.Optimus.Console class. Use own IConsole implementation.
 - Removed Engine.OnResponse and Engine.OnRequest events.
 - Removed Engine.Load method.
+- Removed Engine.ComputedStylesEnabled property (use EngineBuilder.EnableCss(...)).
 - Changed INode.ChildNode property type to the NodeList.
 - Changed Document.GetElementsByName method return type to the NodeList.
 - Changed Document's and Element's GetElementsByTagName and GetElementsByClassName methods return type to the HtmlCollection.

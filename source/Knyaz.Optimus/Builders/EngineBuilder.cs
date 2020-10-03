@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
+using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ScriptExecuting;
@@ -14,7 +15,7 @@ namespace Knyaz.Optimus.ResourceProviders
     public class EngineBuilder
     {
         private IResourceProvider _resourceProvider;
-        private bool _computedStylesEnabled = false;
+        private DocumentStylesConfiguration _stylesConfig;
         private WindowConfig _windowConfig;
 
         private Func<ScriptExecutionContext, IScriptExecutor> _getScriptExecutor;
@@ -32,8 +33,15 @@ namespace Knyaz.Optimus.ResourceProviders
         /// </summary>
         public EngineBuilder EnableCss()
         {
-	        _computedStylesEnabled = true;
+	        _stylesConfig = new DocumentStylesConfiguration();
 	        return this;
+        }
+
+        public EngineBuilder EnableCss(Action<DocumentStylesConfiguration> configure)
+        {
+            _stylesConfig = new DocumentStylesConfiguration();
+            configure?.Invoke(_stylesConfig);
+            return this;
         }
 
         public EngineBuilder ConfigureResourceProvider(Action<ResourceProviderBuilder> configure)
@@ -69,8 +77,12 @@ namespace Knyaz.Optimus.ResourceProviders
             
             var windowKeeper = new Window[1];
             
-            return windowKeeper[0] = new Window(() => windowKeeper[0].Engine.Document, _windowConfig?._windowOpenHandler, navigator, 
-                _windowConfig?._console ?? NullConsole.Instance, getEngine);
+            return windowKeeper[0] = new Window(
+                () => windowKeeper[0].Engine.Document, 
+                _windowConfig?._windowOpenHandler, 
+                navigator, 
+                _windowConfig?._console ?? NullConsole.Instance, 
+                getEngine);
         }
 
         public Engine Build()
@@ -85,12 +97,18 @@ namespace Knyaz.Optimus.ResourceProviders
             var exeCtx = new ScriptExecutionContext(window);
             
             var scriptExecutor = _getScriptExecutor?.Invoke(exeCtx);
+
+            var docStyling = 
+                _stylesConfig == null ? null 
+                : (Func<Document, DocumentStyling>)(doc => new DocumentStyling(
+                    doc, 
+                    _stylesConfig?.UserAgentStyleSheet, 
+                    s => resourceProvider.SendRequestAsync(engineKeeper[0].CreateRequest(s))));
             
-            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor) {
-	            ComputedStylesEnabled = _computedStylesEnabled
-            }; 
+            return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor, docStyling); 
         }
-        
+
+
         public class WindowConfig
         {
             internal PluginInfo[] _plugins;

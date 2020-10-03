@@ -6,9 +6,17 @@ using Knyaz.Optimus.Html;
 
 namespace Knyaz.Optimus.Dom.Css
 {
-	class StyleSheetBuilder
+	/// <summary> Builds <see cref="CssStyleSheets"/> objects.</summary>
+	public class StyleSheetBuilder
 	{
-		public static CssStyleSheet CreateStyleSheet(TextReader reader, Func<string, TextReader> getImport)
+		public static CssStyleSheet CreateStyleSheet(TextReader reader)
+		{
+			var styleSheet = new CssStyleSheet();
+			FillStyleSheet(reader, styleSheet, null);
+			return styleSheet;
+		}
+		
+		internal static CssStyleSheet CreateStyleSheet(TextReader reader, Func<string, TextReader> getImport)
 		{
 			var styleSheet = new CssStyleSheet();
 			FillStyleSheet(reader, styleSheet, getImport);
@@ -27,7 +35,8 @@ namespace Knyaz.Optimus.Dom.Css
 				{
 					var dirrective = enumerator.Current.Data;
 					var import = dirrective.Substring(7);
-					Import(styleSheet, import, getImport);
+					if(getImport != null)
+						Import(styleSheet, import, getImport);
 					enumerator.MoveNext();
 				}
 
@@ -84,7 +93,7 @@ namespace Knyaz.Optimus.Dom.Css
 			FillStyleSheet(reader, styleSheet, getImport);
 		}
 
-		public static bool CreateRule(CssStyleSheet styleSheet, IEnumerator<CssChunk> enumerator, out CssRule rule)
+		internal static bool CreateRule(CssStyleSheet styleSheet, IEnumerator<CssChunk> enumerator, out CssRule rule)
 		{
 			if (enumerator.Current.Type == CssChunkTypes.Directive)
 			{
@@ -131,7 +140,7 @@ namespace Knyaz.Optimus.Dom.Css
 			return FillStyle(styleRule.Style, enumerator);
 		}
 
-		public static void FillStyle(CssStyleDeclaration style, string str)
+		internal static void FillStyle(CssStyleDeclaration style, string str)
 		{
 			if (str[0] != '{')
 				str = '{' + str;
