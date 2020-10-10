@@ -13,12 +13,9 @@
     <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Copyright>Konstantin Petukhov, 2019</Copyright>
-    <VersionPrefix>2.4.0</VersionPrefix>
-      <PackageReleaseNotes>
-          Expanded TypedArray API.
-          Expanded Console (info, warn, assert, group and other methods)
-          Added HTMLAnchorElement type.
-      </PackageReleaseNotes>
+    <VersionPrefix>2.4.1</VersionPrefix>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
