@@ -18,7 +18,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		string ClassName { get; set; }
 		string InnerHTML { get; set; }
 		string TextContent { get; set; }
-
+		
 		/// <summary>
 		/// Returns a collection containing all descendant elements with the specified tag name.
 		/// </summary>
