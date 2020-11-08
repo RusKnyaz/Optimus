@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -162,6 +163,14 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 				else
 				{
 					escape = false;
+					
+					if (char.IsLetterOrDigit(c)) //encoded char
+					{
+						var charCode = ReadEncodedChar(reader);
+						if(charCode >= 0)
+							result.Append((char)charCode);
+						continue;
+					}
 				}
 
 				result.Append(c);
@@ -169,6 +178,34 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 			}
 			
 			return result.ToString();
+		}
+
+		private static int ReadEncodedChar(TextReader reader)
+		{
+			int code;
+			var text = new StringBuilder();
+			while ((code = reader.Peek()) >= 0)
+			{
+				var c = (char)code;
+				if (c == ' ')
+				{
+					reader.Read();
+					break;
+				}
+				else if (c == '\\')
+				{
+					break;
+				}
+
+				reader.Read();
+				text.Append(c);
+			}
+
+			if (text.Length == 0
+			             || !int.TryParse(text.ToString(), NumberStyles.HexNumber, new NumberFormatInfo(), out var result))
+				return code;
+
+			return result;
 		}
 
 		private static CssExpression Combine(CssExpression left, CssExpression right, CssExpression.BinaryOperator op) =>

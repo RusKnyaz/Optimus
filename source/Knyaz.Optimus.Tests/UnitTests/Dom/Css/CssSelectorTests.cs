@@ -85,6 +85,14 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("a\\.b","<a.b name=match></a.b><a name=nomatch></a>")]
 		[TestCase("#\\.a", "<div name=match id='.a'></div>")]
 		[TestCase("#\\.", "<div name=match id='.'></div>")]
+		[TestCase(".\\{", "<div name=match class={></div>")]
+		
+		//encoded chars
+		[TestCase(".\\3A", "<div name=match class=':'></div>")]
+		[TestCase(".\\3A\\3A", "<div name=match class='::'></div>")]
+		[TestCase(".\\3A a", "<div name=match class=':a'></div>")]
+		[TestCase(".\\A9", "<div name=match class=©></div>")]
+		[TestCase(".\\1F6", "<div name=match class=Ƕ></div>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var engine = Load(html);
