@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <UsingTask TaskName="GetSemanticVersion"
+        TaskFactory="RoslynCodeTaskFactory"
+        AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+        <ParameterGroup>
+            <VersionPrefix ParameterType="System.String" Required="true" />
+            <BranchName ParameterType="System.String"/>
+            <BuildNumber ParameterType="System.String"/>
+            <Version ParameterType="System.String" Output="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System.Diagnostics" />
+            <Code Type="Fragment" Language="cs">
+            <![CDATA[
+                var suffix = "";
+                switch(BranchName)
+                {
+                    case null:
+                    case "": suffix="local";break;
+                    case "develop": suffix = $"alpha-{BuildNumber}";break;
+                    case "master": suffix= "";break;
+                    case string txt when txt.StartsWith("release/") || txt.StartsWith("hotfix/"):suffix=$"beta-{BuildNumber}";break;
+                    default:  suffix=BranchName.Replace("/","-") + "-" + BuildNumber;break;
+                }
+                Version = suffix == "" ? VersionPrefix : VersionPrefix + "-" + suffix;
+            ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+    
+    <!--
+    Use folowing command to write the version into the version.txt
+    dotnet msbuild Knyaz.Optimus/Knyaz.Optimus.csproj -target:PrintSemanticVersion -p:BranchName=develop -p:BuildNumber=321 -nologo > version.txt
+    -->
+    <Target Name="PrintSemanticVersion">
+        <GetSemanticVersion VersionPrefix="$(Version)" BranchName="$(BranchName)" BuildNumber="$(BuildNumber)">
+            <Output TaskParameter="Version" PropertyName="Version" />
+        </GetSemanticVersion>
+        <Message Importance="High" Text="$(Version)"/>
+    </Target>
+
+    <Target Name="GetVersion" Label="Saves generated assembly version to the version.text file">
+        <WriteLinesToFile File="version.txt" Lines="$(Version)" Overwrite="true" Encoding="ASCII" />
+    </Target>
+   
+</Project>
