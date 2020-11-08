@@ -1,6 +1,13 @@
 # Optimus Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.4.1] - 2020-11-21
+
+### Fixed
+
+- CSS selector parsing when it contains special characters and codes
+
+
 ## [2.4]
 
 ### New features

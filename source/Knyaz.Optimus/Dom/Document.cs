@@ -79,10 +79,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 		
-		/// <summary>
-		/// Creates new <sse cref="Document"/> instance.
-		/// </summary>
-		/// <param name="window">The Window object ot be associated with the document. Can be null.</param>
+		/// <summary> Creates new <sse cref="Document"/> instance. </summary>
 		internal Document(string namespaceUri, string qualifiedNameStr, DocType docType, IWindow window) : base(null)
 		{
 			Implementation = new DomImplementation();

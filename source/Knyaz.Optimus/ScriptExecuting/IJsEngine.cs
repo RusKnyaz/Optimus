@@ -1,5 +1,4 @@
 using System;
-using Jint.Native;
 
 namespace Knyaz.Optimus.ScriptExecuting
 {
@@ -15,10 +14,9 @@ namespace Knyaz.Optimus.ScriptExecuting
 
         void SetGlobal(object global); 
         
-        /// <summary>
-        /// Registers new global type.
-        /// </summary>
+        /// <summary> Registers new global type. </summary>
         /// <param name="name">The type name available in java script.</param>
+        /// <param name="type">The type to be defined.</param>
         /// <param name="func">The function called to construct new object.</param>
         void AddGlobalType(string name, Type type, Func<object[], object> func);
         

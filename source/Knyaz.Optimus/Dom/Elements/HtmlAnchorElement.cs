@@ -5,8 +5,8 @@ namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
 	/// Anchor element implementation (tag: a).
-	/// <seealso cref="https://www.w3.org/TR/2012/WD-html-markup-20121025/a.html#a"/>
-	/// <seealso cref="https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element"/>
+	/// <seealso href="https://www.w3.org/TR/2012/WD-html-markup-20121025/a.html#a"/>
+	/// <seealso href="https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element"/>
 	/// </summary>
 	[JsName("HTMLAnchorElement")]
 	public class HtmlAnchorElement : HtmlElement
@@ -81,7 +81,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		
 		/// <summary>
 		/// Relationship between the location in the document containing the hyperlink and the destination resource
-		/// <seealso cref="https://wiki.whatwg.org/wiki/RelExtensions"/>
+		/// <seealso href="https://wiki.whatwg.org/wiki/RelExtensions"/>
 		/// </summary>
 		public string Rel
 		{

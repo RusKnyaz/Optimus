@@ -15,6 +15,7 @@
     <Copyright>Konstantin Petukhov, 2019</Copyright>
     <VersionPrefix>2.4.1</VersionPrefix>
     <PackageReleaseNotes>
+    Fixed css selector parsing when it contains special characters and codes.
     </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
