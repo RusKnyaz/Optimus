@@ -79,7 +79,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 		
-		/// <summary> Creates new <sse cref="Document"/> instance. </summary>
+		/// <summary> Creates new <see cref="Document"/> instance. </summary>
 		internal Document(string namespaceUri, string qualifiedNameStr, DocType docType, IWindow window) : base(null)
 		{
 			Implementation = new DomImplementation();
