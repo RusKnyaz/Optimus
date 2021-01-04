@@ -155,7 +155,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var page = await engine.OpenUrl("http://localhost");
 
-			var script = (Script)page.Document.CreateElement("script");
+			var script = (HtmlScriptElement)page.Document.CreateElement("script");
 			script.Src = "http://localhost/script.js";
 			page.Document.Head.AppendChild(script);
 
@@ -264,7 +264,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			var onloadSignal = new ManualResetEvent(false);
 			
-			var d = (Script)page.Document.CreateElement("script");
+			var d = (HtmlScriptElement)page.Document.CreateElement("script");
 			d.Id = "aaa";
 			d.Async = true;
 			d.Src = "http://localhost/script.js";

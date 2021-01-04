@@ -188,7 +188,7 @@ namespace Knyaz.Optimus.Dom
 		public IEnumerable<HtmlFormElement> Forms => GetElementsByTagName("form").Cast<HtmlFormElement>();
 
 		/// <summary> Returns a collection of &lt;script&gt; elements in the document. </summary>
-		public IEnumerable<Script> Scripts => GetElementsByTagName("script").Cast<Script>();
+		public IEnumerable<HtmlScriptElement> Scripts => GetElementsByTagName("script").Cast<HtmlScriptElement>();
 
 		/// <summary> Writes HTML expressions or JavaScript code to a document. </summary>
 		/// <param name="text"></param>
@@ -290,7 +290,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Bold: return new HtmlElement(this, invariantTagName);
 				case TagsNames.Button: return new HtmlButtonElement(this);
 				case TagsNames.Input: return new HtmlInputElement(this);
-				case TagsNames.Script: return new Script(this);
+				case TagsNames.Script: return new HtmlScriptElement(this);
 				case TagsNames.Head:return new Head(this);
 				case TagsNames.Body:return new HtmlBodyElement(this);
 				case TagsNames.Textarea: return new HtmlTextAreaElement(this);

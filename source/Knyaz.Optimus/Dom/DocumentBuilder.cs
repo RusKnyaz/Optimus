@@ -96,7 +96,7 @@ namespace Knyaz.Optimus.Dom
 				}
 				
 				//skip child handling for nodes that not accepted children.
-				if (currentNode is Script)
+				if (currentNode is HtmlScriptElement)
 					continue;
 
 				if (currentNode is HtmlOptionElement option)

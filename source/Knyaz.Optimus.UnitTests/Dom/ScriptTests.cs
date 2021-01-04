@@ -36,7 +36,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var document = new Document();
 			document.Write("<script id=d>ABC</script>");
 			var script = document.GetElementById("d");
-			var clone = script.CloneNode(true) as Script;
+			var clone = script.CloneNode(true) as HtmlScriptElement;
 			clone.Assert(x => x.Text == "ABC");
 		}
 	}

@@ -4,11 +4,9 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	/// <summary>
-	/// Represents &lt;SCRIPT&gt; element.
-	/// </summary>
+	/// <summary> Represents &lt;SCRIPT&gt; element. </summary>
 	[JsName("HTMLScriptElement")]
-	public sealed class Script : HtmlElement
+	public sealed class HtmlScriptElement : HtmlElement
 	{
 		private readonly AttributeMappedValue<string> _type;
 		private readonly AttributeMappedValue<string> _charset;
@@ -41,7 +39,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Type { get => _type.Value;set => _type.Value = value;}
 
-		internal Script(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
+		internal HtmlScriptElement(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
 		{
 			_type = new AttributeMappedValue<string>(this, "type");
 			_charset = new AttributeMappedValue<string>(this, "charset");
@@ -93,7 +91,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <returns></returns>
 		public override Node CloneNode(bool deep)
 		{
-			var node = (Script)base.CloneNode(deep);
+			var node = (HtmlScriptElement)base.CloneNode(deep);
 			node.Executed = Executed;
 			return node;
 		}

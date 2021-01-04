@@ -17,8 +17,8 @@ namespace Knyaz.Optimus.Dom
 	/// </summary>
 	public class DocumentScripting : IDisposable
 	{
-		private readonly Queue<Tuple<Task<string>, Script>> _deferredScripts = 
-			new Queue<Tuple<Task<string>, Script>>();
+		private readonly Queue<Tuple<Task<string>, HtmlScriptElement>> _deferredScripts = 
+			new Queue<Tuple<Task<string>, HtmlScriptElement>>();
 		private readonly IDocument _document;
 		private readonly IScriptExecutor _scriptExecutor;
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
@@ -72,7 +72,7 @@ namespace Knyaz.Optimus.Dom
 			//Prevent 'Collection was modified' exception.
 			var tmpChildNodes = node.Flatten().OfType<HtmlElement>().ToArray();
 			
-			foreach (var script in tmpChildNodes.OfType<Script>())
+			foreach (var script in tmpChildNodes.OfType<HtmlScriptElement>())
 			{
 				var remote = IsExternalScript(script);
 				var async = script.Async && remote || script.Source == NodeSources.Script;
@@ -80,7 +80,7 @@ namespace Knyaz.Optimus.Dom
 
 				if (defer)
 				{
-					_deferredScripts.Enqueue(new Tuple<Task<string>, Script>(LoadAsync(script, _getResourceAsyncFn), script));
+					_deferredScripts.Enqueue(new Tuple<Task<string>, HtmlScriptElement>(LoadAsync(script, _getResourceAsyncFn), script));
 				}
 				else if (remote) //script that have to be loaded
 				{
@@ -99,7 +99,7 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		//todo: revise it. it shouldn't be here.
-		internal static async Task<string> LoadAsync(Script script, Func<string, Task<IResource>> getResourceAsyncFn)
+		internal static async Task<string> LoadAsync(HtmlScriptElement script, Func<string, Task<IResource>> getResourceAsyncFn)
 		{
 			if (string.IsNullOrEmpty(script.Src))
 				throw new InvalidOperationException("Src not set.");
@@ -159,7 +159,7 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private void RaiseScriptExecutionError(Script script, Exception ex)
+		private void RaiseScriptExecutionError(HtmlScriptElement script, Exception ex)
 		{
 			ScriptExecutionError?.Invoke(script, ex);
 
@@ -169,7 +169,7 @@ namespace Knyaz.Optimus.Dom
 			script.OwnerDocument.DispatchEvent(evt);
 		}
 
-		private void RaiseAfterScriptExecute(Script script)
+		private void RaiseAfterScriptExecute(HtmlScriptElement script)
 		{
 			AfterScriptExecute?.Invoke(script);
 
@@ -178,7 +178,7 @@ namespace Knyaz.Optimus.Dom
 			script.DispatchEvent(evt);
 		}
 
-		private void RaiseBeforeScriptExecute(Script script)
+		private void RaiseBeforeScriptExecute(HtmlScriptElement script)
 		{
 			BeforeScriptExecute?.Invoke(script);
 
@@ -190,17 +190,17 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Raised before running the script.
 		/// </summary>
-		public event Action<Script> BeforeScriptExecute;
+		public event Action<HtmlScriptElement> BeforeScriptExecute;
 		
 		/// <summary>
 		/// Raised after running the script.
 		/// </summary>
-		public event Action<Script> AfterScriptExecute;
+		public event Action<HtmlScriptElement> AfterScriptExecute;
 		
 		/// <summary>
 		/// Raised on script execution error.
 		/// </summary>
-		public event Action<Script, Exception> ScriptExecutionError;
+		public event Action<HtmlScriptElement, Exception> ScriptExecutionError;
 
 		#region IDisposable implementation
 
@@ -214,17 +214,17 @@ namespace Knyaz.Optimus.Dom
 
 		class ScriptInfo
 		{
-			public readonly Script Node;
+			public readonly HtmlScriptElement Node;
 			public readonly string Code;
 
-			public ScriptInfo(Script node, string code)
+			public ScriptInfo(HtmlScriptElement node, string code)
 			{
 				Node = node;
 				Code = code;
 			}
 		}
 		
-		private static bool IsExternalScript(Script script) => !string.IsNullOrEmpty(script.Src);
+		private static bool IsExternalScript(HtmlScriptElement script) => !string.IsNullOrEmpty(script.Src);
 	}
 }
 
