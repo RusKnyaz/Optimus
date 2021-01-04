@@ -145,6 +145,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("RelListContains")]
 		[TestCase("ChangeRelGetRelList")]
 		[TestCase("AddToRelList")]
+		[TestCase("RelListToString")]
 		[TestCase("ClickOnClick")]
 		public void HtmlAnchorElementTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		

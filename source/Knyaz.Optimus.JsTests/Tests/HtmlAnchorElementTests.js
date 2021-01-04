@@ -56,6 +56,13 @@ Test("HtmlAnchorElementTests", {
             Assert.AreEqual("a b c", a.rel);
         }
     },
+    "RelListToString":{
+        run:function () {
+            var a = document.createElement("a");
+            a.rel = "a b";
+            Assert.AreEqual("a b", a.relList.toString());
+        }
+    },
     "ClickOnClick":{
         run:function(){
             var data = null;

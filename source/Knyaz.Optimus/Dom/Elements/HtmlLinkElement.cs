@@ -12,6 +12,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLLinkElement")]
 	public sealed class HtmlLinkElement : HtmlElement
 	{
+		private readonly TokenList _relList;
 		private class Defaults
 		{
 			public static string Href = string.Empty;
@@ -24,7 +25,14 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Target = String.Empty;
 		}
 
-		internal HtmlLinkElement(Document ownerDocument) : base(ownerDocument, TagsNames.Link){}
+		internal HtmlLinkElement(Document ownerDocument)
+			: base(ownerDocument, TagsNames.Link)
+		{
+			_relList = new TokenList(() => Rel);
+			_relList.Changed += () => {
+				Rel = string.Join(" ", _relList);
+			};
+		}
 
 		/// <summary>
 		/// Gets or sets a list of one or more media formats to which the resource applies.
@@ -89,6 +97,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			get { return GetAttribute("rel", Defaults.Rel); }
 			set { SetAttribute("rel", value); }
 		}
+		
+		/// <summary>// Read-only property reflects the rel attribute. </summary>
+		public ITokenList RelList => _relList;
 
 		/// <summary>
 		/// Gets or sets the reverse relationship of the linked resource from the resource to the document.

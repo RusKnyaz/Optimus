@@ -35,5 +35,18 @@ namespace Knyaz.Optimus.Tests.Dom
 
 			_link.Assert(style => style.Href == "file://some.css" && style.Type == "text/css");
 		}
+		
+		[Test]
+		public static void RelList()
+		{
+			var doc = DomImplementation.Instance.CreateHtmlDocument();
+			var anchor = new HtmlLinkElement(doc);
+			Assert.AreEqual(0, anchor.RelList.Count);
+			anchor.Rel = "hello world";
+			Assert.AreEqual(new[] {"hello", "world"}, anchor.RelList);
+			anchor.RelList.Remove("hello");
+			Assert.AreEqual("world", anchor.Rel);
+		}
+
 	}
 }

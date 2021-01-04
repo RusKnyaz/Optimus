@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.ResourceProviders;
@@ -99,6 +100,18 @@ namespace Knyaz.Optimus.Tests.Dom
 			signal.WaitOne(5000);
 			
 			Assert.AreEqual(new object[]{2d,1d}, console.LogHistory);
+		}
+
+		[Test]
+		public static void RelList()
+		{
+			var doc = DomImplementation.Instance.CreateHtmlDocument();
+			var anchor = new HtmlAnchorElement(doc);
+			Assert.AreEqual(0, anchor.RelList.Count);
+			anchor.Rel = "hello world";
+			Assert.AreEqual(new[] {"hello", "world"}, anchor.RelList);
+			anchor.RelList.Remove("hello");
+			Assert.AreEqual("world", anchor.Rel);
 		}
 	}
 }

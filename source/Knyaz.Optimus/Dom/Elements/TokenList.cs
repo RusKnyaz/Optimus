@@ -132,5 +132,7 @@ namespace Knyaz.Optimus.Dom.Elements
 				return false;
 			}
 		}
+
+		public override string ToString() => _classNameFn();
 	}
 }
