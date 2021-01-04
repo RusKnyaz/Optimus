@@ -49,7 +49,7 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Glues Document and ScriptExecutor.
 		/// </summary>
-		public DocumentScripting Scripting	{get; private set;}
+		internal DocumentScripting Scripting {get; private set;}
 		internal DocumentStyling Styling { get; private set; }
 
 		/// <summary>
