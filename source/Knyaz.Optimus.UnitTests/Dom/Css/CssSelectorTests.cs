@@ -19,6 +19,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 
 		
 		[TestCase("*", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
+		[TestCase(".a", @"<div name=match class=a></div><div name=nomatch class=A></div>", Description = "Class selector is case sensitive")]
 		[TestCase(".pointsPanel strong", @"<body><div class=""pointsPanel""><strong name=match></strong></div></body>")]
 		[TestCase(".pointsPanel strong", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
 		[TestCase(".pointsPanel h2 > strong", @"<body><div class=""pointsPanel""><h2><strong name=match></strong></h2></div></body>")]
@@ -37,22 +38,31 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("#m > div", "<div name=nomatch></div><div id=m name=nomatch><div name=match><div name=nomatch></div></div></div>")]
 		[TestCase("#m > div a", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a></div></div>")]
 		[TestCase("#m > div a,\r\n#m > div span", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a><span name=match></span><div name=nomatch</div></div></div>")]
+		[TestCase("#m > div a,#m > div span", "<div name=nomatch></div><div id=m name=nomatch><div name=nomatch><a name=match></a><span name=match></span><div name=nomatch</div></div></div>")]
+		[TestCase("#sizzle1>.blockUI", "<div id=sizzle1><div name=match class=blockUI></div></div>")]
 		[TestCase(".form-signin", "<div class='form' name=nomatch></div><div class='form-signin'name=match></div>")]
 		[TestCase("[custom]", "<div name=nomatch></div><div custom name=match></div><div custom=123 name=match></div>")]
 		[TestCase("#d[custom]", "<div custom name=nomatch></div><div custom name=match id=d></div>")]
 		[TestCase("#d [custom]", "<div custom name=nomatch></div><div custom name=nomatch id=d><div custom name=match></div></div>")]
+		[TestCase("[custom='abc']", "<div name=nomatch custom=ABC></div><div name=match custom=abc></div>", Description = "Attribute equals expression is case sensitive")]
 		[TestCase("[custom='123']", "<div name=nomatch custom></div><div name=match custom=123></div>")]
+		[TestCase("[custom='']", "<div name=match custom=''></div><div name=match custom></div>")]
+		[TestCase("[custom='']", "<div name=nomatch custom='a'></div><div name=nomatch></div>")]
 		[TestCase("[custom='\"123']", "<div name=nomatch custom></div><div name=match custom='\"123'></div>")]
 		[TestCase("[custom=\"'123\"]", "<div name=nomatch custom></div><div name=match custom=\"'123\"></div>")]
 		[TestCase("[custom=\"123\"]", "<div name=nomatch custom></div><div name=match custom=123></div>")]
-		[TestCase("[custom~=\"123\"]", "<div name=nomatch custom></div><div name=match custom=123></div><div name=match custom='123 456'></div>")]
+		[TestCase("[custom~=\"123\"]", "<div name=nomatch custom></div><a name=match custom=123></a><span name=match custom='123 456'></span>")]
 		[TestCase("[custom~=\"123 456\"]", "<div name=nomatch custom=123></div><div name=nomatch custom=\"123 456\"></div>")]
 		[TestCase("[custom~=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div>")]
 		[TestCase("[custom|=\"123\"]", "<div name=nomatch custom=1234></div><div name=match custom=123></div><div name=match custom=\"123-456\"></div>")]
 		[TestCase("[custom^=\"123\"]", "<div name=nomatch custom=0123></div><div name=match custom=1234></div><div name=match custom=123></div><div name=match custom=\"123-456\"></div>")]
+		[TestCase("[custom^=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div><div name=nomatch custom=a></div>")]
 		[TestCase("[custom$=\"123\"]", "<div name=match custom=0123></div><div name=nomatch custom=1234></div><div name=match custom=123></div><div name=match custom=\"456-123\"></div>")]
+		[TestCase("[custom$=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div><div name=nomatch custom=a></div>")]
 		[TestCase("[custom*=\"123\"]", "<div name=nomatch custom=12></div><div name=match custom=0123></div><div name=match custom=1234></div><div name=match custom=123></div><div name=match custom=\"456-123\"></div>")]
+		[TestCase("[custom*=\"\"]", "<div name=nomatch custom></div><div name=nomatch custom=\"\"></div><div name=nomatch custom=a></div>")]
 		[TestCase("[=\"asd\"]", "<div name=nomatch></div>")]
+		[TestCase("[]", "<div name=nomatch></div>")]
 		[TestCase("[=]", "<div name=nomatch></div>")]
 		[TestCase("p+p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
 		[TestCase("p + p", "<p name=nomatch></p><p name=match></p>text<p name=match></p>")]
@@ -62,6 +72,27 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("input:-moz-suppressed", "<input type=text class='form-control' name=nomatch></input>")]
 		[TestCase("[data-toggle=\"dropdown\"]", "<span data-toggle=dropdown name=match></span>")]
 		[TestCase("a.user.active", "<a name=match class='user active'></a>")]
+		
+		[TestCase(".a,.b", "<a name=match class='a b'></a><div name=match class=a></div><span name=match class=b></span>")]
+		[TestCase("#a,.b", "<a name=match class='a b'></a><a name=match id=a></a>")]
+		[TestCase("#a,\r\n.b", "<a name=match class='a b'></a><a name=match id=a></a>")]
+		
+		//escaped chars
+		[TestCase(".\\.a", "<div name=match class='.a'></div>")]
+		[TestCase(".a\\.b", "<div name=match class='a.b'></div><div name=nomatch class='a'></div>")]
+		[TestCase(".a\\.b", "<div name=nomatch class='a\\.b'></div>")]
+		[TestCase(".a\\.b", "<div name=match class=a.b></div><div name=nomatch class=a></div>")]
+		[TestCase("a\\.b","<a.b name=match></a.b><a name=nomatch></a>")]
+		[TestCase("#\\.a", "<div name=match id='.a'></div>")]
+		[TestCase("#\\.", "<div name=match id='.'></div>")]
+		[TestCase(".\\{", "<div name=match class={></div>")]
+		
+		//encoded chars
+		[TestCase(".\\3A", "<div name=match class=':'></div>")]
+		[TestCase(".\\3A\\3A", "<div name=match class='::'></div>")]
+		[TestCase(".\\3A a", "<div name=match class=':a'></div>")]
+		[TestCase(".\\A9", "<div name=match class=©></div>")]
+		[TestCase(".\\1F6", "<div name=match class=Ƕ></div>")]
 		public void MatchChildTest(string selectorText, string html)
 		{
 			var document = Load(html);

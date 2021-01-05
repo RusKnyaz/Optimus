@@ -14,6 +14,13 @@ All notable changes to this project will be documented in this file.
 - Changed Document.GetElementsByName method return type to the NodeList.
 - Changed Document's and Element's GetElementsByTagName and GetElementsByClassName methods return type to the HtmlCollection.
 
+## [2.4.1] - 2020-11-21
+
+### Fixed
+
+- CSS selector parsing when it contains special characters and codes
+
+
 ## [2.4]
 
 ### New features
