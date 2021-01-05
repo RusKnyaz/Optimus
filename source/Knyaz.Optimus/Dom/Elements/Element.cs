@@ -132,7 +132,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary> Returns a live DOMTokenList collection of the class attributes of the element. </summary>
-		public ITokenList ClassList => _classList;
+		public TokenList ClassList => _classList;
 
 		/// <summary> Represents the element's identifier, reflecting the id global attribute. </summary>
 		public string Id

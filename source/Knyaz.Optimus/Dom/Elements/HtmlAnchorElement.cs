@@ -111,7 +111,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			set => TextContent = value;
 		}
 
-		public ITokenList RelList => _relList;
+		public TokenList RelList => _relList;
 		
 		/*
 		attribute DOMString media;

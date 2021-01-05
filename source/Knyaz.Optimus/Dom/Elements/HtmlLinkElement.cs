@@ -99,7 +99,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 		
 		/// <summary>// Read-only property reflects the rel attribute. </summary>
-		public ITokenList RelList => _relList;
+		public TokenList RelList => _relList;
 
 		/// <summary>
 		/// Gets or sets the reverse relationship of the linked resource from the resource to the document.

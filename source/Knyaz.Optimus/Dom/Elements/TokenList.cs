@@ -6,20 +6,9 @@ using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
-	/// <summary>
-	/// https://www.w3.org/TR/dom/#domtokenlist
-	/// </summary>
-	public interface ITokenList : ICollection<string>
-	{
-		bool Toggle(string token);
-		bool Toggle(string token, bool force);
-	}
-
-	/// <summary>
-	/// Tokens list with lazy evaluation.
-	/// </summary>
+	/// <summary> DOM Tokens list. </summary>
 	[JsName("DOMTokenList")]
-	internal class TokenList : ITokenList
+	public class TokenList : ICollection<string>
 	{
 		readonly List<string> _internalList;
 
