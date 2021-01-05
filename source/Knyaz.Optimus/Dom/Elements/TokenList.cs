@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -17,6 +18,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// Tokens list with lazy evaluation.
 	/// </summary>
+	[JsName("DOMTokenList")]
 	internal class TokenList : ITokenList
 	{
 		readonly List<string> _internalList;
