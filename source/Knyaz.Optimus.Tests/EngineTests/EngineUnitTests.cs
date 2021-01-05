@@ -91,7 +91,6 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			var consoleMock = new Mock<IConsole>();
 
 			var engine = TestingEngine.BuildJint(resources, consoleMock.Object);
-			string attr = null;
 			await engine.OpenUrl("http://localhost");
 			
 			consoleMock.Verify(x => x.Log("content1"), Times.Once);
