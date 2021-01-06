@@ -22,6 +22,10 @@ ProjectSection(SolutionItems) = preProject
 	Directory.Build.targets = Directory.Build.targets
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.JsTests", "Knyaz.Optimus.JsTests\Knyaz.Optimus.JsTests.csproj", "{EE326712-E374-42C2-A55F-ACE78F75AFB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.UnitTests", "Knyaz.Optimus.UnitTests\Knyaz.Optimus.UnitTests.csproj", "{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,14 @@ Global
 		{7A0B4AFF-55C4-4FA0-8883-CADD6DF1338E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A0B4AFF-55C4-4FA0-8883-CADD6DF1338E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A0B4AFF-55C4-4FA0-8883-CADD6DF1338E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE326712-E374-42C2-A55F-ACE78F75AFB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE326712-E374-42C2-A55F-ACE78F75AFB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE326712-E374-42C2-A55F-ACE78F75AFB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE326712-E374-42C2-A55F-ACE78F75AFB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
