@@ -256,5 +256,10 @@ Test("DataViewTests", {
             Assert.AreEqual(4, Float32Array.BYTES_PER_ELEMENT, "Float32Array.BYTES_PER_ELEMENT");
             Assert.AreEqual(8, Float64Array.BYTES_PER_ELEMENT, "Float64Array.BYTES_PER_ELEMENT");
         }
+    },
+    "GetPrototypeOf":{
+        run: function(){
+            Assert.AreEqual("[object ArrayBuffer]", Object.getPrototypeOf(new ArrayBuffer()).toString());
+        }
     }
 });

@@ -187,6 +187,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Uint16InstantiatedFromArray")]
 		[TestCase("Uint16InstantiatedFromSignedArray")]
 		[TestCase("BytesPerElement")]
+		[TestCase("GetPrototypeOf")]
 		
 		[TestCase("Uint8ArrayFromNull")]
 		[TestCase("Uint16ArrayFromNull")]

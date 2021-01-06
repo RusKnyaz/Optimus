@@ -12,6 +12,8 @@ namespace Knyaz.Optimus.Dom.Perf
 		
 		internal ArrayBuffer(byte[] data) => Data = data;
 
+		public ArrayBuffer() :this(0){}
+		
 		/// <summary>
 		/// Creates new instance of <see cref="ArrayBuffer"/>
 		/// </summary>
