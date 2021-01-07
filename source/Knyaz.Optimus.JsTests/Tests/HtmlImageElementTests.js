@@ -48,7 +48,7 @@ Test("HtmlImageElementTests", {
     "PrototypeOfNewImage":{
         run: function(){
             var img = new Image(10,10);
-            Assert.AreEqual("[object HTMLImageElementPrototype]", Object.getPrototypeOf(img).toString());
+            Assert.AreEqual("[object HTMLImageElement]", Object.getPrototypeOf(img).toString());
         }
     },
     "NewImageInstanceOfHTMLImageElement":{

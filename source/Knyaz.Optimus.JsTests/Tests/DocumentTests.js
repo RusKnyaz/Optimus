@@ -223,7 +223,7 @@ Test("DocumentTests", {
             Assert.IsNotNull(Object.getPrototypeOf(document), "Object.getPrototypeOf(document)");
             Assert.IsNotNull(Object.getPrototypeOf(document).write, "Object.getPrototypeOf(document).write");
             Assert.AreEqual(document.write, Object.getPrototypeOf(document).write, "Object.getPrototypeOf(document).write === document.write");
-            Assert.AreEqual("[object HTMLDocumentPrototype]", Object.getPrototypeOf(document).toString(), "Object.getPrototypeOf(document).toString()");
+            Assert.AreEqual("[object HTMLDocument]", Object.getPrototypeOf(document).toString(), "Object.getPrototypeOf(document).toString()");
             Assert.AreEqual(true, 'body' in Object.getPrototypeOf(document), "'body' in Object.getPrototypeOf(document)");
         }
     },
