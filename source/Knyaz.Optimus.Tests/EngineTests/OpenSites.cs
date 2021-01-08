@@ -249,6 +249,9 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public async Task OpenHabr()
 		{
+			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | 
+			                                       SecurityProtocolType.Tls11 |
+			                                       SecurityProtocolType.Tls;
 			var engine = TestingEngine.BuildJint();
 			var page = await engine.OpenUrl("https://habr.com");
 			System.Console.WriteLine(page.Document.InnerHTML);
