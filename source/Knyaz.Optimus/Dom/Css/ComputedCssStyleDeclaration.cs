@@ -28,7 +28,7 @@ namespace Knyaz.Optimus.Dom.Css
 				yield return rule.Style;
 			
 			//default styles is last
-			if (elt is HtmlElement)
+			if (elt is HtmlElement && _defaultStyleSheet != null)
 				foreach (var rule in GetStyleRulesFor(elt, Enumerable.Repeat(_defaultStyleSheet,1))
 					.SelectMany(x => x.Selectors.Select(sel => Tuple.Create(sel, x)))
 					.OrderByDescending(tuple => tuple.Item1.Specificity)

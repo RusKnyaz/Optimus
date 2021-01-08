@@ -851,5 +851,21 @@ function reqListener () {
 			await engine.OpenUrl("http://loc/");
 			Assert.AreEqual(new[]{"added","ok","body onload"}, console.LogHistory);
 		}
+		
+		[Test]
+		public async Task GetStyleWhenThereAreNoDefaultStyleSheet()
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				@"<html><body></body></html>");
+			
+			var engine = EngineBuilder.New().UseJint()
+				.EnableCss()
+				.SetResourceProvider(resourceProvider)
+				.Build();
+			var page = await engine.OpenUrl("http://loc/");
+
+			var style = page.Document.Body.GetComputedStyle();
+			var position = style.GetPropertyValue("position");
+		}
 	}
 }
