@@ -62,8 +62,10 @@ namespace Knyaz.Optimus.ResourceProviders
 			{
 				resultRequest.Content = new StreamContent(new MemoryStream(request.Data));
 			}
+
+			if (request.Headers == null) 
+				return resultRequest;
 			
-			if(request.Headers != null)
 			foreach (var keyValue in request.Headers)
 			{
 				switch (keyValue.Key)
