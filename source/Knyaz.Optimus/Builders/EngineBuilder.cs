@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Knyaz.Optimus.Configure;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
@@ -27,7 +26,7 @@ namespace Knyaz.Optimus.ResourceProviders
             _resourceProvider = resourceProvider;
             return this;
         }
-
+        
         /// <summary>
         /// Enables computed styles evaluation. Styles evaluation is disabled by default.
         /// </summary>

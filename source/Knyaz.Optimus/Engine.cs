@@ -30,7 +30,8 @@ namespace Knyaz.Optimus
 		public IResourceProvider ResourceProvider { get; }
 
 		internal IPredictedResourceProvider _predictedResourceProvider;
-
+		
+		
 		/// <summary>
 		/// Gets the current Script execution engine. Can be used to execute custom script or get some global values.
 		/// </summary>

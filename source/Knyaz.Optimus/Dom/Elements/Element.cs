@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -538,25 +539,79 @@ namespace Knyaz.Optimus.Dom.Elements
 			return ((IElement) this).GetRecursive(x => (IElement) x.ParentNode).FirstOrDefault(selector.IsMatches);
 		}
 
-		/// <summary>
-		/// Returns the size of an element and its position relative to the viewport.
-		/// </summary>
-		/// <returns></returns>
-		public DomRect GetBoundingClientRect()
+		/// <summary> Returns the size of an element and its position relative to the viewport. </summary>
+		/// <returns><see cref="DomRect"/> object.</returns>
+		public DomRect GetBoundingClientRect() =>
+			OwnerDocument.GetElementBounds is Func<Element, RectangleF[]> getElementBounds 
+				? DomRect.FromRectangleF(Surround(getElementBounds(this))) 
+				: DomRect.Empty;
+
+		private RectangleF Surround(RectangleF[] rects)
 		{
-			//stub
-			//todo: implement something
-			return new DomRect();
+			if(rects.Length == 0)
+				return RectangleF.Empty;
+			
+			if (rects.Length == 1)
+				return rects[0];
+
+			return rects.Aggregate((r1, r2) =>
+			{
+				var left = Math.Min(
+					Math.Min(r1.Left, r1.Left + r1.Width),
+					Math.Min(r2.Left, r2.Left + r2.Width));
+				var top = Math.Min(
+					Math.Min(r1.Top, r1.Top+r1.Height),
+					Math.Min(r2.Top, r2.Top+r2.Height));
+				
+				var right = 
+					Math.Max(Math.Max(r1.Left, r1.Left+r1.Width),
+						Math.Max(r2.Left, r2.Left+r2.Width));
+				var bottom = Math.Max(Math.Max(r1.Top, r1.Top+r1.Height),
+					Math.Max(r2.Top, r2.Top+r2.Height));
+				
+				return new RectangleF(
+					left,top,
+					right-left,
+					bottom-top);
+			});
 		}
 
+
 		/// <summary>
-		/// Removes this node from its parent.
+		/// Returns a collection of DOMRect objects that indicate the bounding rectangles for each CSS border box in a client.
+		/// Most elements only have one border box each, but a multiline inline element
+		/// (such as a multiline 'span' element, by default) has a border box around each line.
 		/// </summary>
+		/// <returns></returns>
+		public DomRect[] GetClientRects() =>
+			OwnerDocument.GetElementBounds is Func<Element, RectangleF[]> getElementBounds 
+				? getElementBounds(this).Select(DomRect.FromRectangleF).ToArray() 
+				: new[]{DomRect.Empty};
+
+
+		/// <summary> Removes this node from its parent. </summary>
 		public void Remove() => ParentNode?.RemoveChild(this);
 	}
 
+	[JsName("DOMRect")]
 	public class DomRect
 	{
+		internal static DomRect Empty = new DomRect(0, 0, 0, 0);
+
+		internal static DomRect FromRectangleF(RectangleF rect) => new DomRect(rect.X, rect.Y, rect.Width, rect.Height);
+		
+		public DomRect(float x, float y, float width, float height)
+		{
+			Width = width;
+			Height = height;
+			X = x;
+			Y = y;
+			Top = height >= 0 ? y : y + height;
+			Bottom = height > 0 ? y + height : y;
+			Left = width >= 0 ? x : x + width;
+			Right = width > 0 ? x + width : x;
+		}
+		
 		/// <summary>
 		/// Y-coordinate, relative to the viewport origin, of the bottom of the rectangle box.
 		/// </summary>

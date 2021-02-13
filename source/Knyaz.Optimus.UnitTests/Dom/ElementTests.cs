@@ -1,8 +1,11 @@
-﻿using Knyaz.Optimus.Dom;
+﻿using Knyaz.Optimus;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 using System.Collections.Generic;
 using Knyaz.NUnit.AssertExpressions;
+using Knyaz.Optimus.ResourceProviders;
+using Moq;
 
 namespace Knyaz.Optimus.Tests.Dom
 {

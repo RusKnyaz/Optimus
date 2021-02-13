@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -43,6 +44,8 @@ namespace Knyaz.Optimus.Dom
 
 		//Used in HtmlImageElement for image loading.
 		internal Func<string, Task<IImage>> GetImage;
+
+		internal Func<Element, RectangleF[]> GetElementBounds;
 		
 		private HtmlBodyElement _body;
 

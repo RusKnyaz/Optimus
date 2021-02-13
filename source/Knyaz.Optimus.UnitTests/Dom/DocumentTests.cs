@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System.Drawing;
+using System.Linq;
 using Knyaz.NUnit.AssertExpressions;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 using NUnit.Framework;
+using Moq;
 
 namespace Knyaz.Optimus.Tests.Dom
 {
@@ -341,6 +343,54 @@ namespace Knyaz.Optimus.Tests.Dom
 			body.InnerHTML = "ABC";
 			doc.Body = (HtmlBodyElement)body;
 			Assert.AreEqual("<HEAD></HEAD><BODY>ABC</BODY>", doc.DocumentElement.InnerHTML);
+		}
+		
+		[Test]
+		public static void GetBoundingClientRect()
+		{
+			var layoutService = Mock.Of<ILayoutService>(x => 
+				x.GetElementBounds(It.IsAny<Element>()) == new[]{new RectangleF(1,3,7,11)});
+
+			var document = DomImplementation.Instance.CreateHtmlDocument("test");
+			document.AttachLayoutService(layoutService);
+			document.Write("<html><div id=d>abc</div></html>");
+			
+			var div = document.GetElementById("d");
+			div.GetBoundingClientRect().Assert(domRect =>
+				domRect.X == 1 &&
+				domRect.Y == 3 &&
+				domRect.Width == 7 &&
+				domRect.Height == 11 &&
+				domRect.Left == 1 &&
+				domRect.Top == 3 &&
+				domRect.Right == 8 &&
+				domRect.Bottom == 14 );
+		}
+		
+		[Test]
+		public static void GetBoundingClientRectMultiple()
+		{
+			var layoutService = Mock.Of<ILayoutService>(x => 
+				x.GetElementBounds(It.IsAny<Element>()) == new[]
+				{
+					new RectangleF(1,3,7,11),
+					new RectangleF(0,5,1,27)
+				});
+
+			var document = DomImplementation.Instance.CreateHtmlDocument("test");
+			document.AttachLayoutService(layoutService);
+			document.Write("<html><div id=d>abc</div></html>");
+
+			var div = document.GetElementById("d");
+			div.GetBoundingClientRect().Assert(domRect =>
+				domRect.X == 0 &&
+				domRect.Y == 3 &&
+				domRect.Width == 8 &&
+				domRect.Height == 29 &&
+				domRect.Left == 0 &&
+				domRect.Top == 3 &&
+				domRect.Right == 8 &&
+				domRect.Bottom == 32 );
 		}
 	}
 }
