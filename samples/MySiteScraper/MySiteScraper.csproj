@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\source\Knyaz.Optimus.Scripting.Jint\Knyaz.Optimus.Scripting.Jint.csproj" />
+      <ProjectReference Include="..\..\source\Knyaz.Optimus.Scripting.Jurassic\Knyaz.Optimus.Scripting.Jurassic.csproj" />
+      <ProjectReference Include="..\..\source\Knyaz.Optimus\Knyaz.Optimus.csproj" />
+    </ItemGroup>
+
+</Project>

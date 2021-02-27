@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.ResourceProviders
 		{
 			_getClientFn = req =>
 			{
-				var handler = new HttpClientHandler {CookieContainer = req.Cookies};
+				var handler = new HttpClientHandler {CookieContainer = req.Cookies ?? new CookieContainer()};
 				
 				handlerConfig?.Invoke(handler);
 				
