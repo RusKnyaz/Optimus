@@ -2,26 +2,16 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/RusKnyaz/Optimus</PackageProjectUrl>
-    <PackageIconUrl />
     <RepositoryUrl>https://github.com/RusKnyaz/Optimus</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <Description>Optimus is headless Web Browser fully implemented on .net.</Description>
-    <PackageTags>headless web browser</PackageTags>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <Copyright>Konstantin Petukhov, 2021</Copyright>
-    <VersionPrefix>3.0.0</VersionPrefix>
     <PackageReleaseNotes>
 - Removed obsolete API (Engine(IResourceProvider) constructor, Engine.OnWindowOpen, Knyaz.Optimus.Console class, Engine.OnResponse and Engine.OnRequest events, Engine.Load method)
 - Changed INode.ChildNode property type to the NodeList.
 - Changed Document.GetElementsByName method return type to the NodeList.
 - Changed Document's and Element's GetElementsByTagName and GetElementsByClassName methods return type to the HtmlCollection.
     </PackageReleaseNotes>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Properties\AssemblyInfo.cs" />
@@ -35,8 +25,5 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 </Project>

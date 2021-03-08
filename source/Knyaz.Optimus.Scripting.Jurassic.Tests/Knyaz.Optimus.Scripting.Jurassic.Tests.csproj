@@ -1,20 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFrameworks>net452;net5.0</TargetFrameworks>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-        <PackageReference Include="Knyaz.NUnit.AssertExpressions" Version="1.0.0" />
         <PackageReference Include="Moq" Version="4.7.142" />
-        <PackageReference Include="NUnit" Version="3.13.1" />
-        <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+        <PackageReference Include="NUnit" Version="3.9.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
     </ItemGroup>
-
     <ItemGroup>
-      <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />
+      <ProjectReference Include="..\Knyaz.Optimus.Scripting.Jurassic\Knyaz.Optimus.Scripting.Jurassic.csproj" />
     </ItemGroup>
-    
 </Project>

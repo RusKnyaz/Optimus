@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Knyaz.Optimus.Scripting.Jint</id>
+    <version>$version$</version>
+    <authors>Konstantin Petukhov</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Allows to use Jint to execute JavaScript in Optimus.</description>
+    <copyright>Konstantin Petukhov, 2021</copyright>
+    <repository type="Git" url="https://github.com/RusKnyaz/Optimus" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.2">
+        <dependency id="Jint" version="2.10.3" exclude="Build,Analyzers" />
+        <dependency id="Knyaz.Optimus" version="[3.0.0,4.0.0)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Jint" version="2.10.3" exclude="Build,Analyzers" />
+        <dependency id="Knyaz.Optimus" version="[3.0.0,4.0.0)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="../../LICENSE.txt" target="" />
+    <file src="bin/Release/net452/Knyaz.Optimus.Scripting.Jint.dll" target="lib/net452/Knyaz.Optimus.Scripting.Jint.dll" />
+    <file src="bin/Release/net452/Knyaz.Optimus.Scripting.Jint.xml" target="lib/net452/Knyaz.Optimus.Scripting.Jint.xml" />
+    <file src="bin/Release/netstandard2.0/Knyaz.Optimus.Scripting.Jint.dll" target="lib/netstandard2.0/Knyaz.Optimus.Scripting.Jint.dll" />
+    <file src="bin/Release/netstandard2.0/Knyaz.Optimus.Scripting.Jint.xml" target="lib/netstandard2.0/Knyaz.Optimus.Scripting.Jint.xml" />
+  </files>
+</package>

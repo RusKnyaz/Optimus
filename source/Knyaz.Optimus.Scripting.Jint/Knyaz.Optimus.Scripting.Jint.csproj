@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+        <Description>Allows to use Jint to execute JavaScript in Optimus.</Description>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>Knyaz.Optimus.Scripting.Jint.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="Jint" Version="2.10.3" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />
+    </ItemGroup>
+
+</Project>

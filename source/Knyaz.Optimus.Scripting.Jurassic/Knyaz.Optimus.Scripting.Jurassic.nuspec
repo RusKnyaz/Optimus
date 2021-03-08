@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Knyaz.Optimus.Scripting.Jurassic</id>
+    <version>$version$</version>
+    <authors>Konstantin Petukhov</authors>
+    <owners>Konstantin Petukhov</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Plugin for the Knyaz.Optimus to connect Jurassic JavaScript engine.</description>
+    <copyright>Konstantin Petukhov, 2021</copyright>
+    <license type="file">LICENSE.txt</license>
+    <repository type="Git" url="https://github.com/RusKnyaz/Optimus" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.2">
+        <dependency id="Jurassic" version="[3.1.0,4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Knyaz.Optimus" version="[3.0.0,4.0.0)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Jurassic" version="[3.1.0,4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Knyaz.Optimus" version="[3.0.0,4.0.0)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="../../LICENSE.txt" target="" />
+    <file src="bin/Release/net452/Knyaz.Optimus.Scripting.Jurassic.dll" target="lib/net452/Knyaz.Optimus.Scripting.Jurassic.dll" />
+    <file src="bin/Release/net452/Knyaz.Optimus.Scripting.Jurassic.xml" target="lib/net452/Knyaz.Optimus.Scripting.Jurassic.xml" />
+    <file src="bin/Release/netstandard2.0/Knyaz.Optimus.Scripting.Jurassic.dll" target="lib/netstandard2.0/Knyaz.Optimus.Scripting.Jurassic.dll" />
+    <file src="bin/Release/netstandard2.0/Knyaz.Optimus.Scripting.Jurassic.xml" target="lib/netstandard2.0/Knyaz.Optimus.Scripting.Jurassic.xml" />
+  </files>
+</package>

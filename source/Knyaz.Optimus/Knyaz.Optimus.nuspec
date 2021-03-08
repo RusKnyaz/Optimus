@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Knyaz.Optimus</id>
+    <version>$version$</version>
+    <authors>Konstantin Petukhov</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://github.com/RusKnyaz/Optimus</projectUrl>
+    <description>Optimus is headless Web Browser fully implemented on .net.</description>
+    <releaseNotes>- Removed obsolete API (Engine(IResourceProvider) constructor, Engine.OnWindowOpen, Knyaz.Optimus.Console class, Engine.OnResponse and Engine.OnRequest events, Engine.Load method)
+- Changed INode.ChildNode property type to the NodeList.
+- Changed Document.GetElementsByName method return type to the NodeList.
+- Changed Document's and Element's GetElementsByTagName and GetElementsByClassName methods return type to the HtmlCollection.</releaseNotes>
+    <copyright>Konstantin Petukhov, 2021</copyright>
+    <tags>headless web browser</tags>
+    <repository type="Git" url="https://github.com/RusKnyaz/Optimus" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.2">
+        <dependency id="System.Net.Http" version="4.3.3" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Net.Http" version="4.3.3" exclude="Build,Analyzers" />
+        <dependency id="System.Drawing.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+    <files>
+        <file src="../../LICENSE.txt" target="" />
+        <file src="bin/Release/net452/Knyaz.Optimus.dll" target="lib/net452/Knyaz.Optimus.dll" />
+        <file src="bin/Release/net452/Knyaz.Optimus.xml" target="lib/net452/Knyaz.Optimus.xml" />
+        <file src="bin/Release/netstandard2.0/Knyaz.Optimus.dll" target="lib/netstandard2.0/Knyaz.Optimus.dll" />
+        <file src="bin/Release/netstandard2.0/Knyaz.Optimus.xml" target="lib/netstandard2.0/Knyaz.Optimus.xml" />
+    </files>
+</package>

@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+    <PropertyGroup>
+        <!-- Bind nuspecs -->
+        <NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+    </PropertyGroup>
+
+    <!-- Set nuspec properties -->
+    <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec" Condition=" '$(IsPackable)' == 'true' ">
+        <PropertyGroup>
+            <NuspecProperties>$(NuspecProperties);version=$(Version)</NuspecProperties>
+        </PropertyGroup>
+    </Target>
+    
+    
+    
     <UsingTask TaskName="GetSemanticVersion"
         TaskFactory="RoslynCodeTaskFactory"
         AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">

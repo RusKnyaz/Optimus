@@ -12,6 +12,7 @@ ProjectSection(SolutionItems) = preProject
 	..\docs\snippets.md = ..\docs\snippets.md
 	..\CHANGELOG.md = ..\CHANGELOG.md
 	..\README.md = ..\README.md
+	..\LICENSE.txt = ..\LICENSE.txt
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution files ", "solution files ", "{F661EEF9-540E-4408-907C-CEBB7B868DD6}"
@@ -23,6 +24,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.JsTests", "Knyaz.Optimus.JsTests\Knyaz.Optimus.JsTests.csproj", "{EE326712-E374-42C2-A55F-ACE78F75AFB2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.UnitTests", "Knyaz.Optimus.UnitTests\Knyaz.Optimus.UnitTests.csproj", "{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.Scripting.Jint", "Knyaz.Optimus.Scripting.Jint\Knyaz.Optimus.Scripting.Jint.csproj", "{17B14D99-EDA3-4281-A7DB-BCBE55DB86F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.Scripting.Jurassic", "Knyaz.Optimus.Scripting.Jurassic\Knyaz.Optimus.Scripting.Jurassic.csproj", "{5FFBC0E0-D071-4A5A-AF76-2FE006121A71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.Scripting.Jurassic.Tests", "Knyaz.Optimus.Scripting.Jurassic.Tests\Knyaz.Optimus.Scripting.Jurassic.Tests.csproj", "{A34BD8DB-83DD-4444-8A8A-D391FE39BB52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Knyaz.Optimus.Scripting.Jint.Tests", "Knyaz.Optimus.Scripting.Jint.Tests\Knyaz.Optimus.Scripting.Jint.Tests.csproj", "{DAD4F6AA-FF9A-4A3C-8BC8-C4A3400669FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +63,22 @@ Global
 		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4641C7E9-B3F7-47E4-B055-A6EC6816CD90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17B14D99-EDA3-4281-A7DB-BCBE55DB86F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B14D99-EDA3-4281-A7DB-BCBE55DB86F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17B14D99-EDA3-4281-A7DB-BCBE55DB86F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17B14D99-EDA3-4281-A7DB-BCBE55DB86F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FFBC0E0-D071-4A5A-AF76-2FE006121A71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FFBC0E0-D071-4A5A-AF76-2FE006121A71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FFBC0E0-D071-4A5A-AF76-2FE006121A71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FFBC0E0-D071-4A5A-AF76-2FE006121A71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A34BD8DB-83DD-4444-8A8A-D391FE39BB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A34BD8DB-83DD-4444-8A8A-D391FE39BB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A34BD8DB-83DD-4444-8A8A-D391FE39BB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A34BD8DB-83DD-4444-8A8A-D391FE39BB52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAD4F6AA-FF9A-4A3C-8BC8-C4A3400669FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAD4F6AA-FF9A-4A3C-8BC8-C4A3400669FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAD4F6AA-FF9A-4A3C-8BC8-C4A3400669FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAD4F6AA-FF9A-4A3C-8BC8-C4A3400669FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

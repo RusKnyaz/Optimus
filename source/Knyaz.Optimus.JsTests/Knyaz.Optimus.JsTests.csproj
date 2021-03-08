@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFrameworks>net452;net5.0</TargetFrameworks>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     
@@ -10,8 +10,6 @@
         <PackageReference Include="Moq" Version="4.7.142" />
         <PackageReference Include="NUnit" Version="3.13.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-        <PackageReference Include="Knyaz.Optimus.Scripting.Jint" Version="1.0.0-beta-24" />
-        <PackageReference Include="Knyaz.Optimus.Scripting.Jurassic" Version="3.0.0-beta-30" />
     </ItemGroup>
     
     <ItemGroup>
@@ -19,6 +17,8 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\Knyaz.Optimus.Scripting.Jurassic\Knyaz.Optimus.Scripting.Jurassic.csproj" />
+      <ProjectReference Include="..\Knyaz.Optimus.Scripting.Jint\Knyaz.Optimus.Scripting.Jint.csproj" />
       <ProjectReference Include="..\Knyaz.Optimus\Knyaz.Optimus.csproj" />
     </ItemGroup>
     
