@@ -4,9 +4,10 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
 
-namespace Knyaz.Optimus.ResourceProviders
+namespace Knyaz.Optimus
 {
     /// <summary>
     /// Configures and builds <see cref="Engine"/>;
@@ -32,8 +33,8 @@ namespace Knyaz.Optimus.ResourceProviders
         /// </summary>
         public EngineBuilder EnableCss()
         {
-	        _stylesConfig = new DocumentStylesConfiguration();
-	        return this;
+            _stylesConfig = new DocumentStylesConfiguration();
+            return this;
         }
 
         public EngineBuilder EnableCss(Action<DocumentStylesConfiguration> configure)
@@ -45,10 +46,10 @@ namespace Knyaz.Optimus.ResourceProviders
 
         public EngineBuilder ConfigureResourceProvider(Action<ResourceProviderBuilder> configure)
         {
-	        var builder = new ResourceProviderBuilder();
-	        configure(builder);
-	        _resourceProvider = builder.Build();
-	        return this;
+            var builder = new ResourceProviderBuilder();
+            configure(builder);
+            _resourceProvider = builder.Build();
+            return this;
         }
 
         public EngineBuilder Window(Action<WindowConfig> configure)
@@ -60,8 +61,8 @@ namespace Knyaz.Optimus.ResourceProviders
 
         public EngineBuilder JsScriptExecutor(Func<ScriptExecutionContext, IJsScriptExecutor> getScriptExecutor)
         {
-	        _getScriptExecutor = context => new ScriptExecutor(() => getScriptExecutor(context));
-	        return this;
+            _getScriptExecutor = context => new ScriptExecutor(() => getScriptExecutor(context));
+            return this;
         }
 
         private Window BuildWindow(Func<Engine> getEngine)
@@ -99,10 +100,10 @@ namespace Knyaz.Optimus.ResourceProviders
 
             var docStyling = 
                 _stylesConfig == null ? null 
-                : (Func<Document, DocumentStyling>)(doc => new DocumentStyling(
-                    doc, 
-                    _stylesConfig?.UserAgentStyleSheet, 
-                    s => resourceProvider.SendRequestAsync(engineKeeper[0].CreateRequest(s))));
+                    : (Func<Document, DocumentStyling>)(doc => new DocumentStyling(
+                        doc, 
+                        _stylesConfig?.UserAgentStyleSheet, 
+                        s => resourceProvider.SendRequestAsync(engineKeeper[0].CreateRequest(s))));
             
             return engineKeeper[0] = new Engine(resourceProvider, window , scriptExecutor, docStyling); 
         }
@@ -128,21 +129,13 @@ namespace Knyaz.Optimus.ResourceProviders
 
             public WindowConfig SetConsole(IConsole console)
             {
-	            _console = console;
-	            return this;
+                _console = console;
+                return this;
             }
         }
     }
+}
 
-    public class ScriptExecutionContext
-    {
-        public ScriptExecutionContext(IWindowEx window)
-        {
-            Window = window;
-        }
-
-        public IWindowEx Window { get; }
-
-        public ScriptingSettings Settings => ScriptingSettings.Default;
-    }
+namespace Knyaz.Optimus.ResourceProviders
+{
 }

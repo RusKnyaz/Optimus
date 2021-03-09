@@ -1,6 +1,7 @@
 ﻿using System;
+using Knyaz.Optimus.ResourceProviders;
 
-namespace Knyaz.Optimus.ResourceProviders
+namespace Knyaz.Optimus
 {
 	/// <summary>
 	/// Configures Resource provider.

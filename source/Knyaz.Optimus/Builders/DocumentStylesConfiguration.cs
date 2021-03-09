@@ -1,6 +1,6 @@
 using Knyaz.Optimus.Dom.Css;
 
-namespace Knyaz.Optimus.ResourceProviders
+namespace Knyaz.Optimus
 {
 	public class DocumentStylesConfiguration
 	{

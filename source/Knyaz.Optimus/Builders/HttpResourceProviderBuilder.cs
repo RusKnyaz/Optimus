@@ -2,8 +2,9 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Knyaz.Optimus.ResourceProviders;
 
-namespace Knyaz.Optimus.ResourceProviders
+namespace Knyaz.Optimus
 {
     /// <summary>
     /// Allows to configure and build <see cref="HttpResourceProvider"/> object.
