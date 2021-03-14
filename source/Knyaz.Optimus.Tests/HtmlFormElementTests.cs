@@ -47,5 +47,34 @@ namespace Knyaz.Optimus.Tests
 			Assert.AreEqual(actionValue, form.GetAttribute("action"));
 			return form.Action;
 		}
+
+		[TestCase("", ExpectedResult = "application/x-www-form-urlencoded")]
+		[TestCase("application/x-www-form-urlencoded", ExpectedResult = "application/x-www-form-urlencoded")]
+		[TestCase("invalid", ExpectedResult = "application/x-www-form-urlencoded")]
+		[TestCase("text/plain", ExpectedResult = "text/plain")]
+		[TestCase("TEXT/plain", ExpectedResult = "text/plain")]
+		[TestCase("multipart/form-data", ExpectedResult = "multipart/form-data")]
+		public string EncTypeFromAttr(string encType)
+		{
+			var engine = TestingEngine.Build("http://a.bc/Account/Login/", $"<form id=f enctype=\"{encType}\"></form>");
+			engine.OpenUrl("http://a.bc/Account/Login/").Wait();
+			var form = (HtmlFormElement)engine.Document.GetElementById("f");
+			return form.Enctype;
+		}
+		
+		[TestCase("", ExpectedResult = "application/x-www-form-urlencoded")]
+		[TestCase("invalid", ExpectedResult = "application/x-www-form-urlencoded")]
+		[TestCase("text/plain", ExpectedResult = "text/plain")]
+		[TestCase("TEXT/plain", ExpectedResult = "text/plain")]
+		[TestCase("multipart/form-data", ExpectedResult = "multipart/form-data")]
+		public string SetGetEncType(string encType)
+		{
+			var engine = TestingEngine.Build("http://a.bc/Account/Login/", "<form id=f></form>");
+			engine.OpenUrl("http://a.bc/Account/Login/").Wait();
+			var form = (HtmlFormElement)engine.Document.GetElementById("f");
+			form.Enctype = encType;
+			Assert.AreEqual(encType, form.GetAttribute("enctype"));
+			return form.Enctype;
+		}
 	}
 }

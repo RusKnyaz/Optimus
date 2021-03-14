@@ -100,7 +100,17 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Enctype
 		{
-			get => GetAttribute("enctype", AllowedEnctypes, Defaults.Enctype).ToLowerInvariant();
+			get
+			{
+				switch (GetAttribute("enctype", AllowedEnctypes, Defaults.Enctype).ToLowerInvariant())
+				{
+				
+					case "text/plain": return "text/plain";
+					case "multipart/form-data": return "multipart/form-data";
+					default: return "application/x-www-form-urlencoded";
+				}
+				
+			}
 			set => SetAttribute("enctype", value);
 		}
 
