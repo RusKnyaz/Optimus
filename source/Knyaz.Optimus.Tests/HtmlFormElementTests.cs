@@ -21,5 +21,31 @@ namespace Knyaz.Optimus.Tests
 			Assert.IsNotNull(form);
 			Assert.AreEqual(1, form.Elements.Count);
 		}
+
+		[TestCase("", ExpectedResult = "http://a.bc/Account/Login/")]
+		[TestCase("Hoba", ExpectedResult = "http://a.bc/Account/Login/Hoba")]
+		[TestCase("/hoba", ExpectedResult = "http://a.bc/hoba")]
+		[TestCase("http://q.we", ExpectedResult = "http://q.we/")]
+		public string GetAction(string attrValue)
+		{
+			var engine = TestingEngine.Build("http://a.bc/Account/Login/", $"<form id=f action=\"{attrValue}\"></form>");
+			engine.OpenUrl("http://a.bc/Account/Login/").Wait();
+			var form = (HtmlFormElement)engine.Document.GetElementById("f");
+			return form.Action;
+		}
+		
+		[TestCase("", ExpectedResult = "http://a.bc/Account/Login/")]
+		[TestCase("Hoba", ExpectedResult = "http://a.bc/Account/Login/Hoba")]
+		[TestCase("/hoba", ExpectedResult = "http://a.bc/hoba")]
+		[TestCase("http://q.we", ExpectedResult = "http://q.we/")]
+		public string SetGetAction(string actionValue)
+		{
+			var engine = TestingEngine.Build("http://a.bc/Account/Login/", "<form id=f></form>");
+			engine.OpenUrl("http://a.bc/Account/Login/").Wait();
+			var form = (HtmlFormElement)engine.Document.GetElementById("f");
+			form.Action = actionValue;
+			Assert.AreEqual(actionValue, form.GetAttribute("action"));
+			return form.Action;
+		}
 	}
 }

@@ -135,7 +135,3 @@ namespace Knyaz.Optimus
         }
     }
 }
-
-namespace Knyaz.Optimus.ResourceProviders
-{
-}

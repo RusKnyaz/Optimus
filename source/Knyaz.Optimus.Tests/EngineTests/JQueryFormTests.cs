@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		[Test]
 		public async Task Smoke()
 		{
-			var engine = TestingEngine.Build("<html><head><script> " + R.JQueryJs + " </script>" +
+			var engine = TestingEngine.BuildJint("<html><head><script> " + R.JQueryJs + " </script>" +
 			                                 "<script>" + R.JQueryFormJs + "</script></head><body></body></html>");
 			engine.ScriptExecutor.OnException += exception => System.Console.WriteLine(exception);
 			await engine.OpenUrl("http://localhost");

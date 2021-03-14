@@ -77,7 +77,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Action
 		{
-			get => GetAttribute("action", Defaults.Action);
+			get => 
+				UriHelper.GetUri(OwnerDocument.DefaultView.Location.Href, GetAttribute("action", Defaults.Action)).AbsoluteUri;
 			set => SetAttribute("action", value);
 		}
 

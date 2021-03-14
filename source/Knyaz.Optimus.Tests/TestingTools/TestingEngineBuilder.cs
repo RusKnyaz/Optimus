@@ -10,12 +10,18 @@ namespace Knyaz.Optimus.Tests.TestingTools
 	/// <summary> Helper methods to build <see cref="Engine"/> for tests. </summary>
 	internal static class TestingEngine
 	{
-		public static Engine Build(string html)
+		public static Engine Build(string url, string html) => 
+			Build(Mocks.ResourceProvider(url, html));
+
+		public static Engine BuildJint(string html)
 		{
 			var resources = Mocks.ResourceProvider("http://localhost", html);
 			var engine = TestingEngine.BuildJintCss(resources);
 			return engine;
 		}
+		
+		public static Engine Build(IResourceProvider resourceProvider)
+			=> EngineBuilder.New().SetResourceProvider(resourceProvider).Build();
 		
 		/// <summary> Configures engine with Jint. </summary>
 		public static Engine BuildJint() =>
