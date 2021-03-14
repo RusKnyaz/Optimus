@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
+﻿using System.Net;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
 {
@@ -91,14 +92,19 @@ namespace Knyaz.Optimus.Dom.Elements
 			set => SetAttribute("placeholder", value);
 		}
 
-		/// <summary>
-		/// Gets or sets the raw value contained in the control.
-		/// </summary>
-		public string Value
+		private string _innerHTML;
+		public override string InnerHTML
 		{
-			get => InnerHTML ?? string.Empty;
-			set => InnerHTML = value ?? string.Empty;
+			get => _innerHTML;
+			set
+			{
+				_innerHTML = WebUtility.HtmlEncode(value);
+				Value = value;
+			}
 		}
+
+		/// <summary> Gets or sets the raw value contained in the control. </summary>
+		public string Value { get; set; }
 
 		
 		public string DirName

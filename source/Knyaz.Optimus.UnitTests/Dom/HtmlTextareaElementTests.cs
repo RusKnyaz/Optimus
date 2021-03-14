@@ -1,4 +1,5 @@
-﻿using Knyaz.Optimus.Dom;
+﻿using Knyaz.NUnit.AssertExpressions;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using NUnit.Framework;
 
@@ -62,7 +63,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		}
 
 		[Test]
-		public void NeightbourOwnerForm()
+		public void NeighbourOwnerForm()
 		{
 			var form = _document.CreateElement("form");
 			form.Id = "myForm";
@@ -76,6 +77,26 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void ToStringTest()
 		{
 			Assert.AreEqual("[object HTMLTextAreaElement]", _textArea.ToString());
+		}
+
+		[TestCase("hello")]
+		[TestCase("<div>ABC</div>")]
+		[TestCase("\r\n")]
+		public void SetValue(string val)
+		{
+			var text = (HtmlTextAreaElement)_document.CreateElement("textarea");
+			text.Value = val;
+			Assert.AreEqual(val, text.Value);
+		}
+
+		[TestCase("","","")]
+		[TestCase("ABC","ABC","ABC")]
+		[TestCase("<div>ABC!@#$</dIv>","&lt;div&gt;ABC!@#$&lt;/dIv&gt;","<div>ABC!@#$</dIv>")]
+		public void SetInnerHtml(string html, string expectedHtml, string expectedValue)
+		{
+			var text = (HtmlTextAreaElement)_document.CreateElement("textarea");
+			text.InnerHTML = html;
+			text.Assert(t => t.InnerHTML == expectedHtml && t.Value == expectedValue);
 		}
 	}
 }
