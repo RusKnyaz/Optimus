@@ -1,13 +1,11 @@
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ResourceProviders;
-using Knyaz.Optimus.ScriptExecuting.Jint;
 using NUnit.Framework;
 
 namespace Knyaz.Optimus.Tests
 {
 	[TestFixture]
-	public class ElementsTests
+	public class HtmlSelectElementTests
 	{
 		//Note: do not change formatting in html. tabs and spaces matter
 		[TestCase(@"<select id=s multiple>
@@ -33,12 +31,11 @@ namespace Knyaz.Optimus.Tests
 			
 			var engine = new EngineBuilder()
 				.SetResourceProvider(resourceProvider)
-				.UseJint()
 				.Build();
 		
 			var page = await engine.OpenUrl("http://localhost", false);
 
-			var s = page.Document.GetElementById("s") as HtmlSelectElement;
+			var s = (HtmlSelectElement)page.Document.GetElementById("s");
 			
 			return s.SelectedIndex;
 		}

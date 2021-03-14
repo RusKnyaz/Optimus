@@ -82,6 +82,38 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 			Assert.AreEqual("username=John", data);
 		}
+		
+		[TestCase("application/x-www-form-urlencoded", ExpectedResult = "username=John%40mail.m&password=1%21+%25%26&Text1=hello%0D%0Aworld%3Dpip")]
+		[TestCase("text/plain", ExpectedResult = "username=John@mail.m\r\npassword=1! %&\r\nText1=hello\r\nworld=pip\r\n")]
+		[TestCase("multipart/form-data", ExpectedResult = 
+			"-----------------------------421941713216853671061224586803\r\nContent-Disposition: form-data; name=\"username\"\r\n\r\nJohn@mail.m\r\n" +
+			"-----------------------------421941713216853671061224586803\r\nContent-Disposition: form-data; name=\"password\"\r\n\r\n1! %&\r\n" +
+			"-----------------------------421941713216853671061224586803\r\nContent-Disposition: form-data; name=\"Text1\"\r\nhello\r\nworld=pip\r\n" +
+			"-----------------------------421941713216853671061224586803--\r\n", Ignore = "Not implemented")]
+		public static string SubmitPostFormEncodingType(string enctype)
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					$"<form method=post action='login' enctype='{enctype}'>" +
+					$"<input name=username type=text>" +
+					$"<input name=password type=password>" +
+					"<textarea name=\"Text1\" cols=\"40\" rows=\"5\"></textarea>" +
+					$"</form>")
+				.Resource("http://site.net/login", "<div id=d></div>");
+
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			doc.Get<HtmlInputElement>("[name=username]").First().Value = "John@mail.m";
+			doc.Get<HtmlInputElement>("[name=password]").First().Value = "1! %&";
+			doc.Get<HtmlTextAreaElement>("[name=Text1]").First().Value = "hello\r\nworld=pip";
+			doc.Get<HtmlFormElement>("form").First().Submit();
+			Assert.IsNotNull(engine.WaitId("d"));
+
+			return Encoding.UTF8.GetString(httpResources.History[1].Data);
+		}
 
 		[Test]
 		public static void SubmitFormUtf8()

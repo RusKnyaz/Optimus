@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Text;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
@@ -37,14 +39,36 @@ namespace Knyaz.Optimus
 			var dataElements = form.Elements.OfType<IFormElement>().Where(x => !string.IsNullOrEmpty(x.Name));
 
 			var replaceSpaces = method != "post" || enctype != "multipart/form-data";
-			
-			var data = string.Join("&", dataElements.Select(x => 
-				x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
-			));
 
-			if(enctype == "application/x-www-form-urlencoded")
+			var data = string.Empty;
+
+			if (method == "get")
 			{
-				data = System.Uri.EscapeUriString(data);
+				data = string.Join("&", dataElements.Select(x =>
+					x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
+				));
+
+				if (enctype == "application/x-www-form-urlencoded")
+				{
+					data = System.Uri.EscapeUriString(data);
+				}
+			}
+			else if(method == "post")
+			{
+				if (enctype == "application/x-www-form-urlencoded")
+				{
+					data = string.Join("&", dataElements.Select(x =>
+						x.Name + "=" + (x.Value != null ? WebUtility.UrlEncode(x.Value).Replace("!", "%21") : "")
+					));
+				}
+				else if (enctype == "text/plain")
+				{
+					data = string.Concat(dataElements.Select(x => (x.Name + "=" + (x.Value ?? "")) + "\r\n"));
+				}
+				else
+				{
+					throw new NotImplementedException("multipart-form-data form encryption type is not supported");
+				}
 			}
 
 			var isGet = method == "get";
@@ -80,7 +104,7 @@ namespace Knyaz.Optimus
 				var response = await ResourceProvider.SendRequestAsync(request);
 
 				//what should we do if the frame is not found?
-				if (response.Type.StartsWith(ResourceTypes.Html))
+				if (response.Type == null || response.Type.StartsWith(ResourceTypes.Html))
 				{
 					LoadFromResponse(document, response);
 				}
