@@ -36,7 +36,10 @@ namespace Knyaz.Optimus
 			if (string.IsNullOrEmpty(action))
 				return;
 			
-			var dataElements = form.Elements.OfType<IFormElement>().Where(x => !string.IsNullOrEmpty(x.Name));
+			var dataElements = form.Elements.OfType<IFormElement>()
+				.Where(x => !string.IsNullOrEmpty(x.Name) && 
+				            !(x is HtmlInputElement input && input.Type == "checkbox" && !input.Checked) //skip unchecked cheboxes
+				            );
 
 			var replaceSpaces = method != "post" || enctype != "multipart/form-data";
 
@@ -45,7 +48,7 @@ namespace Knyaz.Optimus
 			if (method == "get")
 			{
 				data = string.Join("&", dataElements.Select(x =>
-					x.Name + "=" + (x.Value != null ? (replaceSpaces ? x.Value.Replace(' ', '+') : x.Value) : "")
+					x.Name + "=" + (GetValue(x) is string strValue ? (replaceSpaces ? strValue.Replace(' ', '+') : strValue) : "")
 				));
 
 				if (enctype == "application/x-www-form-urlencoded")
@@ -58,12 +61,12 @@ namespace Knyaz.Optimus
 				if (enctype == "application/x-www-form-urlencoded")
 				{
 					data = string.Join("&", dataElements.Select(x =>
-						x.Name + "=" + (x.Value != null ? WebUtility.UrlEncode(x.Value).Replace("!", "%21") : "")
+						x.Name + "=" + (GetValue(x) is string strValue ? WebUtility.UrlEncode(strValue).Replace("!", "%21") : "")
 					));
 				}
 				else if (enctype == "text/plain")
 				{
-					data = string.Concat(dataElements.Select(x => (x.Name + "=" + (x.Value ?? "")) + "\r\n"));
+					data = string.Concat(dataElements.Select(x => (x.Name + "=" + (GetValue(x) ?? "")) + "\r\n"));
 				}
 				else
 				{
@@ -89,7 +92,7 @@ namespace Knyaz.Optimus
 				}
 				else
 				{
-					ScriptExecutor.Clear();
+					ScriptExecutor?.Clear();
 					Document = document;
 				}
 
@@ -111,5 +114,9 @@ namespace Knyaz.Optimus
 			}
 			//todo: handle 'about:blank'
 		}
+
+		static string GetValue(IFormElement elt) =>
+			elt is HtmlInputElement input && input.Type == "checkbox" ? input.Checked ? "true" : "false"
+				: elt.Value;
 	}
 }

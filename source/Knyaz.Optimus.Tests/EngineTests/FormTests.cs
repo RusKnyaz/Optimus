@@ -101,7 +101,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 					$"</form>")
 				.Resource("http://site.net/login", "<div id=d></div>");
 
-			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
+			var engine = TestingEngine.Build(new ResourceProvider(httpResources, null));
 			engine.OpenUrl("http://site.net").Wait();
 
 			var doc = engine.Document;
@@ -112,6 +112,35 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			doc.Get<HtmlFormElement>("form").First().Submit();
 			Assert.IsNotNull(engine.WaitId("d"));
 
+			return Encoding.UTF8.GetString(httpResources.History[1].Data);
+		}
+
+		[TestCase(true, ExpectedResult = "rememberme=true")]
+		[TestCase(false, ExpectedResult = "")]
+		public static string SubmitPostFormCheckbox(bool check)
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'>" +
+					"<input name=rememberme type=cheCkbox id=checkbox>" +
+					"</form>")
+				.Resource("http://site.net/login", "<div id=d></div>");
+
+			var engine = TestingEngine.Build(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			var form = doc.Get<HtmlFormElement>("form").First();
+
+			if (check)
+			{
+				var cb = (HtmlInputElement)form.Elements.Single();
+				cb.Checked = true;
+			}
+
+			form.Submit();
+			
 			return Encoding.UTF8.GetString(httpResources.History[1].Data);
 		}
 

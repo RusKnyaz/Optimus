@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Knyaz.Optimus.Dom.Events;
+using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements
@@ -19,6 +21,31 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Type = "text";
 			public static string Autocomplete = "on";
 		}
+
+		private static HashSet<string> Types = new HashSet<string> {
+			"button",
+			"checkbox",
+			"color",
+			"date",
+			"datetime-local",
+			"email",
+			"file",
+			"hidden",
+			"image",
+			"month",
+			"number",
+			"password",
+			"radio",
+			"range",
+			"reset",
+			"search",
+			"submit",
+			"tel",
+			"text",
+			"time",
+			"url",
+			"week"
+		}; 
 
 		internal HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input){}
 
@@ -125,7 +152,11 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Type
 		{
-			get => GetAttribute("type", Defaults.Type);
+			get
+			{
+				var val = GetAttribute("type", Defaults.Type).ToLower();
+				return Types.Contains(val) ? val : "text";
+			} 
 			set => SetAttribute("type", value);
 		}
 

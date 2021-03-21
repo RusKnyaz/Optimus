@@ -104,5 +104,39 @@ namespace Knyaz.Optimus.Tests.Dom
 			_input.SetAttribute("disabled", attrValue);	
 			Assert.AreEqual(expectedValue, _input.Disabled);
 		}
+		
+		[TestCase("checkbox", ExpectedResult = "checkbox")]
+		[TestCase("CHECKbox", ExpectedResult = "checkbox")]
+		[TestCase("invalid", ExpectedResult = "text")]
+		[TestCase("button", ExpectedResult ="button")]
+		[TestCase("checkbox", ExpectedResult ="checkbox")]
+		[TestCase("color", ExpectedResult ="color")]
+		[TestCase("date", ExpectedResult ="date")]
+		[TestCase("datetime-local", ExpectedResult ="datetime-local")]
+		[TestCase("email", ExpectedResult ="email")]
+		[TestCase("file", ExpectedResult ="file")]
+		[TestCase("hidden", ExpectedResult ="hidden")]
+		[TestCase("image", ExpectedResult ="image")]
+		[TestCase("month", ExpectedResult ="month")]
+		[TestCase("number", ExpectedResult ="number")]
+		[TestCase("password", ExpectedResult ="password")]
+		[TestCase("radio", ExpectedResult ="radio")]
+		[TestCase("range", ExpectedResult ="range")]
+		[TestCase("reset", ExpectedResult ="reset")]
+		[TestCase("search", ExpectedResult ="search")]
+		[TestCase("submit", ExpectedResult ="submit")]
+		[TestCase("tel", ExpectedResult = "tel")]
+		[TestCase("text", ExpectedResult ="text")]
+		[TestCase("time", ExpectedResult ="time")]
+		[TestCase("url", ExpectedResult ="url")]
+		[TestCase("week",ExpectedResult = "week")]
+		public static string SetType(string type)
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument();
+			var elt = (HtmlInputElement)document.CreateElement("input");
+			elt.Type = type;
+			Assert.AreEqual(type, elt.GetAttribute("type"));
+			return elt.Type;
+		}
 	}
 }
