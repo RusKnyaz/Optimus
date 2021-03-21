@@ -102,6 +102,7 @@ namespace Knyaz.Optimus
 					//todo: use right encoding and enctype
 					request.Method = "POST";
 					request.Data = Encoding.UTF8.GetBytes(data);
+					request.Headers["Content-Type"] = enctype;
 				}
 
 				var response = await ResourceProvider.SendRequestAsync(request);
