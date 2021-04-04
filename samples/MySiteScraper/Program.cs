@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Knyaz.Optimus;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 //using Knyaz.Optimus.Scripting.Jurassic;
 using Knyaz.Optimus.TestingTools;
