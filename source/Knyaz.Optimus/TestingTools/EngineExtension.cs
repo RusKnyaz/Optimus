@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
 using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ResourceProviders;
 
 namespace Knyaz.Optimus.TestingTools
 {
@@ -271,6 +273,11 @@ namespace Knyaz.Optimus.TestingTools
 			((Navigator) engine.Window.Navigator).UserAgent = userAgent;
 			return engine;
 		}
+		
+		public static async Task<IResource> DownloadAsync(this Engine engine, string href) =>
+			(await engine.ResourceProvider.SendRequestAsync(new Request("GET", new Uri(href)) {
+				Cookies = engine.CookieContainer
+			}));
 	}
 
 	public enum KnownUserAgents

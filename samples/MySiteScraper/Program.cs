@@ -83,7 +83,7 @@ namespace MySiteScraper
 			else
 			{
 				Console.WriteLine("Downloading: " + anchor.Href);
-				using var s = engine.DownloadAsync(url + anchor.Href).Result;
+				using var s = engine.DownloadAsync(url + anchor.Href).Result.Stream;
 				var data = s.ReadBytesToEnd();
 				Console.WriteLine($"Downloaded {data.Length} bytes.");
 			}
@@ -105,10 +105,5 @@ namespace MySiteScraper
 				return ms.ToArray();
 			}
 		}
-
-		public static async Task<Stream> DownloadAsync(this Engine engine, string href) =>
-			(await engine.ResourceProvider.SendRequestAsync(new Request("GET", new Uri(href)) {
-				Cookies = engine.CookieContainer
-			})).Stream;
 	}
 }
