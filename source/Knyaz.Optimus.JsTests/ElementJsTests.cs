@@ -60,7 +60,10 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ChildNodesIsLive")]
 		public void ElementTests(string testName)
 		{
-			if (_jsEngine == JsEngines.Jurassic && (testName == "DataSetToAttribute" || testName == "DataSetToExistingAttribute"))
+			if (_jsEngine == JsEngines.Jurassic && (
+				testName == "DataSetToAttribute" 
+				|| testName == "DataSetToExistingAttribute"
+				|| testName == "SetChildNode"))
 				Assert.Ignore("Ignored due to bug in jurassic");
 		
 			JsTestsRunner.Run(_jsEngine, testName);
