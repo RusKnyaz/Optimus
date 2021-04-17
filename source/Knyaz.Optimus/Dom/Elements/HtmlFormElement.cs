@@ -29,7 +29,19 @@ namespace Knyaz.Optimus.Dom.Elements
 		static string[] AllowedEnctypes = new []{"application/x-www-form-urlencoded", "multipart/form-data", "text/plain" };
 		private static string[] AllowedMethods = new[] {"get", "post"};
 
-		internal HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form){}
+		internal HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form)
+		{
+			Elements = new HtmlCollection(() =>
+			{
+				//todo: consider to make search more optimal
+				var allElements = this.IsInDocument() ? OwnerDocument.Flatten() : this.Flatten();
+				return allElements.OfType<IFormElement>()
+					.Where(x => x.Form == this)
+					.OfType<HtmlElement>()
+					.Where(x => !(x is HtmlInputElement htmlInputElement) || htmlInputElement.Type != "image")
+					.ToList();
+			});
+		}
 
 		protected override void CallDirectEventSubscribers(Event evt)
 		{
@@ -139,20 +151,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// is the form element, with the exception of input elements whose type attribute is in the Image Button state, 
 		/// which must, for historical reasons, be excluded from this particular collection.
 		/// </summary>
-		public IReadOnlyCollection<HtmlElement> Elements
-		{
-			get
-			{
-				//todo: consider to make search more optimal
-				var allelements = this.IsInDocument() ? OwnerDocument.Flatten() : this.Flatten();
-				return allelements.OfType<IFormElement>()
-                    .Where(x => x.Form == this)
-                    .OfType<HtmlElement>()
-                    .Where(x=> !(x is HtmlInputElement) ||((HtmlInputElement)x).Type != "image" )
-					.ToList();
-			}
-		} 
-
+		public HtmlCollection Elements { get; }
+		
 		/// <summary>
 		/// Resets the form to its initial state.
 		/// </summary>

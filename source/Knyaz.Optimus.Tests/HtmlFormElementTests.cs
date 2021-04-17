@@ -1,4 +1,5 @@
 using System.Linq;
+using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.TestingTools;
@@ -20,6 +21,17 @@ namespace Knyaz.Optimus.Tests
 			var form = engine.Document.Get<HtmlFormElement>("#f").FirstOrDefault();
 			Assert.IsNotNull(form);
 			Assert.AreEqual(1, form.Elements.Count);
+		}
+
+		[Test]
+		public void ElementsIsLiveCollection()
+		{
+			var document = DomImplementation.Instance.CreateHtmlDocument();
+			var form = (HtmlFormElement)document.CreateElement("form");
+			var elements = form.Elements; 
+			Assume.That(elements.Count, Is.EqualTo(0));
+			form.AppendChild(document.CreateElement("input"));
+			Assert.AreEqual(1, elements.Count);
 		}
 
 		[TestCase("", ExpectedResult = "http://a.bc/Account/Login/")]
