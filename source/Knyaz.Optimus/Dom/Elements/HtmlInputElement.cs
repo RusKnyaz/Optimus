@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using Knyaz.Optimus.Dom.Events;
-using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Elements

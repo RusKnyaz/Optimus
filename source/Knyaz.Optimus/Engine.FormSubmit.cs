@@ -37,9 +37,10 @@ namespace Knyaz.Optimus
 				return;
 			
 			var dataElements = form.Elements.OfType<IFormElement>()
-				.Where(x => !string.IsNullOrEmpty(x.Name) && 
-				            !(x is HtmlInputElement input && input.Type == "checkbox" && !input.Checked) //skip unchecked cheboxes
-				            );
+				.Where(x => 
+					!string.IsNullOrEmpty(x.Name) 
+					&& !(x is HtmlInputElement input && input.Type == "checkbox" && !input.Checked) //skip unchecked checkboxes
+					&& !x.Disabled);
 
 			var replaceSpaces = method != "post" || enctype != "multipart/form-data";
 

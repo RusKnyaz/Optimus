@@ -238,5 +238,27 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			
 			engine.Document.Assert(doc => doc.Location.Href == "http://site.net/login");
 		}
+
+		[Test]
+		public static async Task OmitDisabledInputs()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method='post'>" +
+					"<input name=t1 value=A/>" +
+					"<input name=t2 value=B disabled/>" +
+					"<input name=t3 value=C disabled=1/>" +
+					"<input name=t4 value=D disabled=0/>" +
+					"<button id=b type='submit'></button></form>");
+			
+			var engine = TestingEngine.BuildJint(new ResourceProvider(httpResources, null));
+			var page = await engine.OpenUrl("http://site.net");
+			
+			page.Document.Get<HtmlButtonElement>("button").First().Click();
+			
+			var data = 	Encoding.UTF8.GetString(httpResources.History[1].Data);
+			Assert.AreEqual("t1=A", data);
+			
+		}
 	}
 }
