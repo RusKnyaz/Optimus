@@ -245,5 +245,9 @@ namespace Knyaz.Optimus.Environment
 			evt.InitEvent(eventType, options != null && options.Bubbles, options != null && options.Cancelable);
 			return evt;
 		}
+
+		[JsCtor("UIEvent")]
+		public UiEvent NewUiEvent(string eventType = null, UiEventInitOptions options = null) => 
+			new UiEvent(Document, eventType, options);
 	}
 }

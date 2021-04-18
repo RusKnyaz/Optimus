@@ -1,21 +1,42 @@
-﻿using Knyaz.Optimus.Environment;
+﻿using System;
+using Knyaz.Optimus.Environment;
+using Knyaz.Optimus.ScriptExecuting;
 
 namespace Knyaz.Optimus.Dom.Events
 {
 	/// <summary>
 	/// The base class for UI events.
 	/// </summary>
-	public class UIEvent : Event
+	[JsName("UIEvent")]
+	public class UiEvent : Event
 	{
-		internal UIEvent(Document owner) : base(owner){}
-		
-		public Window View {
-			get;
-			protected set;
+		internal UiEvent(Document owner) : base(owner){}
+
+		internal UiEvent(Document owner, string type, UiEventInitOptions options) :
+			base(owner, type, options)
+		{
+			View = options?.View;
+			Detail = options?.Detail ?? 0;
 		}
-		/*
-		readonly    attribute long    detail;*/
-		//todo: complete
+
+		[Obsolete("The method is deprecated.")]
+		[JsName("InitUIEvent")]
+		public void InitUiEvent(string type, bool canBubble, bool cancelable,Window view, long detail)
+		{
+			base.InitEvent(type, canBubble, cancelable);
+			View = view;
+			Detail = detail;
+		}
 		
+		public Window View { get; private set; }
+		
+		public long Detail { get; private set; }
+	}
+	
+	public class UiEventInitOptions : EventInitOptions
+	{
+		public long Detail;
+
+		public Window View;
 	}
 }

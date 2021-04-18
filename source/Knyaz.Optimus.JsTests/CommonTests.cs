@@ -202,6 +202,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		public void XmlHttpRequestTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("FunctionsDefined")]
+		[TestCase("NewUIEvent")]
+		[TestCase("NewEvent")]
+		[TestCase("WindowIsSelf")]
 		public void WindowTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 		
 		[TestCase("StyleOfCustom")]

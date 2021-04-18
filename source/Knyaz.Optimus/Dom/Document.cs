@@ -398,7 +398,7 @@ namespace Knyaz.Optimus.Dom
 					return new MutationEvent(this);
 				case "uievent":
 				case "uievents":
-					return new UIEvent(this);
+					return new UiEvent(this);
 				case "keyboardevent":
 				case "keyboardevents":
 					return new KeyboardEvent(this);

@@ -5,7 +5,7 @@ namespace Knyaz.Optimus.Dom.Events
 	/// <summary>
 	/// Describes a user interaction with the keyboard.
 	/// </summary>
-	public class KeyboardEvent : UIEvent
+	public class KeyboardEvent : UiEvent
 	{
 		private string _modifiers;
 
@@ -34,8 +34,7 @@ namespace Knyaz.Optimus.Dom.Events
 			ulong location,
 			string modifiers, bool repeat)
 		{
-			InitEvent(type, canBubble, cancellable);
-			View = view;
+			InitUiEvent(type, canBubble, cancellable, view, 0);
 			Code = charArg;
 			Key = key;
 			Location = location;
