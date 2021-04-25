@@ -255,11 +255,7 @@ namespace Knyaz.Optimus
 
 		public void Dispose() => Window.Dispose();
 
-		/// <summary>
-		/// Gets the current media settings (used in computed styles evaluation).
-		/// </summary>
-		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
-
+		
 		private IScriptExecutor _scriptExecutor;
 	}
 }

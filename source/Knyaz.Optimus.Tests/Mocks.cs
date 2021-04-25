@@ -52,8 +52,6 @@ namespace Knyaz.Optimus.Tests
 			resourceProvider.Resource(url, Encoding.UTF8.GetBytes(data), mimeType);
 		
 		
-		
-		
 		public static SpecResourceProvider HttpResourceProvider() => new SpecResourceProvider();
 
 		public class SpecResourceProvider : IResourceProvider

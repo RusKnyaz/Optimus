@@ -73,7 +73,6 @@ namespace Knyaz.Optimus.ResourceProviders
 					case "Content-Type":
 						if (resultRequest.Content == null)
 							throw new Exception("'Content-Type' header requires data to be not null.");
-							
 						resultRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(keyValue.Value);
 						break;
 					default:

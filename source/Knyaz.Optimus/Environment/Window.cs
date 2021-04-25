@@ -203,7 +203,11 @@ namespace Knyaz.Optimus.Environment
 		/// Returns a new MediaQueryList object representing the parsed results of the specified media query string.
 		/// </summary>
 		public MediaQueryList MatchMedia(string media)
-			=> new MediaQueryList(media, () => _engine.CurrentMedia);
+			=> new MediaQueryList(media, () => CurrentMedia);
+		
+		/// <summary> Gets the current media settings (used in computed styles evaluation). </summary>
+		[JsHidden]
+		public readonly MediaSettings CurrentMedia  = new MediaSettings {Device = "screen", Width = 1024};
 
 		/// <summary>
 		/// Disposes the window object.
