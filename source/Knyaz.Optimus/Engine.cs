@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.Html;
 using Knyaz.Optimus.ResourceProviders;
@@ -19,8 +20,8 @@ namespace Knyaz.Optimus
 	/// </summary>
 	public partial class Engine: IDisposable
 	{
+		private IScriptExecutor _scriptExecutor;
 		private readonly Func<Document, DocumentStyling> _docStylingFn;
-		private Document _document;
 		private Uri _uri;
 		internal readonly LinkProvider LinkProvider = new LinkProvider();
 		
@@ -47,23 +48,16 @@ namespace Knyaz.Optimus
 			}
 		}
 
-		/// <summary>
-		/// Glues Document and ScriptExecutor.
-		/// </summary>
-		internal DocumentScripting Scripting {get; private set;}
-		internal DocumentStyling Styling { get; private set; }
-
-		/// <summary>
-		/// Returns the cookie container that used to create requests.
-		/// </summary>
-		public CookieContainer CookieContainer => _cookieContainer; 
+		
+		/// <summary> Returns the cookie container that used to create requests. </summary>
+		public CookieContainer CookieContainer { get; }
 
 		/// <summary>
 		/// Gets the current Window object.
 		/// </summary>
 		public Window Window { get; }
-
-		readonly CookieContainer _cookieContainer;
+		
+		internal DocumentHolder CurrentDocument { get; private set; }
 
 		internal Engine(IResourceProvider resourceProvider,
 			Window window,
@@ -75,7 +69,7 @@ namespace Knyaz.Optimus
 			
 			_predictedResourceProvider = resourceProvider as IPredictedResourceProvider;
 			
-			_cookieContainer = new CookieContainer();
+			CookieContainer = new CookieContainer();
 
 			Window = window ?? throw new ArgumentNullException(nameof(window));
 			Window.Engine = this;
@@ -83,62 +77,73 @@ namespace Knyaz.Optimus
 			if (scriptExecutor != null)
 				ScriptExecutor = scriptExecutor; 
 		}
+		
 
 		/// <summary>
 		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).
 		/// </summary>
-		public Document Document
+		public Document Document => CurrentDocument?.Document;
+		
+		internal class DocumentHolder : IDisposable
 		{
-			get { return _document; }
-			private set
+			public readonly Document Document;
+			/// <summary>
+			/// Glues Document and ScriptExecutor.
+			/// </summary>
+			public readonly DocumentScripting Scripting;
+			public readonly DocumentStyling Styling;
+			
+			private readonly Action<HtmlFormElement, Dom.Elements.HtmlElement> _onFormSubmit;
+
+			public DocumentHolder(Document document,
+				DocumentScripting scripting, 
+				DocumentStyling styling, 
+				Action<HtmlFormElement, Dom.Elements.HtmlElement> onFormSubmit)
 			{
-				if (_document != null)
-				{
-					Document.OnFormSubmit -= OnFormSubmit;
-				}
-
-				if (Scripting != null)
-				{
-					
-					Scripting.Dispose();
-					Scripting = null;
-				}
-
-				if (Styling != null)
-				{
-					Styling.Dispose();
-					Styling = null;
-				}
-
-				_document = value;
-				
-				if (_document != null)
-				{
-					if (_scriptExecutor != null)
-					{
-						Scripting = new DocumentScripting(_document, ScriptExecutor,
-							s => ResourceProvider.SendRequestAsync(CreateRequest(s)));
-					}
-
-					Document.OnFormSubmit += OnFormSubmit;
-					
-					Document.CookieContainer = _cookieContainer;
-
-					Styling = _docStylingFn?.Invoke(_document);
-					
-					Document.GetImage = async url =>
-					{
-						var request = CreateRequest(url);
-						var response = await ResourceProvider.SendRequestAsync(request);
-						if(response is HttpResponse httpResponse && httpResponse.StatusCode != HttpStatusCode.OK)
-							throw new Exception("Resource not found");
-							
-						return new Image(response.Type, response.Stream);
-					};
-				}
-
-				DocumentChanged?.Invoke();
+				Document = document;
+				_onFormSubmit = onFormSubmit;
+				Scripting = scripting;
+				Styling = styling;
+				Document.OnFormSubmit += onFormSubmit;
 			}
+
+			public void Dispose()
+			{
+				Scripting?.Dispose();
+				Styling?.Dispose();
+				Document.OnFormSubmit -= _onFormSubmit;
+			}
+		}
+
+		private void ResetDocument(bool clearScript)
+		{
+			if(clearScript)
+				ScriptExecutor?.Clear();
+			
+			CurrentDocument?.Dispose();
+			
+			var document = new Document(Window);
+			var scripting = ScriptExecutor != null
+				? new DocumentScripting(
+					document,
+					ScriptExecutor,
+					s => ResourceProvider.SendRequestAsync(CreateRequest(s)))
+				: null;
+
+			document.CookieContainer = CookieContainer;
+
+			document.GetImage = async url =>
+			{
+				var request = CreateRequest(url);
+				var response = await ResourceProvider.SendRequestAsync(request);
+				if (response is HttpResponse httpResponse && httpResponse.StatusCode != HttpStatusCode.OK)
+					throw new Exception("Resource not found");
+
+				return new Image(response.Type, response.Stream);
+			};
+
+			CurrentDocument = new DocumentHolder(document, scripting, _docStylingFn?.Invoke(document), OnFormSubmit);
+			DocumentChanged?.Invoke();
 		}
 		
 
@@ -175,12 +180,10 @@ namespace Knyaz.Optimus
 		{
 			//todo: stop unfinished ajax requests or drop their results
 			Window.Timers.ClearAll();
-			if(clearScript)
-				ScriptExecutor?.Clear();
 			var uri = UriHelper.IsAbsolute(path) ? new Uri(path) : new Uri(Uri, path);
 			Window.History.PushState(null, null, uri.AbsoluteUri);
-			
-			Document = new Document(Window);
+
+			ResetDocument(clearScript);
 			LinkProvider.Root = Uri.GetRoot();
 			var response = await ResourceProvider.SendRequestAsync(CreateRequest(path));
 			
@@ -190,12 +193,12 @@ namespace Knyaz.Optimus
 				? new HttpPage(Document, httpResponse.StatusCode)
 				: new Page(Document);
 		}
-
+		
 		internal Request CreateRequest(string uri, string method = "GET")
 		{
 			var req = new Request(method, LinkProvider.MakeUri(uri));
 			req.Headers["User-Agent"] = Window.Navigator.UserAgent;
-			req.Cookies = _cookieContainer;
+			req.Cookies = CookieContainer;
 			return req;
 		}
 
@@ -254,8 +257,5 @@ namespace Knyaz.Optimus
 		}
 
 		public void Dispose() => Window.Dispose();
-
-		
-		private IScriptExecutor _scriptExecutor;
 	}
 }

@@ -83,18 +83,18 @@ namespace Knyaz.Optimus
 
 			if (action != "about:blank")
 			{
-				var document = new Document(Window);
+				Document document;
 
 				HtmlIFrameElement targetFrame;
 				if (!string.IsNullOrEmpty(form.Target) &&
 				    (targetFrame = Document.GetElementsByName(target).FirstOrDefault() as HtmlIFrameElement) != null)
 				{
-					targetFrame.ContentDocument = document;
+					document = targetFrame.ContentDocument = new Document(Window);
 				}
 				else
 				{
-					ScriptExecutor?.Clear();
-					Document = document;
+					ResetDocument(true);
+					document = Document;
 				}
 
 				var request = CreateRequest(url);

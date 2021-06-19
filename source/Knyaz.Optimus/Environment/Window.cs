@@ -189,7 +189,7 @@ namespace Knyaz.Optimus.Environment
 		/// <param name="pseudoElt">A string specifying the pseudo-element to match. Must be omitted (or null) for regular elements.</param>
 		public ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt)
 		{
-			var styling = _engine.Styling;
+			var styling = _engine.CurrentDocument.Styling;
 			if (styling != null)
 				return styling.GetComputedStyle(element);
 

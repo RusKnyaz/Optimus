@@ -43,6 +43,7 @@ namespace Knyaz.Optimus.Dom
 		internal DateTime CreatedOn = DateTime.UtcNow;
 
 		//Used in HtmlImageElement for image loading.
+		//todo: remove it from document or initialize from ctor.
 		internal Func<string, Task<IImage>> GetImage;
 
 		internal Func<Element, RectangleF[]> GetElementBounds;
