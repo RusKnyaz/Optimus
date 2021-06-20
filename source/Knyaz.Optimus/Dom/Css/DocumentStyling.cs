@@ -49,7 +49,7 @@ namespace Knyaz.Optimus.Dom.Css
 		    }
 		}
 
-		private void HandleNode(INode node)
+		private void HandleNode(Node node)
 		{
 			if (node is Text txt && node.ParentNode is HtmlStyleElement styleElt && !string.IsNullOrWhiteSpace(txt.Data))
 			{

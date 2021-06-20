@@ -17,8 +17,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// <summary>
 	/// http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
 	/// </summary>
-	/// <inheritdoc cref="INode"/>
-	public abstract class Node : INode, IEventTarget
+	public abstract class Node : IEventTarget
 	{
 		private readonly EventTarget  EventTarget;
 		internal NodeSources Source;

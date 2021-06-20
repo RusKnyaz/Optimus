@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Tools;
-using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ScriptExecuting;
 
@@ -399,7 +398,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary> Checks whether a node is a descendant of a given Element or not. </summary>
 		/// <param name="element">The node to search.</param>
 		/// <returns><c>True</c> if node found, <c>False</c> otherwise.</returns>
-		public bool Contains(INode element) => ChildNodes.Flat(x => x.ChildNodes).Contains(element);
+		public bool Contains(Node element) => ChildNodes.Flat(x => x.ChildNodes).Contains(element);
 
 		/// <summary> For an Element the NodeName is tag name. </summary>
 		public override string NodeName => TagName;

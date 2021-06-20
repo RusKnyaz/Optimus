@@ -6,7 +6,6 @@ using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
 using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting;
-using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Tools;
 using System.IO;
 

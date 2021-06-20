@@ -1,5 +1,4 @@
-﻿using Knyaz.Optimus.Dom.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Knyaz.Optimus.Dom.Elements;
 
@@ -14,7 +13,7 @@ namespace Knyaz.Optimus.Tools
 		/// Gets all descendants of a given node with the node itself.
 		/// </summary>
 		/// <returns>The original node and all of its descendants.</returns>
-		public static IEnumerable<INode> Flatten(this INode elem)
+		public static IEnumerable<Node> Flatten(this Node elem)
 		{
 			yield return elem;
 			foreach (var documentElement in elem.ChildNodes.SelectMany(x => x.Flatten()))
@@ -35,7 +34,7 @@ namespace Knyaz.Optimus.Tools
 		/// </summary>
 		/// <returns><c>true</c> if is in document the specified node; otherwise, <c>false</c>.</returns>
 		/// <param name="node">Node.</param>
-		public static bool IsInDocument(this INode node)
+		public static bool IsInDocument(this Node node)
 		{
 			var praParent = node;
 			while (praParent.ParentNode != null)
@@ -47,7 +46,7 @@ namespace Knyaz.Optimus.Tools
 		/// <summary>
 		/// Retrieves all node ancestors.
 		/// </summary>
-		public static IEnumerable<INode> Ancestors(this INode node)
+		public static IEnumerable<Node> Ancestors(this Node node)
 		{
 			var parent = node.ParentNode;
 			while (parent != null)

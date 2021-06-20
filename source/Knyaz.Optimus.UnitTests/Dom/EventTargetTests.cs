@@ -1,7 +1,6 @@
 ﻿using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Events;
-using Knyaz.Optimus.Dom.Interfaces;
 using Moq;
 using NUnit.Framework;
 
@@ -18,9 +17,9 @@ namespace Knyaz.Optimus.Tests.Dom
 			void OnRootCapture(Event evt);
 		}
 
-		private INode _childOriginal;
-		private INode _parentOriginal;
-		private INode _rootOriginal;
+		private object _childOriginal;
+		private object _parentOriginal;
+		private object _rootOriginal;
 
 		private EventTarget _child;
 		private EventTarget _parent;
@@ -33,16 +32,16 @@ namespace Knyaz.Optimus.Tests.Dom
 		{
 			_handlers = new Mock<IEventHandlers>();
 
-			_rootOriginal = Mock.Of<INode>();
+			_rootOriginal = new object();
 			_root = new EventTarget(_rootOriginal, () => null);
 			_root.AddEventListener("click", _handlers.Object.OnRootBubble, false);
 			_root.AddEventListener("click", _handlers.Object.OnRootCapture, true);
 
-			_parentOriginal = Mock.Of<INode>();
+			_parentOriginal = new object();
 			_parent = new EventTarget(_parentOriginal, () => _root);
 			_parent.AddEventListener("click", _handlers.Object.OnParentBubble, false);
 
-			_childOriginal = Mock.Of<INode>();
+			_childOriginal = new object();
 			_child = new EventTarget(_childOriginal, () => _parent);
 			_child.AddEventListener("click", _handlers.Object.OnChildBubble, false);
 		}
