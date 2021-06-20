@@ -22,7 +22,7 @@ namespace Knyaz.Optimus.Dom
 	/// all idls http://www.w3.org/TR/REC-DOM-Level-1/idl-definitions.html
 	/// </summary>
 	[JsName("HTMLDocument")]
-	public class HtmlDocument : Element, IDocument
+	public class HtmlDocument : Element
 	{
 		//used for event's timestamp.
 		internal DateTime CreatedOn = DateTime.UtcNow;
@@ -197,7 +197,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary>
 		/// Fired when the initial HTML document has been completely loaded and parsed, without waiting for stylesheets, images, and subframes to finish loading.
 		/// </summary>
-		public event Action<IDocument> DomContentLoaded;
+		internal event Action<HtmlDocument> DomContentLoaded;
 
 		/// <summary>
 		/// Returns a StyleSheetList of CSSStyleSheet objects for stylesheets explicitly linked into or embedded in a document.

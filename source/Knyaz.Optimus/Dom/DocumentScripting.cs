@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.Dom
 	{
 		private readonly Queue<Tuple<Task<string>, HtmlScriptElement>> _deferredScripts = 
 			new Queue<Tuple<Task<string>, HtmlScriptElement>>();
-		private readonly IDocument _document;
+		private readonly HtmlDocument _document;
 		private readonly IScriptExecutor _scriptExecutor;
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
 
@@ -122,7 +122,7 @@ namespace Knyaz.Optimus.Dom
 			return null;
 		}
 
-		void OnDocumentDomContentLoaded (IDocument document)
+		void OnDocumentDomContentLoaded (HtmlDocument document)
 		{
 			//Execute deferred scripts
 			while (_deferredScripts.Count > 0)
