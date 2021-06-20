@@ -71,7 +71,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void DomBuildOrder()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var res = "";
             
 			var div = document.CreateElement("div");
@@ -83,9 +83,9 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual("<DIV><SPAN></SPAN></DIV>", res);
 		}
 
-		private Document Build(string txt)
+		private HtmlDocument Build(string txt)
 		{
-			var d = new Document();
+			var d = new HtmlDocument();
 			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(txt)))
 			{
 				DocumentBuilder.Build(d, stream);	

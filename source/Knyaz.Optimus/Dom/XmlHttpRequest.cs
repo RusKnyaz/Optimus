@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Dom
 		private readonly Func<string, string, Request> _requestFn;
 		private readonly IResourceProvider _resourceProvider;
 		private readonly Func<object> _syncObj;
-		private readonly Document _owner;
+		private readonly HtmlDocument _owner;
 		private Request _request;
 		private object _responseObj = null;
 		private bool _async;
@@ -31,7 +31,7 @@ namespace Knyaz.Optimus.Dom
 		
 		internal XmlHttpRequest(IResourceProvider resourceProvider, 
 			Func<object> syncObj, 
-			Document owner, 
+			HtmlDocument owner, 
 			Func<string, string, Request> requestFn)
 		{
 			_resourceProvider = resourceProvider ?? throw new ArgumentNullException(nameof(resourceProvider));
@@ -110,12 +110,12 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
-		private Document _responseXml = null;
+		private HtmlDocument _responseXml = null;
 		
 		/// <summary>
 		/// Gets a Document containing the HTML or XML retrieved by the request.
 		/// </summary>
-		public Document ResponseXML 
+		public HtmlDocument ResponseXML 
 		{ 
 			get
 			{
@@ -126,7 +126,7 @@ namespace Knyaz.Optimus.Dom
 					return _responseXml;
 
 				if (ResponseType == "document")
-					return (Document) Response;
+					return (HtmlDocument) Response;
 
 				if (ResponseType == "")
 					return null;
@@ -179,7 +179,7 @@ namespace Knyaz.Optimus.Dom
 					using (var reader = new BinaryReader(_stream))
 						return new ArrayBuffer(reader.ReadBytes((int)_stream.Length));
 				case "document":
-					var doc = new Document();
+					var doc = new HtmlDocument();
 					DocumentBuilder.Build(doc, _stream);
 					return doc;
 				case "json":

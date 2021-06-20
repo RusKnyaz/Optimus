@@ -48,7 +48,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 		{
 			var xhr = Send("document", "<html><body><div id=h>hello</div></body></html>");
 
-			Assert.IsInstanceOf<Document>(xhr.Response);
+			Assert.IsInstanceOf<HtmlDocument>(xhr.Response);
 			Assert.AreEqual(xhr.Response, xhr.ResponseXML);
 			Assert.AreEqual(xhr.ResponseXML, xhr.ResponseXML);
 			Assert.AreEqual("hello", xhr.ResponseXML.GetElementById("h").InnerHTML);

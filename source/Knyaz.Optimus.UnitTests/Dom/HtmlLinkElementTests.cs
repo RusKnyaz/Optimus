@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlLinkElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlLinkElement _link;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_link = (HtmlLinkElement)_document.CreateElement("link");
 		}
 

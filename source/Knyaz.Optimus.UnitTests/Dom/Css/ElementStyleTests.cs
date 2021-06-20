@@ -13,14 +13,14 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	public class ElementStyleTests
 	{
 		private IWindow _window;
-		private Document _document;
+		private HtmlDocument _document;
 		HtmlDivElement _div;
 
 		[SetUp]
 		public void SetUp()
 		{
 			_window = Mock.Of<IWindow>();
-			_document = new Document(_window);
+			_document = new HtmlDocument(_window);
 			_div = (HtmlDivElement) _document.CreateElement("DIV");
 		}
 

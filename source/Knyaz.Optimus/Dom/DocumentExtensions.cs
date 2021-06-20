@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom
 		/// <summary> Adds layout service to enable GetClientRects function. </summary>
 		/// <param name="document"></param>
 		/// <param name="layoutService"></param>
-		public static void AttachLayoutService(this Document document, ILayoutService layoutService)
+		public static void AttachLayoutService(this HtmlDocument document, ILayoutService layoutService)
 		{
 			document.GetElementBounds = 
 				layoutService != null ? layoutService.GetElementBounds 

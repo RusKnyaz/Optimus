@@ -279,7 +279,7 @@ namespace Knyaz.Optimus.Tests.ScriptExecuting
                 @"var listener = function(e){console.log(e);};
                 addEventListener('click', listener, true);");
 
-            var evt = new Event("click", new Document());
+            var evt = new Event("click", new HtmlDocument());
 
             Assert.IsNotNull(args);
             args.Item2(evt);

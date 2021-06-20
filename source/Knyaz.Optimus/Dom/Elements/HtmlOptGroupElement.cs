@@ -8,6 +8,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLOptGroupElement")]
 	public class HtmlOptGroupElement : HtmlElement
 	{
-		internal HtmlOptGroupElement(Document ownerDocument) : base(ownerDocument, TagsNames.OptGroup){}
+		internal HtmlOptGroupElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.OptGroup){}
 	}
 }

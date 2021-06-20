@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetStyleFromAttribute()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var elem = doc.CreateElement("div") as HtmlElement;
 			Assert.IsNotNull(elem);
 			elem.SetAttribute("style","color:black");
@@ -22,7 +22,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase(false, 0)]
 		public void CloneSpan(bool deep, int expectedChildCount)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
 			var span = document.GetElementById("s");
 
@@ -50,7 +50,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CloneNode()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var comment = document.CreateComment("text");
 			comment.CloneNode().Assert(clone => clone.OwnerDocument == document);
 
@@ -64,7 +64,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void DeepClone()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id='p1'><div id=p2><span id='s'>Span text</span></div></div></body></html>");
 
 			var p1 = document.GetElementById("p1");
@@ -77,7 +77,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void Contains()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var elt = document.CreateElement("div");
 			var sub = document.CreateElement("span");
 			elt.AppendChild(sub);
@@ -91,7 +91,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void TextContent()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><ul id=\"myList\"><li id=\"item1\">Coffee</li><li id=\"item2\">Tea</li></ul></body></html>");
 			var ul = document.GetElementById("myList");
 			Assert.AreEqual("CoffeeTea", ul.TextContent);
@@ -100,7 +100,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void AttributesCaseInsensitive()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><div id=a CustomAttr=abc></div></html>");
 			var a = document.GetElementById("a");
 			a.SetAttribute("ABC", "1");

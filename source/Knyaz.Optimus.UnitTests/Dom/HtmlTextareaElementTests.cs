@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlTextareaElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlTextAreaElement _textArea;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_textArea = (HtmlTextAreaElement)_document.CreateElement("textarea");
 		}
 

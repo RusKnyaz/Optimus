@@ -22,7 +22,7 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		private static readonly string[] AvailableTypes = {"submit", "button", "reset"};
 
-		internal HtmlButtonElement(Document ownerDocument) : base(ownerDocument, TagsNames.Button) { }
+		internal HtmlButtonElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Button) { }
 
 		protected override void CallDirectEventSubscribers(Event evt)
 		{

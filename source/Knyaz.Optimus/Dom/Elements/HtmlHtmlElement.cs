@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLHtmlElement")]
 	public sealed class HtmlHtmlElement : HtmlElement
 	{
-		internal HtmlHtmlElement(Document ownerDocument) : base(ownerDocument, TagsNames.Html){}
+		internal HtmlHtmlElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Html){}
 
 		/// <summary>
 		/// Gets or sets inner html of the 'HTML' element.

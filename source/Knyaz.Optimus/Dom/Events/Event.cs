@@ -52,7 +52,7 @@ namespace Knyaz.Optimus.Dom.Events
 		internal bool Canceled { get; private set; }
 		internal bool PreventDefaultDeprecated { get; set; }
 
-		internal Event(Document owner)
+		internal Event(HtmlDocument owner)
 		{
 			TimeStamp = (DateTime.UtcNow - owner.CreatedOn).Milliseconds;
 		}
@@ -62,12 +62,12 @@ namespace Knyaz.Optimus.Dom.Events
 		/// </summary>
 		/// <param name="type">Event type.</param>
 		/// <param name="owner">Parent document.</param>
-		internal Event(string type, Document owner):this(owner)
+		internal Event(string type, HtmlDocument owner):this(owner)
 		{
 			Type = type;
 		}
 
-		internal Event(Document owner, string type, EventInitOptions opts) : this(owner)
+		internal Event(HtmlDocument owner, string type, EventInitOptions opts) : this(owner)
 		{
 			InitEvent(type, opts?.Bubbles ?? false, opts?.Cancelable ?? false);
 		}

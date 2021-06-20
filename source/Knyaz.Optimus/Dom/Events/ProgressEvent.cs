@@ -24,7 +24,7 @@
 		/// <summary>
 		/// Creates a new ProgressEvent with a given type.
 		/// </summary>
-		public ProgressEvent(string type, Document owner):base(type, owner) {}
+		public ProgressEvent(string type, HtmlDocument owner):base(type, owner) {}
 
 		/// <summary>
 		/// Initializes the vent.

@@ -8,6 +8,6 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLDivElement")]
 	public sealed class HtmlDivElement : HtmlElement
 	{
-		internal HtmlDivElement(Document ownerDocument) : base(ownerDocument, TagsNames.Div) { }
+		internal HtmlDivElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Div) { }
 	}
 }

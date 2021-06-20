@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLLabelElement")]
 	public class HtmlLabelElement : HtmlElement
 	{
-		internal HtmlLabelElement(Document ownerDocument) : base(ownerDocument, TagsNames.Label){}
+		internal HtmlLabelElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Label){}
 
 		protected override void AfterEventDispatch(Event evt)
 		{

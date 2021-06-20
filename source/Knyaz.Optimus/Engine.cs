@@ -21,7 +21,7 @@ namespace Knyaz.Optimus
 	public partial class Engine: IDisposable
 	{
 		private IScriptExecutor _scriptExecutor;
-		private readonly Func<Document, DocumentStyling> _docStylingFn;
+		private readonly Func<HtmlDocument, DocumentStyling> _docStylingFn;
 		private Uri _uri;
 		internal readonly LinkProvider LinkProvider = new LinkProvider();
 		
@@ -62,7 +62,7 @@ namespace Knyaz.Optimus
 		internal Engine(IResourceProvider resourceProvider,
 			Window window,
 			IScriptExecutor scriptExecutor, 
-			Func<Document, DocumentStyling> docStyling)
+			Func<HtmlDocument, DocumentStyling> docStyling)
 		{
 			_docStylingFn = docStyling;
 			ResourceProvider = resourceProvider ?? throw new ArgumentNullException();
@@ -82,11 +82,11 @@ namespace Knyaz.Optimus
 		/// <summary>
 		/// Gets the active <see cref="Document"/> if exists (OpenUrl must be called before).
 		/// </summary>
-		public Document Document => CurrentDocument?.Document;
+		public HtmlDocument Document => CurrentDocument?.Document;
 		
 		internal class DocumentHolder : IDisposable
 		{
-			public readonly Document Document;
+			public readonly HtmlDocument Document;
 			/// <summary>
 			/// Glues Document and ScriptExecutor.
 			/// </summary>
@@ -95,7 +95,7 @@ namespace Knyaz.Optimus
 			
 			private readonly Action<HtmlFormElement, Dom.Elements.HtmlElement> _onFormSubmit;
 
-			public DocumentHolder(Document document,
+			public DocumentHolder(HtmlDocument document,
 				DocumentScripting scripting, 
 				DocumentStyling styling, 
 				Action<HtmlFormElement, Dom.Elements.HtmlElement> onFormSubmit)
@@ -122,7 +122,7 @@ namespace Knyaz.Optimus
 			
 			CurrentDocument?.Dispose();
 			
-			var document = new Document(Window);
+			var document = new HtmlDocument(Window);
 			var scripting = ScriptExecutor != null
 				? new DocumentScripting(
 					document,
@@ -202,7 +202,7 @@ namespace Knyaz.Optimus
 			return req;
 		}
 
-		private void LoadFromResponse(Document document, IResource resource)
+		private void LoadFromResponse(HtmlDocument document, IResource resource)
 		{
 			if (resource.Type == null || !resource.Type.StartsWith(ResourceTypes.Html))
 				throw new Exception("Invalid resource type: " + (resource.Type ?? "<null>"));
@@ -216,7 +216,7 @@ namespace Knyaz.Optimus
 			BuildDocument(document, resource.Stream);
 		}
 
-		private void BuildDocument(Document document, Stream stream)
+		private void BuildDocument(HtmlDocument document, Stream stream)
 		{
 			//todo: fix protocol
 			if(Uri == null)

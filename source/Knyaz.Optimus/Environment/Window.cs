@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Environment
 		public WindowTimers Timers => _timers;
 		
 		public IConsole Console { get; }
-		public Document Document => _engine.Document;
+		public HtmlDocument Document => _engine.Document;
 		public Storage LocalStorage { get; } = new Storage();
 		public Storage SessionStorage { get; }= new Storage();
 

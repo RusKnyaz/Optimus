@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<html><head><script id='s' type='text/javascript'>alert('a');</script></head></html>", "alert('a');")]
 		public void EmbeddedScriptInnerHtml(string html, string expectedInnerHtml)
 		{
-			var document = new Document(null);
+			var document = new HtmlDocument(null);
 			document.Write(html);
 			document.GetElementById("s").Assert(script => script.InnerHTML == expectedInnerHtml); 
 		}
@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ParseFromHtml()
 		{
-			var document = new Document(null);
+			var document = new HtmlDocument(null);
 			var div = document.CreateElement("div");
 			div.InnerHTML = "<script>var x = 5;</script>";
 			div.Assert(d=> 
@@ -33,7 +33,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CloneTest()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<script id=d>ABC</script>");
 			var script = document.GetElementById("d");
 			var clone = script.CloneNode(true) as HtmlScriptElement;

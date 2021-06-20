@@ -12,21 +12,21 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class DocumentTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 
 		[SetUp]
-		public void SetUp() => _document = new Document();
+		public void SetUp() => _document = new HtmlDocument();
 
 		[Test]
 		public void Document() =>
-			new Document().Assert(document =>
+			new HtmlDocument().Assert(document =>
 				document.OwnerDocument == null &&
 				document.ParentNode == null);
 
 		[Test]
 		public void Element()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><span></span></body></html>");
 			Assert.IsNotNull(document.DocumentElement);
 			Assert.AreEqual(2, document.DocumentElement.ChildNodes.Count);
@@ -40,7 +40,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CreateElement()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var el = document.CreateElement("div");
 			Assert.AreEqual("DIV", el.TagName);
 			Assert.AreEqual(document, el.OwnerDocument);
@@ -49,7 +49,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void Comment()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><!-- hello --></body></html");
 			Assert.AreEqual(1, document.Body.ChildNodes.Count);
 			Assert.IsInstanceOf<Comment>(document.Body.ChildNodes[0]);
@@ -58,7 +58,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void AppendChildRemovesNodeFromOldParrent()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id='p1'><span id='s'></span></div><div id='p2'></div></body></html");
 			var div1 = document.GetElementById("p1");
 			var div2 = document.GetElementById("p2");
@@ -74,7 +74,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void InsertBeforeRemovesNodeFromOldParrent()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id='p1'><span id='s'></span></div></body></html>");
 			var div1 = document.GetElementById("p1");
 			var span = document.GetElementById("s");
@@ -90,7 +90,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase(false, 0)]
 		public void CloneNode(bool deep, int expectedChildCount)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id='p1'><span id='s'>Span text</span></div></body></html>");
 			var span = document.GetElementById("s");
 
@@ -118,28 +118,28 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CreateComment()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.CreateComment("Com").Assert(com => com.Data == "Com" && com.OwnerDocument == document);
 		}
 
 		[Test]
 		public void CreateTextNode()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.CreateTextNode("X").Assert(text => text.Data == "X" && text.OwnerDocument == document);
 		}
 
 		[Test]
 		public void CreateAttribute()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.CreateAttribute("a").Assert(attr => attr.Name == "a" && attr.OwnerDocument == document);
 		}
 
 		[Test]
 		public void CreateDocumentFragment()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var x = document.CreateDocumentFragment();
 			Assert.AreEqual(document, x.OwnerDocument);
 			Assert.IsNull(x.ParentNode);
@@ -148,7 +148,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void HeadBody()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><head><meta/></head><body><div></div></body></html>");
 			document.Assert(doc => doc.Body.InnerHTML == "<DIV></DIV>" && doc.Head.InnerHTML == "<META></META>");
 		}
@@ -156,7 +156,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void UnClosedTag()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><head><meta></head><body><div></div></body></html>");
 			document.Assert(doc => doc.Body.InnerHTML == "<DIV></DIV>" && doc.Head.InnerHTML == "<META></META>");
 		}
@@ -164,7 +164,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void GetElementsByClassName()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><head><meta></head><body>" +
 						   "<div class='a' id='d1'></div>" +
 						   "<div class = 'b' id = 'd2'></div>" +
@@ -179,7 +179,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void DocumentElementNodeName()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><head><meta></head><body>" +
 						   "<div class='a' id='d1'></div>" +
 						   "<div class = 'b' id = 'd2'></div>" +
@@ -196,9 +196,9 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual(expectedMode, document.CompatMode);
 		}
 
-		private Document Document(string html)
+		private HtmlDocument Document(string html)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write(html);
 			return document;
 		}
@@ -284,7 +284,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<div id=s></div><div id=s></div>", "#s", "s,s")]
 		public void QuerySelectorAll(string html, string selector, string expectedIds)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write(html);
 
 			var items = doc.QuerySelectorAll(selector).OfType<IElement>().Select(x => x.Id).ToArray();
@@ -306,7 +306,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<select id=d><option selected></option></select>", "#d [selected]", "<OPTION selected=\"\"></OPTION>")]
 		public void QuerySelectorAll2(string html, string selector, string expectedResult)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write(html);
 			Assert.AreEqual(expectedResult, string.Join(",", doc.QuerySelectorAll(selector).OfType<HtmlElement>().Select(x => x.OuterHTML)));
 		}
@@ -314,7 +314,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void InnerHtml()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Head.InnerHTML = "<script>var a = 5;</script>";
 			Assert.AreEqual("<HEAD><SCRIPT>var a = 5;</SCRIPT></HEAD><BODY></BODY>", doc.DocumentElement.InnerHTML);
 		}
@@ -338,7 +338,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetBody()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var body = doc.CreateElement("body");
 			body.InnerHTML = "ABC";
 			doc.Body = (HtmlBodyElement)body;

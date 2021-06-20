@@ -7,13 +7,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlFormElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlFormElement _form;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_form = (HtmlFormElement)_document.CreateElement("form");
 		}
 

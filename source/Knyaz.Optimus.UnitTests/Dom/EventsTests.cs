@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase(false, true, false, "TD")]
 		public void Propagation(bool bubblable, bool stop, bool capture, string expectedEventsOrder)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<html><body><table id='table'><tr id='row'><td id='cell'></td></tr></table></body></html>");
 			var table = doc.GetElementById("table");
 			var row = doc.GetElementById("row");
@@ -44,7 +44,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void DomNodeInsertedTest()
 		{
 			var called = false;
-			var document = new Document();
+			var document = new HtmlDocument();
 			var x = document.CreateElement("div");
 			x.AddEventListener("DOMNodeInserted", e => called = true, false);
 			document.Body.AppendChild(x);

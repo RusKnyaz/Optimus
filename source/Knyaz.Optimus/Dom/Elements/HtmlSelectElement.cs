@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLSelectElement")]
 	public sealed class HtmlSelectElement : HtmlElement
 	{
-		internal HtmlSelectElement(Document ownerDocument) : base(ownerDocument, TagsNames.Select)
+		internal HtmlSelectElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Select)
 		{
 			Options = new HtmlOptionsCollection(this);
 			SelectedOptions = new List<HtmlOptionElement>();

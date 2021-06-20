@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLTableCellElement")]
 	public sealed class HtmlTableCellElement : HtmlElement
 	{
-		public HtmlTableCellElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
+		public HtmlTableCellElement(HtmlDocument ownerDocument, string tagName) : base(ownerDocument, tagName)
 		{
 		}
 

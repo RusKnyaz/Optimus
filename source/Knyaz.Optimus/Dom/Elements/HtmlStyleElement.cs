@@ -14,7 +14,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Media = string.Empty;
 		};
 
-		internal HtmlStyleElement(Document ownerDocument) : base(ownerDocument, TagsNames.Style)
+		internal HtmlStyleElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Style)
 		{
 		}
 

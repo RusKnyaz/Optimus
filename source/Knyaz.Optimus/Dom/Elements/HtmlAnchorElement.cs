@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	{
 		private readonly TokenList _relList;
 		
-		internal HtmlAnchorElement(Document ownerDocument) : base(ownerDocument, TagsNames.A)
+		internal HtmlAnchorElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.A)
 		{
 			_relList = new TokenList(() => Rel);
 			_relList.Changed += () => {

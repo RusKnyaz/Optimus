@@ -32,7 +32,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			await engine.OpenUrl("http://localhost");
 		}
 		
-		private async Task<Document> Load(IResourceProvider resourceProvider)
+		private async Task<HtmlDocument> Load(IResourceProvider resourceProvider)
 		{
 			var engine = TestingEngine.BuildJint(resourceProvider);
 			return (await engine.OpenUrl("http://localhost")).Document;

@@ -5,15 +5,15 @@ namespace Knyaz.Optimus
 {
     public class Page
     {
-        public Document Document { get; }
-        internal Page( Document document) => Document = document;
+        public HtmlDocument Document { get; }
+        internal Page( HtmlDocument document) => Document = document;
     }
 
     public class HttpPage : Page
     {
         public HttpStatusCode HttpStatusCode { get; }
 
-        internal HttpPage(Document document, HttpStatusCode statusCode) : base(document) =>
+        internal HttpPage(HtmlDocument document, HttpStatusCode statusCode) : base(document) =>
             HttpStatusCode = statusCode;
     }
 }

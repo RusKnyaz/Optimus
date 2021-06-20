@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLOptionElement")]
 	public sealed class  HtmlOptionElement : HtmlElement
 	{
-		internal HtmlOptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Option){}
+		internal HtmlOptionElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Option){}
 
 		/// <summary>
 		/// Gets or sets the 'name' attribute value.

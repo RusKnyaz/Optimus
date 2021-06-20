@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlImageElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 
 		[SetUp]
 		public void SetUp()

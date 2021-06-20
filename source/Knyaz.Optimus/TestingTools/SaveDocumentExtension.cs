@@ -16,7 +16,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// </summary>
 		/// <param name="doc"></param>
 		/// <param name="writer"></param>
-		public static void Save(this Document doc, TextWriter writer)
+		public static void Save(this HtmlDocument doc, TextWriter writer)
 		{
 			if(doc.DocumentElement.TagName != "HTML")
 				throw new ArgumentOutOfRangeException("doc", "HTML document supported only.");
@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.TestingTools
 			WriteCloseTag(writer, docHead.TagName);
 		}
 
-		private static void WriteStyles(TextWriter writer, Document document)
+		private static void WriteStyles(TextWriter writer, HtmlDocument document)
 		{
 			if (document.StyleSheets.SelectMany(x => x.CssRules).Any())
 			{
@@ -98,7 +98,7 @@ namespace Knyaz.Optimus.TestingTools
 			writer.Write('>');
 		}
 
-		public static string Save(this Document doc)
+		public static string Save(this HtmlDocument doc)
 		{
 			using (var writer = new StringWriter())
 			{

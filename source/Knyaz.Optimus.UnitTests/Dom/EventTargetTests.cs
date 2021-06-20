@@ -50,7 +50,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void UnbubblableEvent()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", false, false);
 
@@ -64,7 +64,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void RootEvent()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var evt = doc.CreateEvent("Event");
 			evt.InitEvent("click", true, true);
 			_root.DispatchEvent(evt);

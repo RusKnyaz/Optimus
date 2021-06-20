@@ -8,12 +8,12 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlBrElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 		}
 
 		[Test]

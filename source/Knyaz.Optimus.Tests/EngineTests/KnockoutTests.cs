@@ -13,14 +13,14 @@ namespace Knyaz.Optimus.Tests.EngineTests
 	[TestFixture]
 	public class KnockoutTests
 	{
-		static async Task<Document> Load(string html)
+		static async Task<HtmlDocument> Load(string html)
 		{
 			var rp = Mocks.ResourceProvider("http://localhost", html);
 			var engine = TestingEngine.BuildJint(rp, SystemConsole.Instance);
 			return (await engine.OpenUrl("http://localhost")).Document;
 		}
 
-		static Task<Document> Load(string script, string body) =>
+		static Task<HtmlDocument> Load(string script, string body) =>
 			Load("<html><head><script>" + R.KnockoutJs + "</script></head><body>" + body + "</body><script>" +
 			     script + "</script></html>");
 

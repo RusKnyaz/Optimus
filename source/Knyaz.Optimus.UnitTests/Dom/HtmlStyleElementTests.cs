@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlStyleElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlStyleElement _style;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_style = (HtmlStyleElement)_document.CreateElement("style");
 		}
 

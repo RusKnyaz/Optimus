@@ -39,7 +39,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public string Type { get => _type.Value;set => _type.Value = value;}
 
-		internal HtmlScriptElement(Document ownerDocument) : base(ownerDocument, TagsNames.Script)
+		internal HtmlScriptElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Script)
 		{
 			_type = new AttributeMappedValue<string>(this, "type");
 			_charset = new AttributeMappedValue<string>(this, "charset");

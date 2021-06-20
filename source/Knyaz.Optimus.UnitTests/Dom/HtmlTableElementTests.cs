@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlTableElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		HtmlTableElement _table;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_table = (HtmlTableElement)_document.CreateElement("TABLE");
 		}
 

@@ -5,7 +5,7 @@
 	/// </summary>
 	public class ErrorEvent : Event
 	{
-		internal ErrorEvent(Document owner) : base(owner){}
+		internal ErrorEvent(HtmlDocument owner) : base(owner){}
 		
 		/// <summary>
 		/// Gets a human-readable error message describing the problem.

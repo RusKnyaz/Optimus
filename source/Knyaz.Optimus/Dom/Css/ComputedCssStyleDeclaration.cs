@@ -88,7 +88,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		string GetParentPropertyValue(string propertyName)
 		{
-			var doc = _elt.ParentNode as Document;
+			var doc = _elt.ParentNode as HtmlDocument;
 			if (doc != null)
 			{
 				if (propertyName == Css.FontSize|| propertyName == Css.FontStyle || propertyName == Css.FontFamily)

@@ -7,7 +7,7 @@ namespace Knyaz.Optimus.Dom.Events
 	/// </summary>
 	public class CustomEvent : Event
 	{
-		internal CustomEvent(Document owner) : base(owner){}
+		internal CustomEvent(HtmlDocument owner) : base(owner){}
 		
 		/// <summary>
 		/// Any data passed when initializing the event.

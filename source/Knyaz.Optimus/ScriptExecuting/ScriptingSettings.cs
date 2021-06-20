@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 				typeof(HtmlUnknownElement),
 				typeof(HtmlScriptElement),
 				typeof(Comment),
-				typeof(Document),
+				typeof(HtmlDocument),
 				typeof(Text),
 				typeof(Attr),
 				//Perf types

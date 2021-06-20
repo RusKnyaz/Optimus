@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLUnknownElement")]
 	public sealed class HtmlUnknownElement : HtmlElement
 	{
-		internal HtmlUnknownElement(Document ownerDocument, string tagName) 
+		internal HtmlUnknownElement(HtmlDocument ownerDocument, string tagName) 
 			: base(ownerDocument, tagName.ToUpperInvariant()){}
 	}
 }

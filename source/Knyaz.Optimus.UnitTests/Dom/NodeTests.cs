@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Tests.Dom
 	{
 		private Element CreateElement(string html)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var tmp = document.CreateElement("div");
 			tmp.InnerHTML = html;
 			return (Element)tmp.FirstChild;
@@ -45,7 +45,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<div><div id='n1'></div></div><div><div id='n2'></div></div>", ExpectedResult = 2)]
 		public int CompareDocumentPosition_NodeNode(string html)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<html><body>"+html+"</doby></html>");
 			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById("n2"));
 		}
@@ -57,7 +57,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<div id='n1'></div><div id='n2'></div>", "n2", ExpectedResult = 4)]
 		public int CompareDocumentPosition_NodeAttr(string html, string attrElemId)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<html><body>" + html + "</doby></html>");
 			return doc.GetElementById("n1").CompareDocumentPosition(doc.GetElementById(attrElemId).GetAttributeNode("id"));
 		}
@@ -65,7 +65,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void AttributeNode()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<html><body><div id='x'></div></doby></html>");
 			var div = doc.GetElementById("x");
 			var attr = div.GetAttributeNode("id");
@@ -77,7 +77,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void AttributeNodeOfAddedElement()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<html><body><div id='x'></div></doby></html>");
 
 			var span = doc.CreateElement("span");
@@ -91,7 +91,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetAttributeNode()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 
 			var span = doc.CreateElement("span");
 			var attr = doc.CreateAttribute("name");
@@ -106,7 +106,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CompareDocumentPositionOfFreeNodes()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var n1 = doc.CreateElement("div");
 			var n2 = doc.CreateElement("div");
 			Assert.AreEqual(1, n1.CompareDocumentPosition(n2));
@@ -116,7 +116,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void RemoveAttribute()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("div");
 			var attr = doc.CreateAttribute("name");
 			attr.Value = "D";
@@ -130,7 +130,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void RemoveAttributeNode()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("div");
 			var attr = doc.CreateAttribute("name");
 			attr.Value = "D";
@@ -145,7 +145,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetInnerHtml()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var d = doc.CreateElement("<div>");
 			d.InnerHTML = "<strong></strong>";
 			Assert.AreEqual(doc, d.ChildNodes[0].OwnerDocument);
@@ -154,7 +154,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetAttributeFromId()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var d = doc.CreateElement("div") as HtmlDivElement;
 			d.SetAttribute("Id", "d");
 			Assert.AreEqual("d", d.Id);
@@ -163,7 +163,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void TextParentTest()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("div");
 			div.InnerHTML = "text";
 			Assert.AreEqual(div, div.ChildNodes[0].ParentNode);

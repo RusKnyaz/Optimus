@@ -25,7 +25,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Target = String.Empty;
 		}
 
-		internal HtmlLinkElement(Document ownerDocument)
+		internal HtmlLinkElement(HtmlDocument ownerDocument)
 			: base(ownerDocument, TagsNames.Link)
 		{
 			_relList = new TokenList(() => Rel);

@@ -4,7 +4,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 { 
 	public interface INode
  	{
-		Document OwnerDocument { get; }
+		HtmlDocument OwnerDocument { get; }
 		Node AppendChild(Node node);
 		Node RemoveChild(Node node);
 		Node InsertBefore(Node newChild, Node refNode);

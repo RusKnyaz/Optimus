@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLTableElement")]
 	public sealed class HtmlTableElement : HtmlElement
 	{
-		internal HtmlTableElement(Document ownerDocument) : base(ownerDocument, TagsNames.Table)
+		internal HtmlTableElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Table)
 		{
 			Rows = new HtmlCollection(GetRows);
 			TBodies = new HtmlCollection(() => ChildNodes.OfType<HtmlTableSectionElement>().Where(x => x.TagName == TagsNames.TBody));

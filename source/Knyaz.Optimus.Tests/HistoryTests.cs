@@ -17,7 +17,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		private IResourceProvider _resourceProvider;
 		private Engine _engine;
 		Window Window => _engine.Window;
-		private Document Document => _engine.Document;
+		private HtmlDocument Document => _engine.Document;
 		IHistory History => Window.History;
 
 		[SetUp]

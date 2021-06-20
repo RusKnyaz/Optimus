@@ -23,7 +23,7 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		private IImage _loadedImage = null;
 		
-		internal HtmlImageElement(Document ownerDocument, Func<string, Task<IImage>> loadImage) : base(ownerDocument, TagsNames.Img)
+		internal HtmlImageElement(HtmlDocument ownerDocument, Func<string, Task<IImage>> loadImage) : base(ownerDocument, TagsNames.Img)
 		{
 			_loadImage = loadImage;
 			_src = new AttributeMappedValue<string>(this, "src");

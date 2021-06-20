@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void FlattenTest()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("DIV");
 			div.InnerHTML = "<p><span></span></p><br/>";
 			var res = div.Flatten().Select(x => x.NodeName).ToArray();

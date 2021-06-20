@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public partial class HtmlInputElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlInputElement _input;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_input = (HtmlInputElement)_document.CreateElement("input");
 		}
 
@@ -41,7 +41,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<input id='i' type='checkbox'/>", false)]
 		public void InputCheckedLoad(string html, bool expectedChecked)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body>" + html + "</body></html>");
 			var el = (HtmlInputElement)document.GetElementById("i");
 			Assert.AreEqual(expectedChecked, el.Checked);

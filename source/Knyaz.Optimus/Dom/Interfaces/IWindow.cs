@@ -26,7 +26,7 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
 		MediaQueryList MatchMedia(string query);
 		
-		Document Document {get;}
+		HtmlDocument Document {get;}
 		IConsole Console { get; }
 		Storage LocalStorage { get; } 
 		Storage SessionStorage { get; }

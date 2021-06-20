@@ -21,7 +21,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		private readonly TokenList _classList = null;
 		private readonly List<Node> _childNodes = new List<Node>();
 
-		internal Element(Document ownerDocument) : base(ownerDocument)
+		internal Element(HtmlDocument ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
 			Attributes = new AttributesCollection();
@@ -120,7 +120,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public AttributesCollection Attributes { get; }
 
-		internal Element(Document ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
+		internal Element(HtmlDocument ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
 
 		/// <summary> Get the tag name of an element. </summary>
 		public string TagName { get; private set; }
@@ -288,13 +288,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary> Returns the top-level document object for this node. </summary>
-		public override Document OwnerDocument
+		public override HtmlDocument OwnerDocument
 		{
 			get => base.OwnerDocument;
 			set	{}
 		}
 
-		internal override void SetOwner(Document doc)
+		internal override void SetOwner(HtmlDocument doc)
 		{
 			base.SetOwner(doc);
 			foreach (var attribute in Attributes)

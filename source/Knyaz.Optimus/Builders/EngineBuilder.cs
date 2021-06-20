@@ -100,7 +100,7 @@ namespace Knyaz.Optimus
 
             var docStyling = 
                 _stylesConfig == null ? null 
-                    : (Func<Document, DocumentStyling>)(doc => new DocumentStyling(
+                    : (Func<HtmlDocument, DocumentStyling>)(doc => new DocumentStyling(
                         doc, 
                         _stylesConfig?.UserAgentStyleSheet, 
                         s => resourceProvider.SendRequestAsync(engineKeeper[0].CreateRequest(s))));

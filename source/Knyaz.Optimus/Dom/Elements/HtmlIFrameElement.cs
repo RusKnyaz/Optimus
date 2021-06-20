@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public const string LongDesc = "";
 		}
 
-		internal HtmlIFrameElement(Document ownerDocument) : base(ownerDocument, TagsNames.IFrame)
+		internal HtmlIFrameElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.IFrame)
 		{
 		}
 
@@ -76,7 +76,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// The document this frame contains, if there is any and it is available, or null otherwise.
 		/// todo: implement document loading
 		/// </summary>
-		public Document ContentDocument { get; internal set; }
+		public HtmlDocument ContentDocument { get; internal set; }
 
 		public event Action<Event> OnError;
 		public event Action<Event> OnLoad;

@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CreateDocumentFragment()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var x = document.CreateDocumentFragment();
 			var el = document.CreateElement("div");
 			x.AppendChild(el);
@@ -20,7 +20,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void CloneDocumentFragment()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var docFrag = document.CreateDocumentFragment();
 			var el = document.CreateElement("div");
 			docFrag.AppendChild(el);

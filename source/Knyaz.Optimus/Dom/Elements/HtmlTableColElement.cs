@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLTableColElement")]
 	public sealed class HtmlTableColElement : HtmlElement
 	{
-		internal HtmlTableColElement(Document ownerDocument) : base(ownerDocument, TagsNames.Col){}
+		internal HtmlTableColElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Col){}
 
 		/// <summary>
 		/// Gets or sets 'align' attribute value.

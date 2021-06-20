@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLBRElement")]
 	public sealed class HtmlBrElement : HtmlElement
 	{
-		internal HtmlBrElement(Document ownerDocument) : base(ownerDocument, TagsNames.Br){}
+		internal HtmlBrElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Br){}
 
 		/// <summary>
 		/// Gets or sets the 'clear' attribute value that specifies where the next line should appear in a 

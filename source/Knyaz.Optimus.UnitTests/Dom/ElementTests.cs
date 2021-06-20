@@ -15,7 +15,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void GetOuterHtml()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><div id=a CustomAttr=abc><span>123</span></div></html>");
 			var div = document.GetElementById("a");
 			Assert.AreEqual("<DIV id=\"a\" customattr=\"abc\"><SPAN>123</SPAN></DIV>", div.OuterHTML);
@@ -24,7 +24,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetOuterHtml()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id=a CustomAttr=abc><span>123</span></div></body></html>");
 			var div = document.GetElementById("a");
 			div.OuterHTML = "<span>123</span><span>qwe</span>";
@@ -34,7 +34,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetOuterHtmlWithoutParent()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var div = document.CreateElement("div");
 			div.InnerHTML = "ABC";
 			Assert.AreEqual("<DIV>ABC</DIV>", div.OuterHTML);
@@ -47,7 +47,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("afterend", "<DIV id=\"a\"><SPAN>123</SPAN></DIV>A<DIV>B</DIV>C")]
 		public void InsertAdjacentHtml(string position, string expectedHtml)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write("<html><body><div id=a><span>123</span></div></body></html>");
 			var div = document.GetElementById("a");
 			div.InsertAdjacentHTML(position, "A<div>B</div>C");
@@ -57,7 +57,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ClassListAdd()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var div = document.CreateElement("DIV");
 			div.ClassName = "a b c";
 			div.ClassList.Add("f");
@@ -68,7 +68,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ClassListReflectsClassNameChanges()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var div = document.CreateElement("DIV");
 			div.ClassName = "a b c";
 			var classList = div.ClassList;
@@ -84,7 +84,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ClassListReflectsClassAttributeChanges()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var div = document.CreateElement("DIV");
 			div.ClassName = "a b c";
 			var classList = div.ClassList;
@@ -100,7 +100,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ClassListReflectsClassAttributeChanges2()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var div = document.CreateElement("DIV");
 			div.ClassName = "a b c";
 			var classList = div.ClassList;
@@ -116,7 +116,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void Contains()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<div id=d1><div id=d2><div id=d3></div></div></div>");
 			var d1 = doc.GetElementById("d1");
 			var d2 = doc.GetElementById("d2");
@@ -128,9 +128,9 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void OwnerDocumentCanNotBeSetted()
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			var div = document.CreateElement("DIV");
-			var doc2 = new Document();
+			var doc2 = new HtmlDocument();
 			div.OwnerDocument = doc2;
 			Assert.AreNotEqual(doc2, div.OwnerDocument);
 		}
@@ -140,7 +140,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<div id=d1 name=target><div id=start></div></div>", "#d1")]
 		public void Closest(string html, string query)
 		{
-			var document = new Document();
+			var document = new HtmlDocument();
 			document.Write(html);
 			var start = document.GetElementById("start");
 			start.Closest(query).Assert(elt => elt.GetAttribute("name") == "target");
@@ -152,7 +152,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<div id=parent><div>child</div></div><div id=new></div>", "<DIV>child</DIV><DIV id=\"new\"></DIV>", TestName = "InsertBefore_RefIsNull_AddsToEnd")]
 		public void InsertBefore(string sourceHtml, string resultHtml)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write(sourceHtml);
 			var dnew = doc.GetElementById("new");
 			var dref = doc.GetElementById("ref");
@@ -165,7 +165,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<DIV id=parent><DIV id=ref></DIV></DIV><DIV id=new></DIV>", "<DIV id=\"parent\"><DIV id=\"new\"></DIV></DIV>")]
 		public void ReplaceChild(string sourceHtml, string resultHtml)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write(sourceHtml);
 			var dnew = doc.GetElementById("new");
 			var dref = doc.GetElementById("ref");
@@ -177,7 +177,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ChildNodesLive()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<div id=d1></div>");
 			var childNodes = doc.Body.ChildNodes;
 			doc.Body.InnerHTML = "<div></div><span></span>";
@@ -187,7 +187,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetAttributeNodeNew()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("div");
 			var attr1 = doc.CreateAttribute("attr1");
 			attr1.Value = "1";
@@ -200,7 +200,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetAttributeNodeExists()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("div");
 			var attr1 = doc.CreateAttribute("attr");
 			attr1.Value = "1";
@@ -218,7 +218,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void SetAttributeNodeTwice()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var div = doc.CreateElement("div");
 			var attr1 = doc.CreateAttribute("attr");
 			attr1.Value = "1";
@@ -238,7 +238,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("", ExpectedResult = 0)]
 		public int GetElementsByClassName(string selector)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<div class='a b c'></div>");
 			var res = doc.GetElementsByClassName(selector);
 			return res.Count;
@@ -249,7 +249,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("*", ExpectedResult = 3)]
 		public int GetElementsByTagName(string tagName)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<div><div><span></span></div></div>");
 			return doc.Body.GetElementsByTagName(tagName).Count;
 		}
@@ -260,7 +260,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<div id='a'><div><strong></strong></div></div>", ExpectedResult = 1)]
 		public int GetElementsByTagNameStrong(string html)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<html><body>" + html + "</body></html>");
 
 			return doc.GetElementById("a").GetElementsByTagName("strong").Count;
@@ -269,7 +269,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void Remove()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<div id='d'></div>");
 			var div = doc.GetElementById("d");
 			div.Remove();
@@ -280,7 +280,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void EventHandlingOrder()
 		{
 			var sequence = new List<string>();
-			var document = new Document();
+			var document = new HtmlDocument();
 			var d1 = document.CreateElement("div") as HtmlElement;
 			d1.Id = "A";
 			var d2 = document.CreateElement("div") as HtmlElement;
@@ -311,7 +311,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void EventHandlingOrderNotBubblable()
 		{
 			var sequence = new List<string>();
-			var document = new Document();
+			var document = new HtmlDocument();
 			var d1 = document.CreateElement("div") as HtmlElement;
 			d1.Id = "A";
 			var d2 = document.CreateElement("div") as HtmlElement;

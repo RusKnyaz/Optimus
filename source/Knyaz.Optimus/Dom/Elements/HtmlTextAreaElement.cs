@@ -27,7 +27,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static string Wrap = string.Empty;
 		}
 
-		internal HtmlTextAreaElement(Document ownerDocument) : base(ownerDocument, TagsNames.Textarea){}
+		internal HtmlTextAreaElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Textarea){}
 
 		/// <summary>
 		/// Gets or sets the element's autofocus attribute, indicating that the control should have input focus when the page loads.

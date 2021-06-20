@@ -46,7 +46,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			"week"
 		}; 
 
-		internal HtmlInputElement(Document ownerDocument) : base(ownerDocument, TagsNames.Input){}
+		internal HtmlInputElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Input){}
 
 		private bool _prevChecked;
 

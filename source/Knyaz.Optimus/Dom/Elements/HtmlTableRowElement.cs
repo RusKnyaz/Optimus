@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLTableRowElement")]
 	public class HtmlTableRowElement : HtmlElement
 	{
-		internal HtmlTableRowElement(Document ownerDocument) : base(ownerDocument, TagsNames.Tr)
+		internal HtmlTableRowElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Tr)
 		{
 			Cells = new HtmlCollection(() => ChildNodes.OfType<HtmlTableCellElement>());
 		}

@@ -5,6 +5,6 @@
 	/// </summary>
 	public sealed class Head : HtmlElement
 	{
-		internal Head(Document ownerDocument) : base(ownerDocument, TagsNames.Head){}
+		internal Head(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Head){}
 	}
 }

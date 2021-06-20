@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlSelectElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlSelectElement _select;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_select = (HtmlSelectElement)_document.CreateElement("select");
 		}
 

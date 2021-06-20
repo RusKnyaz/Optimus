@@ -29,7 +29,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		static string[] AllowedEnctypes = new []{"application/x-www-form-urlencoded", "multipart/form-data", "text/plain" };
 		private static string[] AllowedMethods = new[] {"get", "post"};
 
-		internal HtmlFormElement(Document ownerDocument) : base(ownerDocument, TagsNames.Form)
+		internal HtmlFormElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Form)
 		{
 			Elements = new HtmlCollection(() =>
 			{

@@ -24,7 +24,7 @@ namespace Knyaz.Optimus.Dom
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
 
 		internal DocumentScripting (
-			Document document, 
+			HtmlDocument document, 
 			IScriptExecutor scriptExecutor,
 			Func<string,Task<IResource>> getResourceAsyncFn)
 		{

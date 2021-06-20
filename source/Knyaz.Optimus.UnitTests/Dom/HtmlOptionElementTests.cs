@@ -13,7 +13,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void ParentForm()
 		{
-			var document = new Document {Body = {InnerHTML = "<form><select><option></option></select></form>"}};
+			var document = new HtmlDocument {Body = {InnerHTML = "<form><select><option></option></select></form>"}};
 			var option = (HtmlOptionElement)document.GetElementsByTagName("option").Single();
 			var form = document.GetElementsByTagName("form").Single();
 			Assert.AreEqual(form, option.Form);
@@ -22,7 +22,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void FormOfOptionsWithoutSelectIsNull()
 		{
-			var document = new Document {Body = {InnerHTML = "<form><option></option></form>"}};
+			var document = new HtmlDocument {Body = {InnerHTML = "<form><option></option></form>"}};
 			var option = (HtmlOptionElement)document.GetElementsByTagName("option").Single();
 			Assert.IsNull(option.Form);
 		}
@@ -30,7 +30,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void NeighbourForm()
 		{
-			var document = new Document{Body = {InnerHTML = 
+			var document = new HtmlDocument{Body = {InnerHTML = 
 				@"<form id='f'></form>
 				  <select form='f'><option value=1>One</option></select>"}};
 			var option = (HtmlOptionElement)document.GetElementsByTagName("option").Single();
@@ -41,7 +41,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void FormOfOptionInsideOptgroup()
 		{
-			var document = new Document{Body={InnerHTML = @"<form id=f></form>
+			var document = new HtmlDocument{Body={InnerHTML = @"<form id=f></form>
 				<select form=f><optgroup><option></option></optgroup></select>"}};
 			var option = (HtmlOptionElement)document.GetElementsByTagName("option").Single();
 			var form = document.GetElementsByTagName("form").Single();
@@ -51,14 +51,14 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void NestedOptgroupsDeprecated()
 		{
-			var document = new Document{Body={InnerHTML = @"<select><optgroup><optgroup><option></option></optgroup></optgroup></select>"}};
+			var document = new HtmlDocument{Body={InnerHTML = @"<select><optgroup><optgroup><option></option></optgroup></optgroup></select>"}};
 			document.GetElementsByTagName("option").Single().Assert(option=>
 				((HtmlElement)option.ParentNode).TagName == TagsNames.OptGroup &&
 				((HtmlElement)option.ParentNode.ParentNode).TagName == TagsNames.Select);
 			
 		}
 
-		private static Document Doc(string html) => new Document {Body = {InnerHTML = html}}; 
+		private static HtmlDocument Doc(string html) => new HtmlDocument {Body = {InnerHTML = html}}; 
 		
 		[Test]
 		public void Index() => 

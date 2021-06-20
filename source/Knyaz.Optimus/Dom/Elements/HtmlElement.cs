@@ -18,7 +18,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			public static bool Hidden = false;
 		}
 
-		internal HtmlElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName) =>
+		internal HtmlElement(HtmlDocument ownerDocument, string tagName) : base(ownerDocument, tagName) =>
 			Dataset = new DomStringMap(this);
 
 		protected override void CallDirectEventSubscribers(Event evt)

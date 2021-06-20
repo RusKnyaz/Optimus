@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLTableSectionElement")]
 	public sealed class HtmlTableSectionElement : HtmlElement
 	{
-		internal HtmlTableSectionElement(Document ownerDocument, string tagName) : base(ownerDocument, tagName)
+		internal HtmlTableSectionElement(HtmlDocument ownerDocument, string tagName) : base(ownerDocument, tagName)
 		{
 			Rows = new HtmlCollection(() => ChildNodes.OfType<HtmlTableRowElement>());
 		}

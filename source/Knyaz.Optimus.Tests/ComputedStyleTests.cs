@@ -12,7 +12,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	[TestFixture]
 	public class ComputedStyleTests
 	{
-		private async Task<Document> Load(string html)
+		private async Task<HtmlDocument> Load(string html)
 		{
 			var engine = CreateEngine(html);
 			return (await engine.OpenUrl("http://localhost")).Document;

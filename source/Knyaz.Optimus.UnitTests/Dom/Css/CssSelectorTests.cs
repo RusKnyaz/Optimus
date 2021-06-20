@@ -10,7 +10,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 	[TestFixture]
 	public class CssSelectorTests
 	{
-		private Document Load(string html)
+		private HtmlDocument Load(string html)
 		{
 			var document = DomImplementation.Instance.CreateHtmlDocument();
 			document.Write(html);
@@ -148,7 +148,7 @@ namespace Knyaz.Optimus.Tests.Dom.Css
 		[TestCase("<script type='text/html'><div id=d></div></script>", "#d", "")]
 		public void Select(string html, string selector, string expectedIds)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write(html);
 			var cssSelector = new CssSelector(selector);
 			var items = cssSelector.Select(doc.DocumentElement).Select(x => x.Id).ToArray();

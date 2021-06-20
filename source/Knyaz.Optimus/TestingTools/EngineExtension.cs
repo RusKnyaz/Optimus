@@ -132,7 +132,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <summary>
 		/// Wait while element with specified id appears in document.
 		/// </summary>
-		public static Element WaitId(this Document document, string id)
+		public static Element WaitId(this HtmlDocument document, string id)
 		{
 			return WaitId(document, id, DefaultTimeout);
 		}
@@ -140,7 +140,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <summary>
 		/// Wait while element with specified id appears in document.
 		/// </summary>
-		public static Element WaitId(this Document document, string id, int timeout)
+		public static Element WaitId(this HtmlDocument document, string id, int timeout)
 		{
 			var timespan = 100;
 			for (int i = 0; i < timeout / timespan; i++)
@@ -204,7 +204,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <param name="query"></param>
 		/// <param name="timeout"></param>
 		/// <returns>Matched elements.</returns>
-		public static IEnumerable<IElement> WaitSelector(this Document doc, string query, int timeout = 0)
+		public static IEnumerable<IElement> WaitSelector(this HtmlDocument doc, string query, int timeout = 0)
 		{
 			if (timeout == 0)
 				timeout = DefaultTimeout;

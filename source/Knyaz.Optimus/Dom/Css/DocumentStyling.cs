@@ -14,12 +14,12 @@ namespace Knyaz.Optimus.Dom.Css
 	/// </summary>
 	internal class DocumentStyling : IDisposable
 	{
-		private readonly Document _document;
+		private readonly HtmlDocument _document;
 		private readonly Func<string, Task<IResource>> _getResourceAsyncFn;
 		public int Version = 0;
 
 		public DocumentStyling(
-			Document document,
+			HtmlDocument document,
 			CssStyleSheet defaultStyleSheet,
 			Func<string, Task<IResource>> getResourceAsyncFn)
 		{

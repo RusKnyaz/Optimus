@@ -8,13 +8,13 @@ namespace Knyaz.Optimus.Tests.Dom
 	[TestFixture]
 	public class HtmlButtonElementTests
 	{
-		private Document _document;
+		private HtmlDocument _document;
 		private HtmlButtonElement _button;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_document = new Document();
+			_document = new HtmlDocument();
 			_button = (HtmlButtonElement)_document.CreateElement("button");
 		}
 
@@ -40,7 +40,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[TestCase("<button id=b></button>", false)]
 		public void Autofocus(string html, bool expectedAutofocus)
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			var container = doc.CreateElement("div");
 			container.InnerHTML = html;
 			((HtmlButtonElement)container.FirstChild)
@@ -51,7 +51,7 @@ namespace Knyaz.Optimus.Tests.Dom
 		[Test]
 		public void Labels()
 		{
-			var doc = new Document();
+			var doc = new HtmlDocument();
 			doc.Write("<button id=b></button><label for=b>label1</label><label for=b>label2</label>");
 
 			var button = (HtmlButtonElement)doc.GetElementById("b");

@@ -8,7 +8,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLTableCaptionElement")]
 	public sealed class HtmlTableCaptionElement : HtmlElement
 	{
-		internal HtmlTableCaptionElement(Document ownerDocument) : base(ownerDocument, TagsNames.Caption)
+		internal HtmlTableCaptionElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Caption)
 		{
 		}
 

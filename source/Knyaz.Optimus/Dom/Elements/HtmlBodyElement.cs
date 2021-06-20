@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	[JsName("HTMLBodyElement")]
 	public class HtmlBodyElement : HtmlElement
 	{
-		internal HtmlBodyElement(Document ownerDocument) : base(ownerDocument, TagsNames.Body){}
+		internal HtmlBodyElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Body){}
 
 		/// <summary>
 		/// Fired immediately after a page has been loaded.
