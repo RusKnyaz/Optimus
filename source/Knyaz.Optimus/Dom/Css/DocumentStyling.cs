@@ -84,7 +84,7 @@ namespace Knyaz.Optimus.Dom.Css
 			_document.StyleSheets.Add(styleSheet);
 		}
 
-		private Dictionary<IElement, ICssStyleDeclaration> _cache = new Dictionary<IElement, ICssStyleDeclaration>();
+		private Dictionary<Element, ICssStyleDeclaration> _cache = new Dictionary<Element, ICssStyleDeclaration>();
 		/// <summary>
 		/// Default styles.
 		/// </summary>
@@ -95,7 +95,7 @@ namespace Knyaz.Optimus.Dom.Css
 		/// </summary>
 		/// <param name="elt">The <see cref="Element"/> for which to get the computed style.</param>
 		/// <returns>The <see cref="ICssStyleDeclaration"/> containing all element's computed properties.</returns>
-		public ICssStyleDeclaration GetComputedStyle(IElement elt)
+		public ICssStyleDeclaration GetComputedStyle(Element elt)
 		{
 			if (_cache.ContainsKey(elt))
 				return _cache[elt];

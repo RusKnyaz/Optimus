@@ -452,7 +452,7 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		/// <param name="query">The CSS selector.</param>
 		/// <returns>Found element or <c>null</c>.</returns>
-		public override IElement QuerySelector(string query) => new CssSelector(query).Select(DocumentElement).FirstOrDefault();
+		public override Element QuerySelector(string query) => new CssSelector(query).Select(DocumentElement).FirstOrDefault();
 
 		/// <summary> Gets a collection containing all elements that matches a specified CSS selector(s) in the document. </summary>
 		/// <param name="query">The CSS selector.</param>

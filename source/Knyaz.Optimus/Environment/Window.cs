@@ -180,14 +180,14 @@ namespace Knyaz.Optimus.Environment
 		/// <summary>
 		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain.
 		/// </summary>
-		public ICssStyleDeclaration GetComputedStyle(IElement element) => GetComputedStyle(element, null);
+		public ICssStyleDeclaration GetComputedStyle(Element element) => GetComputedStyle(element, null);
 
 		/// <summary>
 		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain. 
 		/// </summary>
 		/// <param name="element">The <see cref="Element"/> for which to get the computed style.</param>
 		/// <param name="pseudoElt">A string specifying the pseudo-element to match. Must be omitted (or null) for regular elements.</param>
-		public ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt)
+		public ICssStyleDeclaration GetComputedStyle(Element element, string pseudoElt)
 		{
 			var styling = _engine.CurrentDocument.Styling;
 			if (styling != null)

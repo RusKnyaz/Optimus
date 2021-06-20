@@ -287,7 +287,7 @@ namespace Knyaz.Optimus.Tests.Dom
 			var doc = new HtmlDocument();
 			doc.Write(html);
 
-			var items = doc.QuerySelectorAll(selector).OfType<IElement>().Select(x => x.Id).ToArray();
+			var items = doc.QuerySelectorAll(selector).OfType<Element>().Select(x => x.Id).ToArray();
 
 			CollectionAssert.AreEqual(string.IsNullOrEmpty(expectedIds) ? new string[0] : expectedIds.Split(','), items);
 		}

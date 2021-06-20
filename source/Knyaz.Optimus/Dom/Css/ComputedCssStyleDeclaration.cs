@@ -12,11 +12,11 @@ namespace Knyaz.Optimus.Dom.Css
 	internal class ComputedCssStyleDeclaration : ICssStyleDeclaration
 	{
 		private readonly CssStyleSheet _defaultStyleSheet;
-		private readonly IElement _elt;
+		private readonly Element _elt;
 		private readonly Func<int> _getVersion;
 		private CachedEnumerable<ICssStyleDeclaration> _styles;
 
-		private IEnumerable<ICssStyleDeclaration> GetStylesFor(IElement elt)
+		private IEnumerable<ICssStyleDeclaration> GetStylesFor(Element elt)
 		{
 			if (elt is HtmlElement htmlElt)
 				yield return htmlElt.Style;
@@ -36,7 +36,7 @@ namespace Knyaz.Optimus.Dom.Css
 					yield return rule.Style;
 		}
 
-		private static IEnumerable<CssStyleRule> GetStyleRulesFor(IElement elt, IEnumerable<CssStyleSheet> styleSheets)
+		private static IEnumerable<CssStyleRule> GetStyleRulesFor(Element elt, IEnumerable<CssStyleSheet> styleSheets)
 		{
 			//todo: it would be better to have reversed list, or access it by index;
 			//todo(2): what about safe enumeration
@@ -63,7 +63,7 @@ namespace Knyaz.Optimus.Dom.Css
 
 		private int _cachedVersion;
 
-		internal ComputedCssStyleDeclaration(CssStyleSheet defaultStyleSheet, IElement elt, Func<int> getVersion)
+		internal ComputedCssStyleDeclaration(CssStyleSheet defaultStyleSheet, Element elt, Func<int> getVersion)
 		{
 			_defaultStyleSheet = defaultStyleSheet;
 			_elt = elt;

@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using Knyaz.Optimus.Dom.Css.Expression;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
-using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Css
 {
@@ -23,11 +23,11 @@ namespace Knyaz.Optimus.Dom.Css
 		/// <summary> Check if the element matched by given selector. </summary>
 		/// <param name="elt">The element to be checked.</param>
 		/// <returns></returns>
-		public bool IsMatches(IElement elt) => _expression.Match(elt);
+		public bool IsMatches(Element elt) => _expression.Match(elt);
 
 		
-		public IEnumerable<IElement> Select(IElement root) => 
-			root.Flatten().OfType<IElement>().Where(IsMatches);
+		public IEnumerable<Element> Select(Element root) => 
+			root.Flatten().OfType<Element>().Where(IsMatches);
 
 		public static implicit operator CssSelector(string query) => 
 			new CssSelector(query);

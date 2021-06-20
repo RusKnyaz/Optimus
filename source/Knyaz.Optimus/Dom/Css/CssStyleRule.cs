@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Dom.Interfaces;
 
 namespace Knyaz.Optimus.Dom.Css
@@ -58,6 +59,6 @@ namespace Knyaz.Optimus.Dom.Css
 		/// </summary>
 		/// <param name="elt"></param>
 		/// <returns></returns>
-		internal bool IsMatchesSelector(IElement elt) => Selectors.Any( x=> x.IsMatches(elt));
+		internal bool IsMatchesSelector(Element elt) => Selectors.Any( x=> x.IsMatches(elt));
 	}
 }

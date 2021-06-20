@@ -34,7 +34,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// Gets the all element styles. Shortened form for to call Element.OwnerDocument.DefaultView.GetComputedStyle(elt).
 		/// </summary>
 		/// <param name="elt">The element to get style for.</param>
-		public static ICssStyleDeclaration GetComputedStyle(this IElement elt) =>
+		public static ICssStyleDeclaration GetComputedStyle(this Element elt) =>
 			elt.OwnerDocument.DefaultView.GetComputedStyle(elt);
 	}
 }

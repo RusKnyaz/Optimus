@@ -8,7 +8,6 @@ using Knyaz.Optimus.Dom;
 using Knyaz.Optimus.Dom.Css;
 using Knyaz.Optimus.Dom.Elements;
 using Knyaz.Optimus.Tools;
-using Knyaz.Optimus.Dom.Interfaces;
 using Knyaz.Optimus.Environment;
 using Knyaz.Optimus.ResourceProviders;
 
@@ -175,7 +174,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <param name="engine"></param>
 		/// <param name="query"></param>
 		/// <returns></returns>
-		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query)
+		public static IEnumerable<Element> WaitSelector(this Engine engine, string query)
 		{
 			return WaitSelector(engine, query, DefaultTimeout);
 		}
@@ -187,7 +186,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <param name="query">Css selector.</param>
 		/// <param name="timeout">Time to wait in milliseconds.</param>
 		/// <returns>Collection of found elements.</returns>
-		public static IEnumerable<IElement> WaitSelector(this Engine engine, string query, int timeout)
+		public static IEnumerable<Element> WaitSelector(this Engine engine, string query, int timeout)
 		{
 			engine.WaitDocumentLoad();
 			
@@ -201,7 +200,7 @@ namespace Knyaz.Optimus.TestingTools
 		/// <param name="query"></param>
 		/// <param name="timeout"></param>
 		/// <returns>Matched elements.</returns>
-		public static IEnumerable<IElement> WaitSelector(this HtmlDocument doc, string query, int timeout = 0)
+		public static IEnumerable<Element> WaitSelector(this HtmlDocument doc, string query, int timeout = 0)
 		{
 			if (timeout == 0)
 				timeout = DefaultTimeout;

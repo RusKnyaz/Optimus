@@ -22,8 +22,8 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		int SetInterval([JsExpandArray]Action<object[]> handler, double? delay, params object[] data);
 		void ClearInterval(int handle);
 
-		ICssStyleDeclaration GetComputedStyle(IElement element);
-		ICssStyleDeclaration GetComputedStyle(IElement element, string pseudoElt);
+		ICssStyleDeclaration GetComputedStyle(Element element);
+		ICssStyleDeclaration GetComputedStyle(Element element, string pseudoElt);
 		MediaQueryList MatchMedia(string query);
 		
 		HtmlDocument Document {get;}

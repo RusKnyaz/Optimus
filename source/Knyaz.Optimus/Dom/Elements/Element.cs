@@ -16,7 +16,7 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// Represents the element of the DOM.
 	/// https://www.w3.org/TR/2004/REC-DOM-Level-3-Core-2004040
 	/// </summary>
-	public abstract class Element : Node, IElement
+	public abstract class Element : Node
 	{
 		private readonly TokenList _classList = null;
 		private readonly List<Node> _childNodes = new List<Node>();
@@ -517,7 +517,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary>
 		/// Returns first descendant element that matches a specified CSS selector(s).
 		/// </summary>
-		public virtual IElement QuerySelector(string query) =>
+		public virtual Element QuerySelector(string query) =>
 			((CssSelector) query).Select(this).FirstOrDefault();
 
 		/// <summary>
@@ -533,10 +533,10 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary> Returns nearest ancestor or itself which satisfies to specified selector. </summary>
 		/// <param name="query"></param>
 		/// <returns></returns>
-		public IElement Closest(string query)
+		public Element Closest(string query)
 		{
 			var selector = new CssSelector(query);
-			return ((IElement) this).GetRecursive(x => (IElement) x.ParentNode).FirstOrDefault(selector.IsMatches);
+			return this.GetRecursive(x => (Element) x.ParentNode).FirstOrDefault(selector.IsMatches);
 		}
 
 		/// <summary> Returns the size of an element and its position relative to the viewport. </summary>

@@ -26,13 +26,13 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 		public static CssExpression State(CssExpression expression, string state) => 
 			new StateExpression(expression, state);
 		
-		public abstract bool Match(IElement elt);
+		public abstract bool Match(Element elt);
 
 		public virtual int GetSpecificity() => 1;
 
 		public enum BinaryOperator { Ancestor, Parent, And, PrevSibling, Prev }
 
-		class EmptyExpression : CssExpression { public override bool Match(IElement elt) => false; }
+		class EmptyExpression : CssExpression { public override bool Match(Element elt) => false; }
 
 		class OrExpression : CssExpression
 		{
@@ -41,7 +41,7 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 			public OrExpression(IReadOnlyCollection<CssExpression> expression) => _expression = expression;
 
 
-			public override bool Match(IElement elt) => _expression.Any(e => e.Match(elt));
+			public override bool Match(Element elt) => _expression.Any(e => e.Match(elt));
 
 			public override string ToString() => string.Join(",", _expression);
 
@@ -62,25 +62,23 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 			}
 
 
-			public override bool Match(IElement elt)
+			public override bool Match(Element elt)
 			{
 				switch (_operator)
 				{
 					case BinaryOperator.Parent:
 					{
-						return (elt.ParentNode is IElement parentElt) && (_left.Match(parentElt) && _right.Match(elt));
+						return (elt.ParentNode is Element parentElt) && (_left.Match(parentElt) && _right.Match(elt));
 					}
 					case BinaryOperator.Ancestor:
 					{
 						return
-							elt.ParentNode is IElement parentElt
-								? parentElt.GetRecursive(x => x.ParentNode as IElement).Any(
-									x => x != null && (_left.Match(x) && _right.Match(elt)))
-								: false;
+							elt.ParentNode is Element parentElt && parentElt.GetRecursive(x => x.ParentNode as Element)
+								.Any(x => x != null && (_left.Match(x) && _right.Match(elt)));
 					}
 					case BinaryOperator.And: return _left.Match(elt) && _right.Match(elt);
 					case BinaryOperator.PrevSibling:
-						return GetPrevElement(elt) is IElement prevElement && _left.Match(prevElement) && _right.Match(elt);
+						return GetPrevElement(elt) is Element prevElement && _left.Match(prevElement) && _right.Match(elt);
 					case BinaryOperator.Prev:
 						return _right.Match(elt) && 
 						       GetPrevElement(elt).GetRecursive(GetPrevElement)
@@ -108,19 +106,19 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 			public override int GetSpecificity() => _left.GetSpecificity() + _right.GetSpecificity();
 		}
 
-		private static IElement GetPrevElement(IElement elt)
+		private static Element GetPrevElement(Element elt)
 		{
 			var result = elt.PreviousSibling;
-			while (!(result is IElement) && result != null)
+			while (!(result is Element) && result != null)
 				result = result.PreviousSibling;//can be [text] or comment and etc.
-			return (IElement)result;
+			return (Element)result;
 		}
 
 		class StateExpression : CssExpression
 		{
 			private readonly CssExpression _expression;
 			private readonly string _state;
-			public override bool Match(IElement elt) => false; //todo: implement
+			public override bool Match(Element elt) => false; //todo: implement
 
 			public StateExpression(CssExpression expression, string state)
 			{
@@ -135,7 +133,7 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 		
 		class AllExpression : CssExpression
 		{
-			public override bool Match(IElement elt) => true;
+			public override bool Match(Element elt) => true;
 			public override string ToString() => "*";
 
 			public override int GetSpecificity() => 0;
@@ -146,7 +144,7 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 			readonly string _className;
 			public ClassExpression(string className) => _className = className;
 
-			public override bool Match(IElement elt) => ((Element)elt).ClassList.Contains(_className);
+			public override bool Match(Element elt) => ((Element)elt).ClassList.Contains(_className);
 			public override int GetSpecificity() => 256;
 
 			public override string ToString() => "." + _className;
@@ -156,7 +154,7 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 		{
 			private readonly string _tagName;
 			public TagExpression(string tagName) => _tagName = tagName;
-			public override bool Match(IElement elt) => string.Equals(elt.TagName, _tagName, StringComparison.OrdinalIgnoreCase);
+			public override bool Match(Element elt) => string.Equals(elt.TagName, _tagName, StringComparison.OrdinalIgnoreCase);
 
 			public override string ToString() => _tagName;
 		}
@@ -166,7 +164,7 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 			private readonly string _id;
 
 			public IdExpression(string id) => _id = id;
-			public override bool Match(IElement elt) => elt.Id == _id;
+			public override bool Match(Element elt) => elt.Id == _id;
 			public override int GetSpecificity() => 65536;
 
 			public override string ToString() => "#" + _id;
@@ -196,7 +194,7 @@ namespace Knyaz.Optimus.Dom.Css.Expression
 				_operator = @operator;
 			}
 
-			public override bool Match(IElement elt)
+			public override bool Match(Element elt)
 			{
 				if (_operator == AttributeOperator.Exists)
 					return elt.HasAttribute(_attribute);
