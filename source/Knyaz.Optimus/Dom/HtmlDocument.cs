@@ -81,6 +81,9 @@ namespace Knyaz.Optimus.Dom
 			DefaultView = window;
 
 			ReadyState = DocumentReadyStates.Loading;
+
+			Scripts = new HtmlCollection(() => GetElementsByTagName("script"));
+			Forms = new HtmlCollection(() => GetElementsByTagName("form"));
 		}
 
 		public override Node AppendChild(Node node)
@@ -173,10 +176,10 @@ namespace Knyaz.Optimus.Dom
 		public string DocumentURI { get => DefaultView.Location.Href; set => DefaultView.Location.Href = value;}
 
 		/// <summary> Returns a collection of all &lt;form&gt; elements in the document. </summary>
-		public IEnumerable<HtmlFormElement> Forms => GetElementsByTagName("form").Cast<HtmlFormElement>();
+		public HtmlCollection Forms { get; }
 
 		/// <summary> Returns a collection of &lt;script&gt; elements in the document. </summary>
-		public IEnumerable<HtmlScriptElement> Scripts => GetElementsByTagName("script").Cast<HtmlScriptElement>();
+		public HtmlCollection Scripts { get; }
 
 		/// <summary> Writes HTML expressions or JavaScript code to a document. </summary>
 		/// <param name="text"></param>

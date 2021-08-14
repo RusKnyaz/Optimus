@@ -46,6 +46,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 	    [TestCase("Properties")]
 		[TestCase("QuerySelectorAllReturnsNodeList")]
 		[TestCase("QuerySelectorAllReturnsStaticCollection")]
+		[TestCase("ScriptsExists")]
+		[TestCase("ScriptsLength")]
+		[TestCase("FormsLength")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]

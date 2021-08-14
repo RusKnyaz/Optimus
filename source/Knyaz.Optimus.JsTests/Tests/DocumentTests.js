@@ -264,5 +264,30 @@ Test("DocumentTests", {
             //original query result should not be changed.            
             Assert.AreEqual(1, xClass.length);
         }
+    },
+    "ScriptsExists":{
+        run:function(){
+            Assert.IsNotNull(document.scripts, "document.scripts != null");
+        }
+    },
+    "ScriptsLength":{
+        run:function(){
+            var js = document.scripts;
+            var l1 = js.length;
+            var s = document.createElement("script");
+            document.head.appendChild(s);
+            var l2 = js.length;
+            Assert.AreEqual(1, l2-l1);
+        }
+    },
+    "FormsLength":{
+        run:function(){
+            var forms = document.forms;
+            var l1 = forms.length;
+            var s = document.createElement("form");
+            document.head.appendChild(s);
+            var l2 = forms.length;
+            Assert.AreEqual(1, l2-l1);
+        }
     }
 });
