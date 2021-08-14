@@ -131,30 +131,41 @@ namespace Knyaz.Optimus.Dom
 			}
 		}
 
+
+		
 		private void ExecuteScript(ScriptInfo script)
 		{
-			if (script.Node.Executed)
+			var scriptElement = script.Node;
+			
+			if (scriptElement.Executed)
 				return;
 
-			lock (script.Node.OwnerDocument)
+			var document = scriptElement.OwnerDocument;
+			
+			lock (document)
 			{
-				RaiseBeforeScriptExecute(script.Node);
+				RaiseBeforeScriptExecute(scriptElement);
 
+				document.CurrentScript = scriptElement;
 				try
 				{
 					_scriptExecutor.Execute(
-						script.Node.Type ?? "text/javascript", 
+						scriptElement.Type ?? "text/javascript",
 						script.Code);
-					script.Node.Executed = true;
-					if (IsExternalScript(script.Node))
+					scriptElement.Executed = true;
+					if (IsExternalScript(scriptElement))
 						script.Node.RaiseEvent("load", true, false);
 				}
 				catch (Exception ex)
 				{
-					RaiseScriptExecutionError(script.Node, ex);
+					RaiseScriptExecutionError(scriptElement, ex);
+				}
+				finally
+				{
+					document.CurrentScript = null;
 				}
 
-				RaiseAfterScriptExecute(script.Node);
+				RaiseAfterScriptExecute(scriptElement);
 			}
 		}
 

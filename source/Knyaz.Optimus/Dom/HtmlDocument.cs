@@ -180,6 +180,9 @@ namespace Knyaz.Optimus.Dom
 
 		/// <summary> Returns a collection of &lt;script&gt; elements in the document. </summary>
 		public HtmlCollection Scripts { get; }
+		
+		/// <summary> Run-time property. Reflects currently executing script element. </summary>
+		public HtmlScriptElement CurrentScript { get; internal set; }
 
 		/// <summary> Writes HTML expressions or JavaScript code to a document. </summary>
 		/// <param name="text"></param>
