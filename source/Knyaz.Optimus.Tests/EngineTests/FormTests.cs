@@ -260,5 +260,211 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.AreEqual("t1=A", data);
 			
 		}
+
+		[Test]
+		public static async Task OnSubmitEventCalled()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'><input name=username type=text><input type=submit id=sub></form>")
+				.Resource("http://site.net/login", "<div id=d></div>");
+
+			var engine = TestingEngine.Build(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			var submitButton = doc.Get<HtmlInputElement>("#sub").First();
+			var form = doc.Get<HtmlFormElement>("form").First();;
+
+			bool formsOnSubmitCalled = false;
+			form.OnSubmit += _ => formsOnSubmitCalled = true;
+			bool windowOnSubmitCalled = false;
+			engine.Window.OnSubmit += _ => windowOnSubmitCalled = true; 
+			
+			submitButton.Click();
+			
+			Assert.IsTrue(formsOnSubmitCalled);
+			Assert.IsTrue(windowOnSubmitCalled);
+		}
+		
+		[Test]
+		public static async Task OnSubmitEventNotCalled()
+		{
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/",
+					"<form method=post action='login'><input name=username type=text><input type=submit id=sub></form>")
+				.Resource("http://site.net/login", "<div id=d></div>");
+
+			var engine = TestingEngine.Build(new ResourceProvider(httpResources, null));
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			var form = doc.Get<HtmlFormElement>("form").First();;
+
+			bool formsOnSubmitCalled = false;
+			form.OnSubmit += _ => formsOnSubmitCalled = true;
+			bool windowOnSubmitCalled = false;
+			engine.Window.OnSubmit += _ => windowOnSubmitCalled = true; 
+			
+			form.Submit();
+			
+			Assert.IsFalse(formsOnSubmitCalled);
+			Assert.IsFalse(windowOnSubmitCalled);
+		}
+
+		[Test]
+		public static async Task EventsOrder()
+		{
+			var html = @"<form><button id=b>clickme</button></form>";
+			
+			var js = @"
+			window.onsubmit = function(){console.log('window onsubmit');};
+			window.onclick = function(){console.log('window onclick')};
+			var f = document.getElementsByTagName('form')[0];
+			f.onsubmit = function(){console.log('form onsubmit')};
+			f.onclick = function(){console.log('form onclick')};
+			var b = document.getElementById('b');
+			b.onclick=function(){console.log('button onclick')};";
+			
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/", $"{html}<script>{js}</script>");
+
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(httpResources, console);
+			
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			var button = doc.Get<HtmlButtonElement>("#b").First();
+			
+			button.Click();
+			
+			Assert.AreEqual(new[]
+			{
+				"button onclick",
+				"form onclick",
+				"window onclick",
+				"form onsubmit",
+				"window onsubmit"
+			}, console.LogHistory);
+		}
+		
+		[Test]
+		public static async Task EventsOrder2()
+		{
+			var html = @"<form id=f><button id=b>clickme</button></form>";
+			
+			var js = @"var b = document.getElementById('b');
+
+b.addEventListener( 'click', function(){console.log('b.click')}, false );
+b.addEventListener( 'click', function(){console.log('b.click bubble')}, true );
+b.addEventListener( 'subscribe', function(){console.log('b.subscribe')}, false );
+
+var f = document.getElementById('f');
+f.addEventListener( 'click', function(){console.log('f.click')}, false );
+f.addEventListener( 'click', function(){console.log('f.click bubble')}, true );
+f.addEventListener( 'subscribe', function(){console.log('f.subscribe')}, false );
+
+document.addEventListener( 'click', function(){console.log('d.click')}, false );
+document.addEventListener( 'click', function(){console.log('d.click bubble')}, true );
+document.addEventListener( 'subscribe', function(){console.log('d.subscribe')}, false );";
+			
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/", $"{html}<script>{js}</script>");
+
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(httpResources, console);
+			var page = await engine.OpenUrl("http://site.net");
+			
+			engine.OnUriChanged += () => console.Log("reloaded");
+
+			var doc = page.Document;
+
+			var button = doc.Get<HtmlButtonElement>("#b").First();
+			
+			button.Click();
+
+			await Task.Delay(1000);
+			
+			Assert.AreEqual(new[]
+			{
+				"d.click bubble",
+				"f.click bubble",
+				"b.click",
+				"b.click bubble",
+				"f.click",
+				"d.click",
+				"reloaded"
+			}, console.LogHistory);
+		}
+		
+		
+
+		[Test]
+		public static async Task CancelSubmit()
+		{
+			var html = @"<form><button id=b>clickme</button></form>";
+			
+			var js = @"
+			window.onsubmit = function(){console.log('window onsubmit');};
+			window.onclick = function(){console.log('window onclick')};
+			var f = document.getElementsByTagName('form')[0];
+			f.onsubmit = function(){console.log('form onsubmit')};
+			f.onclick = function(){console.log('form onclick')};
+			var b = document.getElementById('b');
+			b.onclick=function(){console.log('button onclick'); return false;};";
+			
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/", $"{html}<script>{js}</script>");
+
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(httpResources, console);
+			
+			engine.OpenUrl("http://site.net").Wait();
+
+			var doc = engine.Document;
+
+			var button = doc.Get<HtmlButtonElement>("#b").First();
+			
+			button.Click();
+			
+			Assert.AreEqual(new[]
+			{
+				"button onclick",
+				"form onclick",
+				"window onclick"
+			}, console.LogHistory);
+		}
+		
+		[TestCase("true", "click,submit,reload")]
+		[TestCase("false", "click")]
+		public static async Task CancelSubmitFromWindow(string returnValue, string log)
+		{
+			var html = @"<form><button id=b>clickme</button></form>";
+			
+			var js = "window.onsubmit=function(){console.log('submit')};"+
+			         $"window.onclick=function(){{console.log('click'); return {returnValue};}};";
+			
+			var httpResources = Mocks.HttpResourceProvider()
+				.Resource("http://site.net/", $"{html}<script>{js}</script>");
+
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(httpResources, console);
+			
+			var page = await engine.OpenUrl("http://site.net");
+
+			engine.OnUriChanged += () => console.Log("reload");
+
+			var button = page.Document.Get<HtmlButtonElement>("#b").First();
+			
+			button.Click();
+
+			await Task.Delay(1000);
+
+			Assert.AreEqual(log, string.Join(",", console.LogHistory));
+		}
 	}
 }

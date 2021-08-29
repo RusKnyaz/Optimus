@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Knyaz.Optimus.Dom.Elements;
-using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.ScriptExecuting.Jint;
 using Knyaz.Optimus.TestingTools;
 using Knyaz.Optimus.Tests.TestingTools;

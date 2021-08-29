@@ -32,6 +32,9 @@ namespace Knyaz.Optimus.Dom.Interfaces
 		Storage SessionStorage { get; }
 		void Open(string url = null, string windowName = null, string features = null);
 		void Alert(string msg);
+
+		/// <summary> Event fires when the user submits a form by button. It doesn't fire when the user called form.submit method. </summary>
+		event Func<Event, bool?> OnClick;
 	}
 	
 	public interface IWindowEx : IWindow

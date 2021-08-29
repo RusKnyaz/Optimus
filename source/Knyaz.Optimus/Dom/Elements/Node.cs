@@ -37,8 +37,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 		
 		protected virtual void BeforeEventDispatch(Event evt) {}
-		protected virtual void CallDirectEventSubscribers(Event obj) {}
-		protected virtual void AfterEventDispatch(Event obj) {}
+		protected virtual void CallDirectEventSubscribers(Event evt) {}
+		protected virtual void AfterEventDispatch(Event evt) {}
 
 		private HtmlDocument _ownerDocument;
 

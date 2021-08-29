@@ -1,5 +1,4 @@
 using System.Reflection;
-using Knyaz.Optimus.ResourceProviders;
 using Knyaz.Optimus.Scripting.Jint.Internal;
 
 namespace Knyaz.Optimus.ScriptExecuting.Jint

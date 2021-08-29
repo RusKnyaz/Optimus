@@ -357,6 +357,9 @@ namespace Knyaz.Optimus.Scripting.Jint.Internal
 
 		public IDictionary<EventInfo, FunctionInstance> GetAttachedEventsFor(JsValue clrThis)
 		{
+			if (clrThis == _getEngine().Global)
+				return _globalAttachedEvents;
+			
 			var clrObjectInst = (ClrObject) clrThis.AsObject();
 			return clrObjectInst.AttachedEvents;
 		}
@@ -364,7 +367,11 @@ namespace Knyaz.Optimus.Scripting.Jint.Internal
 		private readonly IDictionary<Tuple<FunctionInstance, JsValue>, Delegate> _jsToClrDelegatesMap = new Dictionary<Tuple<FunctionInstance, JsValue>, Delegate>(
 			new TupleComparer<FunctionInstance, JsValue>());
 
+		//window object
 		private object _global;
+		//window events
+		private readonly IDictionary<EventInfo, FunctionInstance> _globalAttachedEvents = 
+			new Dictionary<EventInfo, FunctionInstance>();
 
 		void RegisterMap(Delegate clrObject, FunctionInstance jsObject, JsValue jsThis)
 		{

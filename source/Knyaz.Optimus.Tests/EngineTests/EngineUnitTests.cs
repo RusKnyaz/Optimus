@@ -166,6 +166,7 @@ namespace Knyaz.Optimus.Tests.EngineTests
 
 		[TestCase("var timer = window.setTimeout(function(x){console.log(x);}, 300, 'ok');")]
 		[TestCase("var timer = window.setTimeout(function(x){console.log('ok');}, 300);")]
+		[TestCase("var timer = window.setTimeout(function(x){console.log('ok');}, 4);")]
 		public async Task SetTimeout(string code)
 		{
 			var resources = Mocks.ResourceProvider("http://localhost", Mocks.Page(code));
@@ -177,6 +178,27 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.IsTrue(signal.WaitOne(1000));
 			console.Verify(x => x.Log("ok"), Times.Once);
 		}
+
+		[Test]
+		public async Task SetTimeoutMany()
+		{
+			var code = @"window.setTimeout(function(x){console.log('ok');}, 4);
+window.setTimeout(function(x){console.log('ok');}, 0);
+window.setTimeout(function(x){console.log('ok');}, 4);
+window.setTimeout(function(x){console.log('ok');}, 0);";
+			
+			var resources = Mocks.ResourceProvider("http://localhost", Mocks.Page(code));
+			using (var signal = new CountdownEvent(4))
+			{
+				var console = new TestingConsole();
+				console.OnLog += o => signal.Signal();
+				var engine = TestingEngine.BuildJint(resources, console); 
+				await engine.OpenUrl("http://localhost");
+				Assert.IsTrue(signal.Wait(1000));
+				Assert.AreEqual(new[]{"ok","ok","ok","ok"}, console.LogHistory);
+			}
+		}
+
 
 		[Test, Ignore("For manual run")]
 		public async Task ClearTimeout()
@@ -866,6 +888,19 @@ function reqListener () {
 
 			var style = page.Document.Body.GetComputedStyle();
 			var position = style.GetPropertyValue("position");
+		}
+
+		[TestCase("window.x = 5;console.log(window.x != null);")]
+		[TestCase("window.x = function(){};console.log(window.x != null);")]
+		public async Task SetWindowProperty(string code)
+		{
+			var resourceProvider = Mocks.ResourceProvider("http://loc/",
+				$"<html><script>{code}</script></html>");
+
+			var console = new TestingConsole();
+			var engine = TestingEngine.BuildJint(resourceProvider, console);
+			var page = await engine.OpenUrl("http://loc/");
+			Assert.AreEqual(new[]{true}, console.LogHistory);
 		}
 	}
 }

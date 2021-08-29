@@ -56,8 +56,28 @@ namespace Knyaz.Optimus.Environment
 			_timers.OnException += exception => { Console.Log("Unhandled exception in timer handler function: " + exception.ToString()); };
 
 			_eventTarget = new EventTarget(this, () => null, () => _engine.Document);
+			
+			_eventTarget.CallDirectEventSubscribers += CallDirectEventSubscribers;
 		}
-		
+
+		private void CallDirectEventSubscribers(Event evt)
+		{
+			switch (evt.Type)
+			{
+				case "submit":
+					if (OnSubmit?.Invoke(evt) != false && !evt.IsDefaultPrevented())
+						Document.HandleFormSubmit(evt.Target as HtmlFormElement, evt.OriginalTarget as HtmlElement);
+					break;
+				case "click":
+					if (OnClick?.Invoke(evt) != false &&
+					    !evt.IsDefaultPrevented() 
+					    && evt.Target is HtmlButtonElement button 
+					    && button.Type == "submit")
+						button.Form?.RaiseSubmit(evt.Target as HtmlElement);
+					break;
+			}
+		}
+
 		internal Engine Engine
 		{
 			get => _engine;
@@ -175,7 +195,16 @@ namespace Knyaz.Optimus.Environment
 		/// <summary>
 		/// Callback to attach the handler of 'alert' method calls.
 		/// </summary>
+		[JsHidden]
 		public event Action<string> OnAlert;
+		
+		/// <summary> Event fires when the user submits a form by button. It doesn't fire when the user called form.submit method. </summary>
+		[JsName("onsubmit")]
+		public event Func<Event, bool?> OnSubmit;
+		
+		/// <summary> Event fires when the user submits a form by button. It doesn't fire when the user called form.submit method. </summary>
+		[JsName("onclick")]
+		public event Func<Event, bool?> OnClick;
 
 		/// <summary>
 		/// Gives the values of all the CSS properties of an element after applying the active stylesheets and resolving any basic computation those values may contain.

@@ -50,12 +50,9 @@ namespace Knyaz.Optimus.Dom.Elements
 			if (evt.Type == "submit")
 			{
 				Handle("onsubmit", OnSubmit, evt);
-				if (!evt.IsDefaultPrevented())
-				{
-					OwnerDocument.HandleFormSubmit(this, evt.OriginalTarget as HtmlElement);
-				}
 			}
 		}
+
 
 		/// <summary>
 		/// Gets or sets the 'name' attribute value reflecting the value of the form's name HTML attribute, containing the name of the form.
@@ -193,8 +190,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/*
            attribute boolean noValidate;
 
-  readonly attribute HTMLFormControlsCollection elements;
-  readonly attribute long length;
+    readonly attribute long length;
   getter Element (unsigned long index);
   getter (RadioNodeList or Element) (DOMString name);
 

@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.Scripting.Jint.Internal
 			Set = new ClrFunctionInstance(engine, (jsThis, args) =>
 			{
 				var objectInstance = jsThis.AsObject();
-				var clrThis = jsThis.ToObject();
+				var clrThis = converter.ConvertFromJs(jsThis);
                         
 				var attachedEvents = converter.GetAttachedEventsFor(objectInstance);
                     

@@ -24,13 +24,6 @@ namespace Knyaz.Optimus.Dom.Elements
 
 		internal HtmlButtonElement(HtmlDocument ownerDocument) : base(ownerDocument, TagsNames.Button) { }
 
-		protected override void CallDirectEventSubscribers(Event evt)
-		{
-			base.CallDirectEventSubscribers(evt);
-
-			if (evt.Type == "click" && !evt.IsDefaultPrevented())
-				Form?.RaiseSubmit(evt.Target as HtmlElement);
-		}
 
 		/// <summary>
 		/// Is a string indicating the behavior of the button. This is an enumerated attribute with the following possible values:
