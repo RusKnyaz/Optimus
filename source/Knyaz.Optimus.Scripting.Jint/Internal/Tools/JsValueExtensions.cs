@@ -57,7 +57,7 @@ namespace Knyaz.Optimus.ScriptExecuting
 					//if the target type is class that contains only public fields
 					//it can be deserialized from js object.
 
-					return targetType.IsClass && targetType.BaseType == typeof(object) && targetType != typeof(string);
+					return targetType.IsClass && targetType != typeof(string);
 				}
 			}
 

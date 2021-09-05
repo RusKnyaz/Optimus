@@ -282,5 +282,9 @@ namespace Knyaz.Optimus.Environment
 		[JsCtor("UIEvent")]
 		public UiEvent NewUiEvent(string eventType = null, UiEventInitOptions options = null) => 
 			new UiEvent(Document, eventType, options);
+
+		[JsCtor("MouseEvent")]
+		public MouseEvent NewMouseEvent(string eventType, MouseEventInitOptions options = null) =>
+			new MouseEvent(Document, eventType, options);
 	}
 }

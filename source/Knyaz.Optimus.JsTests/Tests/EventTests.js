@@ -20,6 +20,35 @@ Test("EventTests", {
             Assert.AreEqual(true, evt.bubbles);
         }
     },
+    "MouseEventType":{
+        run: function(){
+            Assert.AreEqual("function", typeof MouseEvent);
+        }
+    },
+    "MouseEventConstructor": {
+        run: function () {
+            var evt = new MouseEvent("click");
+            Assert.AreEqual("click", evt.type);
+            Assert.AreEqual(false, evt.cancelable);
+            Assert.AreEqual(false, evt.bubbles);
+        }
+    },
+    "MouseEventConstructorWithInit": {
+        run: function () {
+            var evt = new MouseEvent("click", {"bubbles": true, "cancelable": false});
+            Assert.AreEqual("click", evt.type);
+            Assert.AreEqual(false, evt.cancelable);
+            Assert.AreEqual(true, evt.bubbles);
+        }
+    },
+    "UiEventConstructorWithInit": {
+        run: function () {
+            var evt = new UIEvent("click", {"bubbles": true, "cancelable": false});
+            Assert.AreEqual("click", evt.type);
+            Assert.AreEqual(false, evt.cancelable);
+            Assert.AreEqual(true, evt.bubbles);
+        }
+    },
     "AddEventListenerCallOnce":{
         run: function () {
             var evt = new Event("click", {"bubbles": true, "cancelable": false});

@@ -231,10 +231,17 @@ namespace Knyaz.Optimus.Scripting.Jint.Internal
 			return prototype;
 		}
 		
-		public static short ConvertToShort(JsValue value) => 
+		public static short ConvertToShort(JsValue value) =>
+			value.IsUndefined() ? default(short) :
 			value.IsString() ? short.Parse(value.AsString()) : (short) value.AsNumber();
 
-		public static int ConvertToInt(JsValue value) => value.IsString() ? int.Parse(value.AsString()) : (int) value.AsNumber();
+		public static int ConvertToInt(JsValue value) => 
+			value.IsUndefined() ? default(int) :
+			value.IsString() ? int.Parse(value.AsString()) : (int) value.AsNumber();
+		
+		public static long ConvertToLong(JsValue value) => 
+			value.IsUndefined() ? default(long) :
+			value.IsString() ? long.Parse(value.AsString()) : (long) value.AsNumber();
 		
 		public static ulong ConvertToULong(JsValue value) => value.IsString() ? ulong.Parse(value.AsString()) : (ulong) value.AsNumber();
 
@@ -508,6 +515,12 @@ namespace Knyaz.Optimus.Scripting.Jint.Internal
 			
 			if(type == typeof(short))
 				return Expression.Call(typeof(DomConverter), nameof(ConvertToShort), typeEmptyArray, getItemExpression);
+			
+			if(type == typeof(long))
+				return Expression.Call(typeof(DomConverter), nameof(ConvertToLong), typeEmptyArray, getItemExpression);
+			
+			if(type == typeof(ulong))
+				return Expression.Call(typeof(DomConverter), nameof(ConvertToULong), typeEmptyArray, getItemExpression);
 
 			var converterConst = Expression.Constant(this);
 			

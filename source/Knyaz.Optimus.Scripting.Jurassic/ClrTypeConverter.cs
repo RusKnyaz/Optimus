@@ -257,15 +257,15 @@ namespace Knyaz.Optimus.Scripting.Jurassic
 	        
             if (targetType == typeof(bool))
                 return ConvertBoolToClr(jsObject);
-            
+
             if (jsObject == null)
-                return null;
+	            return targetType.IsPrimitive ? Activator.CreateInstance(targetType) : null;
 
             if (targetType == typeof(double))
-                return Convert.ToDouble(jsObject);
+	            return Convert.ToDouble(jsObject);
 
             if (targetType == typeof(double?))
-                return jsObject == null ? null : (double?)Convert.ToDouble(jsObject);
+                return (double?)Convert.ToDouble(jsObject);
             
             if (targetType == typeof(float))
 	            return Convert.ToSingle(jsObject);
@@ -472,13 +472,13 @@ namespace Knyaz.Optimus.Scripting.Jurassic
 
             var parameterExpression = Expression.Parameter(typeof(ObjectInstance), "jsObj");
 
-            //todo: for boolTypes. ConvertBooleanToClr can be called instead of "ConvertToClr"
+            //todo: for boolTypes. ConvertBooleanToClr can be called instead of "ConvertToClr" etc.
             
             var binds = type.GetFields(BindingFlags.Public | BindingFlags.SetField | BindingFlags.Instance)
                 .Select(fieldInfo => (MemberBinding)Expression.Bind(
                     fieldInfo,
                     Expression.Convert(Expression.Call(Expression.Constant(this, typeof(ClrTypeConverter)),
-                        nameof(ConvertToClr),new Type[0],
+                        nameof(ConvertToClr), new Type[0],
                         Expression.Call(parameterExpression,
                             "get_Item", new Type[0],
                             Expression.Constant(fieldInfo.GetName(), typeof(string))),
