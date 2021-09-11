@@ -289,5 +289,12 @@ Test("DocumentTests", {
             var l2 = forms.length;
             Assert.AreEqual(1, l2-l1);
         }
+    },
+    "CreateAttribute":{
+        run:function(){
+            var attr = document.createAttribute('lay-submit');
+            Assert.AreEqual("lay-submit", attr.name);
+            Assert.AreEqual('', attr.value);
+        }
     }
 });

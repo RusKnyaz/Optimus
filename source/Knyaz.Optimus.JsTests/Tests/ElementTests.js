@@ -417,5 +417,16 @@
             doc.body.innerHTML = "";//clear body
             Assert.AreEqual(0, nodes.length, "updated count");
         }
+    },
+    "GetAttributeNoValue":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            doc.write("<body><div id='d' lay-submit></div></body>");
+            var d = doc.getElementById('d');
+            var attr = d.getAttributeNode('lay-submit');
+            Assert.IsNotNull(attr);
+            Assert.AreEqual('', attr.value);
+            Assert.AreEqual('', d.getAttribute('lay-submit'));
+        }
     }
 });

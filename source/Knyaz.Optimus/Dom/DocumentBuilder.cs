@@ -177,7 +177,7 @@ namespace Knyaz.Optimus.Dom
 		{
 			foreach (var attribute in htmlElement.Attributes)
 			{
-				elem.SetAttribute(attribute.Key, attribute.Value);
+				elem.SetAttribute(attribute.Key, attribute.Value ?? string.Empty);
 
 				if (attribute.Key == "selected" && elem is HtmlOptionElement option)
 				{

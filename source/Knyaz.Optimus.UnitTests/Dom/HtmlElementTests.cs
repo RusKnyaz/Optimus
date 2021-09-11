@@ -158,5 +158,24 @@ namespace Knyaz.Optimus.Tests.Dom
 			elt.SetAttribute("data-my-data", "hello");
 			Assert.AreEqual("hello", elt.Dataset["myData"]);
 		}
+		
+		[Test]
+		public void GetAttributeNodeNoValue()
+		{
+			var document = new HtmlDocument();
+			document.Write("<html><div id=a lay-submit></div></html>");
+			var a = document.GetElementById("a");
+			var attr = a.GetAttributeNode("lay-submit");
+			Assert.AreEqual("", attr.Value);
+		}
+		
+		[Test]
+		public void GetAttributeNoValue()
+		{
+			var document = new HtmlDocument();
+			document.Write("<html><div id=a lay-submit lay-filter=\"*\"></div></html>");
+			var a = document.GetElementById("a");
+			Assert.AreEqual("", a.GetAttribute("lay-submit"));
+		}
 	}
 }

@@ -49,6 +49,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ScriptsExists")]
 		[TestCase("ScriptsLength")]
 		[TestCase("FormsLength")]
+		[TestCase("CreateAttribute")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]

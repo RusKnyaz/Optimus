@@ -21,6 +21,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		internal Attr(string name, HtmlDocument ownerDoc)
 		{
 			_name = name;
+			Value = string.Empty;
 			SetOwner(ownerDoc);
 		}
 

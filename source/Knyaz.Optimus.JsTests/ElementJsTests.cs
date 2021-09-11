@@ -58,6 +58,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("SetChildNode")]
 		[TestCase("ChildNodesIsNodeList")]
 		[TestCase("ChildNodesIsLive")]
+		[TestCase("GetAttributeNoValue")]
 		public void ElementTests(string testName)
 		{
 			if (_jsEngine == JsEngines.Jurassic && (

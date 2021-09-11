@@ -133,7 +133,10 @@ namespace Knyaz.Optimus.Tests.Dom
 		public void CreateAttribute()
 		{
 			var document = new HtmlDocument();
-			document.CreateAttribute("a").Assert(attr => attr.Name == "a" && attr.OwnerDocument == document);
+			document.CreateAttribute("a").Assert(attr => 
+				attr.Name == "a" 
+				&& attr.OwnerDocument == document 
+				&& attr.Value == "");
 		}
 
 		[Test]
