@@ -87,6 +87,7 @@ namespace Knyaz.Optimus.Dom
 			Links = new HtmlCollection(() => 
 				GetElementsByTagName(TagsNames.A).Where(x => !string.IsNullOrEmpty(((HtmlAnchorElement)x).Href))
 					.Concat(GetElementsByTagName(TagsNames.Textarea).Where(x => !string.IsNullOrEmpty(((HtmlAreaElement)x).Href))));
+			Embeds = new HtmlCollection(() => GetElementsByTagName(TagsNames.Embed));
 		}
 
 		public override Node AppendChild(Node node)
@@ -154,6 +155,8 @@ namespace Knyaz.Optimus.Dom
 		/// The directionality of the text of the document. Possible values are 'rtl', right to left, and 'ltr', left to right.
 		/// </summary>
 		public string Dir { get; set; } = string.Empty;
+		
+		public HtmlCollection Embeds { get; }
 
 		/// <summary>
 		/// Returns first DocType element in document.
@@ -318,6 +321,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Label: return new HtmlLabelElement(this);
 				case TagsNames.OptGroup: return new HtmlOptGroupElement(this);
 				case TagsNames.Img: return new HtmlImageElement(this, GetImage);
+				case TagsNames.Embed: return new HtmlEmbedElement(this);
 			}
 
 			return new HtmlUnknownElement(this, invariantTagName);

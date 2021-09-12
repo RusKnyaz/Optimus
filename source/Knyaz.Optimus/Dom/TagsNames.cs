@@ -47,6 +47,8 @@
 		
 		/// <summary>DIV</summary>
 		public const string Div = "DIV";
+
+		public const string Embed = "embed";
 		
 		/// <summary>FORM</summary>
 		public const string Form = "FORM";
@@ -66,7 +68,7 @@
 		/// <summary>IMG</summary>
 		/// <remarks>Image</remarks>
 		public const string Img = "IMG";
-
+		
 		/// <summary>LABEL</summary>
 		public const string Label = "LABEL";
 		
