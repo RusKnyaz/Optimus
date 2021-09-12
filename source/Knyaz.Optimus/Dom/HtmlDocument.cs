@@ -144,6 +144,17 @@ namespace Knyaz.Optimus.Dom
 			set { }
 		}
 
+		/// <summary> Returns the character encoding of the document that it's currently rendered with. </summary>
+		public string CharacterSet => "UTF-8";
+
+		/// <summary> Returns the MIME type that the document is being rendered as. </summary>
+		public string ContentType { get; internal set; } = "text/html";
+
+		/// <summary>
+		/// The directionality of the text of the document. Possible values are 'rtl', right to left, and 'ltr', left to right.
+		/// </summary>
+		public string Dir { get; set; } = string.Empty;
+
 		/// <summary>
 		/// Returns first DocType element in document.
 		/// </summary>

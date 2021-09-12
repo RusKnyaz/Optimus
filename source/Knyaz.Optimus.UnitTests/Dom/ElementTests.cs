@@ -339,5 +339,22 @@ namespace Knyaz.Optimus.Tests.Dom
 			Assert.AreEqual("d1 capture - 1A,d2 attr - 2B,d2 bubbling - 2B,d2 capture - 2B",
 				string.Join(",", sequence));
 		}
+
+		[Test]
+		public static void ChildElementCount()
+		{
+			var document = new HtmlDocument();
+			document.Write(@"<div id=d>
+					<span>
+  
+				</span>
+				asd
+				</div>");
+
+			var div = document.GetElementById("d");
+			
+			Assert.AreEqual(1, div.ChildElementCount);
+			Assert.AreEqual(3, div.ChildNodes.Count);
+		}
 	}
 }

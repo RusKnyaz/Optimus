@@ -134,6 +134,8 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// <summary> Returns a live DOMTokenList collection of the class attributes of the element. </summary>
 		public TokenList ClassList => _classList;
 
+		public int ChildElementCount => ChildNodes.OfType<Element>().Count();
+
 		/// <summary> Represents the element's identifier, reflecting the id global attribute. </summary>
 		public string Id
 		{
