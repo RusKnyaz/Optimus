@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -82,8 +81,9 @@ namespace Knyaz.Optimus.Dom
 
 			ReadyState = DocumentReadyStates.Loading;
 
-			Scripts = new HtmlCollection(() => GetElementsByTagName("script"));
-			Forms = new HtmlCollection(() => GetElementsByTagName("form"));
+			Scripts = new HtmlCollection(() => GetElementsByTagName(TagsNames.Script));
+			Forms = new HtmlCollection(() => GetElementsByTagName(TagsNames.Form));
+			Images = new HtmlCollection(() => GetElementsByTagName(TagsNames.Img));
 		}
 
 		public override Node AppendChild(Node node)
@@ -177,6 +177,9 @@ namespace Knyaz.Optimus.Dom
 
 		/// <summary> Returns a collection of all &lt;form&gt; elements in the document. </summary>
 		public HtmlCollection Forms { get; }
+		
+		/// <summary> Returns collection of the images in the current HTML document. </summary>
+		public HtmlCollection Images { get; }
 
 		/// <summary> Returns a collection of &lt;script&gt; elements in the document. </summary>
 		public HtmlCollection Scripts { get; }

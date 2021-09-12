@@ -395,5 +395,17 @@ namespace Knyaz.Optimus.Tests.Dom
 				domRect.Right == 8 &&
 				domRect.Bottom == 32 );
 		}
+
+		[Test]
+		public static void Images()
+		{
+			var doc = DomImplementation.Instance.CreateHtmlDocument("test");
+			var images = doc.Images;
+			Assert.AreEqual(0, images.Count, "Image count in empty doc");
+			var img = doc.CreateElement("img");
+			Assert.AreEqual(0, images.Count, "Image count after image creation");
+			doc.Body.AppendChild(img);
+			Assert.AreEqual(1, images.Count, "Image count after the image added to the document");
+		}
 	}
 }

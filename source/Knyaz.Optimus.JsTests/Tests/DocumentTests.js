@@ -290,6 +290,18 @@ Test("DocumentTests", {
             Assert.AreEqual(1, l2-l1);
         }
     },
+    "Images":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument("test");
+            var images = doc.images;
+            Assert.AreEqual(0, images.length);
+            var img = doc.createElement("img");
+            Assert.AreEqual(0, images.length);
+            doc.body.appendChild(img);
+            Assert.AreEqual(1, images.length);
+            Assert.AreEqual(img, images[0]);
+        }
+    },
     "CreateAttribute":{
         run:function(){
             var attr = document.createAttribute('lay-submit');
