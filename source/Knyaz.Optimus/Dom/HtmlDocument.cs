@@ -458,10 +458,8 @@ namespace Knyaz.Optimus.Dom
 		/// </summary>
 		public string Title { get; set; }
 
-		/// <summary>
-		/// Gets the currently focused element in the document.
-		/// </summary>
-		public object ActiveElement { get; set; }
+		/// <summary> Gets the currently focused element in the document. </summary>
+		public Element ActiveElement { get; set; }
 
 		internal CookieContainer CookieContainer { get; set; }
 
