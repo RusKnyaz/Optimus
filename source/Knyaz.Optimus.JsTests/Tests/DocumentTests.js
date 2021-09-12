@@ -291,7 +291,7 @@ Test("DocumentTests", {
         }
     },
     "Images":{
-        run:function(){
+        run:function() {
             var doc = document.implementation.createHTMLDocument("test");
             var images = doc.images;
             Assert.AreEqual(0, images.length);
@@ -301,6 +301,18 @@ Test("DocumentTests", {
             Assert.AreEqual(1, images.length);
             Assert.AreEqual(img, images[0]);
         }
+    },
+    "Links":{
+        run:function() {
+            var doc = document.implementation.createHTMLDocument('test');
+            var a = doc.createElement('a');
+            var links = doc.links;
+            console.log(links.length);
+            document.body.appendChild(a);
+            console.log(links.length);
+            a.href = '#some';
+            console.log(links.length);
+        }    
     },
     "CreateAttribute":{
         run:function(){

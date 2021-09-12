@@ -9,6 +9,8 @@
 		/// <remarks>Hyperlink</remarks>
 		public const string A = "A";
 
+		public const string Area = "AREA";
+
 		/// <summary>BASE</summary>
 		/// <remarks>Specifies the base URL/target for all relative URLs in a document</remarks>
 		public const string Base = "BASE";

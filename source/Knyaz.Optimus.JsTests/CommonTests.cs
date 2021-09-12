@@ -50,6 +50,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("ScriptsLength")]
 		[TestCase("FormsLength")]
 		[TestCase("Images")]
+		[TestCase("Links")]
 		[TestCase("CreateAttribute")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 

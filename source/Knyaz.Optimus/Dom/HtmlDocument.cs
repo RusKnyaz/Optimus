@@ -84,6 +84,9 @@ namespace Knyaz.Optimus.Dom
 			Scripts = new HtmlCollection(() => GetElementsByTagName(TagsNames.Script));
 			Forms = new HtmlCollection(() => GetElementsByTagName(TagsNames.Form));
 			Images = new HtmlCollection(() => GetElementsByTagName(TagsNames.Img));
+			Links = new HtmlCollection(() => 
+				GetElementsByTagName(TagsNames.A).Where(x => !string.IsNullOrEmpty(((HtmlAnchorElement)x).Href))
+					.Concat(GetElementsByTagName(TagsNames.Textarea).Where(x => !string.IsNullOrEmpty(((HtmlAreaElement)x).Href))));
 		}
 
 		public override Node AppendChild(Node node)
@@ -180,6 +183,11 @@ namespace Knyaz.Optimus.Dom
 		
 		/// <summary> Returns collection of the images in the current HTML document. </summary>
 		public HtmlCollection Images { get; }
+		
+		/// <summary>
+		/// Returns a collection of all &lt;area&gt; elements and &lt;a&gt; elements in a document with a value for the href attribute.
+		/// </summary>
+		public HtmlCollection Links { get; }
 
 		/// <summary> Returns a collection of &lt;script&gt; elements in the document. </summary>
 		public HtmlCollection Scripts { get; }
@@ -266,6 +274,7 @@ namespace Knyaz.Optimus.Dom
 			{
 				//todo: fill the list
 				case TagsNames.A: return new HtmlAnchorElement(this);
+				case TagsNames.Area: return new HtmlAreaElement(this);
 				case TagsNames.Br: return new HtmlBrElement(this);
 				case TagsNames.TFoot:
 				case TagsNames.THead:
