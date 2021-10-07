@@ -220,10 +220,7 @@ namespace Knyaz.Optimus.Dom
 		}
 
 		/// <summary> Same as write(), but adds a newline character after each statement </summary>
-		public void WriteLn(string text)
-		{
-			throw new NotImplementedException("Please use write instead.");
-		}
+		public void WriteLn(string text) => Write(text + System.Environment.NewLine);
 
 		/// <summary>
 		/// Fired when the initial HTML document has been completely loaded and parsed, without waiting for stylesheets, images, and subframes to finish loading.
