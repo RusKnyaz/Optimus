@@ -55,6 +55,7 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("TitleFromElement")]
 		[TestCase("SetTitle")]
 		[TestCase("UpdateTitle")]
+		[TestCase("XmlHtmlDocument")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]

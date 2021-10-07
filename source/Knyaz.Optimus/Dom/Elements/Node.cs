@@ -22,13 +22,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		private readonly EventTarget  EventTarget;
 		internal NodeSources Source;
 
-		protected Node(HtmlDocument ownerDocument = null)
+		protected Node(Document ownerDocument = null)
 		{
 			_ownerDocument = ownerDocument;
 			NodeType = _NODE;
 			EventTarget = new EventTarget(this, () => 
-					this is HtmlDocument doc ? (IEventTarget)doc.DefaultView : ParentNode?.EventTarget, 
-				() => OwnerDocument ?? this as HtmlDocument);
+					this is Document doc ? (IEventTarget)doc.DefaultView : ParentNode?.EventTarget, 
+				() => OwnerDocument ?? this as Document);
 			
 			EventTarget.BeforeEventDispatch += x => BeforeEventDispatch(x);
 			EventTarget.CallDirectEventSubscribers += x => CallDirectEventSubscribers(x);
@@ -40,9 +40,9 @@ namespace Knyaz.Optimus.Dom.Elements
 		protected virtual void CallDirectEventSubscribers(Event evt) {}
 		protected virtual void AfterEventDispatch(Event evt) {}
 
-		private HtmlDocument _ownerDocument;
+		private Document _ownerDocument;
 
-		public virtual HtmlDocument OwnerDocument
+		public virtual Document OwnerDocument
 		{
 			get { return _ownerDocument; }
 			set { }
@@ -51,14 +51,14 @@ namespace Knyaz.Optimus.Dom.Elements
 		[JsName("namespaceURI")]
 		public string NamespaceUri { get; internal set; }
 
-		internal virtual void SetOwner(HtmlDocument doc) => _ownerDocument = doc;
+		internal virtual void SetOwner(Document doc) => _ownerDocument = doc;
 
 		public virtual Node AppendChild(Node node) => throw new NotSupportedException();
 
 		protected void RegisterNode(Node node)
 		{
 			node.ParentNode = this;
-			var owner = OwnerDocument ?? this as HtmlDocument;
+			var owner = OwnerDocument ?? this as Document;
 			if (owner == null) return;
 			node.SetOwner(owner);
 			owner.HandleNodeAdded(node);
@@ -69,7 +69,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		
 		private void RaiseDomNodeInserted(Node newChild)
 		{
-			var owner = OwnerDocument ?? this as HtmlDocument;
+			var owner = OwnerDocument ?? this as Document;
 			var evt = (MutationEvent)owner.CreateEvent("MutationEvent");
 			evt.InitMutationEvent("DOMNodeInserted", true, false, newChild.ParentNode, null, null, null, 0);
 			newChild.DispatchEvent(evt);

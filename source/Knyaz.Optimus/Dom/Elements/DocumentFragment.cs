@@ -5,7 +5,7 @@
 	/// </summary>
 	public sealed class DocumentFragment : Element
 	{
-		internal DocumentFragment(HtmlDocument ownerDocument): base(ownerDocument)
+		internal DocumentFragment(Document ownerDocument): base(ownerDocument)
 			=>	NodeType = DOCUMENT_FRAGMENT_NODE;
 		
 		/// <summary>

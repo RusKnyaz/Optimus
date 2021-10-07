@@ -1,5 +1,4 @@
-﻿using Knyaz.Optimus.ScriptExecuting;
-
+﻿
 namespace Knyaz.Optimus.Dom.Elements
 {
 	/// <summary>
@@ -18,7 +17,7 @@ namespace Knyaz.Optimus.Dom.Elements
 			Value = value;
 		}
 
-		internal Attr(string name, HtmlDocument ownerDoc)
+		internal Attr(string name, Document ownerDoc)
 		{
 			_name = name;
 			Value = string.Empty;

@@ -15,12 +15,12 @@ namespace Knyaz.Optimus.Dom.Elements
 	/// Represents the element of the DOM.
 	/// https://www.w3.org/TR/2004/REC-DOM-Level-3-Core-2004040
 	/// </summary>
-	public abstract class Element : Node
+	public class Element : Node
 	{
 		private readonly TokenList _classList = null;
 		private readonly List<Node> _childNodes = new List<Node>();
 
-		internal Element(HtmlDocument ownerDocument) : base(ownerDocument)
+		internal Element(Document ownerDocument) : base(ownerDocument)
 		{
 			NodeType = ELEMENT_NODE;
 			Attributes = new AttributesCollection();
@@ -119,7 +119,7 @@ namespace Knyaz.Optimus.Dom.Elements
 		/// </summary>
 		public AttributesCollection Attributes { get; }
 
-		internal Element(HtmlDocument ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
+		internal Element(Document ownerDocument, string tagName) : this(ownerDocument) => TagName = tagName;
 
 		/// <summary> Get the tag name of an element. </summary>
 		public string TagName { get; private set; }
@@ -289,13 +289,13 @@ namespace Knyaz.Optimus.Dom.Elements
 		}
 
 		/// <summary> Returns the top-level document object for this node. </summary>
-		public override HtmlDocument OwnerDocument
+		public override Document OwnerDocument
 		{
 			get => base.OwnerDocument;
 			set	{}
 		}
 
-		internal override void SetOwner(HtmlDocument doc)
+		internal override void SetOwner(Document doc)
 		{
 			base.SetOwner(doc);
 			foreach (var attribute in Attributes)

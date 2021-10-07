@@ -10,9 +10,9 @@ namespace Knyaz.Optimus.Dom.Events
 	[JsName("UIEvent")]
 	public class UiEvent : Event
 	{
-		internal UiEvent(HtmlDocument owner) : base(owner){}
+		internal UiEvent(Document owner) : base(owner){}
 
-		internal UiEvent(HtmlDocument owner, string type, UiEventInitOptions options) :
+		internal UiEvent(Document owner, string type, UiEventInitOptions options) :
 			base(owner, type, options)
 		{
 			View = options?.View;

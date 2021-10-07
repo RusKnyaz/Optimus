@@ -33,7 +33,7 @@ namespace Knyaz.Optimus.TestingTools
 			
 			var signal = new ManualResetEventSlim(false);
 
-			var handler = (Action<HtmlDocument>)(document => signal.Set());
+			var handler = (Action<Document>)(document => signal.Set());
 
 			engine.Document.DomContentLoaded += handler;
 

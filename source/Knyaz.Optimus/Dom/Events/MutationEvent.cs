@@ -19,7 +19,7 @@ namespace Knyaz.Optimus.Dom.Events
 		public string AttrName { get; private set; }
 		public ushort AttrChange { get; private set; }
 		
-		internal MutationEvent(HtmlDocument owner) : base(owner){}
+		internal MutationEvent(Document owner) : base(owner){}
 
 		public void InitMutationEvent(string type, bool bubbles, bool cancelable, Node relatedNode,
 			string prevValue, string newValue, string attrName, ushort attrChange)

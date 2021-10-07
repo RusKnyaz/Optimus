@@ -9,7 +9,7 @@ namespace Knyaz.Optimus.Dom.Events
 	{
 		private string _modifiers;
 
-		internal KeyboardEvent(HtmlDocument owner):base(owner){}
+		internal KeyboardEvent(Document owner):base(owner){}
 
 		// KeyLocationCode
 		/*const unsigned long DOM_KEY_LOCATION_STANDARD = 0x00;

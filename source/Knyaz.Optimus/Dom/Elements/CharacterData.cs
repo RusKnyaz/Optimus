@@ -6,7 +6,7 @@
 	/// </summary>
 	public abstract class CharacterData : Node
 	{
-		internal CharacterData(HtmlDocument owner):base(owner){}
+		internal CharacterData(Document owner):base(owner){}
 
 		/// <summary>
 		/// The text of this node.
@@ -76,7 +76,7 @@
 	/// </summary>
 	public class Text : CharacterData
 	{
-		internal Text(HtmlDocument owner) : base(owner) => NodeType = TEXT_NODE;
+		internal Text(Document owner) : base(owner) => NodeType = TEXT_NODE;
 
 		public override Node CloneNode(bool deep) => new Text(OwnerDocument) { Data = Data };
 
@@ -95,7 +95,7 @@
 	/// </summary>
 	public class Comment : CharacterData
 	{
-		internal Comment(HtmlDocument owner) : base(owner) => NodeType = COMMENT_NODE;
+		internal Comment(Document owner) : base(owner) => NodeType = COMMENT_NODE;
 
 		public override Node CloneNode(bool deep) => new Comment(OwnerDocument) { Data = Data };
 

@@ -11,7 +11,7 @@ namespace Knyaz.Optimus.Dom
 	[JsName("DOMParser")]
 	public class DomParser
 	{
-		public object ParseFromString(string content, string mimeType)
+		public Document ParseFromString(string content, string mimeType)
 		{
 			if (string.IsNullOrEmpty(mimeType))
 				throw new ArgumentOutOfRangeException(nameof(mimeType));

@@ -121,7 +121,7 @@ namespace Knyaz.Optimus.Dom
 			return null;
 		}
 
-		void OnDocumentDomContentLoaded (HtmlDocument document)
+		void OnDocumentDomContentLoaded (Document document)
 		{
 			//Execute deferred scripts
 			while (_deferredScripts.Count > 0)

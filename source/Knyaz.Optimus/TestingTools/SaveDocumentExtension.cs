@@ -42,7 +42,7 @@ namespace Knyaz.Optimus.TestingTools
 			WriteCloseTag(writer, docHead.TagName);
 		}
 
-		private static void WriteStyles(TextWriter writer, HtmlDocument document)
+		private static void WriteStyles(TextWriter writer, Document document)
 		{
 			if (document.StyleSheets.SelectMany(x => x.CssRules).Any())
 			{

@@ -6,11 +6,11 @@ namespace Knyaz.Optimus.Dom.Events
 	/// <summary> Represents events that occur when user interacting with a pointing device. </summary>
 	public class MouseEvent : UiEvent
     {
-		internal MouseEvent(HtmlDocument owner) : base(owner)
+		internal MouseEvent(Document owner) : base(owner)
 		{
 		}
         
-        internal MouseEvent(HtmlDocument owner, string type, MouseEventInitOptions options) :
+        internal MouseEvent(Document owner, string type, MouseEventInitOptions options) :
             base(owner, type, options)
         {
             if (options != null)

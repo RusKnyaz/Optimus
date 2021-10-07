@@ -24,7 +24,7 @@ namespace Knyaz.Optimus.Dom
 		public HtmlDocument CreateHtmlDocument(string title = "")
 		{
 			var docType = CreateDocumentType("html", string.Empty, string.Empty);
-			var doc = CreateDocument("http://www.w3.org/1999/xhtml", "html", docType);
+			var doc = new HtmlDocument("http://www.w3.org/1999/xhtml", "html", docType, null);
 			doc.Title = title;
 			return doc;
 		}
@@ -48,7 +48,7 @@ namespace Knyaz.Optimus.Dom
 		/// <param name="namespaceURI">Is a string containing the namespace URI of the document to be created, or null if the document doesn't belong to one.</param>
 		/// <param name="qualifiedNameStr">Is a string containing the qualified name, that is an optional prefix and colon plus the local root element name, of the document to be created.</param>
 		/// <param name="documentType">Is the DocumentType of the document to be created.</param>
-		public HtmlDocument CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType = null)
+		public XmlDocument CreateDocument(string namespaceURI, string qualifiedNameStr, DocType documentType = null)
 		{
 			if(qualifiedNameStr == null)
 				throw new ArgumentNullException(nameof(qualifiedNameStr));
@@ -61,7 +61,7 @@ namespace Knyaz.Optimus.Dom
 			The XMLNS namespace is: http://www.w3.org/2000/xmlns/*/
 			
 			//todo: we have to do something with namespaceURI and qualifiedNameStr fields.
-			return new HtmlDocument(namespaceURI, qualifiedNameStr, documentType, null);
+			return new XmlDocument(namespaceURI, qualifiedNameStr, documentType, null);
 		}
 	}
 }

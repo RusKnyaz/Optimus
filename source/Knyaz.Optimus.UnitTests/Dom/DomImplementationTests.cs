@@ -16,10 +16,10 @@ namespace Knyaz.Optimus.Tests.Dom
 
 	    [Test]
 	    public void CreateDocumentHtml() =>
-		    DomImplementation.Instance.CreateDocument("http://www.w3.org/1999/xhtml","html").Assert(doc => doc.DocumentElement.TagName == "HTML");
+		    DomImplementation.Instance.CreateDocument("http://www.w3.org/1999/xhtml","html").Assert(doc => doc.DocumentElement.TagName == "html");
 	    
 	    [Test]
 	    public void CreateDocumentSvg() => 
-		    DomImplementation.Instance.CreateDocument("http://www.w3.org/2000/svg","svg").Assert(doc => doc.DocumentElement.TagName == "SVG");
+		    DomImplementation.Instance.CreateDocument("http://www.w3.org/2000/svg","svg").Assert(doc => doc.DocumentElement.TagName == "svg");
     }
 }

@@ -349,5 +349,13 @@ Test("DocumentTests", {
             doc.title = "world";
             Assert.AreEqual("world", title.textContent);
         }
+    },
+    "XmlHtmlDocument":{
+        run: function(){
+            Assert.AreEqual("[object HTMLDocument]", HTMLDocument.prototype.toString());
+            Assert.AreEqual("[object Document]", Object.getPrototypeOf(HTMLDocument.prototype).toString());
+            Assert.AreEqual("[object XMLDocument]", XMLDocument.prototype.toString());
+            Assert.AreEqual("[object Document]", Object.getPrototypeOf(XMLDocument.prototype).toString());
+        }
     }
 });
