@@ -127,6 +127,12 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("AddEventListenerTwice")]
 		[TestCase("AddEventListenerTwiceAndRemove")]
 		public void EventTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
+		
+		[TestCase("DomParserType")]
+		[TestCase("DomParserConstructor")]
+		[TestCase("DomParserWindowConstructor")]
+		[TestCase("ParseHtml")]
+		public void DomParserTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("SetItem")]
 		[TestCase("SetItemTwice")]

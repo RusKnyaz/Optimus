@@ -286,5 +286,8 @@ namespace Knyaz.Optimus.Environment
 		[JsCtor("MouseEvent")]
 		public MouseEvent NewMouseEvent(string eventType, MouseEventInitOptions options = null) =>
 			new MouseEvent(Document, eventType, options);
+
+		[JsCtor("DOMParser")]
+		public DomParser DomParser() => new DomParser();
 	}
 }
