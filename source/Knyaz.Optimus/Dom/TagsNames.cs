@@ -125,6 +125,8 @@
 		/// <summary>THEAD</summary>
 		/// <remarks>Table header.</remarks>
 		public const string THead = "THEAD";
+
+		public const string Title = "TITLE";
 		
 		/// <summary>TR</summary>
 		/// <remarks>Table row.</remarks>

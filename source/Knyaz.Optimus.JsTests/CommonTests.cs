@@ -52,6 +52,9 @@ namespace Knyaz.Optimus.Tests.JsTests
 		[TestCase("Images")]
 		[TestCase("Links")]
 		[TestCase("CreateAttribute")]
+		[TestCase("TitleFromElement")]
+		[TestCase("SetTitle")]
+		[TestCase("UpdateTitle")]
 		public void DocumentTests(string testName) => JsTestsRunner.Run(_jsEngine, testName);
 
 		[TestCase("CommentRemove")]

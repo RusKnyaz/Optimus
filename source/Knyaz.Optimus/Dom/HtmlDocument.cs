@@ -311,6 +311,7 @@ namespace Knyaz.Optimus.Dom
 				case TagsNames.Head:return new Head(this);
 				case TagsNames.Body:return new HtmlBodyElement(this);
 				case TagsNames.Textarea: return new HtmlTextAreaElement(this);
+				case TagsNames.Title: return new HtmlTitleElement(this);
 				case TagsNames.Form:return new HtmlFormElement(this);
 				case TagsNames.IFrame:return new HtmlIFrameElement(this);
 				case TagsNames.Html:return new HtmlHtmlElement(this);
@@ -465,10 +466,28 @@ namespace Knyaz.Optimus.Dom
 
 		public string CompatMode => ChildNodes.OfType<DocType>().Any() ? "CSS1Compat" : "BackCompat";
 
+		
+		private HtmlTitleElement GetTitleElement() => (HtmlTitleElement)GetElementsByTagName(TagsNames.Title).FirstOrDefault();
+		
 		/// <summary>
 		/// Sets or gets the title of the document.
 		/// </summary>
-		public string Title { get; set; }
+		public string Title
+		{
+			get => GetTitleElement()?.TextContent ?? string.Empty;
+			set
+			{
+				var elt = GetTitleElement();
+				if (elt == null && !string.IsNullOrEmpty(value))
+				{
+					elt = (HtmlTitleElement)CreateElement("title");
+					Head.AppendChild(elt);
+				}
+
+				if(elt != null)
+					elt.TextContent = value;
+			}
+		}
 
 		/// <summary> Gets the currently focused element in the document. </summary>
 		public Element ActiveElement { get; set; }

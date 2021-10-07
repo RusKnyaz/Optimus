@@ -320,5 +320,34 @@ Test("DocumentTests", {
             Assert.AreEqual("lay-submit", attr.name);
             Assert.AreEqual('', attr.value);
         }
+    },
+    "TitleFromElement":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            var title = doc.createElement('title');
+            title.textContent = "Hello";
+            doc.head.appendChild(title);
+            Assert.AreEqual("Hello", doc.title);
+        }
+    },
+    "SetTitle": {
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            doc.title = "Hello"
+            Assert.AreEqual("Hello", doc.title);
+            var title = doc.getElementsByTagName("title")[0];
+            Assert.AreEqual("Hello", title.textContent); 
+        }
+    },
+    "UpdateTitle":{
+        run:function(){
+            var doc = document.implementation.createHTMLDocument();
+            var title = doc.createElement('title');
+            title.textContent = "Hello";
+            doc.head.appendChild(title);
+            Assert.AreEqual("Hello", doc.title);
+            doc.title = "world";
+            Assert.AreEqual("world", title.textContent);
+        }
     }
 });
