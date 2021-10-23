@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Knyaz.Optimus.Environment;
 
 namespace Knyaz.Optimus.ResourceProviders
 {
@@ -16,17 +17,36 @@ namespace Knyaz.Optimus.ResourceProviders
 		{
 			var uri = request.Url;
 
-			var fielInfo = new FileInfo(uri.AbsolutePath);
+			var fileInfo = new FileInfo(uri.AbsolutePath);
 
-			using (var stream = fielInfo.OpenRead())
-			using(var reader = new StreamReader(stream))
+			var inferredMimeTYpe = GetMimeTypeByExt(fileInfo.Extension);
+			
+			var response = new FileResponse(inferredMimeTYpe, fileInfo.OpenRead());
+			
+			//todo: try to get mime type from the request header first.
+			
+			return Task.Run(() => (IResource)response);
+		}
+
+		private string GetMimeTypeByExt(string ext)
+		{
+			switch (ext.ToUpperInvariant())
 			{
-				/*return reader.ReadToEndAsync().ContinueWith(task => 
-					new FileResponse(ResourceTypes.Html /*todo: extract from extension#1#, new MemoryStream(Encoding.UTF8.GetBytes(task.Result))));*/
-
-				var data = reader.ReadToEnd();
-				IResource response = new FileResponse(ResourceTypes.Html /*todo: extract from extension*/, new MemoryStream(Encoding.UTF8.GetBytes(data)));
-				return Task.Run(() => response);
+				case ".BMP":
+					return ResourceTypes.Bmp;
+				case ".PNG":
+					return ResourceTypes.Png;
+				case ".JPG":
+					return ResourceTypes.Jpg;
+				case ".HTM":
+				case ".HTML":
+					return ResourceTypes.Html;
+				case ".CSS":
+					return ResourceTypes.Css;
+				case ".JS":
+					return ResourceTypes.JavaScript;
+				default:
+					return ResourceTypes.Html;
 			}
 		}
 	}
