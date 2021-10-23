@@ -3,7 +3,7 @@
 
     <!-- References -->
     <PropertyGroup>
-        <VersionPrefix>3.0.0</VersionPrefix>
+        <VersionPrefix>3.0.1</VersionPrefix>
         <Copyright>Konstantin Petukhov, $([System.DateTime]::Now.Year)</Copyright>
         <Authors>Konstantin Petukhov</Authors>
         <Company>Knyaz</Company>
