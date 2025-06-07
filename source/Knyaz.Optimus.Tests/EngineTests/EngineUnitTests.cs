@@ -108,7 +108,19 @@ namespace Knyaz.Optimus.Tests.EngineTests
 			Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Count);
 		}
 
-		[Test]
+        [Test]
+        public async Task LoadPageAsync()
+        {
+            var resourceProvider = Mocks.ResourceProvider(
+                "http://localhost", "<html><body><div id='c'></div></body></html>");
+
+            var engine = Builder(resourceProvider).Build();
+            await engine.OpenUrl("http://localhost");
+            await engine.WaitIdAsync("c");
+            Assert.AreEqual(1, engine.Document.Body.GetElementsByTagName("div").Count);
+        }
+
+        [Test]
 		public async Task NonJsScript()
 		{
 			var resources = Mocks.ResourceProvider("http://localhost",

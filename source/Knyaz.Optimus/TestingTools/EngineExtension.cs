@@ -268,12 +268,7 @@ namespace Knyaz.Optimus.TestingTools
 		{
 			((Navigator) engine.Window.Navigator).UserAgent = userAgent;
 			return engine;
-		}
-		
-		public static async Task<IResource> DownloadAsync(this Engine engine, string href) =>
-			(await engine.ResourceProvider.SendRequestAsync(new Request("GET", new Uri(href)) {
-				Cookies = engine.CookieContainer
-			}));
+		}		
 	}
 
 	public enum KnownUserAgents
