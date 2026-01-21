@@ -37,7 +37,7 @@
     <PackageReference Include="NBench" Version="1.0.4" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.3" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Knyaz.Optimus.Scripting.Jurassic\Knyaz.Optimus.Scripting.Jurassic.csproj" />
